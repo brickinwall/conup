@@ -16,9 +16,10 @@ public class LaunchCommunication {
 		System.out.println("Starting communication node ....");
 		
 		CompositeGenerator compositeGenerator = 
-				new CompositeGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services.VcServiceImpl", businessCompositeLocation);
+				new CompositeGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services." + componentName + "VcServiceImpl", businessCompositeLocation);
 		compositeGenerator.generate();
-		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services.VcServiceImpl");
+//		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services.VcServiceImpl");
+		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, compositeGenerator);
 		vcServiceGenerator.generate();
 		
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
