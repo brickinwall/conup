@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
@@ -17,23 +18,30 @@ import cn.edu.nju.moon.conup.communication.services.FreenessService;
 import cn.edu.nju.moon.conup.communication.services.OndemandService;
 import cn.edu.nju.moon.conup.data.InArcRegistryImpl;
 import cn.edu.nju.moon.conup.def.Arc;
-import cn.edu.nju.moon.conup.domain.generator.DomainConfig;
-import cn.edu.nju.moon.conup.domain.generator.DomainConfigImpl;
 
 public class VcServiceGeneratorImpl implements VcServiceGenerator {
 	private static String CLASS_NAME = "VcServiceImpl";
-	private static String CLASS_FILE = CLASS_NAME + ".java";
+	private static String CLASS_FILE = null;
 	private String componentName;
-	private String qualifier;
+//	private String qualifier;
 	private String fileDir;
 	private String fileLocation;
+	private CompositeGeneratorImpl compositeGenerator;
 
-	public VcServiceGeneratorImpl(String componentName, String qualifier) {
+//	public VcServiceGeneratorImpl(String componentName, String qualifier) {
+//		super();
+//		this.componentName = componentName;
+//		this.qualifier = qualifier;
+//		this.CLASS_FILE = componentName + this.CLASS_NAME + ".java";
+//	}
+
+	public VcServiceGeneratorImpl(String componentName, CompositeGenerator compositeGenerator) {
 		super();
 		this.componentName = componentName;
-		this.qualifier = qualifier;
+		this.compositeGenerator = (CompositeGeneratorImpl) compositeGenerator;
+		this.CLASS_FILE = componentName + this.CLASS_NAME + ".java";
 	}
-
+	
 	@Override
 	public boolean generate() {
 		createJavaFile();
@@ -55,7 +63,7 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 				+ "services" + File.separator;
 //		String fileDir = baseUri + File.separator + "target" + File.separator
 //				+ "classes" + File.separator;
-		fileLocation = fileDir + CLASS_FILE;
+		fileLocation = fileDir +CLASS_FILE;
 		File vcFile = new File(fileLocation);
 		if (vcFile.exists()) {
 			vcFile.delete();
@@ -93,11 +101,14 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 			while ((tempString = reader.readLine()) != null) {
 //				System.out.println("line " + line + ": " + tempString);
 				if (tempString.contains("public class VcServiceImplTemplate implements ArcService, FreenessService, OndemandService,ComponentUpdateService {")) {
-					tempString = tempString.replace("VcServiceImplTemplate", "VcServiceImpl");
+					tempString = tempString.replace("VcServiceImplTemplate", componentName + "VcServiceImpl");
 					newJavaContent.append(tempString + "\n");
 					newJavaContent.append(addReferences());
 				}else if(tempString.contains("VcServiceImplTemplate")){
-					tempString = tempString.replace("VcServiceImplTemplate", "VcServiceImpl");
+					tempString = tempString.replace("VcServiceImplTemplate", componentName + "VcServiceImpl");
+					newJavaContent.append(tempString + "\n");
+				}else if(tempString.contains("VcServiceImpl")){
+					tempString = tempString.replace("VcServiceImpl", componentName + "VcServiceImpl");
 					newJavaContent.append(tempString + "\n");
 				}else{
 					newJavaContent.append(tempString + "\n");
@@ -119,30 +130,42 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 	}
 
 	private String addReferences() {
-
-		DomainConfig domainConfigTool = new DomainConfigImpl();
-		List<String> destNodes = domainConfigTool.getDestNodes(componentName);
-		if(destNodes == null){
-			return null;
-		}
-		Iterator destIterator = destNodes.iterator();
-		
 		StringBuffer addedContent = new StringBuffer();
-
-		while (destIterator.hasNext()) {
-			String componentName = (String) destIterator.next();
+		Map<String, String> targetComponents = compositeGenerator.getTargetComponentsInfo();
+		Iterator iterator = targetComponents.keySet().iterator();
+		while(iterator.hasNext()){
+			String componentName = (String) iterator.next();
 			componentName = componentName.substring(0, 1).toLowerCase()
 					+ componentName.substring(1);
-//			System.out.println(componentName);
 			addedContent.append("\tprivate OndemandService " + componentName
 					+ "OndemandService;\n");
 			addedContent.append("\tprivate ArcService " + componentName + "ArcService;\n");
+			
 		}
+		
+//		DomainConfig domainConfigTool = new DomainConfigImpl();
+//		List<String> destNodes = domainConfigTool.getDestNodes(componentName);
+//		if(destNodes == null){
+//			return null;
+//		}
+//		Iterator destIterator = destNodes.iterator();
+//		
+////		StringBuffer addedContent = new StringBuffer();
+//
+//		while (destIterator.hasNext()) {
+//			String componentName = (String) destIterator.next();
+//			componentName = componentName.substring(0, 1).toLowerCase()
+//					+ componentName.substring(1);
+////			System.out.println(componentName);
+//			addedContent.append("\tprivate OndemandService " + componentName
+//					+ "OndemandService;\n");
+//			addedContent.append("\tprivate ArcService " + componentName + "ArcService;\n");
+//		}
 		addedContent.append("\n");
-		destIterator = destNodes.iterator();
+		iterator = targetComponents.keySet().iterator();
 		// generate getter setter method
-		while (destIterator.hasNext()) {
-			String componentName = (String) destIterator.next();
+		while (iterator.hasNext()) {
+			String componentName = (String) iterator.next();
 			//if the field's second char is Upper case, the getter and setter method name = get/set + field name
 			if(Character.isUpperCase(componentName.charAt(1))){
 				String lowCaseComponentName = componentName.substring(0, 1).toLowerCase() + componentName.substring(1);

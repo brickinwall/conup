@@ -25,15 +25,16 @@ import cn.edu.nju.moon.conup.communication.convention.CompositeConvention;
  * 
  * */
 public class CompositeGeneratorImpl implements CompositeGenerator {
-	private String namePrefix = null;
+	private String businessCompositeLocation = null;
+	private String commComponentName = null;
+	private String compositeLocation = null;
 	private String compositeName = null;
 	private String compositeUri = null;
-	private String compositeLocation = null;
-	private String commComponentName = null;
-	private String serviceImpl = null;
-	private String businessCompositeLocation = null;
 	private String ip = null;
+	private String namePrefix = null;
 	private int port ;
+	private String serviceImpl = null;
+	private Map<String, String> targetComponentsInfo = null;
 //	private static int base = 9091;
 
 	/**
@@ -53,50 +54,6 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 				+ CompositeConvention.CompositeExtension;
 	}
 
-	
-	/**
-	 * get target component's binding uri info
-	 * @return
-	 */
-	private Map<String,String> getBuisnessRefInfo(){
-		
-		Map<String, String> refs = new ConcurrentHashMap<String, String>();
-		try {
-			SAXBuilder sb = new SAXBuilder();
-			Document doc = sb.build(businessCompositeLocation);
-			Element root = doc.getRootElement();
-			Namespace ns = Namespace.getNamespace("http://docs.oasis-open.org/ns/opencsa/sca/200912");
-			Element component = root.getChild("component", ns);
-			List references = component.getChildren("reference", ns);
-			Iterator iterator = references.iterator();
-			while (iterator.hasNext()) {
-				Element reference = (Element) iterator.next();
-				List binding = reference.getChildren();
-				Iterator bindingIterator = binding.iterator();
-				String bindingUri = null;
-				while (bindingIterator.hasNext()) {
-					Element specificBinding = (Element) bindingIterator.next();
-					bindingUri = specificBinding.getAttributeValue("uri");
-					break;
-				}
-				String ipAndPort = processBindingUri(bindingUri);
-				String targetComponent = getTargetFromBinding(bindingUri);
-				refs.put(targetComponent, ipAndPort);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return refs;
-	}
-
-	private String getTargetFromBinding(String bindingUri) {
-		int lastIndex = bindingUri.lastIndexOf("/");
-		String subStr = bindingUri.substring(0, lastIndex);
-		lastIndex = subStr.lastIndexOf("/");
-		String targetComponentName = subStr.substring(lastIndex + 1, subStr.length());
-		return targetComponentName;
-	}
 
 	private String addReferences() {
 		Map<String, String> buisnessReferenceInfo = getBuisnessRefInfo();
@@ -127,43 +84,20 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 		
 		return addedContent.toString();
 	}
+
 	
-//	private String getIpAndPort(String componentName, String serviceName){
-//		String baseUri = new File("").getAbsolutePath();
-//		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
-//				+ File.separator + "vc-communication";
-//		compositeLocation = baseUri + File.separator + "target" + File.separator
-//				+ "classes" + File.separator;
-//		compositeUri = compositeLocation + componentName + CompositeConvention.Component_Name_Suffix
-//				+ CompositeConvention.CompositeExtension;
-//		try {
-//			SAXBuilder sb = new SAXBuilder();
-//			Document doc = sb.build(compositeUri);
-//			Element root = doc.getRootElement();
-//			Namespace ns = Namespace.getNamespace("http://docs.oasis-open.org/ns/opencsa/sca/200912");
-//			Element component = root.getChild("component", ns);
-//			List services = component.getChildren("service", ns);
-//			Iterator iterator = services.iterator();
-//			while (iterator.hasNext()) {
-//				Element service = (Element) iterator.next();
-//				String name = service.getAttributeValue("name");
-//				if(name.equals(serviceName)){
-//					List binding = service.getChildren();
-//					Iterator bindingIterator = binding.iterator();
-//					while (bindingIterator.hasNext()) {
-//						Element specificBinding = (Element) bindingIterator.next();
-//						String bindingUri = specificBinding.getAttributeValue("uri");
-//						return bindingUri;
-//					}
-//					
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-	
+	/* delete all .composite files in the given directory. */
+	private void deleteCompositeFiles(String dir) {
+		File[] files = new File(dir).listFiles();
+		for (File file : files) {
+			if (!file.isDirectory()
+					&& file.getName().toLowerCase()
+							.contains(CompositeConvention.CompositeExtension)) {
+				file.delete();
+			}
+		}
+	}
+
 	/**
 	 * generate composite file
 	 * 
@@ -246,33 +180,26 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 		return compositeUri;
 	}
 
-	/* delete all .composite files in the given directory. */
-	private void deleteCompositeFiles(String dir) {
-		File[] files = new File(dir).listFiles();
-		for (File file : files) {
-			if (!file.isDirectory()
-					&& file.getName().toLowerCase()
-							.contains(CompositeConvention.CompositeExtension)) {
-				file.delete();
-			}
-		}
-	}
-
-	
-	private void setCommIpAndPort(){
+	/**
+	 * get target component's binding uri info
+	 * @return
+	 */
+	private Map<String,String> getBuisnessRefInfo(){
+		
+//		Map<String, String> refs = new ConcurrentHashMap<String, String>();
+		
+		targetComponentsInfo = new ConcurrentHashMap<String, String>();
 		try {
 			SAXBuilder sb = new SAXBuilder();
 			Document doc = sb.build(businessCompositeLocation);
 			Element root = doc.getRootElement();
 			Namespace ns = Namespace.getNamespace("http://docs.oasis-open.org/ns/opencsa/sca/200912");
 			Element component = root.getChild("component", ns);
-			List services = component.getChildren("service", ns);
-			Iterator iterator = services.iterator();
+			List references = component.getChildren("reference", ns);
+			Iterator iterator = references.iterator();
 			while (iterator.hasNext()) {
-				Element service = (Element) iterator.next();
-				// String name = service.getAttributeValue("name");
-				// if(name.equals(serviceName)){
-				List binding = service.getChildren();
+				Element reference = (Element) iterator.next();
+				List binding = reference.getChildren();
 				Iterator bindingIterator = binding.iterator();
 				String bindingUri = null;
 				while (bindingIterator.hasNext()) {
@@ -281,15 +208,70 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 					break;
 				}
 				String ipAndPort = processBindingUri(bindingUri);
-				String[] tmp = ipAndPort.split(":");
-				this.ip = tmp[0];
-				this.port = Integer.parseInt(tmp[1]) + 1000;
-				break;
+				String targetComponent = getTargetFromBinding(bindingUri);
+//				refs.put(targetComponent, ipAndPort);
+				targetComponentsInfo.put(targetComponent, ipAndPort);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
+//		return refs;
+		return targetComponentsInfo;
+	}
+	
+//	private String getIpAndPort(String componentName, String serviceName){
+//		String baseUri = new File("").getAbsolutePath();
+//		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
+//				+ File.separator + "vc-communication";
+//		compositeLocation = baseUri + File.separator + "target" + File.separator
+//				+ "classes" + File.separator;
+//		compositeUri = compositeLocation + componentName + CompositeConvention.Component_Name_Suffix
+//				+ CompositeConvention.CompositeExtension;
+//		try {
+//			SAXBuilder sb = new SAXBuilder();
+//			Document doc = sb.build(compositeUri);
+//			Element root = doc.getRootElement();
+//			Namespace ns = Namespace.getNamespace("http://docs.oasis-open.org/ns/opencsa/sca/200912");
+//			Element component = root.getChild("component", ns);
+//			List services = component.getChildren("service", ns);
+//			Iterator iterator = services.iterator();
+//			while (iterator.hasNext()) {
+//				Element service = (Element) iterator.next();
+//				String name = service.getAttributeValue("name");
+//				if(name.equals(serviceName)){
+//					List binding = service.getChildren();
+//					Iterator bindingIterator = binding.iterator();
+//					while (bindingIterator.hasNext()) {
+//						Element specificBinding = (Element) bindingIterator.next();
+//						String bindingUri = specificBinding.getAttributeValue("uri");
+//						return bindingUri;
+//					}
+//					
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
+	
+	@Override
+	public String getCompositeName() {
+		return compositeName;
+	}
+
+	public Map<String, String> getTargetComponentsInfo() {
+		return targetComponentsInfo;
+	}
+
+	
+	private String getTargetFromBinding(String bindingUri) {
+		int lastIndex = bindingUri.lastIndexOf("/");
+		String subStr = bindingUri.substring(0, lastIndex);
+		lastIndex = subStr.lastIndexOf("/");
+		String targetComponentName = subStr.substring(lastIndex + 1, subStr.length());
+		return targetComponentName;
 	}
 	
 	private String processBindingUri(String bindingUri){
@@ -369,9 +351,37 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 //		return port;
 //	}
 
-	@Override
-	public String getCompositeName() {
-		return compositeName;
+	private void setCommIpAndPort(){
+		try {
+			SAXBuilder sb = new SAXBuilder();
+			Document doc = sb.build(businessCompositeLocation);
+			Element root = doc.getRootElement();
+			Namespace ns = Namespace.getNamespace("http://docs.oasis-open.org/ns/opencsa/sca/200912");
+			Element component = root.getChild("component", ns);
+			List services = component.getChildren("service", ns);
+			Iterator iterator = services.iterator();
+			while (iterator.hasNext()) {
+				Element service = (Element) iterator.next();
+				// String name = service.getAttributeValue("name");
+				// if(name.equals(serviceName)){
+				List binding = service.getChildren();
+				Iterator bindingIterator = binding.iterator();
+				String bindingUri = null;
+				while (bindingIterator.hasNext()) {
+					Element specificBinding = (Element) bindingIterator.next();
+					bindingUri = specificBinding.getAttributeValue("uri");
+					break;
+				}
+				String ipAndPort = processBindingUri(bindingUri);
+				String[] tmp = ipAndPort.split(":");
+				this.ip = tmp[0];
+				this.port = Integer.parseInt(tmp[1]) + 1000;
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 
