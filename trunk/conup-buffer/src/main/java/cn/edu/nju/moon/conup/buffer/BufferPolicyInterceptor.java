@@ -125,9 +125,9 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")) {
 		// just pass the msg to another interceptor
-			LOGGER.info("In BufferPolicyInterceptor print thread id " + getThreadID() +
-					"\n\tWe current in: " + phase +
-					"\n\tpass msg down...");
+//			LOGGER.info("In BufferPolicyInterceptor print thread id " + getThreadID() +
+//					"\n\tWe current in: " + phase +
+//					"\n\tpass msg down...");
 //			System.out.println("IF: we current in " + phase);
 //			System.out.println("In BufferPolicyInterceptor print thread id " + getThreadID());
 //			System.out.println("BufferPolicyInterceptor: " + this);
