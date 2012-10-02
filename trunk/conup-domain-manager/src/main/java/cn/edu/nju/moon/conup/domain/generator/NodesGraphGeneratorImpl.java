@@ -32,7 +32,7 @@ public class NodesGraphGeneratorImpl implements NodesGraphGenerator {
 
 	private static String XML_Declaration = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
-	public NodesGraphGeneratorImpl() {
+	private NodesGraphGeneratorImpl() {
 		String graphName = "graph.xml";
 		String baseUri = new File("").getAbsolutePath();
 		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
@@ -45,6 +45,9 @@ public class NodesGraphGeneratorImpl implements NodesGraphGenerator {
 	
 	@Override
 	public boolean addNode(String componentName, String bindingIpAndPort) {
+		if(!isExist())
+			return false;
+		
 		try {
 			SAXBuilder sb = new SAXBuilder();
 			Document doc = sb.build(graphUri);
@@ -79,6 +82,9 @@ public class NodesGraphGeneratorImpl implements NodesGraphGenerator {
 
 	@Override
 	public boolean addEdge(String srcComponent, String destComponent) {
+		if(!isExist())
+			return false;
+		
 		SAXBuilder sb = new SAXBuilder();
 		Document doc;
 		try {

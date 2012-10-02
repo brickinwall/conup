@@ -1,10 +1,9 @@
 package cn.edu.nju.moon.conup.domain.services;
 
 import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.tuscany.sca.Node;
@@ -23,8 +22,7 @@ import cn.edu.nju.moon.conup.domain.launcher.LaunchDomainManager;
 
 
 @Service({FreenessService.class, TransactionIDService.class, StaticConfigService.class, DomainComponentUpdateService.class })
-public class DomainManagerServiceImpl implements 
-	FreenessService, TransactionIDService, StaticConfigService, DomainComponentUpdateService{
+public class DomainManagerServiceImpl implements FreenessService, TransactionIDService, StaticConfigService, DomainComponentUpdateService{
 	private static String graphPath = NodesGraphGeneratorImpl.getInstance().getGraphUri();
 	public String createID() {
 		String result = null;
@@ -67,37 +65,37 @@ public class DomainManagerServiceImpl implements
 		Set<String> result = new HashSet<String>();
 		
 		
-		//FOR TEST
-		if(target.equals("AuthComponent")){
-			result.add("ProcComponent");
-			result.add("PortalComponent");
-		} else if(target.equals("ProcComponent")){
-			result.add("PortalComponent");
-		} else if(target.equals("PortalComponent")){
-			
-		}		
-		return result;
+//		//FOR TEST
+//		if(target.equals("AuthComponent")){
+//			result.add("ProcComponent");
+//			result.add("PortalComponent");
+//		} else if(target.equals("ProcComponent")){
+//			result.add("PortalComponent");
+//		} else if(target.equals("PortalComponent")){
+//			
+//		}		
+//		return result;
 		
-//		Set<String> parentComponents = new HashSet<String>();
-//		try {
-//			SAXBuilder sb = new SAXBuilder();
-//			Document doc = sb.build(graphPath);
-//			Element root = doc.getRootElement();
-//			Element edges = root.getChild("edges");
-//			List nodeList = edges.getChildren("edge");
-//			Iterator iterator = nodeList.iterator();
-//			while (iterator.hasNext()) {
-//				Element element = (Element) iterator.next();
-//				String destComponent = element.getAttributeValue("dest");
-//				if(destComponent.equals(target)){
-//					parentComponents.add(element.getAttributeValue("src"));
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		return parentComponents;
+		Set<String> parentComponents = new HashSet<String>();
+		try {
+			SAXBuilder sb = new SAXBuilder();
+			Document doc = sb.build(graphPath);
+			Element root = doc.getRootElement();
+			Element edges = root.getChild("edges");
+			List nodeList = edges.getChildren("edge");
+			Iterator iterator = nodeList.iterator();
+			while (iterator.hasNext()) {
+				Element element = (Element) iterator.next();
+				String destComponent = element.getAttributeValue("dest");
+				if(destComponent.equals(target)){
+					parentComponents.add(element.getAttributeValue("src"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return parentComponents;
 	}
 
 	@Override
@@ -105,38 +103,38 @@ public class DomainManagerServiceImpl implements
 		Set<String> result = new HashSet<String>();
 		
 		
-		//FOR TEST
-		if (target.equals("AuthComponent")) {
-			
-		} else if (target.equals("ProcComponent")) {
-			result.add("AuthComponent");
-		} else if (target.equals("PortalComponent")) {
-			result.add("AuthComponent");
-			result.add("ProcComponent");
-		}
-		
-		return result;
-		
-//		Set<String> subComponents = new HashSet<String>();
-//		try {
-//			SAXBuilder sb = new SAXBuilder();
-//			Document doc = sb.build(graphPath);
-//			Element root = doc.getRootElement();
-//			Element edges = root.getChild("edges");
-//			List nodeList = edges.getChildren("edge");
-//			Iterator iterator = nodeList.iterator();
-//			while (iterator.hasNext()) {
-//				Element element = (Element) iterator.next();
-//				String srcComponent = element.getAttributeValue("src");
-//				if(srcComponent.equals(target)){
-//					subComponents.add(element.getAttributeValue("dest"));
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
+//		//FOR TEST
+//		if (target.equals("AuthComponent")) {
+//			
+//		} else if (target.equals("ProcComponent")) {
+//			result.add("AuthComponent");
+//		} else if (target.equals("PortalComponent")) {
+//			result.add("AuthComponent");
+//			result.add("ProcComponent");
 //		}
 //		
-//		return subComponents;
+//		return result;
+		
+		Set<String> subComponents = new HashSet<String>();
+		try {
+			SAXBuilder sb = new SAXBuilder();
+			Document doc = sb.build(graphPath);
+			Element root = doc.getRootElement();
+			Element edges = root.getChild("edges");
+			List nodeList = edges.getChildren("edge");
+			Iterator iterator = nodeList.iterator();
+			while (iterator.hasNext()) {
+				Element element = (Element) iterator.next();
+				String srcComponent = element.getAttributeValue("src");
+				if(srcComponent.equals(target)){
+					subComponents.add(element.getAttributeValue("dest"));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return subComponents;
 	}
 
 	@Override
@@ -186,6 +184,44 @@ public class DomainManagerServiceImpl implements
 	public boolean update() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void createGraph() {
+		NodesGraphGeneratorImpl nodesGraphGenerator = NodesGraphGeneratorImpl.getInstance();
+		if(!nodesGraphGenerator.isExist())
+			nodesGraphGenerator.createGraph();
+	}
+
+	@Override
+	public boolean addNodes(Map<String, String> nodesInfo) {
+		NodesGraphGeneratorImpl nodesGraphGenerator = NodesGraphGeneratorImpl.getInstance();
+		Iterator iterator = nodesInfo.entrySet().iterator();
+		while(iterator.hasNext()){
+			Map.Entry entry = (Map.Entry) iterator.next(); 
+			String componentName = (String) entry.getKey();
+			String ipAndPortInfo = (String) entry.getValue();
+			nodesGraphGenerator.addNode(componentName, ipAndPortInfo);
+		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean addEdges(Map<String, Set<String>> edgesInfo) {
+		NodesGraphGeneratorImpl nodesGraphGenerator = NodesGraphGeneratorImpl.getInstance();
+		Iterator iterator = edgesInfo.entrySet().iterator();
+		while(iterator.hasNext()){
+			Map.Entry entry = (Map.Entry) iterator.next(); 
+			String srcComponent = (String) entry.getKey();
+			Set<String> destComponents = (Set<String>) entry.getValue();
+			Iterator destIterator = destComponents.iterator();
+			while(destIterator.hasNext()){
+				String destComponent = (String) destIterator.next();
+				nodesGraphGenerator.addEdge(srcComponent, destComponent);
+			}
+		}
+		return true;
 	}
 
 //	@Override
