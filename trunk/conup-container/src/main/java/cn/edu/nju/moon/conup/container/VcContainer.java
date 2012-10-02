@@ -4,6 +4,8 @@ import org.apache.tuscany.sca.Node;
 
 import cn.edu.nju.moon.conup.algorithm.VcAlgorithm;
 import cn.edu.nju.moon.conup.algorithm.VcAlgorithmImpl;
+import cn.edu.nju.moon.conup.communication.generator.CompositeAnalyzer;
+import cn.edu.nju.moon.conup.communication.generator.CompositeAnalyzerImpl;
 import cn.edu.nju.moon.conup.communication.launcher.LaunchCommunication;
 import cn.edu.nju.moon.conup.data.ArcRegistry;
 import cn.edu.nju.moon.conup.data.InArcRegistryImpl;
@@ -14,8 +16,6 @@ import cn.edu.nju.moon.conup.data.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.def.ComponentStatus;
 import cn.edu.nju.moon.conup.def.InterceptorCache;
 import cn.edu.nju.moon.conup.def.InterceptorCacheImpl;
-import cn.edu.nju.moon.conup.domain.generator.CompositeAnalyzer;
-import cn.edu.nju.moon.conup.domain.generator.CompositeAnalyzerImpl;
 import cn.edu.nju.moon.conup.listener.ComponentListener;
 import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
 
