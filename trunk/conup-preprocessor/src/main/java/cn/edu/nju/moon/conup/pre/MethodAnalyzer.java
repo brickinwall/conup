@@ -216,12 +216,12 @@ public class MethodAnalyzer {
 						
 						
 						trigstart.add(new VarInsnNode(ALOAD, localNum));
-						trigstart.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/vc/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/vc/pre/DynamicDependency;"));									
+						trigstart.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 //						trigstart.add(new VarInsnNode(ALOAD, 0));
 //						trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 						trigstart.add(new VarInsnNode(ALOAD, localNum));
 						trigstart.add(new LdcInsnNode("Start"));						
-						trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/vc/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
+						trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 						
 						insns.insert(insns.getFirst(),trigstart);
 					    Iterator<AbstractInsnNode> i = insns.iterator();
@@ -234,12 +234,12 @@ public class MethodAnalyzer {
 								if (ejbinf.containsKey(i1)) {
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
-							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/vc/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/vc/pre/DynamicDependency;"));									
+							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 			//						trig.add(new VarInsnNode(ALOAD, 0));
 			//						trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 							        trig.add(new VarInsnNode(ALOAD, localNum));
 									trig.add(new LdcInsnNode(ejbinf.get(i1)));
-									trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/vc/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
+									trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 									
 									int op=i1.getNext().getOpcode();
 									if (op == ISTORE||op == LSTORE||op == FSTORE||op == DSTORE||op == ASTORE) {
@@ -253,12 +253,12 @@ public class MethodAnalyzer {
 								if (jumpinf.containsKey(i1)) {
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
-							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/vc/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/vc/pre/DynamicDependency;"));									
+							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 						//			trig.add(new VarInsnNode(ALOAD, 0));
 						//			trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 							        trig.add(new VarInsnNode(ALOAD, localNum));
 									trig.add(new LdcInsnNode(jumpinf.get(i1)));
-									trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/vc/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
+									trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 									
 									if(i1 instanceof LabelNode){
 										if(i1.getNext() instanceof LineNumberNode)
@@ -272,12 +272,12 @@ public class MethodAnalyzer {
 									if ((i1.getOpcode() >= IRETURN && i1.getOpcode() <= RETURN)|| i1.getOpcode()==ATHROW) {
 										InsnList trig = new InsnList();
 										trig.add(new VarInsnNode(ALOAD, localNum));
-								        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/vc/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/vc/pre/DynamicDependency;"));									
+								        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 				//						trig.add(new VarInsnNode(ALOAD, 0));
 				//						trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 								        trig.add(new VarInsnNode(ALOAD, localNum));
 										trig.add(new LdcInsnNode(""));
-										trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/vc/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
+										trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 										insns.insert(i1.getPrevious(), trig);
 									}
 								}
