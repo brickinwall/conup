@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+           xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+           targetNamespace="http://conup"
+           name="conup-sample-home">
+
+    <component name="portal">
+        <implementation.web web-uri="helloworld.war"/>
+        <reference name="service" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/PortalService" />
+        </reference>
+        
+        <reference name="portalService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:8184/Portal2Component/PortalService" />
+        </reference>
+        
+        <reference name="notifyService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/NotifyService" />
+        </reference>        
+        
+        <reference name="dbService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:8081/DBComponent/DBService" />
+        </reference>  
+        
+        <reference name="updateComponentService">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:9091/AuthComponentComm/ComponentUpdateService"/>
+        </reference>  
+        
+        <reference name="domainComponentUpdateService">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:7996/DomainManagerComponent/DomainComponentUpdateService" />
+        </reference>
+        
+        <!--
+	        <reference name="updateService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+	        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:7996/PortalComponent/UpdateService" />
+	        </reference>        
+        -->
+    </component>
+</composite>
