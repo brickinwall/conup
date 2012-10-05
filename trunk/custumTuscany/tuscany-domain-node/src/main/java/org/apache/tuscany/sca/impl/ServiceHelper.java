@@ -73,8 +73,12 @@ public class ServiceHelper {
         if (serviceURI.contains("/")) {
             int i = serviceURI.indexOf("/");
             if (i < serviceURI.length() - 1) {
-            	serviceName = serviceURI.substring(i + 1, serviceURI.length()-1);
-//                serviceName = serviceURI.substring(i + 1);
+            	if(serviceURI.contains("#")){
+        			serviceName = serviceURI.substring(i + 1, serviceURI.length()-1);
+        		} else{
+        			serviceName = serviceURI.substring(i + 1);	//original impl
+        		}
+//            	serviceName = serviceURI.substring(i + 1, serviceURI.length()-1);
             }
         }
 
