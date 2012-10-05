@@ -56,6 +56,12 @@
         	<artifactId>conup-container</artifactId>
         	<version>0.3.1-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-data-model</artifactId>
+        	<version>0.3.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

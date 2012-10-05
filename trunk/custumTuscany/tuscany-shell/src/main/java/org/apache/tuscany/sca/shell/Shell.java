@@ -56,13 +56,23 @@ import org.apache.tuscany.sca.shell.jline.JLine;
 
 import cn.edu.nju.moon.conup.container.VcContainer;
 import cn.edu.nju.moon.conup.container.VcContainerImpl;
+import cn.edu.nju.moon.conup.def.NodeHolder;
+
 
 /**
  * A little SCA command shell.
  */
 public class Shell {
 
-    private boolean useJline;
+    public String getCurrentDomain() {
+		return currentDomain;
+	}
+
+	public void setCurrentDomain(String currentDomain) {
+		this.currentDomain = currentDomain;
+	}
+
+	private boolean useJline;
     final List<String> history = new ArrayList<String>();
     private TuscanyRuntime runtime;
     private String currentDomain = "";
@@ -76,6 +86,7 @@ public class Shell {
     public static void main(final String[] args) throws Exception {
         boolean useJline = true;
         String domainURI = "uri:default";
+        String compositeFileName = null;
         
         boolean showHelp = false;
         String contribution = null;
@@ -87,27 +98,13 @@ public class Shell {
             } else {
                 if (s.startsWith("uri:") || s.startsWith("properties:")) {
                     domainURI = s;
+                } else if(s.endsWith(".composite")){
+                	compositeFileName = s;
                 } else {
                     contribution = s;
                 }
             }
         }
-        
-        //get business node name
-//        String componentName = contribution.substring(0, contribution.length()-4);
-        
-        //get VcContainerl
-//		String compositeLocation = contribution + "db.composite";//?????????????????????????
-//        VcContainer container = VcContainerImpl.getInstance();
-//        container.setBusinessComponentName(componentName, compositeLocation);
-        
-        //launch communication node
-        
-        //associate business node with VcContainer
-        
-        
-        //add by jiang
-//        contribution = "target/conup-sample-db.jar";
         
         Shell shell = new Shell(domainURI, useJline);
         if (showHelp || contribution==null) {
@@ -119,7 +116,9 @@ public class Shell {
             String curi = shell.getNode().installContribution(contribution);
             shell.getNode().startDeployables(curi);
             
-            //added by jiang
+            File file = new File(contribution);
+            String absContributionPath = file.getAbsolutePath();
+            //added for conup
             Node node = shell.getNode();
             Contribution cont = node.getContribution(curi);
             List<Composite> composites = cont.getDeployables();
@@ -129,17 +128,28 @@ public class Shell {
             //get component name
             componentName = composite.getComponents().get(0).getName();
             compositeName = composite.getURI();
+            if(compositeFileName == null){
+            	compositeFileName = compositeName;
+            }
+            System.out.println("absContributionPath: " + absContributionPath);
+            System.out.println("compositeFileName: " + compositeFileName);
             //get VcContainer
-//            String compositeLocation = "target" + File.separator + curi + File.separator + compositeName;	//TODO
-            String compositeLocation = curi + File.separator + compositeName;	//TODO
-            VcContainer container = VcContainerImpl.getInstance();
-            container.setBusinessComponentName(componentName, compositeLocation);
-//            container.analyseNodeComposite(compositeLocation);
-            //add current business node to container
-            container.setBusinessNode(node, componentName);
+            String compositeLocation = curi + File.separator + compositeName;
+            if(!absContributionPath.contains("conup-domain-manager")){
+            	VcContainer container = VcContainerImpl.getInstance();
+                container.setBusinessComponentName(componentName, compositeLocation, 
+                		absContributionPath, compositeFileName, domainURI);
+//                container.analyseNodeComposite(compositeLocation);
+                //add current business node to container
+                container.setBusinessNode(node, componentName);
+            } else{
+            	NodeHolder nodeHolder = null;
+            	nodeHolder = NodeHolder.getInstance();
+            	nodeHolder.setNode(node);
+            }
+            
             
         }
-        
         
         shell.run();
     }
