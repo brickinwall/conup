@@ -38,6 +38,15 @@ public abstract class VcContainer {
 	
 	String businessComponentName = null;
 	
+	/** absolute path of the contribution */
+	private String absContributionPath = null;
+	
+	/** composite file's name in the contribution */
+	private String compositeFileName = null;
+	
+	/** component's domain uir */
+	private String domainUri = "uri:default";
+	
 	private Class oldClass;
 	private Class newClass;
 
@@ -128,8 +137,21 @@ public abstract class VcContainer {
 	public void analyseNodeComposite(String filePath){
 		compositeAnalyser.analyze(filePath);
 	}
-	public void setBusinessComponentName(String componentName, String compositeLocation) {
+	
+	/**
+	 * @param componentName business component name
+	 * @param compositeLocation composite location of the contribution
+	 * @param absContributionPath absolute path of the contribution
+	 * @param domainUri domain uri for the business component
+	 * 
+	 * */
+	public void setBusinessComponentName(String componentName, 
+			String compositeLocation, String absContributionPath, 
+			String compositeFileName, String domainUri) {
 		this.businessComponentName = componentName;
+		this.absContributionPath = absContributionPath;
+		this.compositeFileName = compositeFileName;
+		this.domainUri = domainUri;
 		componentStatus.setComponentName(businessComponentName);
 		// start communication component
 		try {
@@ -174,9 +196,29 @@ public abstract class VcContainer {
 	public String getBusinessComponentName() {
 		return businessComponentName;
 	}
-	
-	
-	
-	
 
+	public String getAbsContributionPath() {
+		return absContributionPath;
+	}
+
+	public void setAbsContributionPath(String absContributionPath) {
+		this.absContributionPath = absContributionPath;
+	}
+
+	public String getCompositeFileName() {
+		return compositeFileName;
+	}
+
+	public void setCompositeFileName(String compositeFileName) {
+		this.compositeFileName = compositeFileName;
+	}
+
+	public String getDomainUri() {
+		return domainUri;
+	}
+
+	public void setDomainUri(String domainUri) {
+		this.domainUri = domainUri;
+	}
+	
 }

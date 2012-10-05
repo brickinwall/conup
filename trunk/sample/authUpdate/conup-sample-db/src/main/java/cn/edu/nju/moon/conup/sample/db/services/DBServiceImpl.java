@@ -15,7 +15,6 @@ import cn.edu.nju.moon.conup.container.VcContainerImpl;
 import cn.edu.nju.moon.conup.def.VcTransaction;
 import cn.edu.nju.moon.conup.listener.ComponentListener;
 import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
-import cn.edu.nju.moon.conup.pre.DynamicDependency;
 import com.mysql.jdbc.Statement;
 
 
@@ -30,17 +29,17 @@ public class DBServiceImpl implements DBService {
 	@VcTransaction
 	public List<String> dbOperation() {
 		List<String> result = new ArrayList<String>();
-//		ComponentListener listener = ComponentListenerImpl.getInstance();
-//		Set<String> futureC = new HashSet<String>();
-//		Set<String> pastC = new HashSet<String>();
-//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
-//		listener.notify("start", threadID, futureC, pastC);
+		ComponentListener listener = ComponentListenerImpl.getInstance();
+		Set<String> futureC = new HashSet<String>();
+		Set<String> pastC = new HashSet<String>();
+		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+		listener.notify("start", threadID, futureC, pastC);
 		
-//		listener.notify("running", threadID, futureC, pastC);
+		listener.notify("running", threadID, futureC, pastC);
 		
 		result.add("hello tuscany...");
 
-//		listener.notify("end", threadID, futureC, pastC);
+		listener.notify("end", threadID, futureC, pastC);
 		return result;
 		
 //		String sql = "select * from info";
@@ -78,6 +77,7 @@ public class DBServiceImpl implements DBService {
 //		}
 //		
 //		return result;
+		 
 	}
 
 }

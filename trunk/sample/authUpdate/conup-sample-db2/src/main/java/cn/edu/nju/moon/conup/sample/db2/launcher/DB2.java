@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.sample.db2.launcher;
 
+import java.io.File;
+
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.Contribution;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
@@ -20,17 +22,24 @@ public class DB2 {
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting DB 2 container....");
-        VcContainer container = VcContainerImpl.getInstance();
         String contributionURL = ContributionLocationHelper.getContributionLocation(DB2.class);
         String compositeLocation = contributionURL + "db.composite";
         
-        container.setBusinessComponentName("DB2Component", compositeLocation);
+        VcContainer container = VcContainerImpl.getInstance();
+      //contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("DB2Component", compositeLocation, absContributionPath, null, domainUri);
         
         System.out.println("Starting node DB....");
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
         container.analyseNodeComposite(contributionURL + "db.composite");

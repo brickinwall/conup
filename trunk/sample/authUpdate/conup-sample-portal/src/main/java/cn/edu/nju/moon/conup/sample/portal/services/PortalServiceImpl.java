@@ -11,23 +11,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.tuscany.sca.invocation.Interceptor;
-import org.apache.tuscany.sca.invocation.Message;
-import org.apache.tuscany.sca.invocation.PhasedInterceptor;
-import org.oasisopen.sca.NoSuchServiceException;
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.algorithm.VcAlgorithmImpl;
-import cn.edu.nju.moon.conup.container.VcContainer;
-import cn.edu.nju.moon.conup.container.VcContainerImpl;
-import cn.edu.nju.moon.conup.data.MessageQueue;
-import cn.edu.nju.moon.conup.def.ComponentStatus;
 import cn.edu.nju.moon.conup.def.VcTransaction;
-import cn.edu.nju.moon.conup.domain.services.TransactionIDService;
 import cn.edu.nju.moon.conup.listener.ComponentListener;
 import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
-import cn.edu.nju.moon.conup.pre.DynamicDependency;
 
 //@Service(PortalService.class)
 @Service({PortalService.class, NotifyService.class})
@@ -61,15 +50,15 @@ public class PortalServiceImpl implements PortalService, NotifyService {
 	@Override
 	@VcTransaction
 	public List<String> execute(String userName, String passwd) {
-//		ComponentListener listener = ComponentListenerImpl.getInstance();
-//		Set<String> futureC = new HashSet<String>();
-//		futureC.add("AuthComponent");
-//		futureC.add("ProcComponent");
-//		Set<String> pastC = new HashSet<String>();
-//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
-//		listener.notify("start", threadID, futureC, pastC);
+		ComponentListener listener = ComponentListenerImpl.getInstance();
+		Set<String> futureC = new HashSet<String>();
+		futureC.add("AuthComponent");
+		futureC.add("ProcComponent");
+		Set<String> pastC = new HashSet<String>();
+		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+		listener.notify("start", threadID, futureC, pastC);
 		
-//		listener.notify("running", threadID, futureC, pastC);
+		listener.notify("running", threadID, futureC, pastC);
 		
 		String cred = userName + "," + passwd;
 		
@@ -91,9 +80,9 @@ public class PortalServiceImpl implements PortalService, NotifyService {
 		String token = tokenService.getToken(cred);
 		
 		
-//		futureC.remove("AuthComponent");
-//		pastC.add("AuthComponent");
-//		listener.notify("running", threadID, futureC, pastC);
+		futureC.remove("AuthComponent");
+		pastC.add("AuthComponent");
+		listener.notify("running", threadID, futureC, pastC);
 		
 //		ComponentUpdateService cu = null;
 //		try {
@@ -121,10 +110,10 @@ public class PortalServiceImpl implements PortalService, NotifyService {
 //			e.printStackTrace();							
 //		}
 		
-//		futureC.remove("ProcComponent");
-//		pastC.add("ProcComponent");
-//		listener.notify("running", threadID, futureC, pastC);
-//		listener.notify("end", threadID, futureC, pastC);
+		futureC.remove("ProcComponent");
+		pastC.add("ProcComponent");
+		listener.notify("running", threadID, futureC, pastC);
+		listener.notify("end", threadID, futureC, pastC);
 		return result;
 		 
 	}

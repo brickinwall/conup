@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.sample.portal2.launcher;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -31,17 +32,24 @@ import cn.edu.nju.moon.conup.sample.portal2.services.TokenService;
 public class Portal2 {
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting Portal 2 container....");
-        VcContainer container = VcContainerImpl.getInstance();
         String contributionURL = ContributionLocationHelper.getContributionLocation(Portal2.class);
         String compositeLocation = contributionURL + "portal.composite";
         
-        container.setBusinessComponentName("Portal2Component", compositeLocation);
+        VcContainer container = VcContainerImpl.getInstance();
+        //contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("Portal2Component", compositeLocation, absContributionPath, null, domainUri);
         
 		System.out.println("Starting node portal....");
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-		String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
 		container.analyseNodeComposite(contributionURL + "portal.composite");

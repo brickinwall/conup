@@ -11,16 +11,19 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 public class LaunchDomainManager {
 	public static Set<String> createdTransactions = new HashSet<String>();
-	public static Node node;
+	public static Node node = null;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
         System.out.println("Starting domain-manager node ....");
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        //domain uri
+        String domainUri = null;
+        domainUri = "uri:default";
+//        String domainName = "cn.edu.nju.moon.version-consistency";
+//        String userIdPsw = "userid=" + domainName + "&password=njuics";
+//        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         node = runtime.createNode(domainUri);
         String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchDomainManager.class);

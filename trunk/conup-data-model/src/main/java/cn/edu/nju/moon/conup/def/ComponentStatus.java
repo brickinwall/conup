@@ -36,14 +36,14 @@ public class ComponentStatus {
 //	private String freenessSetup = ComponentStatus.WAITING;
 	private String freenessSetup = ComponentStatus.CONCURRENT;
 	
-	private String currentStatus = ComponentStatus.NORMAL;
-//	private String currentStatus = ComponentStatus.VALID;
+//	private String currentStatus = ComponentStatus.NORMAL;
+	private String currentStatus = ComponentStatus.VALID;
 //	private String currentStatus = ComponentStatus.FREENESS;
 	
 	private String componentName = null;
 	
-	private Scope scope = null;
-//	private Scope scope = new Scope();
+//	private Scope scope = null;
+	private Scope scope = new Scope();
 	
 	
 	private List<String> status;

@@ -17,9 +17,9 @@ public class PortalVisitorThread extends Thread {
 			
 			String targetComponent = "AuthComponent";
 			String freenessSetup = "ConcurrentVersion";
-			DomainComponentUpdateService domainComponentUpdateService = node.getService(DomainComponentUpdateService.class, "DomainManagerComponent#service-binding(DomainComponentUpdateService/DomainComponentUpdateService)");
-			boolean updateResult = domainComponentUpdateService.onDemandRequest(targetComponent, freenessSetup);
-			System.out.println("updateResult" + updateResult);
+//			DomainComponentUpdateService domainComponentUpdateService = node.getService(DomainComponentUpdateService.class, "DomainManagerComponent#service-binding(DomainComponentUpdateService/DomainComponentUpdateService)");
+//			boolean updateResult = domainComponentUpdateService.onDemandRequest(targetComponent, freenessSetup);
+//			System.out.println("updateResult" + updateResult);
 			
 			PortalService portalService = node.getService(PortalService.class, 
 				    "PortalComponent#service-binding(PortalService/PortalService)");

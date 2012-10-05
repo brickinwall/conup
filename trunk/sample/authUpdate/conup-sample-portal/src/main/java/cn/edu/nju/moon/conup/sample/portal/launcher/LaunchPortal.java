@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.sample.portal.launcher;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -33,14 +34,21 @@ public class LaunchPortal {
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchPortal.class);
 		String compositeLocation = contributionURL + "portal.composite";
 		
-        VcContainer container = VcContainerImpl.getInstance();
-        container.setBusinessComponentName("PortalComponent", compositeLocation);
+		VcContainer container = VcContainerImpl.getInstance();
+		//contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("PortalComponent", compositeLocation, absContributionPath, null, domainUri);
         
 		System.out.println("Starting node portal....");
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-		String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
 		container.analyseNodeComposite(contributionURL + "portal.composite");
@@ -68,81 +76,12 @@ public class LaunchPortal {
 	}
 	
 	private static void accessServices(Node node) throws InterruptedException {
-		int threadNum = 10;
+		int threadNum = 3;
 		for(int i=0; i<threadNum; i++){
 			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
 			new PortalVisitorThread(node).start();
 			Thread.sleep(2000);
 		}
 	}
-
-	
-	@Deprecated
-	public static Node launch() throws Exception {
-		System.out.println("Starting node portal....");
-		
-		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-		String domainName = "cn.edu.nju.moon.version-consistency.test";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
-        //create Tuscany node
-        Node node = runtime.createNode(domainUri);
-		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchPortal.class);
-		node.installContribution(contributionURL);
-		node.startComposite("vc-policy-portal-node", "portal.composite");
-
-		CurrentDomain.printDomainAndNodeConf(runtime, node);
-		accessServices(node);
-
-		System.out.println("portal.composite ready for big business !!!");
-		
-		return node;
-	}
-	
-//	@Deprecated
-//	private static void accessServices(Node node) {
-//		try {
-////			InterceptorCache cache = InterceptorCacheImpl.getInstance();
-//			
-//			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
-//			PortalService portalService = node.getService(PortalService.class, 
-//					"PortalComponent#service-binding(PortalService/PortalService)");
-////			System.out.println("\t" + "" + portalService.execute(""));
-//			
-////			System.out.println("InterceptorCacheImpl:");
-////			Set<Entry<String, TransactionDependency>> tmpResult = cache.getDependencies();
-////			for(Entry<String, TransactionDependency> entry : tmpResult){
-////				System.out.println("\t" + "" + entry.getKey() + ": " + entry.getValue());
-////			}
-//			
-////			System.out.println("Please input username and password [userName password]....");
-////			InputStreamReader is = new InputStreamReader(System.in);
-////			BufferedReader br = new BufferedReader(is);
-////			String info = br.readLine();
-////
-////			String[] infos = info.split(" ");
-////			String name = infos[0];
-////			String passwd = infos[1];
-////
-////			System.out.println("\nTry to access TokenComponent#service-binding(TokenService/TokenService):");
-////			TokenService ts = node.getService(TokenService.class,
-////							"TokenComponent#service-binding(TokenService/TokenService)");
-////			String cred = name + "," + passwd;
-////			String token = ts.getToken(cred);
-////			System.out.println("\t" + "" + token);
-////
-////			System.out.println("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
-////			ProcService pi = node.getService(ProcService.class,
-////							"ProcComponent#service-binding(ProcService/ProcService)");
-////			List<String> result = pi.process(token, "");
-////			System.out.println("\t" + "" + result);
-//						
-//			System.out.println();
-//		} catch (NoSuchServiceException e) {
-//			e.printStackTrace();
-////		} catch (IOException e) {
-////			e.printStackTrace();
-//		}
-//	}
 	
 }

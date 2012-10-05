@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.commons.httpclient.HostConfiguration;
+//import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Composite;
@@ -40,7 +40,6 @@ import org.oasisopen.sca.NoSuchServiceException;
 import org.oasisopen.sca.annotation.Reference;
 
 import cn.edu.nju.moon.conup.algorithm.VcAlgorithmImpl;
-import cn.edu.nju.moon.conup.buffer.BufferPolicyInterceptor;
 import cn.edu.nju.moon.conup.communication.convention.CompositeConvention;
 import cn.edu.nju.moon.conup.communication.launcher.LaunchCommunication;
 import cn.edu.nju.moon.conup.communication.services.OndemandService;

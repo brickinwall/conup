@@ -2,8 +2,8 @@
 <composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912" 
 	xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1" 
 	xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912" 
-	targetNamespace="http://version-consistency" 
-	name="DomainManagerComponent.composite" >
+	targetNamespace="http://conup" 
+	name="conup-domain-manager" >
 	<component name="DomainManagerComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.domain.services.DomainManagerServiceImpl" />
 		<service name="FreenessService">

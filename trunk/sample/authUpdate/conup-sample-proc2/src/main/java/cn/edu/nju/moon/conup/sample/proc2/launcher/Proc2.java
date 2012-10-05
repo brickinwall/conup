@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.sample.proc2.launcher;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -30,16 +31,24 @@ public class Proc2 {
 	 */
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting Proc 2 container....");
-        VcContainer container = VcContainerImpl.getInstance();
         String contributionURL = ContributionLocationHelper.getContributionLocation(Proc2.class);
         String compositeLocation = contributionURL + "proc.composite";
-        container.setBusinessComponentName("Proc2Component", compositeLocation);
+        
+        VcContainer container = VcContainerImpl.getInstance();
+        //contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("Proc2Component", compositeLocation, absContributionPath, null, domainUri);
 		
         System.out.println("\nStarting node Proc....");
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
         container.analyseNodeComposite(contributionURL + "proc.composite");

@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.sample.proc.launcher;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -33,14 +34,21 @@ public class LaunchProc {
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchProc.class);
 		String compositeLocation = contributionURL + "proc.composite";
 		
-        VcContainer container = VcContainerImpl.getInstance();
-        container.setBusinessComponentName("ProcComponent", compositeLocation);
+		VcContainer container = VcContainerImpl.getInstance();
+		//contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("ProcComponent", compositeLocation, absContributionPath, null, domainUri);
 		
         System.out.println("\nStarting node Proc....");
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
 //        String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchProc.class);
@@ -69,33 +77,11 @@ public class LaunchProc {
         System.out.println();
     }
 	
-	@Deprecated
-	public static Node launch() throws Exception {
-        System.out.println("Starting node Proc....");
-
-        TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency.test";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
-        //create Tuscany node
-        Node node = runtime.createNode(domainUri);
-        String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchProc.class);
-        node.installContribution(contributionURL);
-        node.startComposite("vc-policy-proc-node", "proc.composite");
-        
-        CurrentDomain.printDomainAndNodeConf(runtime, node);
-//        accessServices(node);
-        
-        System.out.println("proc.composite ready for big business !!!");
-		
-		return node;
-	}
-	
 	private static void accessServices(Node node) {
 		try {
-//			System.out.println("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
-//			ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
-//			System.out.println("\t" + "" + pi.process("nju,cs,pass", ""));
+			System.out.println("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
+			ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
+			System.out.println("\t" + "" + pi.process("nju,cs,pass", ""));
 //			
 //			System.out.println("\nTry to access TokenComponent#service-binding(TokenService/TokenService):");
 //			TokenService ts = node.getService(TokenService.class, "TokenComponent#service-binding(TokenService/TokenService)");
@@ -106,9 +92,9 @@ public class LaunchProc {
 //			VerificationService vs = node.getService(VerificationService.class, "VerificationComponent#service-binding(VerificationService/VerificationService)");
 //			System.out.println("\t" + "" + vs.verify(token));
 			
-			System.out.println("\nTry to access DBComponent#service-binding(DBService/DBService):");
-			DBService db = node.getService(DBService.class, "DBComponent#service-binding(DBService/DBService)");
-			System.out.println("\t" + "" + db.dbOperation());
+//			System.out.println("\nTry to access DBComponent#service-binding(DBService/DBService):");
+//			DBService db = node.getService(DBService.class, "DBComponent#service-binding(DBService/DBService)");
+//			System.out.println("\t" + "" + db.dbOperation());
 			
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

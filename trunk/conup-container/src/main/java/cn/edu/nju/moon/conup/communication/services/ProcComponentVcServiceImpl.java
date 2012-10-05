@@ -76,13 +76,50 @@ import cn.edu.nju.moon.conup.update.ReplaceClassLoader;
 import org.oasisopen.sca.annotation.*;
 
 @Service({ArcService.class,FreenessService.class,OndemandService.class, ComponentUpdateService.class})
-public class VcServiceImplTemplate implements ArcService, FreenessService, OndemandService,ComponentUpdateService {
+public class ProcComponentVcServiceImpl implements ArcService, FreenessService, OndemandService,ComponentUpdateService {
+	private OndemandService dBComponentOndemandService;
+	private ArcService dBComponentArcService;
+	private OndemandService authComponentOndemandService;
+	private ArcService authComponentArcService;
+
+	public OndemandService getdBComponentOndemandService(){
+		return dBComponentOndemandService;
+	}
+	@Reference
+	public void setdBComponentOndemandService(OndemandService ondemandService){
+		 this.dBComponentOndemandService = ondemandService;
+	}
+
+	public ArcService getdBComponentArcService(){
+		return dBComponentArcService;
+	}
+	@Reference
+	public void setdBComponentArcService(ArcService arcService){
+		 this.dBComponentArcService = arcService;
+	}
+
+	public OndemandService getAuthComponentOndemandService(){
+		return authComponentOndemandService;
+	}
+	@Reference
+	public void setAuthComponentOndemandService(OndemandService ondemandService){
+		 this.authComponentOndemandService = ondemandService;
+	}
+
+	public ArcService getAuthComponentArcService(){
+		return authComponentArcService;
+	}
+	@Reference
+	public void setAuthComponentArcService(ArcService arcService){
+		 this.authComponentArcService = arcService;
+	}
+
 
 	private CompositeResolver compositeResolver = new CompositeResolver();
 	private static Map<String, Boolean> OndemandRequestStatus = new HashMap<String, Boolean>();
 	private static Map<String, Boolean> ConfirmOndemandStatus = new HashMap<String, Boolean>();
 	
-	private final static Logger LOGGER = Logger.getLogger(VcServiceImpl.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(ProcComponentVcServiceImpl.class.getName());
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -100,9 +137,9 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 
 	@Override
 	public void update(Arc arc, String flag) {
-		LOGGER.info("****VcServiceImpl.update(...) Arc: source= " + arc.getSourceComponent() + ", target=" + arc.getTargetComponent() + 
+		LOGGER.info("****ProcComponentVcServiceImpl.update(...) Arc: source= " + arc.getSourceComponent() + ", target=" + arc.getTargetComponent() + 
 				"flag: " + flag);
-//		System.out.println("VcServiceImpl.update(...) Arc: source=" + arc.getSourceComponent() + ", target=" + arc.getTargetComponent());
+//		System.out.println("ProcComponentVcServiceImpl.update(...) Arc: source=" + arc.getSourceComponent() + ", target=" + arc.getTargetComponent());
 		if (flag.equals("parent")) {
 			if (arc.getType().equals("future")) {
 				OutArcRegistryImpl.getInstance().update(arc);
@@ -195,7 +232,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 //			System.out.println("\t" + component);
 		}
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		for(String subComponent : targetRef){
 			for(Field field : arcServiceFields){
@@ -226,12 +263,12 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		
 		LOGGER.info(setUpInfos);
 		
-		LOGGER.info("**** >>in VcServiceImpl.setUp(...) print informations start:");
+		LOGGER.info("**** >>in ProcComponentVcServiceImpl.setUp(...) print informations start:");
 		ContainerPrinter containerPrinter = new ContainerPrinter();
 		containerPrinter.printInArcRegistry(InArcRegistryImpl.getInstance());
 		containerPrinter.printOutArcRegistry(OutArcRegistryImpl.getInstance());
 		containerPrinter.printTransactionRegistry(TransactionRegistryImpl.getInstance());
-		LOGGER.info("**** >>in VcServiceImpl.setUp(...) print informations end. " +
+		LOGGER.info("**** >>in ProcComponentVcServiceImpl.setUp(...) print informations end. " +
 				"END OF setUp(...) for " + hostComponent);
 		return true;
 	}
@@ -324,7 +361,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		}//END WHILE
 		LOGGER.info(cleanUpTxRegistry);
 		//notify sub components to clean up
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		for (Field field : arcServiceFields) {
 			if (field.getType().getName().equals(ArcService.class.getName())) {
@@ -341,7 +378,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			}
 		}//END FOR
 		
-		LOGGER.info("**** >>in VcServiceImpl.cleanUp(...) print informations start:");
+		LOGGER.info("**** >>in ProcComponentVcServiceImpl.cleanUp(...) print informations start:");
 		ContainerPrinter containerPrinter = new ContainerPrinter();
 //		System.out.println("InArcRegistry when cleanup:");
 		containerPrinter.printInArcRegistry(inArcRegistry);
@@ -349,7 +386,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		containerPrinter.printOutArcRegistry(outArcRegistry);
 //		System.out.println("TransactionRegistry when cleanup:");
 		containerPrinter.printTransactionRegistry(txRegistry);
-		LOGGER.info("**** >>in VcServiceImpl.cleanUp(...) print informations end");
+		LOGGER.info("**** >>in ProcComponentVcServiceImpl.cleanUp(...) print informations end");
 //		System.out.println("//END OF cleanUp(...)");
 		
 		return true;
@@ -366,7 +403,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 //	@Override
 	public boolean reqOndemandSetup(String currentComponent,
 			String requestSourceComponent,  Scope scope, String freenessSetup) {
-		LOGGER.info("**** in VcServiceImpl.reqOndemandSetup(...):"+
+		LOGGER.info("**** in ProcComponentVcServiceImpl.reqOndemandSetup(...):"+
 			"\t" + "currentComponent=" + currentComponent +
 			"\t" + "requestSourceComponent=" + requestSourceComponent);
 //		System.out.println("reqOndemandSetup(...)");
@@ -553,7 +590,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			
 			fArcs = getFArcs(hostComponent, root);
 			System.out.println("fArcs:");
-			Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+			Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 			Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 			String subComponent;
 			for(Arc arc : fArcs){
@@ -666,7 +703,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			
 		}//END WHILE
 		
-		LOGGER.info("\n**** >>in VcServiceImpl.onDemandSetUp(...) print informations start:");
+		LOGGER.info("\n**** >>in ProcComponentVcServiceImpl.onDemandSetUp(...) print informations start:");
 		ContainerPrinter containerPrinter = new ContainerPrinter();
 //		System.out.println("InArcRegistry after onDemandSetUp():");
 		containerPrinter.printInArcRegistry(InArcRegistryImpl.getInstance());
@@ -674,7 +711,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		containerPrinter.printOutArcRegistry(OutArcRegistryImpl.getInstance());
 //		System.out.println("TransactionRegistry after onDemandSetUp():");
 		containerPrinter.printTransactionRegistry(TransactionRegistryImpl.getInstance());
-		LOGGER.info("\n**** <<in VcServiceImpl.onDemandSetUp(...) print informations end.");
+		LOGGER.info("\n**** <<in ProcComponentVcServiceImpl.onDemandSetUp(...) print informations end.");
 		
 		return true;
 	}
@@ -701,7 +738,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		
 		inArcRegistry.addArc(arc);
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		for(String subComponent : targetRef){
 			for(Field field : arcServiceFields){
@@ -752,7 +789,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		
 		inArcRegistry.addArc(arc);
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		for(String subComponent : targetRef){
 			for(Field field : arcServiceFields){
@@ -804,7 +841,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		else
 			targetRef.addAll(scope.getSubComponents(hostComponent));
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		
 		fArcs = getFArcs(hostComponent, subTx);
@@ -897,7 +934,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		else
 			targetRef.addAll(scope.getSubComponents(hostComponent));
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		
 		pArcs = getPArcs(hostComponent, subTx);
@@ -1090,7 +1127,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		for(String component : targetRef)
 			System.out.println("\t" + component);
 		
-		Class<VcServiceImpl> vcServiceImpl = VcServiceImpl.class;
+		Class<ProcComponentVcServiceImpl> vcServiceImpl = ProcComponentVcServiceImpl.class;
 		Field [] arcServiceFields = vcServiceImpl.getDeclaredFields();
 		for(String subComponent : targetRef){
 			for(Field field : arcServiceFields){
@@ -1507,7 +1544,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 				try{
 					arcService = communicationNode.getService(ArcService.class, endpoint);
 					LOGGER.info("**** Sub components will not host any sub tx, notify sub-component to remove future arc. ");
-//					System.out.println("Access endpoint in VcServiceImpl: " + endpoint);
+//					System.out.println("Access endpoint in ProcComponentVcServiceImpl: " + endpoint);
 					arcService.removeArc(arc);
 				} catch(NoSuchServiceException e){
 					e.printStackTrace();
@@ -1535,7 +1572,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			try{
 				arcService = communicationNode.getService(ArcService.class, endpoint);
 				LOGGER.info("**** Sub tx is end, and will not be used any more, notify host component to add past arc.");
-//				System.out.println("Access endpoint in VcServiceImpl: " + endpoint);
+//				System.out.println("Access endpoint in ProcComponentVcServiceImpl: " + endpoint);
 				arcService.createArc(arc);
 			} catch(NoSuchServiceException e){
 				e.printStackTrace();

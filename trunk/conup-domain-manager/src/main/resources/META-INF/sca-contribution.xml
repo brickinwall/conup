@@ -3,6 +3,6 @@
 <contribution xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
               xmlns:sample="http://conup">
    
-   <deployable composite="sample:conup-sample-proc" />
+   <deployable composite="sample:conup-domain-manager" />
 
 </contribution>

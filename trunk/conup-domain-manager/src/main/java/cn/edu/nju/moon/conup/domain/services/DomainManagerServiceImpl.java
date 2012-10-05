@@ -14,6 +14,7 @@ import org.oasisopen.sca.NoSuchServiceException;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.communication.services.OndemandService;
+import cn.edu.nju.moon.conup.def.NodeHolder;
 import cn.edu.nju.moon.conup.def.Scope;
 import cn.edu.nju.moon.conup.domain.generator.NodesGraphGeneratorImpl;
 import cn.edu.nju.moon.conup.domain.generator.ScopeGeneratorImpl;
@@ -43,7 +44,11 @@ public class DomainManagerServiceImpl implements FreenessService, TransactionIDS
 	@Override
 	public boolean isFreeness(String componentName) {
 		String endPoint = componentName + "Comm#service-binding(FreenessService/FreenessService)";
-		Node communicationNode = LaunchDomainManager.node;
+		Node communicationNode = null;
+		communicationNode = LaunchDomainManager.node;
+		if(communicationNode == null){
+			communicationNode = NodeHolder.getInstance().getNode();
+		}
 		FreenessService freenessService;
 		try {
 			freenessService = communicationNode.getService(FreenessService.class, endPoint);
@@ -157,7 +162,11 @@ public class DomainManagerServiceImpl implements FreenessService, TransactionIDS
 		System.out.println("Update required: target=" + targetComponent + 
 				", freenessSetup=" + freenessSetup);
 		String endPoint = targetComponent + "Comm#service-binding(OndemandService/OndemandService)";
-		Node communicationNode = LaunchDomainManager.node;
+		Node communicationNode = null;
+		communicationNode = LaunchDomainManager.node;
+		if(communicationNode == null){
+			communicationNode = NodeHolder.getInstance().getNode();
+		}
 		OndemandService ondemandService;
 		try {
 			ondemandService = communicationNode.getService(OndemandService.class, endPoint);

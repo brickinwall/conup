@@ -116,8 +116,8 @@ public class Scope {
 		components.add("ProcComponent");
 		components.add("PortalComponent");
 		
-		components.add("Portal2Component");
-		components.add("Proc2Component");
+//		components.add("Portal2Component");
+//		components.add("Proc2Component");
 		target.add("AuthComponent");
 	}
 	
@@ -130,15 +130,17 @@ public class Scope {
 		if(current.equals("AuthComponent")){
 			result.add("ProcComponent");
 			result.add("PortalComponent");
-			result.add("Portal2Component");
-			result.add("Proc2Component");
+//			result.add("Portal2Component");
+//			result.add("Proc2Component");
 		} else if(current.equals("ProcComponent")){
 			result.add("PortalComponent");
 		} else if(current.equals("PortalComponent")){
 			
-		} else if(current.equals("Proc2Component")) {
-			result.add("Portal2Component");
-		} else if(!components.contains(current)){
+		} 
+//		else if(current.equals("Proc2Component")) {
+//			result.add("Portal2Component");
+//		}
+		else if(!components.contains(current)){
 			System.out.println("Invalid component name, because " + current + "is not in scope");
 		}
 		
@@ -158,12 +160,14 @@ public class Scope {
 		} else if (current.equals("PortalComponent")) {
 			result.add("AuthComponent");
 			result.add("ProcComponent");
-		} else if(current.equals("Portal2Component")) {
-			result.add("Proc2Component");
-			result.add("AuthComponent");
-		} else if(current.equals("Proc2Component")){
-			result.add("AuthComponent");
-		} else if (!components.contains(current)) {
+		}
+//		else if(current.equals("Portal2Component")) {
+//			result.add("Proc2Component");
+//			result.add("AuthComponent");
+//		} else if(current.equals("Proc2Component")){
+//			result.add("AuthComponent");
+//		}
+		else if (!components.contains(current)) {
 			System.out.println("Invalid component name, because " + current
 					+ "is not in scope");
 		}

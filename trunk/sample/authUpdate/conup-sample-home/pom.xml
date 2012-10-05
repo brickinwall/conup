@@ -56,12 +56,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-base-runtime-pom</artifactId>
-			<version>2.0-Beta3</version>
-			<type>pom</type>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-sca-api</artifactId>
 			<version>2.0-Beta3</version>
 		</dependency>
@@ -111,11 +105,6 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-contribution</artifactId>
-			<version>2.0-Beta3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-assembly-xml</artifactId>
 			<version>2.0-Beta3</version>
 		</dependency>
 		<dependency>

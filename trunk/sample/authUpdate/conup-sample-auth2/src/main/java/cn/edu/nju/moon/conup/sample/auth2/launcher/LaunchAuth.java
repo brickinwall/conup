@@ -1,6 +1,8 @@
 package cn.edu.nju.moon.conup.sample.auth2.launcher;
 
 
+import java.io.File;
+
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.apache.tuscany.sca.Node;
@@ -13,17 +15,24 @@ import cn.edu.nju.moon.conup.printer.domain.CurrentDomain;
 public class LaunchAuth {
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting Auth container....");
-		VcContainer container = VcContainerImpl.getInstance();
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchAuth.class);
 		String compositeLocation = contributionURL + "auth.composite";
 		
-        container.setBusinessComponentName("AuthComponent", compositeLocation);
+		VcContainer container = VcContainerImpl.getInstance();
+		//contribution's absolute path 
+        File file = new File("");
+        String absContributionPath = file.getAbsolutePath();
+        absContributionPath += File.separator + "target" + File.separator + "classes";
+        //domain uri
+      	String domainUri = null;
+      	domainUri = container.getDomainUri();
+//      String domainName = "cn.edu.nju.moon.version-consistency";
+//      String userIdPsw = "userid=" + domainName + "&password=njuics";
+//      String domainUri = "uri:" + domainName + "?" + userIdPsw;
+        container.setBusinessComponentName("AuthComponent", compositeLocation, absContributionPath, null, domainUri);
 
         System.out.println("Starting auth node ....");
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-        String domainName = "cn.edu.nju.moon.version-consistency";
-        String userIdPsw = "userid=" + domainName + "&password=njuics";
-        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         //create Tuscany node
         Node node = runtime.createNode(domainUri);
         container.analyseNodeComposite(contributionURL + "auth.composite");
