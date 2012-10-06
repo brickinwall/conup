@@ -164,7 +164,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 					ReconfigurationVersion rcfgVersion = ReconfigurationVersion.getInstance();
 					ReflectiveInstanceFactory instanceFactory = rcfgVersion.getInstanceFactory();
 					synchronized(instanceFactory){
-						if(oldVersionRootTxIds.contains(currentRootTxID)){
+						if((oldVersionRootTxIds!=null) && oldVersionRootTxIds.contains(currentRootTxID)){
 							LOGGER.info("dispatcher.dispatchToOldVersion()");
 //							System.out.println("dispatcher.dispatchToOldVersion()");
 							dispatcher.dispatchToOldVersion();
