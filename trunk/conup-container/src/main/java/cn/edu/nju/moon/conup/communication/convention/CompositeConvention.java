@@ -37,5 +37,7 @@ public class CompositeConvention {
 	public static String ONDEMAND_SERVICE = "OndemandService";
 	
 	public static String UPDATE_SERVICE = "ComponentUpdateService";
+	
+	public static String COMPONENT_CONF_SERVICE = "ComponentConfService";
 
 }

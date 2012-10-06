@@ -13,6 +13,7 @@ import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.communication.services.ArcService;
+import cn.edu.nju.moon.conup.communication.services.ComponentConfService;
 import cn.edu.nju.moon.conup.communication.services.ComponentUpdateService;
 import cn.edu.nju.moon.conup.communication.services.FreenessService;
 import cn.edu.nju.moon.conup.communication.services.OndemandService;
@@ -100,7 +101,7 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 			int line = 1;
 			while ((tempString = reader.readLine()) != null) {
 //				System.out.println("line " + line + ": " + tempString);
-				if (tempString.contains("public class VcServiceImplTemplate implements ArcService, FreenessService, OndemandService,ComponentUpdateService {")) {
+				if (tempString.contains("public class VcServiceImplTemplate implements ArcService, FreenessService, OndemandService,ComponentUpdateService, ComponentConfService {")) {
 					tempString = tempString.replace("VcServiceImplTemplate", componentName + "VcServiceImpl");
 					newJavaContent.append(tempString + "\n");
 					newJavaContent.append(addReferences());

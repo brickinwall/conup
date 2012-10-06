@@ -143,6 +143,11 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 				commComponentName + "/" + CompositeConvention.UPDATE_SERVICE + "\"/>" + "\n");
 		buffer.append("\t</service>" + "\n");
 		
+		buffer.append("\t<service name=\"" + CompositeConvention.COMPONENT_CONF_SERVICE + "\">" + "\n");
+		buffer.append("\t\t<tuscany:binding.jsonrpc uri=\"http://" + this.ip + ":" + this.port + "/" + //getIP() + ":" + getPort() + "/" +
+				commComponentName + "/" + CompositeConvention.COMPONENT_CONF_SERVICE + "\"/>" + "\n");
+		buffer.append("\t</service>" + "\n");
+		
 		//add reference
 		buffer.append(addReferences());
 		

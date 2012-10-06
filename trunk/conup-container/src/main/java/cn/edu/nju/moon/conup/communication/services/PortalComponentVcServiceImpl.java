@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,8 +76,8 @@ import cn.edu.nju.moon.conup.update.ReplaceClassLoader;
 
 import org.oasisopen.sca.annotation.*;
 
-@Service({ArcService.class,FreenessService.class,OndemandService.class, ComponentUpdateService.class})
-public class PortalComponentVcServiceImpl implements ArcService, FreenessService, OndemandService,ComponentUpdateService {
+@Service({ArcService.class,FreenessService.class,OndemandService.class, ComponentUpdateService.class, ComponentConfService.class})
+public class PortalComponentVcServiceImpl implements ArcService, FreenessService, OndemandService,ComponentUpdateService, ComponentConfService {
 	private OndemandService procComponentOndemandService;
 	private ArcService procComponentArcService;
 	private OndemandService authComponentOndemandService;
@@ -329,6 +330,10 @@ public class PortalComponentVcServiceImpl implements ArcService, FreenessService
 			LOGGER.info("**** cleanup:CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus() + "which is supposed to be ACTIVATED.");
 //			System.out.println("cleanup:CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus() + "which is supposed to be ACTIVATED.");
 			//TODO ACTIVATED------>NORMAL OR VALID
+			while(!ComponentStatus.getInstance().getCurrentStatus().
+					equals(ComponentStatus.getInstance().getDefaultStatus())){
+				ComponentStatus.getInstance().getNext();
+			}
 		}
 		
 		
@@ -1665,7 +1670,26 @@ public class PortalComponentVcServiceImpl implements ArcService, FreenessService
 					
 				}
 			}
-		
+			
+			LOGGER.info("**** BeforeSetToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus());
+			if(OldVersionRootTransation.getInstance().getOldRootTxIds().isEmpty()){
+				ReconfigurationVersion rcfgVersion = ReconfigurationVersion.getInstance();
+				rcfgVersion.setOldVersion(rcfgVersion.getNewVersion());
+				try {
+					rcfgVersion.getInstanceFactory().setCtr(rcfgVersion.getNewVersion().getConstructor());
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				}
+				while(!ComponentStatus.getInstance().getCurrentStatus().
+						equals(ComponentStatus.getInstance().getDefaultStatus())){
+					ComponentStatus.getInstance().getNext();
+					LOGGER.info("**** SettingToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus());
+				}
+			}
+			LOGGER.info("**** AfterSetToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus() + 
+					", which is supposed to be " + ComponentStatus.getInstance().getDefaultStatus());
 			return true;
 		
 //		if(achieveFreeness.equals(ComponentStatus.CONCURRENT)){
@@ -1785,5 +1809,64 @@ public class PortalComponentVcServiceImpl implements ArcService, FreenessService
 //	public void notifySubTxEnd(Arc arc, String txID) {
 //		// TODO Auto-generated method stub
 //	}
+
+	@Override
+	public String getComponentName() {
+		return compositeResolver.getHostComponentName();
+	}
+
+	@Override
+	public String getCurrentStatus() {
+		VcContainer container;
+		ComponentStatus status;
+		container = VcContainerImpl.getInstance();
+		status = container.getComponentStatus();
+		return status.getCurrentStatus();
+	}
+
+	@Override
+	public List<String> getAllStatuses() {
+		List<String> statuses = new LinkedList<String>();
+		statuses.add(ComponentStatus.NORMAL);
+		statuses.add(ComponentStatus.ON_DEMAND);
+		statuses.add(ComponentStatus.VALID);
+		statuses.add(ComponentStatus.CONCURRENT);
+		statuses.add(ComponentStatus.BLOCKING);
+		statuses.add(ComponentStatus.WAITING);
+		statuses.add(ComponentStatus.FREE);
+		statuses.add(ComponentStatus.UPDATING);
+		statuses.add(ComponentStatus.UPDATED);
+		statuses.add(ComponentStatus.ACTIVATED);
+		return statuses;
+	}
+	
+	@Override
+	public String getDefaultStatus(){
+		VcContainer container;
+		ComponentStatus status;
+		container = VcContainerImpl.getInstance();
+		status = container.getComponentStatus();
+		return status.getDefaultStatus();
+	}
+	
+	@Override
+	public String getFreenessSetup(){
+		VcContainer container;
+		ComponentStatus status;
+		container = VcContainerImpl.getInstance();
+		status = container.getComponentStatus();
+		return status.getFreenessSetup();
+	}
+	
+	@Override
+	public Set<String> getStartedCompositeUri(){
+		Set<String> result = new HashSet<String>();
+		VcContainer container;
+		Node bsNode;
+		container = VcContainerImpl.getInstance();
+		bsNode = container.getBusinessNode();
+		result = ((NodeImpl)bsNode).getStartedComposites().keySet();
+		return result;
+	}
 	
 }
