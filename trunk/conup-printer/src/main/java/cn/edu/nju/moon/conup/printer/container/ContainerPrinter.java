@@ -90,11 +90,17 @@ public class ContainerPrinter {
 		String arcInfos = new String();
 		while(arcIterator.hasNext()){
 			arc = arcIterator.next();
-			String tmp = "\n\t" + "ArcType: " + arc.getType() +
-					"\n\t" + "RootTransaction: " + arc.getRootTransaction() +
-					"\n\t" + "Source: " + arc.getSourceComponent() + "." + arc.getSourceService() +
-					"\n\t" + "Target: " + arc.getTargetComponent() + "." + arc.getTargetService() +
-					"\n\t" + "---------------------------------------------";
+			String tmp = null;
+			if(arc.getType().equals(Arc.FUTURE)){
+				tmp = "\n\t" + arc.getType() + "[" + arc.getSourceComponent() + "-------RootTx:" + arc.getRootTransaction() + "------->" + arc.getTargetComponent() +"]";
+			}else{
+				tmp = "\n\t" + arc.getType() + "  [" + arc.getSourceComponent() + "-------RootTx:" + arc.getRootTransaction() + "------->" + arc.getTargetComponent() +"]";
+			}
+//			String tmp = "\n\t" + "ArcType: " + arc.getType() +
+//					"\n\t" + "RootTransaction: " + arc.getRootTransaction() +
+//					"\n\t" + "Source: " + arc.getSourceComponent() + "." + arc.getSourceService() +
+//					"\n\t" + "Target: " + arc.getTargetComponent() + "." + arc.getTargetService() +
+//					"\n\t" + "---------------------------------------------";
 			arcInfos += tmp;
 //		for(Arc arc : arcRegistry.getArcs()){
 //			LOGGER.info("\t" + "ArcType: " + arc.getType() +
