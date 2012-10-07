@@ -2,6 +2,7 @@ package cn.edu.nju.moon.conup.def;
 
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
 
+/** For dynamic update only, maintain old and new version classes */
 public class ReconfigurationVersion {
 	private static ReconfigurationVersion reconfigurationVersion = new ReconfigurationVersion();
 	private Class oldVersion;
@@ -48,5 +49,14 @@ public class ReconfigurationVersion {
 	
 	private ReconfigurationVersion(){
 		
+	}
+	
+	/** when a dynamic update is done, it's recommended to invoke the method to reset variables   */
+	public boolean reset(){
+		oldVersion = null;
+		newVersion = null;
+		isLoaded = false;
+		instanceFactory = null;
+		return true;
 	}
 }

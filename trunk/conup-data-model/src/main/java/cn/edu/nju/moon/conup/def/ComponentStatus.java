@@ -31,13 +31,15 @@ public class ComponentStatus {
 	 * Achieve Freeness Strategy
 	 */
 	
-	private String onDemandSetup = ComponentStatus.NORMAL; 
+	//By Jiang: it seems that the member variable is of no use, remove it temporally
+//	private String onDemandSetup = ComponentStatus.NORMAL; 
 	
 //	private String freenessSetup = ComponentStatus.WAITING;
 	private String freenessSetup = ComponentStatus.CONCURRENT;
 	
-//	private String currentStatus = ComponentStatus.NORMAL;
-	private String currentStatus = ComponentStatus.VALID;
+	//currentStatus is supposed to be consistent with defaultStatus
+	private String currentStatus = ComponentStatus.NORMAL;
+//	private String currentStatus = ComponentStatus.VALID;
 //	private String currentStatus = ComponentStatus.FREENESS;
 	
 	private String componentName = null;
@@ -48,7 +50,7 @@ public class ComponentStatus {
 	
 	private List<String> status;
 	
-	private String defaultStatus;
+	private String defaultStatus = VALID;
 	
 	public String getDefaultStatus() {
 		return defaultStatus;
@@ -66,13 +68,14 @@ public class ComponentStatus {
 		return instance;
 	}
 	
-	public void init(String componentName, String onDemandSetup, String freenessSetup){
-		this.componentName = componentName;
-		this.onDemandSetup = onDemandSetup;
-		this.freenessSetup = freenessSetup;
-		
-		currentStatus = onDemandSetup;
-	}
+	//By Jiang: it seems that this method is of no use, remove it temporally
+//	public void init(String componentName, String onDemandSetup, String freenessSetup){
+//		this.componentName = componentName;
+//		this.onDemandSetup = onDemandSetup;
+//		this.freenessSetup = freenessSetup;
+//		
+//		currentStatus = onDemandSetup;
+//	}
 	
 	/** return next component status */
 	public String getNext(){
@@ -103,22 +106,22 @@ public class ComponentStatus {
 	public void setComponentName(String componentName) {
 		this.componentName = componentName;
 	}
-
-	public String getOnDemandSetup() {
-		return onDemandSetup;
-	}
-
-	public void setOnDemandSetup(String onDemandSetup) {
-		if(this.currentStatus == ComponentStatus.NORMAL 
-			&& onDemandSetup.equals(ComponentStatus.ON_DEMAND)){
-			this.onDemandSetup = onDemandSetup;
-			this.currentStatus = onDemandSetup;
-		} else{
-			System.out.println("Error: illegal setup. Current component status=" + currentStatus +
-					", but your onDemandSetup=" + onDemandSetup);
-		}
-		
-	}
+	//By Jiang: it seems that this method is of no use, remove it temporally
+//	public String getOnDemandSetup() {
+//		return onDemandSetup;
+//	}
+//	//By Jiang: it seems that this method is of no use, remove it temporally
+//	public void setOnDemandSetup(String onDemandSetup) {
+//		if(this.currentStatus == ComponentStatus.NORMAL 
+//			&& onDemandSetup.equals(ComponentStatus.ON_DEMAND)){
+//			this.onDemandSetup = onDemandSetup;
+//			this.currentStatus = onDemandSetup;
+//		} else{
+//			System.out.println("Error: illegal setup. Current component status=" + currentStatus +
+//					", but your onDemandSetup=" + onDemandSetup);
+//		}
+//		
+//	}
 
 	public String getFreenessSetup() {
 		return freenessSetup;
