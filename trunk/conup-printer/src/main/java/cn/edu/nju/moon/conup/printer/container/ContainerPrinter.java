@@ -20,17 +20,13 @@ public class ContainerPrinter {
 	}
 	
 	public void printInArcRegistry(ArcRegistry arcRegistry){
-		LOGGER.info("** InArcRegistry:"	+ arcRegistry.hashCode());
-//		System.out.println("InArcRegistry:" + arcRegistry.hashCode());
-		printArcRegistry(arcRegistry);
+		printArcRegistry("InArcRegistry", arcRegistry);
 		System.out.println();
 		
 	}
 	
 	public void printOutArcRegistry(ArcRegistry arcRegistry){
-		LOGGER.info("** OutArcRegistry:"	+ arcRegistry.hashCode());
-//		System.out.println("OutArcRegistry:" + arcRegistry.hashCode());
-		printArcRegistry(arcRegistry);
+		printArcRegistry("OutArcRegistry", arcRegistry);
 		System.out.println();
 		
 	}
@@ -83,18 +79,18 @@ public class ContainerPrinter {
 		System.out.println();
 	}
 	
-	public void printArcRegistry(ArcRegistry arcRegistry){
+	public void printArcRegistry(String regsitryType, ArcRegistry arcRegistry){
 		Set<Arc> arcs = arcRegistry.getArcs();
 		Iterator<Arc> arcIterator = arcs.iterator();
 		Arc arc;
 		String arcInfos = new String();
+		String tmp = "** " + regsitryType;
 		while(arcIterator.hasNext()){
 			arc = arcIterator.next();
-			String tmp = null;
-			if(arc.getType().equals(Arc.FUTURE)){
-				tmp = "\n\t" + arc.getType() + "[" + arc.getSourceComponent() + "-------RootTx:" + arc.getRootTransaction() + "------->" + arc.getTargetComponent() +"]";
-			}else{
+			if(arc.getType().equals(Arc.PAST)){
 				tmp = "\n\t" + arc.getType() + "  [" + arc.getSourceComponent() + "-------RootTx:" + arc.getRootTransaction() + "------->" + arc.getTargetComponent() +"]";
+			}else{
+				tmp = "\n\t" + arc.getType() + "[" + arc.getSourceComponent() + "-------RootTx:" + arc.getRootTransaction() + "------->" + arc.getTargetComponent() +"]";
 			}
 //			String tmp = "\n\t" + "ArcType: " + arc.getType() +
 //					"\n\t" + "RootTransaction: " + arc.getRootTransaction() +
