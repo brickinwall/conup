@@ -182,11 +182,10 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 						&& componentStatus.getCurrentStatus().equals(ComponentStatus.UPDATING)){
 						componentStatus.getNext();							// updating----------> updated
 						LOGGER.info("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be UPDATED.");
-//						System.out.println("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be UPDATED.");
-//						ReconfigurationVersion rcfgVersion = ReconfigurationVersion.getInstance();
 						rcfgVersion.setOldVersion(rcfgVersion.getNewVersion());
 						try {
 							instanceFactory.setCtr(rcfgVersion.getNewVersion().getConstructor());
+							rcfgVersion.reset();
 						} catch (SecurityException e) {
 							e.printStackTrace();
 						} catch (NoSuchMethodException e) {
