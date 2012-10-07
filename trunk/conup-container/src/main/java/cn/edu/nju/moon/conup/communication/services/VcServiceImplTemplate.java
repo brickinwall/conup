@@ -284,6 +284,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			rcfgVersion.setOldVersion(rcfgVersion.getNewVersion());
 			try {
 				rcfgVersion.getInstanceFactory().setCtr(rcfgVersion.getNewVersion().getConstructor());
+				rcfgVersion.reset();
 			} catch (SecurityException e) {
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
@@ -294,7 +295,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 //			System.out.println("cleanup:CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus() + "which is supposed to be ACTIVATED.");
 			//TODO ACTIVATED------>NORMAL OR VALID
 			while(!ComponentStatus.getInstance().getCurrentStatus().
-					equals(ComponentStatus.getInstance().getDefaultStatus())){
+					equals(ComponentStatus.getInstance().VALID)){
 				ComponentStatus.getInstance().getNext();
 			}
 		}
@@ -1480,6 +1481,20 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			}
 		}//END ELSE
 		
+		//if component status is NORMAL, don't need to maintain arcs
+		VcContainer container;
+		ComponentStatus componentStatus;
+		container = VcContainerImpl.getInstance();
+		componentStatus = container.getComponentStatus();
+		if(componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)){
+			return;
+		}
+		
+		//if a component is not in the scope, don't need to maintain arcs for it
+		if(!componentStatus.getScope().contains(subTxHost)){
+			return;
+		}
+		
 		if(subTxStatus.equals("start")){
 			//ACK_SUBTX_INIT
 			String parentTxCompName = dependency.getHostComponent();
@@ -1634,25 +1649,27 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 				}
 			}
 			
+			//if dynamic update is done, cleanup is needed
 			LOGGER.info("**** BeforeSetToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus());
 			if(OldVersionRootTransation.getInstance().getOldRootTxIds().isEmpty()){
 				ReconfigurationVersion rcfgVersion = ReconfigurationVersion.getInstance();
 				rcfgVersion.setOldVersion(rcfgVersion.getNewVersion());
 				try {
 					rcfgVersion.getInstanceFactory().setCtr(rcfgVersion.getNewVersion().getConstructor());
+					rcfgVersion.reset();
 				} catch (SecurityException e) {
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();
 				}
 				while(!ComponentStatus.getInstance().getCurrentStatus().
-						equals(ComponentStatus.getInstance().getDefaultStatus())){
+						equals(ComponentStatus.getInstance().VALID)){
 					ComponentStatus.getInstance().getNext();
 					LOGGER.info("**** SettingToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus());
 				}
 			}
 			LOGGER.info("**** AfterSetToNewVersion: CurrentComponentStatus: " + ComponentStatus.getInstance().getCurrentStatus() + 
-					", which is supposed to be " + ComponentStatus.getInstance().getDefaultStatus());
+					", which is supposed to be " + ComponentStatus.getInstance().VALID);
 			return true;
 		
 //		if(achieveFreeness.equals(ComponentStatus.CONCURRENT)){
