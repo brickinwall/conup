@@ -45,7 +45,7 @@ import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
  */
 public class ComponentListenerImpl implements ComponentListener{
 	private static ComponentListenerImpl instance = new ComponentListenerImpl();
-	private final static Logger LOGGER = Logger.getLogger(VcAlgorithmImpl.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(ComponentListenerImpl.class.getName());
 	
 	/** 
 	 * 	Purpose: 
