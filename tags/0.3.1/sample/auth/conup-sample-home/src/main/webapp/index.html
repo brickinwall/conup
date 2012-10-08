@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Version Consistency On tuscany</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/nicejforms.js"></script>
+<style type="text/css" media="screen">@import url(css/niceforms-default.css);</style>
+</head>
+
+<body>
+<div id="container">
+<h1 style="margin-bottom:30px;">VC On Tuscany Home Page</h1>
+<form action="result.jsp" method="post" class="niceform">
+	<label for="textinput">Username:</label><br />
+	<input type="text" id="userName" name="userName" size="12" /><br />
+	<label for="passwordinput">Password:</label><br />
+	<input type="password" id="passwd" name="passwd" size="20" /><br />
+	<br />
+	<input type="submit" value="Submit this form" />
+</form>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){$.NiceJForms.build()});
+</script>
+
+</body>
+</html>

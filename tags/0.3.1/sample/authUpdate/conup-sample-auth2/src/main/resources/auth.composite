@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite	xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+		xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		targetNamespace="http://conup"
+		name="conup-sample-auth2"
+		 >
+		   
+	<!--  requires="trace" policySets="traceBindingPolicySet"-->
+		 
+	<component name="AuthComponent">
+		<implementation.java class="cn.edu.nju.moon.conup.sample.auth2.services.AuthServiceImpl" />
+		<service name="TokenService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8081/AuthComponent/TokenService" />
+		</service>
+		
+		<service name="VerificationService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/VerificationService" />
+		</service>
+	</component>
+		   
+</composite>
+
