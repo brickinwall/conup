@@ -5,7 +5,10 @@ package cn.edu.nju.moon.conup.listener;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
@@ -44,6 +47,27 @@ public class ComponentListenerImpl implements ComponentListener{
 	private static ComponentListenerImpl instance = new ComponentListenerImpl();
 	private final static Logger LOGGER = Logger.getLogger(VcAlgorithmImpl.class.getName());
 	
+	/** 
+	 * 	Purpose: 
+	 * 		It's used to mark whether a setup is done for a root tx.
+	 * 	<KEY, VALUE>:
+	 * 		key: root tx ID 
+	 * 		value: defalut is false, and true means setup is done.
+	 * 	Description:
+	 * 		0)	When ComponentListenerImpl realizes a root tx starts, it adds <rootID, false>
+	 * 			to the isSetupDone, and when a root tx ends, ComponentListenerImpl removes it;
+	 * 		1)	When VcAlgorithmImpl realizes a root's status is "running" for the first time,
+	 * 			it will try to set up recursively, and set <rootID, false> to <rootID, true>;
+	 * 		2)	Taking on-demand setup into consideration, even current component status is 
+	 * 			NORMAL, ComponentListenerImpl needs to set <rootID, false> to <rootID, true>
+	 * 			as long as root tx status is "running".
+	 * 	Disadvantages:
+	 * 		0)	it depends on PingSu's notification strategy, we need an extra notification
+	 * 			from PingSu exactly before root tx starts its first sub-tx.
+	 * 	
+	 *  */
+	private Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
+	
 	public static Logger getLogger() {
 		return LOGGER;
 	}
@@ -64,7 +88,7 @@ public class ComponentListenerImpl implements ComponentListener{
 	
 	/** when an event occurs, this method will be called. */
 	public boolean notify(String transactionStatus, String threadID, Set<String> futureC, Set<String> pastC){
-//		System.out.println("\n\ntransaction.status: " + transactionStatus);
+		LOGGER.info("\n\ntransaction.status: " + transactionStatus);
 //TODO just for suping's test, delete in the future!!!
 		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
 		Iterator iterator = futureC.iterator();
@@ -160,7 +184,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				dependency.setCurrentTx(currentTransaction);
 			} else{
 				LOGGER.warning("Error: dirty data in InterceptroCache.");
-//				System.out.println("Error: dirty data in InterceptroCache.");
 			}
 			
 			// add the current transaction and its dependency to TransactionRegistry
@@ -178,13 +201,18 @@ public class ComponentListenerImpl implements ComponentListener{
 					currentTransactionDependency);
 			
 			LOGGER.info(">>>>In ComponentListenerImpl.notify(before start, ,...)");
-//			System.out.println(">>>>In ComponentListenerImpl.notify(before start, ,...)");
 			ContainerPrinter containerPrinter = new ContainerPrinter();
 			containerPrinter.printInArcRegistry(inArcRegistry);
 			containerPrinter.printOutArcRegistry(outArcRegistry);
 			containerPrinter.printTransactionRegistry(transactionRegistry);
 			LOGGER.info("<<<<In ComponentListenerImpl.notify(before start, ,...)");
-//			System.out.println("<<<<In ComponentListenerImpl.notify(before start, ,...)");
+			
+			//setup is not needed immediately when a root transaction starts
+			if(isRoot){
+				isSetupDone.put(rootTransaction, false);
+				LOGGER.info("Transaction status: " + transactionStatus + ", isSetupDone: ");
+				printIsSetupDone(isSetupDone);
+			}
 			
 			//notify current transaction's parent that a new sub-tx starts
 			if(!isRoot){
@@ -196,12 +224,6 @@ public class ComponentListenerImpl implements ComponentListener{
 						"\n\t" + "currentTransaction: " + currentTransaction +
 						"\n\t" + "hostComponent: " + hostComponent +
 						"\n\t" + "txStatus: " + TransactionSnapshot.START);
-//				System.out.println("Try to notify a new sub-tx starts:");
-//				System.out.println("\t" + "targetEndpoint: " + targetEndpoint);
-//				System.out.println("\t" + "parentTransaction: " + parentTransaction);
-//				System.out.println("\t" + "currentTransaction: " + currentTransaction);
-//				System.out.println("\t" + "hostComponent: " + hostComponent);
-//				System.out.println("\t" + "txStatus: " + TransactionSnapshot.START);
 				ArcService arcService;
 				try {
 					arcService = commNode.getService(
@@ -217,7 +239,6 @@ public class ComponentListenerImpl implements ComponentListener{
 			String currentStatus = componentStatus.getCurrentStatus();
 			
 			LOGGER.info(componentStatus.getComponentName() + "'s status: " + currentStatus);
-//			System.out.println(componentStatus.getComponentName() + "'s status: " + currentStatus);
 			//suspend current thread
 			if( currentStatus.equals(ComponentStatus.ON_DEMAND)){
 				OndemandThreadBuffer threadBuffer;
@@ -227,7 +248,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				synchronized (threadBuffer) {
 					try {
 						LOGGER.info("ComponentStatus is ON_DEMAND, now wait()...");
-//						System.out.println("ComponentStatus is ON_DEMAND, now wait()...");
 						threads.add(Thread.currentThread());
 //						Thread.currentThread().wait();
 						threadBuffer.wait();
@@ -237,8 +257,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				}
 				LOGGER.info("wait() is done, and ComponentStatus is " + 
 						componentStatus.getCurrentStatus());
-//				System.out.println("wait() is done, and ComponentStatus is " + 
-//						componentStatus.getCurrentStatus());
 			}
 			if(!componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)
 				&& !componentStatus.getCurrentStatus().equals(ComponentStatus.ON_DEMAND)){
@@ -248,13 +266,10 @@ public class ComponentListenerImpl implements ComponentListener{
 			}
 			
 			LOGGER.info(">>>>In ComponentListenerImpl.notify(start, ,...)");
-//			System.out.println(">>>>In ComponentListenerImpl.notify(start, ,...)");
-//			ContainerPrinter containerPrinter = new ContainerPrinter();
 			containerPrinter.printInArcRegistry(inArcRegistry);
 			containerPrinter.printOutArcRegistry(outArcRegistry);
 			containerPrinter.printTransactionRegistry(transactionRegistry);
 			LOGGER.info("<<<<In ComponentListenerImpl.notify(start, ,...)");
-//			System.out.println("<<<<In ComponentListenerImpl.notify(start, ,...)");
 			
 		} else if (transactionStatus.equals("running")) {
 			currentTransaction = cache.getDependency(threadID).getCurrentTx();
@@ -272,7 +287,6 @@ public class ComponentListenerImpl implements ComponentListener{
 			//If ComponentStatus isn't NORMAL/ON_DEMAND, arcs need to be maintained.
 			String currentStatus = componentStatus.getCurrentStatus();
 			LOGGER.info(componentStatus.getComponentName() + "'s status: " + currentStatus);
-//			System.out.println(componentStatus.getComponentName() + "'s status: " + currentStatus);
 			//suspend current thread
 			if( currentStatus.equals(ComponentStatus.ON_DEMAND)){
 				OndemandThreadBuffer threadBuffer;
@@ -282,7 +296,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				synchronized (threadBuffer) {
 					try {
 						LOGGER.info("ComponentStatus is ON_DEMAND, now wait()...");
-//						System.out.println("ComponentStatus is ON_DEMAND, now wait()...");
 						threads.add(Thread.currentThread());
 //						Thread.currentThread().wait();
 						threadBuffer.wait();
@@ -292,8 +305,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				}
 				LOGGER.info("wait() is done, and ComponentStatus is " + 
 						componentStatus.getCurrentStatus());
-//				System.out.println("wait() is done, and ComponentStatus is " + 
-//						componentStatus.getCurrentStatus());
 			}
 			if(!componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)
 				&& !componentStatus.getCurrentStatus().equals(ComponentStatus.ON_DEMAND)){
@@ -301,14 +312,21 @@ public class ComponentListenerImpl implements ComponentListener{
 						new VcAlgorithmImpl(VcContainerImpl.getInstance());
 				vcAlgorithm.analyze(transactionStatus, threadID, futureC, pastC);
 			}
+			
 			LOGGER.info(">>>>In ComponentListenerImpl.notify(running , ,...)");
-//			System.out.println(">>>>In ComponentListenerImpl.notify(running , ,...)");
 			ContainerPrinter containerPrinter = new ContainerPrinter();
 			containerPrinter.printInArcRegistry(inArcRegistry);
 			containerPrinter.printOutArcRegistry(outArcRegistry);
 			containerPrinter.printTransactionRegistry(transactionRegistry);
 			LOGGER.info("<<<<In ComponentListenerImpl.notify(running , ,...)");
-//			System.out.println("<<<<In ComponentListenerImpl.notify(running , ,...)");
+			
+			if(componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)
+					|| componentStatus.getCurrentStatus().equals(ComponentStatus.ON_DEMAND)){
+				//maintain isSetupDone
+				isSetupDone.put(rootTransaction, true);
+				LOGGER.info("Transaction status: " + transactionStatus + ", isSetupDone: ");
+				printIsSetupDone(isSetupDone);
+			}
 			
 		} else { // transactionStatus.equals("end")
 			currentTransaction = cache.getDependency(threadID).getCurrentTx();
@@ -334,12 +352,6 @@ public class ComponentListenerImpl implements ComponentListener{
 						"\n\t" + "currentTransaction: " + currentTransaction +
 						"\n\t" + "hostComponent: " + hostComponent + 
 						"\n\t" + "txStatus: " + TransactionSnapshot.END);
-//				System.out.println("Try to notify a new sub-tx ends:");
-//				System.out.println("\t" + "targetEndpoint: " + targetEndpoint);
-//				System.out.println("\t" + "parentTransaction: " + parentTransaction);
-//				System.out.println("\t" + "currentTransaction: " + currentTransaction);
-//				System.out.println("\t" + "hostComponent: " + hostComponent);
-//				System.out.println("\t" + "txStatus: " + TransactionSnapshot.END);
 				ArcService arcService;
 				try {
 					arcService = commNode.getService(
@@ -354,7 +366,6 @@ public class ComponentListenerImpl implements ComponentListener{
 			//If ComponentStatus isn't NORMAL/ON_DEMAND, arcs need to be maintained.
 			String currentStatus = componentStatus.getCurrentStatus();
 			LOGGER.info(componentStatus.getComponentName() + "'s status: " + currentStatus);
-//			System.out.println(componentStatus.getComponentName() + "'s status: " + currentStatus);
 			//suspend current thread
 			if( currentStatus.equals(ComponentStatus.ON_DEMAND)){
 				OndemandThreadBuffer threadBuffer;
@@ -364,7 +375,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				synchronized (threadBuffer) {
 					try {
 						LOGGER.info("ComponentStatus is ON_DEMAND, now wait()...");
-//						System.out.println("ComponentStatus is ON_DEMAND, now wait()...");
 						threads.add(Thread.currentThread());
 //						Thread.currentThread().wait();
 						threadBuffer.wait();
@@ -374,8 +384,6 @@ public class ComponentListenerImpl implements ComponentListener{
 				}
 				LOGGER.info("wait() is done, and ComponentStatus is " + 
 						componentStatus.getCurrentStatus());
-//				System.out.println("wait() is done, and ComponentStatus is " + 
-//						componentStatus.getCurrentStatus());
 			}
 			if(!componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)
 				&& !componentStatus.getCurrentStatus().equals(ComponentStatus.ON_DEMAND)){
@@ -390,25 +398,30 @@ public class ComponentListenerImpl implements ComponentListener{
 				try {
 					arcService = communicationNode.getService(ArcService.class,
 								endpoint);
-//					System.out.println("clean up in ComponentListenerImpl:" + arcService);
 					LOGGER.info("root tx ends, clean up in ComponentListenerImpl:" + arcService);
 					arcService.cleanUp(rootTransaction, scope);
 				} catch (NoSuchServiceException e) {
 					e.printStackTrace();
 				} 
+				
+				//remove root from isSetupDone
+				if( !isSetupDone.containsKey(rootTransaction) 
+					|| !isSetupDone.get(rootTransaction))
+					LOGGER.warning("dirty data found in isSetupDone when cleanup() for root " + rootTransaction);
+				isSetupDone.remove(rootTransaction);
+				LOGGER.info("Transaction status: " + transactionStatus + ", isSetupDone: ");
+				printIsSetupDone(isSetupDone);
 			}
 			
 			//clean interceptor cache
 			InterceptorCache clearCache = InterceptorCacheImpl.getInstance();
 			clearCache.removeDependecy(threadID);
 			LOGGER.info(">>>>In ComponentListenerImpl.notify(end, ,...)");
-//			System.out.println(">>>>In ComponentListenerImpl.notify(end, ,...)");
 			ContainerPrinter containerPrinter = new ContainerPrinter();
 			containerPrinter.printInArcRegistry(inArcRegistry);
 			containerPrinter.printOutArcRegistry(outArcRegistry);
 			containerPrinter.printTransactionRegistry(transactionRegistry);
 			LOGGER.info("<<<<In ComponentListenerImpl.notify(end, ,...)");
-//			System.out.println("<<<<In ComponentListenerImpl.notify(end, ,...)");
 			
 		}//else
 
@@ -429,6 +442,18 @@ public class ComponentListenerImpl implements ComponentListener{
 		}
 		
 		return result;
+	}
+
+	public Map<String, Boolean> getIsSetupDone() {
+		return isSetupDone;
+	}
+	
+	private void printIsSetupDone(Map<String, Boolean> isSetupDone){
+		Iterator<Entry<String, Boolean>> iterator;
+		iterator = isSetupDone.entrySet().iterator();
+		while(iterator.hasNext()){
+			LOGGER.info("\t" + iterator.next().toString());
+		}
 	}
 	
 }//END CLASS

@@ -1,7 +1,10 @@
 package cn.edu.nju.moon.conup.algorithm;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -20,6 +23,8 @@ import cn.edu.nju.moon.conup.def.Scope;
 import cn.edu.nju.moon.conup.def.TransactionDependency;
 import cn.edu.nju.moon.conup.def.TransactionSnapshot;
 import cn.edu.nju.moon.conup.domain.services.TransactionIDService;
+import cn.edu.nju.moon.conup.listener.ComponentListener;
+import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
 import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
 
 public class VcAlgorithmImpl implements VcAlgorithm {
@@ -121,10 +126,48 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 				outArcRegistry.addArc(lpe);
 			}
 
-			LOGGER.info("*** Current tx is root = " 
-					+ isRoot);
-//			System.out.println("isRoot=" + isRoot);
-			if(isRoot){
+			//setup is delayed to "running"
+//			LOGGER.info("*** Current tx is root = " 
+//					+ isRoot);
+//			if(isRoot){
+//				//create a new arc
+//				Arc arc = new Arc();
+//				arc.setType("future");
+//				arc.setRootTransaction(rootTransaction);
+//				arc.setSourceComponent(hostComponent);
+//				arc.setTargetComponent(hostComponent);
+//				
+//				String endpoint = getServiceString(hostComponent);
+//				ArcService arcService;
+//				try {
+//					arcService = communicationNode.getService(ArcService.class,
+//							endpoint);
+//					LOGGER.info("*** Access endpoint: " 
+//							+ endpoint);
+//					arcService.setUp(arc, scope);
+//				} catch (NoSuchServiceException e) {
+//					e.printStackTrace();
+//				}
+//			}//END IF(isRoot)
+		} else if (transactionStatus.equals("running")) {
+			// check outArcRegistry whether it has future arcs not in futureC
+			Set<Arc> futureArcsInOutArcRegistry = outArcRegistry.getArcsViaType("future");
+			currentTransaction = cache.getDependency(threadID).getCurrentTx();
+			rootTransaction = transactionRegistry.getDependency(currentTransaction).getRootTx();
+			
+			//setup is done berfore root's first sub-tx
+			VcContainer container;
+			ComponentListenerImpl listener;
+			Map<String, Boolean> isSetupDone;
+			container = VcContainerImpl.getInstance();
+			listener = (ComponentListenerImpl)container.getListener();
+			isSetupDone = listener.getIsSetupDone();
+			if(rootTransaction.equals(currentTransaction)){
+				//current transaction is root
+				isRoot = true;
+			}
+			LOGGER.info("*** Current tx is root = " + isRoot);
+			if(isRoot && !isSetupDone.get(rootTransaction)){
 				//create a new arc
 				Arc arc = new Arc();
 				arc.setType("future");
@@ -139,18 +182,15 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 							endpoint);
 					LOGGER.info("*** Access endpoint: " 
 							+ endpoint);
-//					System.out.println("Access endpoint in VcAlgorithmImpl:" + endpoint);
 					arcService.setUp(arc, scope);
 				} catch (NoSuchServiceException e) {
 					e.printStackTrace();
 				}
-				
+				//************************
+				isSetupDone.put(rootTransaction, true);
+				LOGGER.info("Transaction status: " + transactionStatus + ", isSetupDone: ");
+				printIsSetupDone(isSetupDone);
 			}//END IF(isRoot)
-		} else if (transactionStatus.equals("running")) {
-			// check outArcRegistry whether it has future arcs not in futureC
-			Set<Arc> futureArcsInOutArcRegistry = outArcRegistry.getArcsViaType("future");
-			currentTransaction = cache.getDependency(threadID).getCurrentTx();
-			rootTransaction = transactionRegistry.getDependency(currentTransaction).getRootTx();
 			
 			
 			Set<Arc> futureArcsBelongToRootInOutArcRegistry = new HashSet<Arc>();
@@ -341,6 +381,14 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 		}
 		
 		return result;
+	}
+	
+	private void printIsSetupDone(Map<String, Boolean> isSetupDone){
+		Iterator<Entry<String, Boolean>> iterator;
+		iterator = isSetupDone.entrySet().iterator();
+		while(iterator.hasNext()){
+			LOGGER.info("\t" + iterator.next().toString());
+		}
 	}
 
 }

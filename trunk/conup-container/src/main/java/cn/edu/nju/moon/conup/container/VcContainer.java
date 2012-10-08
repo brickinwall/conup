@@ -220,5 +220,13 @@ public abstract class VcContainer {
 	public void setDomainUri(String domainUri) {
 		this.domainUri = domainUri;
 	}
+
+	public ComponentListener getListener() {
+		return listener;
+	}
+
+	public void setListener(ComponentListener listener) {
+		this.listener = listener;
+	}
 	
 }
