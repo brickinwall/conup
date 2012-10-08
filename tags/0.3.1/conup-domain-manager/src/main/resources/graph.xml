@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph edgeDefault="directed">
+  <nodes>
+    <node id="DBComponent" bindingInfo="10.0.2.15:8081" />
+    <node id="AuthComponent" bindingInfo="10.0.2.15:8082" />
+    <node id="ProcComponent" bindingInfo="10.0.2.15:8083" />
+    <node id="PortalComponent" bindingInfo="10.0.2.15:8084" />
+    <node id="DB2Component" bindingInfo="10.0.2.15:8181" />
+    <node id="Proc2Component" bindingInfo="10.0.2.15:8183" />
+    <node id="Portal2Component" bindingInfo="10.0.2.15:8184" />
+  </nodes>
+  <edges>
+    <edge src="ProcComponent" dest="AuthComponent" />
+    <edge src="ProcComponent" dest="DBComponent" />
+    <edge src="PortalComponent" dest="ProcComponent" />
+    <edge src="PortalComponent" dest="AuthComponent" />
+    <edge src="Proc2Component" dest="AuthComponent" />
+    <edge src="Proc2Component" dest="DB2Component" />
+    <edge src="Portal2Component" dest="AuthComponent" />
+    <edge src="Portal2Component" dest="Proc2Component" />
+  </edges>
+</graph>
+
