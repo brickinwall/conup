@@ -8,9 +8,9 @@
     <name>Version-consistent dynamic reconfiguration of CBDS</name>
 
 	<scm>
-		<connection>scm:svn:http://conup.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://conup.googlecode.com/svn/trunk</developerConnection>
-		<url>http://conup.googlecode.com/svn/trunk</url>
+		<connection>scm:svn:https://conup.googlecode.com/svn/branches</connection>
+		<developerConnection>scm:svn:https://conup.googlecode.com/svn/branches</developerConnection>
+		<url>https://conup.googlecode.com/svn/branches</url>
 	</scm>
 
 	<dependencies>
@@ -118,6 +118,12 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.0</version>
 				</plugin>
 				
 			</plugins>
