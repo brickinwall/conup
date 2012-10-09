@@ -7,6 +7,12 @@
     <version>0.3.1-SNAPSHOT</version>
     <name>Version-consistent dynamic reconfiguration of CBDS</name>
 
+	<scm>
+		<connection>scm:svn:http://conup.googlecode.com/svn/trunk</connection>
+		<developerConnection>scm:svn:https://conup.googlecode.com/svn/trunk</developerConnection>
+		<url>http://conup.googlecode.com/svn/trunk</url>
+	</scm>
+
 	<dependencies>
 
 		<dependency>
