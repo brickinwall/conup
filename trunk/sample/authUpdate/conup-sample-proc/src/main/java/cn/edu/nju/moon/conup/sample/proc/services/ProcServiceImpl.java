@@ -35,33 +35,33 @@ public class ProcServiceImpl implements ProcService {
 	}
 	@VcTransaction
 	public List<String> process(String token, String data) {
-		ComponentListener listener = ComponentListenerImpl.getInstance();
-		Set<String> futureC = new HashSet<String>();
-		futureC.add("DBComponent");
-		futureC.add("AuthComponent");
-		Set<String> pastC = new HashSet<String>();
-		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
-		
-		listener.notify("start", threadID, futureC, pastC);
-		listener.notify("running", threadID, futureC, pastC);
+//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		Set<String> futureC = new HashSet<String>();
+//		futureC.add("DBComponent");
+//		futureC.add("AuthComponent");
+//		Set<String> pastC = new HashSet<String>();
+//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+//		
+//		listener.notify("start", threadID, futureC, pastC);
+//		listener.notify("running", threadID, futureC, pastC);
 		
 		Boolean authResult = verify.verify(token);
 		
-		futureC.remove("AuthComponent");
-		pastC.add("AuthComponent");
+//		futureC.remove("AuthComponent");
+//		pastC.add("AuthComponent");
 		
-		listener.notify("running", threadID, futureC, pastC);
+//		listener.notify("running", threadID, futureC, pastC);
 		if (authResult) {
 			List<String> result = db.dbOperation();
-			futureC.remove("DBComponent");
-			pastC.add("DBComponent");
-			listener.notify("end", threadID, futureC, pastC);
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
 //			printContainerInfo();
 			return result;
 		} else{
-			futureC.remove("DBComponent");
-			pastC.add("DBComponent");
-			listener.notify("end", threadID, futureC, pastC);
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
 //			printContainerInfo();
 			return null;
 		}

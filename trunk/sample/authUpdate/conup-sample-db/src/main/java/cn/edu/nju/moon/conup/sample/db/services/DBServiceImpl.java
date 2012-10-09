@@ -29,17 +29,17 @@ public class DBServiceImpl implements DBService {
 	@VcTransaction
 	public List<String> dbOperation() {
 		List<String> result = new ArrayList<String>();
-		ComponentListener listener = ComponentListenerImpl.getInstance();
-		Set<String> futureC = new HashSet<String>();
-		Set<String> pastC = new HashSet<String>();
-		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
-		listener.notify("start", threadID, futureC, pastC);
-		
-		listener.notify("running", threadID, futureC, pastC);
+//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		Set<String> futureC = new HashSet<String>();
+//		Set<String> pastC = new HashSet<String>();
+//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+//		listener.notify("start", threadID, futureC, pastC);
+//		
+//		listener.notify("running", threadID, futureC, pastC);
 		
 		result.add("hello tuscany...");
 
-		listener.notify("end", threadID, futureC, pastC);
+//		listener.notify("end", threadID, futureC, pastC);
 		return result;
 		
 //		String sql = "select * from info";

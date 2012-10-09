@@ -40,45 +40,34 @@ public class ProcServiceImpl implements ProcService {
 	}
 
 	public List<String> process(String token, String data) {
-		ComponentListener listener = ComponentListenerImpl.getInstance();
-		Set<String> futureC = new HashSet<String>();
-		futureC.add("DBComponent");
-		futureC.add("AuthComponent");
-		Set<String> pastC = new HashSet<String>();
-		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		Set<String> futureC = new HashSet<String>();
+//		futureC.add("DBComponent");
+//		futureC.add("AuthComponent");
+//		Set<String> pastC = new HashSet<String>();
+//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
 		
-		listener.notify("start", threadID, futureC, pastC);
-		
-		listener.notify("running", threadID, futureC, pastC);
+//		listener.notify("start", threadID, futureC, pastC);
+//		
+//		listener.notify("running", threadID, futureC, pastC);
 		Boolean authResult = verify.verify(token);
 		
-		futureC.remove("AuthComponent");
-		pastC.add("AuthComponent");
+//		futureC.remove("AuthComponent");
+//		pastC.add("AuthComponent");
 		
-		listener.notify("running", threadID, futureC, pastC);
+//		listener.notify("running", threadID, futureC, pastC);
 		if (authResult) {
 			List<String> result = db.dbOperation();
-			futureC.remove("DBComponent");
-			pastC.add("DBComponent");
-			listener.notify("end", threadID, futureC, pastC);
-//			printContainerInfo();
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
 			return result;
 		} else{
-			futureC.remove("DBComponent");
-			pastC.add("DBComponent");
-			listener.notify("end", threadID, futureC, pastC);
-//			printContainerInfo();
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
 			return null;
 		}
 	}
 	
-	private void printContainerInfo(){
-		System.out.println("In ProcServiceImpl.printContainerInfo()...");
-		ContainerPrinter containerPrinter = new ContainerPrinter();
-		containerPrinter.printInArcRegistry(InArcRegistryImpl.getInstance());
-		containerPrinter.printOutArcRegistry(OutArcRegistryImpl.getInstance());
-		System.out.println("outArcRegistry" + OutArcRegistryImpl.getInstance());
-		containerPrinter.printTransactionRegistry(TransactionRegistryImpl.getInstance());
-	}
-
 }
