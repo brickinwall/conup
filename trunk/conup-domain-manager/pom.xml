@@ -4,8 +4,8 @@
     
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-domain-manager</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
-    <name>Version-consistent dynamic reconfiguration of CBDS</name>
+    <version>0.3.1-SNAPSHOT</version>
+    <name>conup-domain-manager</name>
 
 	<scm>
 		<connection>scm:svn:https://conup.googlecode.com/svn/branches</connection>
