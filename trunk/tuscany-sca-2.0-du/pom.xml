@@ -872,7 +872,7 @@ org.apache.tuscany.sca.assembly:org.apache.tuscany.sca.assembly.builder:org.apac
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.2.1</version>
                     <configuration>
-                        <tagBase>https://svn.apache.org/repos/asf/tuscany/sca-java-2.x/tags</tagBase>
+                        <tagBase>https://conup.googlecode.com/svn/tags</tagBase>
                         <useReleaseProfile>false</useReleaseProfile>
                         <preparationGoals>clean install</preparationGoals>
                         <goals>deploy</goals>
