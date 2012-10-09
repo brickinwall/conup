@@ -8,9 +8,9 @@
     <name>conup-domain-manager</name>
 
 	<scm>
-		<connection>scm:svn:https://conup.googlecode.com/svn/branches</connection>
-		<developerConnection>scm:svn:https://conup.googlecode.com/svn/branches</developerConnection>
-		<url>https://conup.googlecode.com/svn/branches</url>
+		<connection>scm:svn:https://conup.googlecode.com/svn/branches/0.3.2</connection>
+		<developerConnection>scm:svn:https://conup.googlecode.com/svn/branches/0.3.2</developerConnection>
+		<url>https://conup.googlecode.com/svn/branches/0.3.2</url>
 	</scm>
 
 	<dependencies>
