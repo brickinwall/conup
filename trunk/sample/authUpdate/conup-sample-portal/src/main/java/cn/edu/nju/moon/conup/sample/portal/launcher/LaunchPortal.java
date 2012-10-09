@@ -19,6 +19,8 @@ import org.apache.tuscany.sca.node.NodeFactory;
 import org.oasisopen.sca.NoSuchServiceException;
 
 
+import cn.edu.nju.moon.conup.communication.services.ComponentConfService;
+import cn.edu.nju.moon.conup.communication.services.ComponentUpdateService;
 import cn.edu.nju.moon.conup.container.VcContainer;
 import cn.edu.nju.moon.conup.container.VcContainerImpl;
 import cn.edu.nju.moon.conup.def.InterceptorCache;
@@ -27,6 +29,7 @@ import cn.edu.nju.moon.conup.def.TransactionDependency;
 import cn.edu.nju.moon.conup.printer.domain.CurrentDomain;
 import cn.edu.nju.moon.conup.sample.portal.services.PortalService;
 import cn.edu.nju.moon.conup.sample.portal.services.ProcService;
+import cn.edu.nju.moon.conup.sample.portal.services.TokenService;
 
 public class LaunchPortal {
 	public static void main(String[] args) throws Exception {
@@ -82,6 +85,46 @@ public class LaunchPortal {
 			new PortalVisitorThread(node).start();
 			Thread.sleep(2000);
 		}
+		
+//		try {
+//			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
+//			PortalService portalService = node.getService(PortalService.class, 
+//				    "PortalComponent#service-binding(PortalService/PortalService)");
+//			System.out.println("\t" + "" + portalService.execute("nju", "cs"));
+			
+//			String baseDir = "/home/nju/deploy/sample/update/";
+//			String classpath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
+//			String contributionURI = "conup-sample-auth";
+//			String compositeURI = "auth.composite";
+//			System.out.println("\nTry to access AuthComponentComm" +
+//					"#service-binding(ComponentUpdateService/ComponentUpdateService):");
+//			ComponentUpdateService authComm = node.getService(ComponentUpdateService.class, 
+//					"AuthComponentComm#service-binding(ComponentUpdateService/ComponentUpdateService)");
+//			System.out.println("\t" + "authComm.update: " + 
+//					authComm.update(baseDir, classpath, contributionURI, compositeURI));
+			
+//			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
+//			PortalService portalService2 = node.getService(PortalService.class, 
+//				    "PortalComponent#service-binding(PortalService/PortalService)");
+//			System.out.println("\t" + "" + portalService2.execute("nju", "cs"));
+			
+//			System.out.println("Try to access AuthComponentComm#service-binding(ComponentConfService/ComponentConfService)");
+//			ComponentConfService compConfService = node.getService(ComponentConfService.class, 
+//				    "AuthComponentComm#service-binding(ComponentConfService/ComponentConfService)");
+//			System.out.println("\t" + "" + compConfService.getAllStatuses());
+//			System.out.println("\t" + "" + compConfService.getStartedCompositeUri());
+//			
+//			System.out.println("\nTry to access AuthComponentComm" +
+//					"#service-binding(ComponentUpdateService/ComponentUpdateService):");
+//			authComm = node.getService(ComponentUpdateService.class, 
+//					"AuthComponentComm#service-binding(ComponentUpdateService/ComponentUpdateService)");
+//			System.out.println("\t" + "authComm.update: " + 
+//					authComm.update(baseDir, classpath, contributionURI, compositeURI));
+			
+//		} catch (NoSuchServiceException e) {
+//			e.printStackTrace();
+//		}
+		
 	}
 	
 }
