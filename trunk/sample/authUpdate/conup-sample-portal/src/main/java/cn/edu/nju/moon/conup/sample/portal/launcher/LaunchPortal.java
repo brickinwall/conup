@@ -79,18 +79,18 @@ public class LaunchPortal {
 	}
 	
 	private static void accessServices(Node node) throws InterruptedException {
-		int threadNum = 3;
-		for(int i=0; i<threadNum; i++){
-			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
-			new PortalVisitorThread(node).start();
-			Thread.sleep(2000);
-		}
-		
-//		try {
+//		int threadNum = 3;
+//		for(int i=0; i<threadNum; i++){
 //			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
-//			PortalService portalService = node.getService(PortalService.class, 
-//				    "PortalComponent#service-binding(PortalService/PortalService)");
-//			System.out.println("\t" + "" + portalService.execute("nju", "cs"));
+//			new PortalVisitorThread(node).start();
+//			Thread.sleep(2000);
+//		}
+		
+		try {
+			System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
+			PortalService portalService = node.getService(PortalService.class, 
+				    "PortalComponent#service-binding(PortalService/PortalService)");
+			System.out.println("\t" + "" + portalService.execute("nju", "cs"));
 			
 //			String baseDir = "/home/nju/deploy/sample/update/";
 //			String classpath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
@@ -121,9 +121,9 @@ public class LaunchPortal {
 //			System.out.println("\t" + "authComm.update: " + 
 //					authComm.update(baseDir, classpath, contributionURI, compositeURI));
 			
-//		} catch (NoSuchServiceException e) {
-//			e.printStackTrace();
-//		}
+		} catch (NoSuchServiceException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
