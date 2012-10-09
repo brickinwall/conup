@@ -116,12 +116,31 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		} else{
 //			System.out.println("operation =" + operation.toString());
 			LOGGER.info("operation =" + operation.toString());
+//			exchangeViaMsgHeader(msg);
 			msg = exchangeViaMsgBody(msg);
 			return getNext().invoke(msg);
 		}//else
 		
 	}
 	
+	private Message exchangeViaMsgHeader(Message msg){
+		if (phase.equals(Phase.SERVICE_POLICY)) {
+			System.out.println("\n\n\nservice interceptor: ");
+			System.out.println(msg.getHeaders().get("conup"));
+		} else if(phase.equals(Phase.REFERENCE_POLICY)){
+			System.out.println("\n\n\nreference interceptor: ");
+			System.out.println(msg.getHeaders());
+			msg.getHeaders().put("conup", "testing");
+		} else if(phase.equals(Phase.SERVICE_INTERFACE)){
+			System.out.println("\n\n\n " + Phase.SERVICE_INTERFACE);
+			System.out.println(msg.getHeaders());
+		} else if(phase.equals(Phase.IMPLEMENTATION_POLICY)){
+			System.out.println("\n\n\n " + Phase.IMPLEMENTATION_POLICY);
+			System.out.println(msg.getHeaders());
+		} 
+		
+		return msg;
+	}
 	
 	/* This method is supposed to exchange root/parent transaction id via Message body.
 	 * 
@@ -282,8 +301,18 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * 
 	 * */
 	private String getTargetString(String raw){
+		if(raw.startsWith("\"")){
+			raw = raw.substring(1);
+		}
+		if(raw.endsWith("\"")){
+			raw = raw.substring(0, raw.length()-1);
+		}
 		int index = raw.indexOf(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER);
-		return raw.substring(raw.substring(index).indexOf("[")+1, raw.substring(index).indexOf("]"));
+		int head = raw.substring(index).indexOf("[")+1;
+		System.out.println(raw.substring(0, head));
+		int tail = raw.substring(index).indexOf("]");
+		System.out.println(raw.substring(head, tail));
+		return raw.substring(head, tail);
 	}
 	
 	/* return current thread ID. */
