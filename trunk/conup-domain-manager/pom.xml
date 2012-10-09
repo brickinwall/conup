@@ -4,7 +4,7 @@
     
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-domain-manager</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>conup-domain-manager</name>
 
 	<scm>

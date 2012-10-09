@@ -6,7 +6,7 @@
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-container</artifactId>
     <version>0.3.1-SNAPSHOT</version>
-    <name>Version-consistent dynamic reconfiguration of CBDS</name>
+    <name>conup-container</name>
 
 	<scm>
 		<connection>scm:svn:https://conup.googlecode.com/svn/branches</connection>

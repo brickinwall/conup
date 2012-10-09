@@ -7,7 +7,7 @@
 	<artifactId>conup-buffer</artifactId>
 	<version>0.3.1-SNAPSHOT</version>
 
-	<name>version-consistency Maven Plugin</name>
+	<name>conup-buffer</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
