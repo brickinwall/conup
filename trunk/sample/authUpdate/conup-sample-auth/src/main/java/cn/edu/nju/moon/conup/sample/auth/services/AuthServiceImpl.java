@@ -24,7 +24,7 @@ public class AuthServiceImpl implements TokenService,VerificationService {
 //		listener.notify("running", threadID, futureC, pastC);
 		
 //		System.out.println("\n\n\n\n======================version 23======================\n\n\n\n");
-//		logger.info("\n\n\n\n======================version 23======================\n\n\n\n");
+		logger.info("\n\n\n\n======================version 23======================\n\n\n\n");
 		String[] creds = cred.split(",");
 		if("nju".equals(creds[0]) && "cs".equals(creds[1])){
 			StringBuilder sb = new StringBuilder(cred);
