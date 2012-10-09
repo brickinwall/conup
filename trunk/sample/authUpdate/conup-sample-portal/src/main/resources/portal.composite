@@ -14,10 +14,6 @@
 		<service name="PortalService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/PortalService" />
 		</service>
-		<service name="NotifyService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/NotifyService" />
-		</service>
-		
 		<reference name="tokenService"  requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/TokenService" />
 		</reference>
