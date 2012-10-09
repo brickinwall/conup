@@ -443,11 +443,13 @@
                 <buildZips>true</buildZips>
             </properties>
             <modules>
+		<module>modules</module>
+		<!--
                 <module>maven/tuscany-maven-plugin</module>
-                <module>modules</module>
                 <module>features</module>
                 <module>distribution</module>
                 <module>maven/archetypes</module>
+		-->
             </modules>
            <build>
               <defaultGoal>deploy</defaultGoal>
