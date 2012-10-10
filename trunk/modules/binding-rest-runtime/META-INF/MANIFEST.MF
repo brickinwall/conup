@@ -1,0 +1,60 @@
+Manifest-Version: 1.0
+Private-Package: org.apache.tuscany.sca.binding.rest.provider;version="2.0.
+ 0",.;version="2.0.0"
+SCA-Version: 1.1
+Bundle-Name: Apache Tuscany SCA REST Binding Runtime
+Bundle-Vendor: The Apache Software Foundation
+Bundle-Version: 2.0.0
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: Apache Tuscany SCA REST Binding Runtime
+Import-Package: javax.jws,
+ javax.servlet,
+ javax.servlet.http,
+ javax.ws.rs,
+ javax.ws.rs.core,
+ javax.ws.rs.ext,
+ javax.xml,
+ org.apache.tuscany.sca.assembly;version="2.0.0",
+ org.apache.tuscany.sca.binding.rest;version="2.0.0",
+ org.apache.tuscany.sca.binding.rest.operationselector.jaxrs;version="2.0.0",
+ org.apache.tuscany.sca.binding.rest.operationselector.rpc;version="2.0.0",
+ org.apache.tuscany.sca.binding.rest.wireformat.json;version="2.0.0",
+ org.apache.tuscany.sca.binding.rest.wireformat.xml;version="2.0.0",
+ org.apache.tuscany.sca.common.http;version="2.0.0",
+ org.apache.tuscany.sca.common.http.cors;version="2.0.0",
+ org.apache.tuscany.sca.core;version="2.0.0",
+ org.apache.tuscany.sca.core.invocation;version="2.0.0",
+ org.apache.tuscany.sca.databinding;version="2.0.0",
+ org.apache.tuscany.sca.databinding.javabeans;version="2.0.0",
+ org.apache.tuscany.sca.databinding.xml;version="2.0.0",
+ org.apache.tuscany.sca.extensibility;version="2.0.0",
+ org.apache.tuscany.sca.host.http;version="2.0.0",
+ org.apache.tuscany.sca.host.http.client;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.impl;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.java;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.java.jaxrs;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.util;version="2.0.0",
+ org.apache.tuscany.sca.invocation;version="2.0.0",
+ org.apache.tuscany.sca.provider;version="2.0.0",
+ org.apache.tuscany.sca.runtime;version="2.0.0",
+ org.apache.tuscany.sca.web.javascript;version="2.0.0",
+ org.apache.wink.client,
+ org.apache.wink.client.handlers,
+ org.apache.wink.common,
+ org.apache.wink.common.internal.registry,
+ org.apache.wink.common.internal.registry.metadata,
+ org.apache.wink.common.model.wadl,
+ org.apache.wink.server.handlers,
+ org.apache.wink.server.internal,
+ org.apache.wink.server.internal.registry,
+ org.apache.wink.server.internal.servlet,
+ org.apache.wink.server.utils,
+ org.oasisopen.sca;version="2.0.0",
+ org.oasisopen.sca.annotation;version="2.0.0"
+Bundle-SymbolicName: org.apache.tuscany.sca.binding.rest.runtime
+Bundle-DocURL: http://www.apache.org/
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,JavaSE-1.6
+
+
