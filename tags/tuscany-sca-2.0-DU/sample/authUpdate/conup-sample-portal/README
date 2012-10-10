@@ -1,0 +1,40 @@
+Secure Store Sample
+======================================
+
+This sample demonstrates how HTTP basic authentication can be added to the sample store scenario that is used
+as a getting started guide for Tuscany SCA. For detailed information on this scenario, please see:
+
+http://tuscany.apache.org/getting-started-with-tuscany.html
+
+or
+
+http://tuscany.apache.org/getting-started-with-tuscany-using-tuscany-eclipse-plugin.html
+
+
+Running And Building The Sample Using Ant
+-----------------------------------------
+With the binary distribution the sample can be run using Ant as follows:
+
+cd store-secure
+ant run
+
+Once the application is running use your browser to visit the following
+URL:
+
+http://localhost:8080/store/
+
+You will be prompted for a username and password.  It doesn't matter what values you enter.
+
+If you want to build it before running it, you can do:
+
+cd store-secure
+ant compile
+ant run
+
+Building The Sample Using Maven
+-------------------------------
+With the source and binary distributions the sample can be built using Maven
+as follows:
+
+cd store-secure
+mvn
