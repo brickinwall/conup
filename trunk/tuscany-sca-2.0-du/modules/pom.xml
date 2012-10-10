@@ -53,7 +53,7 @@
         <module>binding-rmi</module>
         <module>binding-rmi-runtime</module>
         <module>binding-sca-runtime</module>
-	<module>binding-websocket</module>
+		<module>binding-websocket</module>
         <module>binding-ws</module>
         <module>binding-ws-runtime-axis2</module>
         <module>binding-ws-runtime-jaxws</module>
@@ -168,6 +168,13 @@
         <module>base-runtime</module>
         <module>base-runtime-pom</module>
         <module>osgi-runtime-pom</module>
+		<module>conup-buffer</module>
+		<module>conup-container</module>
+		<module>conup-data-model</module>
+		<module>conup-domain-manager</module>
+		<module>conup-preprocessor</module>
+		<module>conup-printer</module>
+		<module>conup-trace</module>
 
     </modules>
 

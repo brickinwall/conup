@@ -347,9 +347,11 @@
             <id>dependencies</id>
             <modules>
                 <module>modules</module>
+				<!--
                 <module>samples</module>
                 <module>tutorials</module>
                 <module>demos</module>
+				-->
             </modules>
             <build>
                 <plugins>
