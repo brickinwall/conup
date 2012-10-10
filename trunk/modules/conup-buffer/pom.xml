@@ -4,6 +4,7 @@
 
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-buffer</artifactId>
+	<name>conup-buffer</name>
 	<version>2.0-DU</version>
 
 
