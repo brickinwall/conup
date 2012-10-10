@@ -77,9 +77,14 @@ public class MethodAnalyzer {
 	/**
 	 * 瀵�?簬宸插垎鏋愬嚭鐨勮烦杞強鍦ㄦ敼鐐硅鍔犲叆鐨勮烦杞俊鎭�
 	 */
-	Hashtable<AbstractInsnNode, String> jumpinf = new Hashtable<AbstractInsnNode, String>();
+	Hashtable<AbstractInsnNode, List<String>> jumpinf = new Hashtable<AbstractInsnNode,List<String>>();
 	Hashtable<AbstractInsnNode, String> ejbinf = new Hashtable<AbstractInsnNode, String>();
 	Hashtable<String, String> ejball= new Hashtable<String, String>();
+	List<AbstractInsnNode> runinf = new LinkedList<AbstractInsnNode>();
+	int runNum = 0;
+	boolean isBranch = false;
+	
+	
 	List<State> states = new LinkedList<State>(); 
 	List<String> com = new LinkedList<String>();
 	
@@ -230,7 +235,17 @@ public class MethodAnalyzer {
 							AbstractInsnNode i1 = i.next();
 //							System.out.println(((AbstractInsnNode)i1).toString());					
 							if (i1 instanceof MethodInsnNode) {	
-								//EJB
+								//COM
+							if(runNum > 0){
+									if(runinf.contains(i1)){
+										InsnList setUp = new InsnList();
+										setUp.add(new VarInsnNode(ALOAD, localNum));										
+										setUp.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));
+										setUp.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "notifyRun", "()V"));
+										insns.insertBefore(i1, setUp);
+									}
+								}
+
 								if (ejbinf.containsKey(i1)) {
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
@@ -247,17 +262,19 @@ public class MethodAnalyzer {
 									} else {
 										insns.insert(i1, trig);
 									}
-				}
+								}
 
 							} else {
 								if (jumpinf.containsKey(i1)) {
+									List<String> jumpEventInf = jumpinf.get(i1);
+									for(String jumpE : jumpEventInf){
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
 							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 						//			trig.add(new VarInsnNode(ALOAD, 0));
 						//			trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 							        trig.add(new VarInsnNode(ALOAD, localNum));
-									trig.add(new LdcInsnNode(jumpinf.get(i1)));
+									trig.add(new LdcInsnNode(jumpE));
 									trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 									
 									if(i1 instanceof LabelNode){
@@ -268,6 +285,7 @@ public class MethodAnalyzer {
 									}										
 									else
 										insns.insert(i1.getPrevious(), trig);
+									}
 								} else {
 									if ((i1.getOpcode() >= IRETURN && i1.getOpcode() <= RETURN)|| i1.getOpcode()==ATHROW) {
 										InsnList trig = new InsnList();
@@ -349,11 +367,13 @@ public class MethodAnalyzer {
 
 					} else {
 						if (jumpinf.containsKey(i1)) {
+							List<String> jumpEventInf = jumpinf.get(i1);
+							for(String jumpE : jumpEventInf){
 							InsnList trig = new InsnList();
 							trig.add(new LdcInsnNode(mn.name));
 					        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/DynamicDependency;"));									
 					        trig.add(new LdcInsnNode(mn.name));
-							trig.add(new LdcInsnNode(jumpinf.get(i1)));
+							trig.add(new LdcInsnNode(jumpE));
 							trig.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 
 							if(i1 instanceof LabelNode){
@@ -364,6 +384,7 @@ public class MethodAnalyzer {
 							}										
 							else
 								insns.insert(i1.getPrevious(), trig);
+							}
 						} else {
 							if ((i1.getOpcode() >= IRETURN && i1.getOpcode() <= RETURN)|| i1.getOpcode()==ATHROW) {
 								InsnList trig = new InsnList();
@@ -485,7 +506,10 @@ public class MethodAnalyzer {
 //					System.out.println(owner);	
 //					System.out.println(isCom(owner));
 					if (isCom(owner)!= null) {
-
+						if(runNum == 0||(runNum == 1 && isBranch)){
+							runinf.add(an);
+							runNum = runNum + 1;
+						}						
 						String e = "COM." + isCom(owner) + "."	+src;
 						ejbinf.put(insns.get(src), e);
 						if(!stateMachine.getStates().contains(src)){
@@ -532,35 +556,64 @@ public class MethodAnalyzer {
 								stateMachine.addEvent(new Event(last_state, src, ""));
 							}
 							if (controlflow.getFlow(src).isWhile) {
-								for (int k = 0; k < controlflow.getDstSize(src); k++) {
+								if(runNum == 0){
+									isBranch = true;
+								}
+								
+								for (int k = 0; k < controlflow.getDstSize(src); k++) {									
 									dst = (Integer) controlflow.getDst(src).get(k);
+									AbstractInsnNode dstNode = insns.get(dst);
 									if(!stateMachine.getStates().contains(dst)){
 										stateMachine.addState(dst);
 									}
 									if (src < dst) {										
-										stateMachine.addEvent(new Event(src,dst, "while.F."+src));
-										jumpinf.put(insns.get(dst), "while.F."+src);
-//										isAnalyze[dst]=1;
+										stateMachine.addEvent(new Event(src,dst, "while.F."+src));										
+										if(jumpinf.containsKey(dstNode)){
+											jumpinf.get(dstNode).add("while.F."+src);
+										}
+										else{
+											List<String> branchEvent = new LinkedList<String>();
+											branchEvent.add("while.F."+src);
+											jumpinf.put(dstNode, branchEvent);
+										}									
 										recognize_state2(dst, dst, insns);
 									} else {										
 										stateMachine.addEvent(new Event(src,dst, "while.T."+src));
-										jumpinf.put(insns.get(dst),"while.T."+src);
-//										isAnalyze[dst]=1;
+										if(jumpinf.containsKey(dstNode)){
+											jumpinf.get(dstNode).add("while.T."+src);
+										}
+										else{
+											List<String> branchEvent = new LinkedList<String>();
+											branchEvent.add("while.T."+src);
+											jumpinf.put(dstNode, branchEvent);
+										}		
+//										jumpinf.put(insns.get(dst),"while.T."+src);
 										recognize_state2(dst, dst, insns);
 									}
 								}
+							
 							} else {
+								if(runNum == 0){
+									isBranch = true;
+								}
 								for (int k = 0; k < controlflow.getDstSize(src); k++) {
 									dst = (Integer) controlflow.getDst(src).get(k);
+									AbstractInsnNode dstNode = insns.get(dst);
 									if(!stateMachine.getStates().contains(dst)){
 										stateMachine.addState(dst);
-										}	
-//									stateMachine.addState(dst);
+										}
 									stateMachine.addEvent(new Event(src, dst,"if." + k+"."+ src));
-									jumpinf.put(insns.get(dst), "if." + k+"."+ src);
-//									isAnalyze[dst]=1;
+									if(jumpinf.containsKey(dstNode)){
+										jumpinf.get(dstNode).add("if." + k+"."+ src);
+									}
+									else{
+										List<String> branchEvent = new LinkedList<String>();
+										branchEvent.add("if." + k+"."+ src);
+										jumpinf.put(dstNode, branchEvent);
+									}
+//									jumpinf.put(insns.get(dst), "if." + k+"."+ src);
 									recognize_state2(dst, dst, insns);
-								}
+								}								
 							}
 						}
 					} else {						
@@ -584,7 +637,7 @@ public class MethodAnalyzer {
 	 * @param last_state
 	 * @param insns
 	 */
-	public void recognize_state(int src, int last_state, InsnList insns) {
+/*	public void recognize_state(int src, int last_state, InsnList insns) {
 		//System.out.println(src);
 //		if (src < stateMachine.getEnd()) {
 			if(src == stateMachine.getStart()){
@@ -672,7 +725,7 @@ public class MethodAnalyzer {
 		}
 			
 	}
-
+*/
 	// merge the state event is empty or the end
 	public void mergeState() {
 //		stateMachine.getStates().add(0, stateMachine.getStart());

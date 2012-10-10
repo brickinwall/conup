@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -257,15 +258,18 @@ public class ProgramAnalyzer {
 		String output = outputLocation;
 		File tempFile = new File(temp);
 		tempFile.mkdir();
-		File destJar = new File(output);
 		jar2temp.unjar(input, temp);
+				
 		findAllCom(tempFile);
 		begin_analyze(tempFile, "Lcn/edu/nju/moon/conup/def/VcTransaction;");
+		
+		File destJar = new File(output);
 		try {
 			temp2jar.jarDir(tempFile, destJar);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public static void main(String args[]) {
@@ -289,15 +293,38 @@ public class ProgramAnalyzer {
 				analyse.analyzeSource(classesToBeAnalysed[i]);
 			}
 
-			// test jar,war,ear
-
-			// String input =
-			// "D:\\program files\\kitchensink-jsp\\target\\jboss-as-kitchensink-jsp.war";
-			// String temp = "e:\\temp";
-			// String output =
-			// "D:\\program files\\jboss-as-7.1.1.Final\\standalone\\deployments\\jboss-as-kitchensink-jsp.war";
-			// analyse.analyzeJar(jarLocation, tempLocation, outputLocation);
-
+			
+/*			// test jar,war,ear
+			ProgramAnalyzer analyse = new ProgramAnalyzer();
+			String jarLocation = "/home/nju/conup-sample-auth.jar";
+			String tempLocation = "/home/temp/conup-sample-auth";
+			String outputLocation =	"/home/analyzed/conup-sample-auth.jar";
+			analyse.analyzeJar(jarLocation, tempLocation, outputLocation);
+*/
+			
+			
+/*			// Test all!
+			ProgramAnalyzer analyse = new ProgramAnalyzer();
+			System.out.println("Please input the application path to be analyze:(For example : /home/nju/workspace/conup-sample-auth/target/classes/)");
+			InputStreamReader is = new InputStreamReader(System.in);
+			BufferedReader br = new BufferedReader(is);			
+//			String classesToBeAnalyse = br.readLine();
+			String classesToBeAnalyse ="/home/nju/conup-sample-auth.jar";
+			String[] names = classesToBeAnalyse.split("/");
+			String fileName = names[names.length-1];
+			if(fileName.endsWith(".jar")||fileName.endsWith(".war")||fileName.endsWith(".ear")||fileName.endsWith(".zip")){
+				System.out.println("It is a .jar,.war or an .ear,please input the unjared file path and the dest file path:(For example: /home/analyzed/ /home/temp/)");
+//				String infos = br.readLine();
+				String infos = "/home/temp/ /home/analyzed/";
+				String tempLocation = infos.split(" ")[0]+fileName.substring(0, fileName.length()-4);
+				String outputLocation =	infos.split(" ")[1]+fileName;
+				analyse.analyzeJar(classesToBeAnalyse, tempLocation, outputLocation);
+			}
+			else
+			{
+				analyse.analyzeSource(classesToBeAnalyse);
+			}
+*/			
 			// test a source application
 			/*
 			 * ProgramAnalyzer analyse=new ProgramAnalyzer(); String projectPath

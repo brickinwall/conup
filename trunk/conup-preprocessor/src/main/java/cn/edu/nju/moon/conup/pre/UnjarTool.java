@@ -22,7 +22,7 @@ public class UnjarTool {
 	public static void main(String args[]) {
 
 		UnjarTool f = new UnjarTool();
-		f.unjar("e:\\jboss-as-kitchensink-jsp.war","e:\\temp");
+		f.unjar("/home/nju/conup-sample-auth.jar","/home/temp");
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class UnjarTool {
 	public void unjar(String jarFileName,String outputPath) {
 		
 		//String jarFileName = "e:\\kichen.jar";
-		Date d = new Date();
+		//Date d = new Date();
 		//String outputPath = "e:\\temp";
 		try {
 			//execute unjar 
@@ -54,8 +54,9 @@ public class UnjarTool {
 			try {
 				Process p1 = Runtime.getRuntime().exec("chmod +x portal.sh");
 				p1.waitFor();
-				Process p2 = Runtime.getRuntime().exec("portal.sh");
-				p2.waitFor();
+				System.out.println("OK......");
+//				Process p2 = Runtime.getRuntime().exec("portal.sh");
+//				p2.waitFor();
 				System.out.println("Granting User Excecute Rights OK!");
 			} catch (Exception e) {
 				e.printStackTrace();
