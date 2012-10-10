@@ -123,7 +123,7 @@ public class DynamicDependency {
 				// listener.notify("running", threadID, new
 				// ConcurrentSkipListSet<String>(), real_past);
 				System.out.println("Transaction  " + id + "  is start!");
-				System.out.println("Event=Start" + "Now,state is empty;Future= " + ";Past=" + real_past);
+				System.out.println("Event=Start" + "Now,state is empty;Future =[];Past=" + real_past);
 			} else {
 				listener.notify("start", threadID, states.get(currentState)
 						.getFuture(), real_past);
@@ -163,8 +163,7 @@ public class DynamicDependency {
 						listener.notify("running", threadID,
 								new ConcurrentSkipListSet<String>(), real_past);
 						System.out.println("Event=" + e.split("-")[0]
-								+ ";Now,state is empty;Future="
-								+ states.get(currentState).getFuture() + ";Past="
+								+ ";Now,state is empty;Future=[];Past="
 								+ real_past);
 					}else{
 					listener.notify("running", threadID,

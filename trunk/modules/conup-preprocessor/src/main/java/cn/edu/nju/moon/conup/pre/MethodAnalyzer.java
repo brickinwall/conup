@@ -237,12 +237,18 @@ public class MethodAnalyzer {
 							if (i1 instanceof MethodInsnNode) {	
 								//COM
 							if(runNum > 0){
-									if(runinf.contains(i1)){
+									if(runinf.contains(i1)){										
 										InsnList setUp = new InsnList();
 										setUp.add(new VarInsnNode(ALOAD, localNum));										
 										setUp.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));
 										setUp.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "notifyRun", "()V"));
-										insns.insertBefore(i1, setUp);
+										AbstractInsnNode ilPre = i1.getPrevious();
+										int op=ilPre.getOpcode();
+										while (op == ALOAD||op == LLOAD||op == FLOAD||op == DLOAD||op == ILOAD) {
+											ilPre = ilPre.getPrevious();
+											op = ilPre.getOpcode();
+										} 
+										insns.insert(ilPre, setUp);
 									}
 								}
 

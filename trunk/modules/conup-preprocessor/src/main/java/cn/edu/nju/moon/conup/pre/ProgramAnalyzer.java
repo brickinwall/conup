@@ -32,8 +32,7 @@ import cn.edu.nju.moon.conup.pre.ProgramAnalyzer;
  */
 public class ProgramAnalyzer {
 
-	// Hashtable<String, List<String>> coms= new Hashtable<String,
-	// List<String>>();
+
 	List<String> coms = new LinkedList<String>();
 
 	/**
@@ -234,7 +233,10 @@ public class ProgramAnalyzer {
 			e.printStackTrace();
 		}
 	}
-
+	/**
+	 * 
+	 * @param projectLocation
+	 */
 	public void analyzeSource(String projectLocation) {
 		String input = projectLocation;
 		File tempFile = new File(input);
@@ -242,17 +244,17 @@ public class ProgramAnalyzer {
 		findAllCom(tempFile);
 		begin_analyze(tempFile, "Lcn/edu/nju/moon/conup/def/VcTransaction;");
 	}
-
+	/**
+	 * analyze jar files : .war, .ear, .jar, .zip
+	 * @param jarLocation
+	 * @param tempLocation
+	 * @param outputLocation
+	 */
 	public void analyzeJar(String jarLocation, String tempLocation,
 			String outputLocation) {
 		UnjarTool jar2temp = new UnjarTool();
 		JarTool temp2jar = new JarTool();
 
-		// String input =
-		// "D:\\program files\\kitchensink-jsp\\target\\jboss-as-kitchensink-jsp.war";
-		// String temp = "e:\\temp";
-		// String output =
-		// "D:\\program files\\jboss-as-7.1.1.Final\\standalone\\deployments\\jboss-as-kitchensink-jsp.war";
 		String input = jarLocation;
 		String temp = tempLocation;
 		String output = outputLocation;
@@ -271,9 +273,48 @@ public class ProgramAnalyzer {
 		}
 
 	}
+	/**
+	 * 
+	 * @param sourcePath
+	 * @param tempPath
+	 * @param targetPath
+	 */
+	public void analyzeApplication(String sourcePath,String tempPath,String targetPath){			
+		String[] names = sourcePath.split("/");
+		String fileName = names[names.length-1];
+		if(fileName.endsWith(".jar")||fileName.endsWith(".war")||fileName.endsWith(".ear")||fileName.endsWith(".zip")){
+			String tempLocation = tempPath+fileName.substring(0, fileName.length()-4);
+			String outputLocation =	targetPath+fileName;
+			analyzeJar(sourcePath, tempLocation, outputLocation);
+		}
+		else
+		{
+			analyzeSource(sourcePath);
+		}
+	}
+	/**
+	 * target application overwrites the source one.
+	 * @param sourcePath
+	 * @param tempPath
+	 */
+	public void analyzeApplication(String sourcePath,String tempPath){
+		String[] names = sourcePath.split("/");
+		String fileName = names[names.length-1];
+		if(fileName.endsWith(".jar")||fileName.endsWith(".war")||fileName.endsWith(".ear")||fileName.endsWith(".zip")){
+			String tempLocation = tempPath+fileName.substring(0, fileName.length()-4);			
+			analyzeJar(sourcePath, tempLocation, sourcePath);
+		}
+		else
+		{
+			analyzeSource(sourcePath);
+		}
+	}
 
 	public static void main(String args[]) {
 		try {
+			ProgramAnalyzer analyse = new ProgramAnalyzer();
+//			analyse.analyzeApplication("/home/analyzed/conup-sample-portal.jar", "/home/temp/", "/home/analyzed/");
+			analyse.analyzeApplication("/home/analyzed/conup-sample-auth.jar", "/home/temp/");
 			// test a source application
 //			 String projectPath ="/home/nju/workspace/conup-sample-db/target/classes/";
 //			 String projectPath ="/home/nju/workspace/conup-sample-auth/target/classes/";
@@ -281,8 +322,7 @@ public class ProgramAnalyzer {
 //			 String projectPath ="/home/nju/workspace/conup-sample-portal/target/classes/";
 //			 ProgramAnalyzer analyse=new ProgramAnalyzer();
 //			 analyse.analyzeSource(projectPath);
-
-			ProgramAnalyzer analyse = new ProgramAnalyzer();
+/*			ProgramAnalyzer analyse = new ProgramAnalyzer();
 			String[] classesToBeAnalysed = new String[] {
 					"/home/nju/workspace/conup-sample-db/target/classes/",
 					"/home/nju/workspace/conup-sample-auth/target/classes/",
@@ -292,7 +332,7 @@ public class ProgramAnalyzer {
 			for (int i = 0; i < classesToBeAnalysed.length; i++) {
 				analyse.analyzeSource(classesToBeAnalysed[i]);
 			}
-
+*/
 			
 /*			// test jar,war,ear
 			ProgramAnalyzer analyse = new ProgramAnalyzer();
