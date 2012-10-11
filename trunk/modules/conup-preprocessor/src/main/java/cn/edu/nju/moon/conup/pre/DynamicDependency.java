@@ -33,11 +33,11 @@ public class DynamicDependency {
 	}
 
 	// private dynamicDependency instance;
-	public static DynamicDependency getInstance(String name) {
+	public static DynamicDependency getInstance(String name,String states,String nexts) {
 		if (ddes.containsKey(name)) {
 			return ddes.get(name);
 		} else {
-			DynamicDependency instance = new DynamicDependency(name);
+			DynamicDependency instance = new DynamicDependency(name,states,nexts);
 			ddes.put(name, instance);
 			return instance;
 		}
@@ -56,13 +56,13 @@ public class DynamicDependency {
 	 * @param name
 	 *            transaction id or name
 	 */
-	private DynamicDependency(String name) {
+	private DynamicDependency(String name,String statesDDA,String nextsDDA) {
 		transactionid = name;
 		className = name.split(";")[0];
-		className = className.replace("/", ".");
+		className = className.replace("/", ".");		
 		methodName = name.split(";")[1];
 		threadID = name.split(";")[2];
-		System.out.println(className + "," + methodName);
+/*		System.out.println(className + "," + methodName);
 
 		try {
 			for (Method m : Class.forName(className).getMethods()) {
@@ -70,33 +70,43 @@ public class DynamicDependency {
 					VcTransaction tran = m.getAnnotation(VcTransaction.class);
 					String nameAnno = tran.name();
 					if (nameAnno.equals(methodName)) {
-
-						String[] stateAnno = tran.states();
-						String[] eventAnno = tran.next();
-
+*/
+						String[] stateAnno = statesDDA.split(";");
+						String[] eventAnno = nextsDDA.split(";");
+						System.out.println("---------states:" + states.size());
 						for (int i = 0; i < stateAnno.length; i++) {
 							String[] si = stateAnno[i].split(",");
 							Set<String> stateFuture = new ConcurrentSkipListSet<String>();
 							for (int j = 0; j < si.length; j++) {
-								/*
-								 * if(si[j].isEmpty()){ si[j] = ""; }
-								 */
+								 if(si[j].equals("_E")) { 
+									 si[j] = ""; 									 
+								}
+								System.out.print(si[j]+"   ");
 								stateFuture.add(si[j]);
 							}
 							SetState state = new SetState();
 							state.setFuture(stateFuture);
 							states.add(state);
 						}
-						System.out.println("states:" + states.size());
+						System.out.println("---------states:" + states.size());
 						// get event information
-						events = eventAnno;
-					}
+						events = new String[eventAnno.length];
+						for(int i = 0; i< eventAnno.length; i++){
+							if(eventAnno[i].equals("_E")){
+								eventAnno[i]="";
+							}
+							events[i] = eventAnno[i];
+							System.out.print(events[i]+"   ");
+						}
+						System.out.println();
+						
+/*					}
 				}
 			}
 		} catch (Exception e) {
 			System.out.println(e.getStackTrace());
 		}
-
+*/
 	}
 
 	public void notifyRun() {
@@ -118,31 +128,34 @@ public class DynamicDependency {
 		if (event.contains("Start")) {
 			currentState = 0;
 			if (states.isEmpty()) {
-				listener.notify("start", threadID,
-						new ConcurrentSkipListSet<String>(), real_past);
+				listener.notify("start", threadID,	new ConcurrentSkipListSet<String>(), real_past);
 				// listener.notify("running", threadID, new
 				// ConcurrentSkipListSet<String>(), real_past);
 				System.out.println("Transaction  " + id + "  is start!");
 				System.out.println("Event=Start" + "Now,state is empty;Future =[];Past=" + real_past);
 			} else {
-				listener.notify("start", threadID, states.get(currentState)
-						.getFuture(), real_past);
+				System.out.println("Transaction  " + id + "  is start!");
+				System.out.println("Event=Start" + "Now,state=" + currentState+ ";Future=" + states.get(currentState).getFuture()
+						+ ";Past=" + real_past);
+				listener.notify("start", threadID, states.get(currentState).getFuture(), real_past);
+/*				if(states.get(currentState).getFuture().isEmpty()){
+					listener.notify("start", threadID, new ConcurrentSkipListSet<String>(), real_past);
+				}
+				else{
+					listener.notify("start", threadID, states.get(currentState).getFuture(), real_past);
+				}
+*/
 				// listener.notify("running", threadID,
 				// states.get(currentState).getFuture(), real_past);
-				System.out.println("Transaction  " + id + "  is start!");
-				System.out.println("Event=Start" + "Now,state=" + currentState
-						+ ";Future=" + states.get(currentState).getFuture()
-						+ ";Past=" + real_past);
+				
 			}
 		} else if (event.isEmpty()) {
 			if (states.isEmpty()) {
-				listener.notify("end", threadID,
-						new ConcurrentSkipListSet<String>(), real_past);
+				listener.notify("end", threadID,new ConcurrentSkipListSet<String>(), real_past);
 				System.out.println("This transaction is end!state is empty!!");
 				ddes.remove(id);
 			} else {
-				listener.notify("end", threadID, states.get(currentState)
-						.getFuture(), real_past);
+				listener.notify("end", threadID, states.get(currentState).getFuture(), real_past);
 				System.out.println("This transaction is end!");
 				ddes.remove(id);
 			}
@@ -160,14 +173,12 @@ public class DynamicDependency {
 				if (e.contains(event)) {
 					currentState = Integer.parseInt(e.split("-")[1]);
 					if(states.isEmpty()){
-						listener.notify("running", threadID,
-								new ConcurrentSkipListSet<String>(), real_past);
+						listener.notify("running", threadID, new ConcurrentSkipListSet<String>(), real_past);
 						System.out.println("Event=" + e.split("-")[0]
 								+ ";Now,state is empty;Future=[];Past="
 								+ real_past);
 					}else{
-					listener.notify("running", threadID,
-							states.get(currentState).getFuture(), real_past);
+					listener.notify("running", threadID,states.get(currentState).getFuture(), real_past);
 					System.out.println("Event=" + e.split("-")[0] + ";Now,state=" + currentState + ";Future=" + states.get(currentState).getFuture() + ";Past="	+ real_past);}
 					return;
 				}
@@ -179,14 +190,14 @@ public class DynamicDependency {
 	}
 
 	public static void main(String args[]) {
-		String name = "cn.edu.nju.moon.vc.pre.Test;execute;1123";
+/*		String name = "cn.edu.nju.moon.vc.pre.Test;execute;1123";
 
 		DynamicDependency.getInstance(name).trigger(name, "Start");
 		DynamicDependency.getInstance(name).trigger(name,
 				"COM.AuthComponent/TokenService.25");
 		DynamicDependency.getInstance(name).trigger(name,
 				"COM.ProcComponent/ProcService.37");
-		DynamicDependency.getInstance(name).trigger(name, "");
+		DynamicDependency.getInstance(name).trigger(name, "");*/
 		// DynamicDependency.getInstance("accessServices").trigger("accessServices",
 		// "");
 		/*
@@ -201,6 +212,11 @@ public class DynamicDependency {
 		 * dynamicDependency
 		 * .getInstance("accessServices").trigger("accessServices", "");
 		 */
+		 DynamicDependency.getInstance("aa", "_E;_E;_E;_E", "if.0.24-1,if.1.24-3;if.0.32-2,if.1.32-3;_E;_E").trigger("aa", "Start");
+		 DynamicDependency.getInstance("aa", "_E;_E;_E;_E", "if.0.24-1,if.1.24-3;if.0.32-2,if.1.32-3;_E;_E").trigger("aa", "if.0.24");
+		 DynamicDependency.getInstance("aa", "_E;_E;_E;_E", "if.0.24-1,if.1.24-3;if.0.32-2,if.1.32-3;_E;_E").trigger("aa", "if.0.32");
+		 DynamicDependency.getInstance("aa", "_E;_E;_E;_E", "if.0.24-1,if.1.24-3;if.0.32-2,if.1.32-3;_E;_E").trigger("aa", "");
+	
 	}
 
 }
