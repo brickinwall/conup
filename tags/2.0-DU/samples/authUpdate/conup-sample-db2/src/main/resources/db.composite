@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!-- requires="trace" policySets="tracePolicySet" policySets="traceImplPolicySet traceBindingPolicySet"-->
+		
+<composite	xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+		xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		targetNamespace="http://conup"
+		name="conup-sample-db2"
+		 >
+        
+	<component name="DB2Component">
+		<implementation.java class="cn.edu.nju.moon.conup.sample.db2.services.DBServiceImpl" />
+		<service name="DBService"  requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8181/DB2Component/DBService" />
+		</service>
+	</component>
+	
+</composite>

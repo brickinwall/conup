@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>	
+	<!--   requires="trace" policySets="traceBindingPolicySet"-->
+		
+<composite	xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+		xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		targetNamespace="http://conup"
+		name="conup-sample-proc"
+		 >
+        
+		<component name="ProcComponent">
+			<implementation.java class="cn.edu.nju.moon.conup.sample.proc.services.ProcServiceImpl" />
+			
+			<service name="ProcService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
+				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8083/ProcComponent/ProcService" />
+			</service>l
+			
+			<reference name="db">
+				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8081/DBComponent/DBService" />
+			</reference>
+			<reference name="verify" >
+				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/VerificationService" />
+			</reference>
+		</component>
+
+</composite>
