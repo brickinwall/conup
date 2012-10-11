@@ -53,17 +53,19 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 	}
 	
 	private void createJavaFile(){
-		String baseUri = new File("").getAbsolutePath();
-		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
-				+ File.separator + "conup-container";
-		fileDir = baseUri + File.separator + "src" + File.separator + "main"
+		
+		String baseUri = this.getClass().getResource("").toString();
+		//baseUri prefix with file: and include package path, need to remove
+		int preIndex = baseUri.indexOf("/");
+		int subIndex = baseUri.indexOf("target/classes/cn/edu/nju/moon/conup/communication/generator/");
+		baseUri = baseUri.substring(preIndex, subIndex);
+		
+		fileDir = baseUri + "src" + File.separator + "main"
 				+ File.separator + "java" + File.separator + "cn"
 				+ File.separator + "edu" + File.separator + "nju"
 				+ File.separator + "moon" + File.separator + "conup"
 				+ File.separator + "communication" + File.separator
 				+ "services" + File.separator;
-//		String fileDir = baseUri + File.separator + "target" + File.separator
-//				+ "classes" + File.separator;
 		fileLocation = fileDir +CLASS_FILE;
 		File vcFile = new File(fileLocation);
 		if (vcFile.exists()) {
@@ -100,7 +102,6 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 			newJavaContent = new StringBuffer();
 			int line = 1;
 			while ((tempString = reader.readLine()) != null) {
-//				System.out.println("line " + line + ": " + tempString);
 				if (tempString.contains("public class VcServiceImplTemplate implements ArcService, FreenessService, OndemandService,ComponentUpdateService, ComponentConfService {")) {
 					tempString = tempString.replace("VcServiceImplTemplate", componentName + "VcServiceImpl");
 					newJavaContent.append(tempString + "\n");
@@ -144,24 +145,6 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 			
 		}
 		
-//		DomainConfig domainConfigTool = new DomainConfigImpl();
-//		List<String> destNodes = domainConfigTool.getDestNodes(componentName);
-//		if(destNodes == null){
-//			return null;
-//		}
-//		Iterator destIterator = destNodes.iterator();
-//		
-////		StringBuffer addedContent = new StringBuffer();
-//
-//		while (destIterator.hasNext()) {
-//			String componentName = (String) destIterator.next();
-//			componentName = componentName.substring(0, 1).toLowerCase()
-//					+ componentName.substring(1);
-////			System.out.println(componentName);
-//			addedContent.append("\tprivate OndemandService " + componentName
-//					+ "OndemandService;\n");
-//			addedContent.append("\tprivate ArcService " + componentName + "ArcService;\n");
-//		}
 		addedContent.append("\n");
 		iterator = targetComponents.keySet().iterator();
 		// generate getter setter method
@@ -211,16 +194,19 @@ public class VcServiceGeneratorImpl implements VcServiceGenerator {
 	}
 
 	private void compileClass() {
-		String baseUri = new File("").getAbsolutePath();
-		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
-				+ File.separator + "conup-container";
-		String srcLocation = baseUri + File.separator + "src" + File.separator + "main"
+		//baseUri prefix with file: and include package path, need to remove
+		String baseUri = this.getClass().getResource("").toString();
+		int preIndex = baseUri.indexOf("/");
+		int subIndex = baseUri.indexOf("target/classes/cn/edu/nju/moon/conup/communication/generator/");
+		baseUri = baseUri.substring(preIndex, subIndex);
+		
+		String srcLocation = baseUri  + "src" + File.separator + "main"
 				+ File.separator + "java" + File.separator + "cn"
 				+ File.separator + "edu" + File.separator + "nju"
 				+ File.separator + "moon" + File.separator + "conup"
 				+ File.separator + "communication" + File.separator
 				+ "services" + File.separator + CLASS_FILE;
-		String classLocation = baseUri + File.separator + "target" + File.separator
+		String classLocation = baseUri + "target" + File.separator
 				+ "classes" + File.separator;
 	        String[] source = { "-d", classLocation, new String(srcLocation) };
 	        try{

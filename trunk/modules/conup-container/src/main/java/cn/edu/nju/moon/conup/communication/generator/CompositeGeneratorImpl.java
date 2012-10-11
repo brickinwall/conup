@@ -154,14 +154,22 @@ public class CompositeGeneratorImpl implements CompositeGenerator {
 		buffer.append("</component>" + "\n");
 		buffer.append("</composite>" + "\n");
 
-		String baseUri = new File("").getAbsolutePath();
-		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
-				+ File.separator + "conup-container";
-		// compositeLocation = baseUri + File.separator + "src" + File.separator
-		// +"main" + File.separator + "resources" + File.separator;
-		compositeLocation = baseUri + File.separator + "target" + File.separator
-				+ "classes" + File.separator;
-		compositeUri = compositeLocation + compositeName;
+//		String baseUri = new File("").getAbsolutePath();
+		
+		String pathStr = this.getClass().getResource("").toString();
+		//pathStr include this class's package path, need to remove it
+		int index = pathStr.indexOf("cn/edu/nju/moon/conup/communication/generator/");
+		String compositeUri = pathStr.substring(0, index);
+		//compositeUri prefix with file:, need to be removed
+		int preIndex = compositeUri.indexOf("/");
+		compositeUri = compositeUri.substring(preIndex, compositeUri.length());
+//		baseUri = baseUri.substring(0, baseUri.lastIndexOf(File.separator))
+//				+ File.separator + "conup-container";
+//		// compositeLocation = baseUri + File.separator + "src" + File.separator
+//		// +"main" + File.separator + "resources" + File.separator;
+//		compositeLocation = baseUri + File.separator + "target" + File.separator
+//				+ "classes" + File.separator;
+		compositeUri = compositeUri + compositeName;
 
 		// deleteCompositeFiles(compositeLocation);
 		File file;
