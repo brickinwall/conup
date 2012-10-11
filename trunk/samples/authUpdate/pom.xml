@@ -28,7 +28,7 @@
     <artifactId>authUpdate</artifactId>
     <version>2.0.1-DU-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Apache Tuscany SCA Samples Getting Started</name>
+    <name>Dynamic update samples</name>
 
     <modules>
         <module>conup-sample-auth</module>

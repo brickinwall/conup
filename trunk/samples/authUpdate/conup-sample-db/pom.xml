@@ -5,7 +5,7 @@
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-sample-db</artifactId>
     <version>2.0.1-DU-SNAPSHOT</version>
-    <name>Version-consistent dynamic reconfiguration of CBDS</name>
+    <name>conup-sample-db</name>
 
 	<dependencies>
         <dependency>

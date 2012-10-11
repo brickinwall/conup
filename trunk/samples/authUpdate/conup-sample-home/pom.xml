@@ -7,7 +7,7 @@
     <version>2.0.1-DU-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>Home</name>
+    <name>conup-sample-home</name>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
