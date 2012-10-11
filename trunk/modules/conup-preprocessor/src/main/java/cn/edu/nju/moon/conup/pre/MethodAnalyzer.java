@@ -54,29 +54,14 @@ import org.objectweb.asm.util.TraceClassVisitor;
  */
 public class MethodAnalyzer {
 
-	/**
-	 *瀛樻斁姣忎釜鎺у埗娴佺▼鐨勫叿浣撲俊鎭紝鍗硈i-ai-sj
-	 */
 	StateMachine stateMachine = new StateMachine();
 	
-	/**
-	 * 瀛樻斁鐘舵�鏈轰俊鎭紝涓昏鏄垎鏋愮▼搴忕殑鎺у埗娴�
-	 */
 	ControlFlow controlflow = new ControlFlow();
 	
-	/**
-	 * 姣忎釜鐘舵�鐐瑰凡浣跨敤鐨勫澶栬皟鐢�
-	 */
 	List<String>[] past;
 	
-	/**
-	 * 姣忎釜鐘舵�鐐瑰皢瑕佺殑瀵瑰璋冪敤
-	 */
 	List<String>[] future;
 	
-	/**
-	 * 瀵�?簬宸插垎鏋愬嚭鐨勮烦杞強鍦ㄦ敼鐐硅鍔犲叆鐨勮烦杞俊鎭�
-	 */
 	Hashtable<AbstractInsnNode, List<String>> jumpinf = new Hashtable<AbstractInsnNode,List<String>>();
 	Hashtable<AbstractInsnNode, String> ejbinf = new Hashtable<AbstractInsnNode, String>();
 	Hashtable<String, String> ejball= new Hashtable<String, String>();
@@ -87,15 +72,10 @@ public class MethodAnalyzer {
 	
 	List<State> states = new LinkedList<State>(); 
 	List<String> com = new LinkedList<String>();
-	
-	/**
-	 * 鍒嗘瀽鍑哄搴旀瘡涓姸鎬佺殑鎵�互鍙兘鐨勪笅姝ュ姩浣滃強鎵�埌杈剧殑涓嬩釜鐘舵�
-	 */
+	String statesDDA = "";
+	String nextsDDA = "";
 	List<String> next = new LinkedList<String>();
 	
-	/**
-	 * 鍒嗘瀽鍑虹殑鎵�互鐘舵�淇℃�?
-	 */
 	List<String> stateall = new LinkedList<String>();
 	/**
 	 * whether the bytecode  is analyzed;
@@ -118,25 +98,27 @@ public class MethodAnalyzer {
 	}
 	
 	public void writeState(MethodNode mn){
-		String statew="";
-		String nextw="";
+		statesDDA = "";
+		nextsDDA = "";
 		for(String s : stateall){
 			if(s.isEmpty())
 			{
-				s="E";
+				s="_E";
 			}
-			statew = statew + s+";";
+			statesDDA = statesDDA + s+";";
 		}
-		statew.subSequence(0, statew.length()-1);
+		statesDDA = statesDDA.subSequence(0, statesDDA.length()-1).toString();
+//		System.out.println("---------state size:"+stateall.size()+"!statesDDA"+statesDDA);		
 		for(String s : next){
 			if(s.isEmpty())
 			{
-				s="E";
+				s="_E";
 			}
-			nextw = nextw + s+";";
+			nextsDDA = nextsDDA + s+";";
 		}
-		nextw.subSequence(0, nextw.length()-1);
-		try{
+		nextsDDA = nextsDDA.subSequence(0, nextsDDA.length()-1).toString();
+//		System.out.println("---------next size:"+next.size()+"!nextsDDA"+nextsDDA);		
+/*		try{
 		  File dir = new File("e:\\ttp");
 		  dir.mkdir();		 
 		  FileWriter fw = new FileWriter("e:\\ttp\\"+mn.name+".txt");
@@ -144,14 +126,14 @@ public class MethodAnalyzer {
 		  bw.write(statew);
 		  bw.newLine();
 		  bw.write(nextw);
-		  bw.flush(); //将数据更新至文件
+		  bw.flush(); //灏嗘暟鎹洿鏂拌嚦鏂囦欢
 		  bw.close();
 		  fw.close();
 		}
 		catch(IOException e) {
 			e.printStackTrace();
 		}
-		
+*/	
 	}
 	/**
 	 * insert the trigger information: use notify
@@ -161,7 +143,7 @@ public class MethodAnalyzer {
 	 * the transaction or method name to be analyze
 	 */
 	public void methodTransform(ClassNode cn,MethodNode mn,String analyzername) {
-		
+//		DynamicDependency.getInstance("da", statesDDA, nextsDDA);
 		           if (mn.name.equals(analyzername)||isTransaction(mn, analyzername)) {
 //		   
 			            //setEjbs(cn);			
@@ -181,11 +163,11 @@ public class MethodAnalyzer {
 						//minimizeState();
 						setStateAll();						
 						setNext();
-//						writeState(mn);
+						writeState(mn);
 						int localNum = mn.localVariables.size();
 //insert annotation
 						Iterator<AnnotationNode> iter = mn.visibleAnnotations.iterator();
-						while (iter.hasNext()) {
+	/*					while (iter.hasNext()) {
 							AnnotationNode an = iter.next();
 							if (an.desc.equals(analyzername)) {
 								List<Object> valuenew = new LinkedList<Object>();
@@ -200,7 +182,7 @@ public class MethodAnalyzer {
 							}
 						}
 						
-
+*/
 						InsnList trigstart = new InsnList();
 //insert mn.name.thread id
 						trigstart.add(new TypeInsnNode(NEW, "java/lang/Integer"));									
@@ -221,13 +203,16 @@ public class MethodAnalyzer {
 						
 						
 						trigstart.add(new VarInsnNode(ALOAD, localNum));
-						trigstart.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
+						trigstart.add(new LdcInsnNode(statesDDA));
+//						System.out.println("----------------------StatesDDA"+statesDDA);
+						trigstart.add(new LdcInsnNode(nextsDDA));
+						trigstart.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 //						trigstart.add(new VarInsnNode(ALOAD, 0));
 //						trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 						trigstart.add(new VarInsnNode(ALOAD, localNum));
 						trigstart.add(new LdcInsnNode("Start"));						
 						trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
-						
+			
 						insns.insert(insns.getFirst(),trigstart);
 					    Iterator<AbstractInsnNode> i = insns.iterator();
 						int src = 0;
@@ -240,7 +225,9 @@ public class MethodAnalyzer {
 									if(runinf.contains(i1)){										
 										InsnList setUp = new InsnList();
 										setUp.add(new VarInsnNode(ALOAD, localNum));										
-										setUp.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));
+										setUp.add(new LdcInsnNode(statesDDA));
+										setUp.add(new LdcInsnNode(nextsDDA));
+										setUp.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));
 										setUp.add(new MethodInsnNode(INVOKEVIRTUAL, "cn/edu/nju/moon/conup/pre/DynamicDependency", "notifyRun", "()V"));
 										AbstractInsnNode ilPre = i1.getPrevious();
 										int op=ilPre.getOpcode();
@@ -255,7 +242,9 @@ public class MethodAnalyzer {
 								if (ejbinf.containsKey(i1)) {
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
-							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
+									trig.add(new LdcInsnNode(statesDDA));
+									trig.add(new LdcInsnNode(nextsDDA));
+							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 			//						trig.add(new VarInsnNode(ALOAD, 0));
 			//						trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 							        trig.add(new VarInsnNode(ALOAD, localNum));
@@ -276,7 +265,9 @@ public class MethodAnalyzer {
 									for(String jumpE : jumpEventInf){
 									InsnList trig = new InsnList();
 									trig.add(new VarInsnNode(ALOAD, localNum));
-							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
+									trig.add(new LdcInsnNode(statesDDA));
+									trig.add(new LdcInsnNode(nextsDDA));
+							        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 						//			trig.add(new VarInsnNode(ALOAD, 0));
 						//			trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 							        trig.add(new VarInsnNode(ALOAD, localNum));
@@ -296,7 +287,9 @@ public class MethodAnalyzer {
 									if ((i1.getOpcode() >= IRETURN && i1.getOpcode() <= RETURN)|| i1.getOpcode()==ATHROW) {
 										InsnList trig = new InsnList();
 										trig.add(new VarInsnNode(ALOAD, localNum));
-								        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
+										trig.add(new LdcInsnNode(statesDDA));
+										trig.add(new LdcInsnNode(nextsDDA));
+								        trig.add(new MethodInsnNode(INVOKESTATIC, "cn/edu/nju/moon/conup/pre/DynamicDependency", "getInstance", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/pre/DynamicDependency;"));									
 				//						trig.add(new VarInsnNode(ALOAD, 0));
 				//						trig.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;"));
 								        trig.add(new VarInsnNode(ALOAD, localNum));
@@ -411,7 +404,7 @@ public class MethodAnalyzer {
 }
 	
 	/**
-	 * 鍒ゆ柇璇ユ柟娉曟槸鍚︽槸闇�鍒嗘�?鐨勬柟娉�?	 * @param mn
+	 * 閸掋倖鏌囩拠銉︽煙濞夋洘妲搁崥锔芥Ц闂囷拷顪呴崚鍡橈拷?閻ㄥ嫭鏌熷▔锟?	 * @param mn
 	 * @param annotationDesc
 	 * @return
 	 */
