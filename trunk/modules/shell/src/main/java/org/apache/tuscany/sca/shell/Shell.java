@@ -58,6 +58,7 @@ import org.apache.tuscany.sca.shell.jline.JLine;
 import cn.edu.nju.moon.conup.container.VcContainer;
 import cn.edu.nju.moon.conup.container.VcContainerImpl;
 import cn.edu.nju.moon.conup.def.NodeHolder;
+import cn.edu.nju.moon.conup.pre.ProgramAnalyzer;
 
 /**
  * A little SCA command shell.
@@ -109,14 +110,28 @@ public class Shell {
             	shell.help(null);
             }
             if (contribution != null) {
+            	//added for conup
+                File file = new File(contribution);
+                String absContributionPath = file.getAbsolutePath();
+                
+                System.out.println("Try to preprocess source code...");
+                //preprocess
+                if(!absContributionPath.contains("conup-domain-manager")){
+                	ProgramAnalyzer analyzer;
+                    analyzer = new ProgramAnalyzer();
+                    analyzer.analyzeApplication(absContributionPath, absContributionPath);
+                    
+                    System.out.println("Preprocessing is done...");
+                } else {
+                	System.out.println("Skip preprocessing...");
+                }
+                
+                
                 System.out.println();
                 System.out.println("install " + contribution + " -start");
                 String curi = shell.getNode().installContribution(contribution);
                 shell.getNode().startDeployables(curi);
                 
-                //added for conup
-                File file = new File(contribution);
-                String absContributionPath = file.getAbsolutePath();
                 //added for conup
                 Node node = shell.getNode();
                 Contribution cont = node.getContribution(curi);
