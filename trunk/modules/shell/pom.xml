@@ -56,6 +56,11 @@
         	<artifactId>conup-container</artifactId>
         	<version>2.0-DU-SNAPSHOT</version>
         </dependency>
+	<dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-preprocessor</artifactId>
+        	<version>2.0-DU-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
