@@ -9,12 +9,6 @@
 	<name>conup-trace</name>
 	<url>http://maven.apache.org</url>
 
-	<scm>
-		<connection>scm:svn:https://conup.googlecode.com/svn/tags/tuscany-sca-2.0-DU/svn/branches</connection>
-		<developerConnection>scm:svn:https://conup.googlecode.com/svn/tags/tuscany-sca-2.0-DU/svn/branches</developerConnection>
-		<url>https://conup.googlecode.com/svn/tags/tuscany-sca-2.0-DU/svn/branches</url>
-	</scm>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
