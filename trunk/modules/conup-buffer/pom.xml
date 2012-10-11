@@ -4,7 +4,7 @@
 
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-buffer</artifactId>
-	<version>2.0.1-DU-SNAPSHOT</version>
+	<version>2.0-DU-SNAPSHOT</version>
 	<name>conup-buffer</name>
 
 	<properties>
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-data-model</artifactId>
-			<version>2.0.1-DU-SNAPSHOT</version>
+			<version>2.0-DU-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
