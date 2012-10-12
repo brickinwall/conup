@@ -32,14 +32,10 @@
 
     <modules>
         <module>conup-sample-auth</module>
-        <module>conup-sample-auth2</module>
         <module>conup-sample-db</module>
-        <module>conup-sample-db2</module>
         <module>conup-sample-home</module>
         <module>conup-sample-portal</module>
-        <module>conup-sample-portal2</module>
         <module>conup-sample-proc</module>
-        <module>conup-sample-proc2</module>
     </modules>
 
 </project>
