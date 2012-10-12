@@ -19,10 +19,13 @@ public class LaunchCommunication {
 		
 		CompositeGenerator compositeGenerator = 
 				new CompositeGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services." + componentName + "VcServiceImpl", businessCompositeLocation);
-		compositeGenerator.generate();
-
-		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, compositeGenerator);
-		vcServiceGenerator.generate();
+		
+		String contributionPath = ContributionLocationHelper.getContributionLocation(LaunchCommunication.class);
+		if(!contributionPath.contains(".jar")){
+			compositeGenerator.generate();
+			VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, compositeGenerator);
+			vcServiceGenerator.generate();
+		}
 		
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
         String domainUri = null;
