@@ -19,15 +19,12 @@ public class LaunchCommunication {
 		
 		CompositeGenerator compositeGenerator = 
 				new CompositeGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services." + componentName + "VcServiceImpl", businessCompositeLocation);
-//		compositeGenerator.generate();
-//		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, "cn.edu.nju.moon.conup.communication.services.VcServiceImpl");
+		compositeGenerator.generate();
+
 		VcServiceGenerator vcServiceGenerator = new VcServiceGeneratorImpl(componentName, compositeGenerator);
-//		vcServiceGenerator.generate();
+		vcServiceGenerator.generate();
 		
         TuscanyRuntime runtime = TuscanyRuntime.newInstance();
-//        String domainName = "cn.edu.nju.moon.version-consistency";
-//        String userIdPsw = "userid=" + domainName + "&password=njuics";
-//        String domainUri = "uri:" + domainName + "?" + userIdPsw;
         String domainUri = null;
         VcContainer container = null;
         container = VcContainerImpl.getInstance();
@@ -38,8 +35,6 @@ public class LaunchCommunication {
         node.installContribution(contributionURL);
         String compositeName = compositeGenerator.getCompositeName();
         node.startComposite("conup-container", compositeName);
-        
-//        CurrentDomain.printDomainAndNodeConf(runtime, node);
         
         System.out.println("communication.composite ready for big business !!!");
         
