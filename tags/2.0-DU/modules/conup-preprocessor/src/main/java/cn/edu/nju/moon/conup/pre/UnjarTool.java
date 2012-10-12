@@ -50,14 +50,14 @@ public class UnjarTool {
 		//System.out.println("System is " + systemName);
 		// command in unix 
 		if (!systemName.toLowerCase().contains("windows")) {
-			System.out.println("Start Granting User Excecute Rights......");
+//			System.out.println("Start Granting User Excecute Rights......");
 			try {
 				Process p1 = Runtime.getRuntime().exec("chmod +x portal.sh");
 				p1.waitFor();
-				System.out.println("OK......");
+//				System.out.println("OK......");
 //				Process p2 = Runtime.getRuntime().exec("portal.sh");
 //				p2.waitFor();
-				System.out.println("Granting User Excecute Rights OK!");
+//				System.out.println("Granting User Excecute Rights OK!");
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Granting User Excecute Rights Failed!");
@@ -173,7 +173,8 @@ public class UnjarTool {
 				// if dir is empty,delete it 
 				else if (fileNames.length == 0) {
 					file.delete();
-				} else {
+				} 
+				else {
 					for (String fileName : fileNames) {
 						File subFile = new File(fileName);
 						clean(path + File.separator + subFile);
@@ -186,7 +187,7 @@ public class UnjarTool {
 			}
 			// if a file,delete it
 			else {
-				System.out.println(file.getAbsolutePath());
+//				System.out.println(file.getAbsolutePath());
 				file.delete();
 			}
 		}

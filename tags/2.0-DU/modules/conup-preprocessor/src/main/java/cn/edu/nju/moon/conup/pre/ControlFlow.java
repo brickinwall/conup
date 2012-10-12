@@ -33,7 +33,7 @@ public class ControlFlow {
 		} else {
 			con.add(new flow(src, dst));
 		}
-		System.out.println(src+"->"+dst);
+//		System.out.println(src+"->"+dst);
 	}
 
 	public int getDstSize(int src) {
@@ -61,7 +61,7 @@ public class ControlFlow {
 			System.out.print(fn.src + "->");
 			List d = getDst(fn.src);
 			for (int i = 0; i < d.size(); i++) {
-				System.out.print(d.get(i) + ",");
+//				System.out.print(d.get(i) + ",");
 			}
 			System.out.println();
 		}

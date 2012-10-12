@@ -54,14 +54,29 @@ import org.objectweb.asm.util.TraceClassVisitor;
  */
 public class MethodAnalyzer {
 
+	/**
+	 *鐎涙ɑ鏂佸В蹇庨嚋閹貉冨煑濞翠胶鈻奸惃鍕徔娴ｆ挷淇婇幁顖ょ礉閸楃i-ai-sj
+	 */
 	StateMachine stateMachine = new StateMachine();
 	
+	/**
+	 * 鐎涙ɑ鏂侀悩鑸碉拷閺堣桨淇婇幁顖ょ礉娑撴槒顪呴弰顖氬瀻閺嬫劗鈻兼惔蹇曟畱閹貉冨煑濞达拷
+	 */
 	ControlFlow controlflow = new ControlFlow();
 	
+	/**
+	 * 濮ｅ繋閲滈悩鑸碉拷閻愮懓鍑℃担璺ㄦ暏閻ㄥ嫬顕径鏍殶閻拷
+	 */
 	List<String>[] past;
 	
+	/**
+	 * 濮ｅ繋閲滈悩鑸碉拷閻愮懓鐨㈢憰浣烘畱鐎电懓顧囩拫鍐暏
+	 */
 	List<String>[] future;
 	
+	/**
+	 * 鐎碉拷?绨鎻掑瀻閺嬫劕鍤惃鍕儲鏉烆剙寮烽崷銊︽暭閻愮顪呴崝鐘插弳閻ㄥ嫯鐑︽潪顑夸繆閹拷
+	 */
 	Hashtable<AbstractInsnNode, List<String>> jumpinf = new Hashtable<AbstractInsnNode,List<String>>();
 	Hashtable<AbstractInsnNode, String> ejbinf = new Hashtable<AbstractInsnNode, String>();
 	Hashtable<String, String> ejball= new Hashtable<String, String>();
@@ -74,8 +89,14 @@ public class MethodAnalyzer {
 	List<String> com = new LinkedList<String>();
 	String statesDDA = "";
 	String nextsDDA = "";
+	/**
+	 * 閸掑棙鐎介崙鍝勵嚠鎼存梹鐦℃稉顏嗗Ц閹胶娈戦幍锟戒簰閸欘垵鍏橀惃鍕瑓濮濄儱濮╂担婊冨挤閹碉拷鍩屾潏鍓ф畱娑撳閲滈悩鑸碉拷
+	 */
 	List<String> next = new LinkedList<String>();
 	
+	/**
+	 * 閸掑棙鐎介崙铏规畱閹碉拷浜掗悩鑸碉拷娣団剝锟?
+	 */
 	List<String> stateall = new LinkedList<String>();
 	/**
 	 * whether the bytecode  is analyzed;
@@ -145,9 +166,9 @@ public class MethodAnalyzer {
 	public void methodTransform(ClassNode cn,MethodNode mn,String analyzername) {
 //		DynamicDependency.getInstance("da", statesDDA, nextsDDA);
 		           if (mn.name.equals(analyzername)||isTransaction(mn, analyzername)) {
-//		   
+//		        	   System.out.println("Begin analyze method:" + mn.name);
 			            //setEjbs(cn);			
-						System.out.println("begin analyze method:"+mn.name);
+//						System.out.println("begin analyze method:"+mn.name);
 						InsnList insns = mn.instructions;
 						stateMachine.setStart(0);
 						stateMachine.setEnd(mn.instructions.size());
