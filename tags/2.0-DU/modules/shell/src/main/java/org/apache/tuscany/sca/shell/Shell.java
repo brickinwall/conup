@@ -78,6 +78,8 @@ public class Shell {
 
     public static void main(final String[] args) throws Exception {
         boolean useJline = true;
+        boolean requirePreprocessor = true;
+        boolean requireContainer = true;
         String domainURI = "uri:default";
         String compositeFileName = null;
         
@@ -91,6 +93,10 @@ public class Shell {
                 showHelp = true;
             } else if (s.startsWith("-nodeXML:")) {
             	nodeXML = s.substring("-nodeXML:".length());
+            } else if("-noPreprocessor".equals(s)){
+            	requirePreprocessor = false;
+            } else if("-noContainer".equals(s)){
+            	requireContainer = false;
             } else {
                 if (s.startsWith("uri:") || s.startsWith("properties:")) {
                     domainURI = s;
@@ -116,12 +122,19 @@ public class Shell {
                 
                 System.out.println("Try to preprocess source code...");
                 //preprocess
-                if(!absContributionPath.contains("conup-domain-manager")){
-                	ProgramAnalyzer analyzer;
-                    analyzer = new ProgramAnalyzer();
-                    analyzer.analyzeApplication(absContributionPath, absContributionPath);
-                    
-                    System.out.println("Preprocessing is done...");
+//                if(!absContributionPath.contains("conup-domain-manager")
+//                	&& !absContributionPath.contains("conup-sample-visitor")){
+                if(requirePreprocessor){
+                	if(!absContributionPath.contains("conup-domain-manager")){
+                		ProgramAnalyzer analyzer;
+                        analyzer = new ProgramAnalyzer();
+                        analyzer.analyzeApplication(absContributionPath, absContributionPath);
+                        
+                        System.out.println("Preprocessing is done...");
+                	} else{
+                		System.out.println("Skip preprocessing...");
+                	}
+                	
                 } else {
                 	System.out.println("Skip preprocessing...");
                 }
@@ -132,36 +145,39 @@ public class Shell {
                 String curi = shell.getNode().installContribution(contribution);
                 shell.getNode().startDeployables(curi);
                 
-                //added for conup
-                Node node = shell.getNode();
-                Contribution cont = node.getContribution(curi);
-                List<Composite> composites = cont.getDeployables();
-                Composite composite = composites.get(0);
-                String componentName = null;
-                String compositeName = null;
-                //get component name
-                componentName = composite.getComponents().get(0).getName();
-                compositeName = composite.getURI();
-                if(compositeFileName == null){
-                	compositeFileName = compositeName;
-                }
-                System.out.println("absContributionPath: " + absContributionPath);
-                System.out.println("compositeFileName: " + compositeFileName);
-                //get VcContainer
-                String compositeLocation = curi + File.separator + compositeName;
-                if(!absContributionPath.contains("conup-domain-manager")){
-                	VcContainer container = VcContainerImpl.getInstance();
-                    container.setBusinessComponentName(componentName, compositeLocation, 
-                    		absContributionPath, compositeFileName, domainURI);
-//                    container.analyseNodeComposite(compositeLocation);
-                    //add current business node to container
-                    container.setBusinessNode(node, componentName);
-                } else{
-                	NodeHolder nodeHolder = null;
-                	nodeHolder = NodeHolder.getInstance();
-                	nodeHolder.setNode(node);
-                }
-            }
+                if(requireContainer){
+                	 //added for conup
+                    Node node = shell.getNode();
+                    Contribution cont = node.getContribution(curi);
+                    List<Composite> composites = cont.getDeployables();
+                    Composite composite = composites.get(0);
+                    String componentName = null;
+                    String compositeName = null;
+                    //get component name
+                    componentName = composite.getComponents().get(0).getName();
+                    compositeName = composite.getURI();
+                    if(compositeFileName == null){
+                    	compositeFileName = compositeName;
+                    }
+                    System.out.println("absContributionPath: " + absContributionPath);
+                    System.out.println("compositeFileName: " + compositeFileName);
+                    //get VcContainer
+                    String compositeLocation = curi + File.separator + compositeName;
+                    if(!absContributionPath.contains("conup-domain-manager")){
+                    	VcContainer container = VcContainerImpl.getInstance();
+                        container.setBusinessComponentName(componentName, compositeLocation, 
+                        		absContributionPath, compositeFileName, domainURI);
+//                        container.analyseNodeComposite(compositeLocation);
+                        //add current business node to container
+                        container.setBusinessNode(node, componentName);
+                    } else{
+                    	NodeHolder nodeHolder = null;
+                    	nodeHolder = NodeHolder.getInstance();
+                    	nodeHolder.setNode(node);
+                    }
+                }//END IF
+               
+            }//END IF
         }
         
         shell.run();
@@ -930,5 +946,7 @@ public class Shell {
         out.println();
         out.println("      -nojline    (optional) use plain Java System.in/out instead of JLine");
         out.println("                             (no tab completion or advanced line editing will be available)");
+        out.println("      -noPreprocessor(optional) don't execute conup-preprocess");
+        out.println("      -noContainer(optional)  don't create a VcContainer for the contribution");
     }
 }
