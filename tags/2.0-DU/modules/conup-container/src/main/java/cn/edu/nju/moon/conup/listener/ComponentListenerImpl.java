@@ -88,7 +88,7 @@ public class ComponentListenerImpl implements ComponentListener{
 	
 	/** when an event occurs, this method will be called. */
 	public boolean notify(String transactionStatus, String threadID, Set<String> futureC, Set<String> pastC){
-		LOGGER.info("\n\ntransaction.status: " + transactionStatus);
+//		LOGGER.info("\n\ntransaction.status: " + transactionStatus);
 //TODO just for suping's test, delete in the future!!!
 		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
 		Iterator iterator = futureC.iterator();
@@ -200,12 +200,12 @@ public class ComponentListenerImpl implements ComponentListener{
 			transactionRegistry.addDependency(currentTransaction,
 					currentTransactionDependency);
 			
-			LOGGER.info(">>>>In ComponentListenerImpl.notify(before start, ,...)");
+//			LOGGER.info(">>>>In ComponentListenerImpl.notify(before start, ,...)");
 			ContainerPrinter containerPrinter = new ContainerPrinter();
-			containerPrinter.printInArcRegistry(inArcRegistry);
-			containerPrinter.printOutArcRegistry(outArcRegistry);
-			containerPrinter.printTransactionRegistry(transactionRegistry);
-			LOGGER.info("<<<<In ComponentListenerImpl.notify(before start, ,...)");
+//			containerPrinter.printInArcRegistry(inArcRegistry);
+//			containerPrinter.printOutArcRegistry(outArcRegistry);
+//			containerPrinter.printTransactionRegistry(transactionRegistry);
+//			LOGGER.info("<<<<In ComponentListenerImpl.notify(before start, ,...)");
 			
 			//setup is not needed immediately when a root transaction starts
 			if(isRoot){
@@ -218,7 +218,7 @@ public class ComponentListenerImpl implements ComponentListener{
 			if(!isRoot){
 				String targetEndpoint = parentComponent +
 						"Comm#service-binding(ArcService/ArcService)";
-				LOGGER.fine("Try to notify a new sub-tx starts:" + 
+				LOGGER.info("Try to notify a new sub-tx starts:" + 
 						"\n\t" + "targetEndpoint: " + targetEndpoint +
 						"\n\t" + "parentTransaction: " + parentTransaction +
 						"\n\t" + "currentTransaction: " + currentTransaction +
@@ -263,13 +263,14 @@ public class ComponentListenerImpl implements ComponentListener{
 				VcAlgorithmImpl vcAlgorithm = 
 						new VcAlgorithmImpl(VcContainerImpl.getInstance());
 				vcAlgorithm.analyze(transactionStatus, threadID, futureC, pastC);
+			}else{
+				LOGGER.info(">>>>In ComponentListenerImpl.notify(start, ,...)");
+				containerPrinter.printInArcRegistry(inArcRegistry);
+				containerPrinter.printOutArcRegistry(outArcRegistry);
+				containerPrinter.printTransactionRegistry(transactionRegistry);
+//				LOGGER.info("<<<<In ComponentListenerImpl.notify(start, ,...)");
 			}
 			
-			LOGGER.info(">>>>In ComponentListenerImpl.notify(start, ,...)");
-			containerPrinter.printInArcRegistry(inArcRegistry);
-			containerPrinter.printOutArcRegistry(outArcRegistry);
-			containerPrinter.printTransactionRegistry(transactionRegistry);
-			LOGGER.info("<<<<In ComponentListenerImpl.notify(start, ,...)");
 			
 		} else if (transactionStatus.equals("running")) {
 			currentTransaction = cache.getDependency(threadID).getCurrentTx();
@@ -311,14 +312,15 @@ public class ComponentListenerImpl implements ComponentListener{
 				VcAlgorithmImpl vcAlgorithm = 
 						new VcAlgorithmImpl(VcContainerImpl.getInstance());
 				vcAlgorithm.analyze(transactionStatus, threadID, futureC, pastC);
+			}else{
+				LOGGER.info(">>>>In ComponentListenerImpl.notify(running , ,...)");
+				ContainerPrinter containerPrinter = new ContainerPrinter();
+				containerPrinter.printInArcRegistry(inArcRegistry);
+				containerPrinter.printOutArcRegistry(outArcRegistry);
+				containerPrinter.printTransactionRegistry(transactionRegistry);
+//				LOGGER.info("<<<<In ComponentListenerImpl.notify(running , ,...)");
 			}
 			
-			LOGGER.info(">>>>In ComponentListenerImpl.notify(running , ,...)");
-			ContainerPrinter containerPrinter = new ContainerPrinter();
-			containerPrinter.printInArcRegistry(inArcRegistry);
-			containerPrinter.printOutArcRegistry(outArcRegistry);
-			containerPrinter.printTransactionRegistry(transactionRegistry);
-			LOGGER.info("<<<<In ComponentListenerImpl.notify(running , ,...)");
 			
 			if(componentStatus.getCurrentStatus().equals(ComponentStatus.NORMAL)
 					|| componentStatus.getCurrentStatus().equals(ComponentStatus.ON_DEMAND)){
@@ -346,7 +348,7 @@ public class ComponentListenerImpl implements ComponentListener{
 			if(!rootTransaction.equals(currentTransaction)){
 				String targetEndpoint = parentComponent +
 						"Comm#service-binding(ArcService/ArcService)";
-				LOGGER.info("Try to notify a new sub-tx ends:" +
+				LOGGER.info("Try to notify a sub-tx ends:" +
 						"\n\t" + "targetEndpoint: " + targetEndpoint +
 						"\n\t" + "parentTransaction: " + parentTransaction +
 						"\n\t" + "currentTransaction: " + currentTransaction +
@@ -421,7 +423,7 @@ public class ComponentListenerImpl implements ComponentListener{
 			containerPrinter.printInArcRegistry(inArcRegistry);
 			containerPrinter.printOutArcRegistry(outArcRegistry);
 			containerPrinter.printTransactionRegistry(transactionRegistry);
-			LOGGER.info("<<<<In ComponentListenerImpl.notify(end, ,...)");
+//			LOGGER.info("<<<<In ComponentListenerImpl.notify(end, ,...)");
 			
 		}//else
 
@@ -451,9 +453,12 @@ public class ComponentListenerImpl implements ComponentListener{
 	private void printIsSetupDone(Map<String, Boolean> isSetupDone){
 		Iterator<Entry<String, Boolean>> iterator;
 		iterator = isSetupDone.entrySet().iterator();
+		String tmp = "";
 		while(iterator.hasNext()){
-			LOGGER.info("\t" + iterator.next().toString());
+			tmp += "\n\t" + iterator.next().toString();
+//			LOGGER.info("\t" + iterator.next().toString());
 		}
+		LOGGER.info(tmp);
 	}
 	
 }//END CLASS

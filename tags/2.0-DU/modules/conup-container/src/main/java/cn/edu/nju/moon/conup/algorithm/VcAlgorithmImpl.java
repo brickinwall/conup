@@ -55,7 +55,6 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 	public void analyze(String transactionStatus, String threadID,
 			Set<String> futureC, Set<String> pastC) {
 //		System.out.println("transaction.status: " + transactionStatus);
-		
 		Node communicationNode = vcContainer.getCommunicationNode();
 		String currentTransaction = null;
 		String parentTransaction = null;
@@ -97,6 +96,7 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 		 * end), then change the Data Module(InArcsRegistry, OutArcsRegistry,
 		 */
 		if (transactionStatus.equals("start")) {
+			LOGGER.info("*** A new transaction start.....");
 			if(rootTransaction.equals(currentTransaction)){
 				//current transaction is root
 				isRoot = true;
@@ -166,7 +166,7 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 				//current transaction is root
 				isRoot = true;
 			}
-			LOGGER.info("*** Current tx is root = " + isRoot);
+			LOGGER.info("*** transactionStatus:running, Current tx is root = " + isRoot);
 			if(isRoot && !isSetupDone.get(rootTransaction)){
 				//create a new arc
 				Arc arc = new Arc();
@@ -180,8 +180,8 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 				try {
 					arcService = communicationNode.getService(ArcService.class,
 							endpoint);
-					LOGGER.info("*** Access endpoint: " 
-							+ endpoint);
+//					LOGGER.info("*** Access endpoint: " + endpoint);
+					LOGGER.info("*** Current transaction is root, and setup is not done, start setup.");
 					arcService.setUp(arc, scope);
 				} catch (NoSuchServiceException e) {
 					e.printStackTrace();
@@ -207,9 +207,7 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 			for (Arc arc : futureArcsBelongToRootInOutArcRegistry) {
 				if (!futureComponentNames.contains(arc.getTargetComponent())
 						&& !arc.getTargetComponent().equals(hostComponent)) {
-					LOGGER.info("*** " 
-							+ arc.toString() 
-							+ "need update in outArcRegistry");
+					LOGGER.info("*** " + arc.toString()	+ "will not use this component anymore, add Past arc in OutArcRegistry.");
 					
 //					System.out.println("\t" + "need update in outArcRegistry");
 					outArcRegistry.update(arc);
@@ -218,8 +216,8 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 					String serviceString = getServiceString(arc
 							.getTargetComponent());
 //					System.out.println("serviceString: " + serviceString);
-					LOGGER.info("*** notify sub-components to update their arcs by service string"
-							+ serviceString);
+//					LOGGER.info("*** notify sub-components to update their arcs by service string" + serviceString);
+					LOGGER.info("*** notify sub-components to add past arc in their InArcRegistry.");
 					
 					ArcService arcService;
 					try {
@@ -328,8 +326,7 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 				try {
 					arcService = communicationNode.getService(ArcService.class,
 							endpoint);
-					LOGGER.info("*** clean up "
-							+ endpoint);
+					LOGGER.info("*** root transaction ends, start clean up.");
 //					System.out.println("clean up in VcAlgorithmImpl:" + arcService);
 					arcService.cleanUp(rootTransaction, scope);
 				} catch (NoSuchServiceException e) {
@@ -347,7 +344,7 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 		containerPrinter.printOutArcRegistry(outArcRegistry);
 		containerPrinter.printTransactionRegistry(transactionRegistry);
 //		System.out.println("<<<<<In VcAlgorithm.analyze(...)");
-		LOGGER.info("*** <<in VcAlgorithm.analyze(...) print informations end.");
+//		LOGGER.info("*** <<in VcAlgorithm.analyze(...) print informations end.");
 
 	}// analyze
 	
@@ -386,9 +383,12 @@ public class VcAlgorithmImpl implements VcAlgorithm {
 	private void printIsSetupDone(Map<String, Boolean> isSetupDone){
 		Iterator<Entry<String, Boolean>> iterator;
 		iterator = isSetupDone.entrySet().iterator();
+		String tmp = "";
 		while(iterator.hasNext()){
-			LOGGER.info("\t" + iterator.next().toString());
+			tmp += "\n\t" + iterator.next().toString();
+//			LOGGER.info("\t" + iterator.next().toString());
 		}
+		LOGGER.info(tmp);
 	}
 
 }
