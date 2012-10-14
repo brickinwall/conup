@@ -1,5 +1,8 @@
 package cn.edu.nju.moon.conup.pre;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 
 /**
@@ -8,6 +11,11 @@ package cn.edu.nju.moon.conup.pre;
  * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
  */
 public class Event {
+    private final static Logger LOGGER = Logger.getLogger(Event.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 	private int head;
 	/**
 	 * @return the head
@@ -15,12 +23,12 @@ public class Event {
 	private int tail;
 	private String event;
 
-	public Event(int head, int tail, String event) {
+	public Event(int head, int tail, String event) {		
 		super();
 		this.head = head;
 		this.tail = tail;
-		this.event = event;
-		System.out.println(head + "-" + event + "-" + tail);
+		this.event = event;		
+		LOGGER.fine(head + "-" + event + "-" + tail);
 	}
 
 	/**

@@ -19,6 +19,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import org.objectweb.asm.ClassReader;
@@ -53,6 +55,11 @@ import org.objectweb.asm.util.TraceClassVisitor;
  * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
  */
 public class MethodAnalyzer {
+	private final static Logger LOGGER = Logger.getLogger(MethodAnalyzer.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 	/**
 	 *鐎涙ɑ鏂佸В蹇庨嚋閹貉冨煑濞翠胶鈻奸惃鍕徔娴ｆ挷淇婇幁顖ょ礉閸楃i-ai-sj
@@ -102,6 +109,7 @@ public class MethodAnalyzer {
 	 * whether the bytecode  is analyzed;
 	 */
 	private int [] isAnalyze;
+	
 	/**
 	 * 
 	 * @param n
@@ -164,11 +172,12 @@ public class MethodAnalyzer {
 	 * the transaction or method name to be analyze
 	 */
 	public void methodTransform(ClassNode cn,MethodNode mn,String analyzername) {
-//		DynamicDependency.getInstance("da", statesDDA, nextsDDA);
+	
+
 		           if (mn.name.equals(analyzername)||isTransaction(mn, analyzername)) {
-//		        	   System.out.println("Begin analyze method:" + mn.name);
+		        	   LOGGER.fine("Begin analyze method:" + mn.name);
 			            //setEjbs(cn);			
-//						System.out.println("begin analyze method:"+mn.name);
+//						LOGGER.fine("begin analyze method:"+mn.name);
 						InsnList insns = mn.instructions;
 						stateMachine.setStart(0);
 						stateMachine.setEnd(mn.instructions.size());
@@ -506,7 +515,6 @@ public class MethodAnalyzer {
 	 * @param insns
 	 */
 	public void recognize_state2(int src, int last_state, InsnList insns) {
-//		System.out.println(src);
 
 			if(src == stateMachine.getStart()){
 				stateMachine.addState(src);
@@ -767,12 +775,13 @@ public class MethodAnalyzer {
 
 
 	public void showEvent() {
+		
 		for (int i = 0; i < stateMachine.getEvents().size(); i++) {
 			Event event = stateMachine.getEvents().get(i);
 			int src = event.getHead();
 			int dst = event.getTail();
-			System.out.println(src + "-" + event.getEvent() + "-" + dst);
-			// System.out.println(event.getEvent().split(".")[0]);
+			LOGGER.fine(src + "-" + event.getEvent() + "-" + dst);
+			// LOGGER.fine(event.getEvent().split(".")[0]);
 
 		}
 	}
@@ -782,7 +791,7 @@ public class MethodAnalyzer {
 	 * set future and past for every state
 	 */
 	public void ExtractMetaData() {
-
+	
 		int states_count = stateMachine.getStatesCount();
 
 		List[] state = new LinkedList[states_count];
@@ -792,7 +801,7 @@ public class MethodAnalyzer {
 		List s = stateMachine.getStates();
 
 		for (int i = 0; i < states_count; i++) {
-			System.out.println(i + ":" + s.get(i));
+			LOGGER.fine(i + ":" + s.get(i));
 
 		}
 
@@ -838,7 +847,7 @@ public class MethodAnalyzer {
 				int head = event.getHead();
 				int tail = event.getTail();
 				String port = event.getPort();
-				System.out.println(port);
+				LOGGER.fine(port);
 				int headindex = s.indexOf(head);
 				int tailindex = s.indexOf(tail);
 				if (port != null && !future[headindex].contains(port)) {
@@ -860,6 +869,7 @@ public class MethodAnalyzer {
 
 	}
 	public void setStates(){
+		
 		int states_count = stateMachine.getStatesCount();
 		for(int i=0; i<states_count; i++){
 			State state = new State(stateMachine.getStates().get(i));
@@ -872,7 +882,7 @@ public class MethodAnalyzer {
 			state.setFuture(future[i]);
 			state.setPast(past[i]);
 			states.add(state);
-			System.out.println(i+":"+future[i]+";"+past[i]);
+			LOGGER.fine(i+":"+future[i]+";"+past[i]);
 		}
 	}
 	
@@ -1040,6 +1050,7 @@ public class MethodAnalyzer {
 	 * set the next state and the trigger event for every state
 	 */
 	public void setNext() {
+	
 		List<Event> event = stateMachine.getEvents();
 		//List state = stateMachine.getStates();
 		for (int i = 0; i < states.size(); i++) {
@@ -1059,7 +1070,7 @@ public class MethodAnalyzer {
 			else
 				next.add((String)nexts.subSequence(0, nexts.length()-1));			
 			
-			System.out.println(i + "next:" + nexts);
+			LOGGER.fine(i + "next:" + nexts);
 			
 		}
 	}

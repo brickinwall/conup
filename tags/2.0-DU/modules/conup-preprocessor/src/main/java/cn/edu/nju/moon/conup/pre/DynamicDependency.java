@@ -11,12 +11,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.def.VcTransaction;
 import cn.edu.nju.moon.conup.listener.ComponentListener;
 import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
+import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
 
 public class DynamicDependency {
+	private final static Logger LOGGER = Logger.getLogger(DynamicDependency.class.getName());
+	public static Logger getLogger() {
+		return LOGGER;
+	}
+
 	ComponentListener listener = ComponentListenerImpl.getInstance();
 	String transactionid;
 	String className;
@@ -62,18 +69,10 @@ public class DynamicDependency {
 		className = className.replace("/", ".");		
 		methodName = name.split(";")[1];
 		threadID = name.split(";")[2];
-/*		System.out.println(className + "," + methodName);
 
-		try {
-			for (Method m : Class.forName(className).getMethods()) {
-				if (m.isAnnotationPresent(VcTransaction.class)) {
-					VcTransaction tran = m.getAnnotation(VcTransaction.class);
-					String nameAnno = tran.name();
-					if (nameAnno.equals(methodName)) {
-*/
 						String[] stateAnno = statesDDA.split(";");
 						String[] eventAnno = nextsDDA.split(";");
-						System.out.println("---------states:" + states.size());
+						LOGGER.fine("---------states:" + states.size());
 						for (int i = 0; i < stateAnno.length; i++) {
 							String[] si = stateAnno[i].split(",");
 							Set<String> stateFuture = new ConcurrentSkipListSet<String>();
@@ -81,14 +80,13 @@ public class DynamicDependency {
 								 if(si[j].equals("_E")) { 
 									 si[j] = ""; 									 
 								}
-								System.out.print(si[j]+"   ");
+//								System.out.print(si[j]+"   ");
 								stateFuture.add(si[j]);
 							}
 							SetState state = new SetState();
 							state.setFuture(stateFuture);
 							states.add(state);
 						}
-						System.out.println("---------states:" + states.size());
 						// get event information
 						events = new String[eventAnno.length];
 						for(int i = 0; i< eventAnno.length; i++){
@@ -96,17 +94,7 @@ public class DynamicDependency {
 								eventAnno[i]="";
 							}
 							events[i] = eventAnno[i];
-							System.out.print(events[i]+"   ");
 						}
-						System.out.println();
-						
-/*					}
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-		}
-*/
 	}
 
 	public void notifyRun() {
@@ -129,13 +117,11 @@ public class DynamicDependency {
 			currentState = 0;
 			if (states.isEmpty()) {
 				listener.notify("start", threadID,	new ConcurrentSkipListSet<String>(), real_past);
-				// listener.notify("running", threadID, new
-				// ConcurrentSkipListSet<String>(), real_past);
-				System.out.println("Transaction  " + id + "  is start!");
-				System.out.println("Event=Start" + "Now,state is empty;Future =[];Past=" + real_past);
+				LOGGER.fine("Transaction  " + id + "  is start!");
+				LOGGER.fine("Event=Start" + "Now,state is empty;Future =[];Past=" + real_past);
 			} else {
-				System.out.println("Transaction  " + id + "  is start!");
-				System.out.println("Event=Start" + "Now,state=" + currentState+ ";Future=" + states.get(currentState).getFuture()
+				LOGGER.fine("Transaction  " + id + "  is start!");
+				LOGGER.fine("Event=Start" + "Now,state=" + currentState+ ";Future=" + states.get(currentState).getFuture()
 						+ ";Past=" + real_past);
 				listener.notify("start", threadID, states.get(currentState).getFuture(), real_past);
 /*				if(states.get(currentState).getFuture().isEmpty()){
@@ -152,11 +138,11 @@ public class DynamicDependency {
 		} else if (event.isEmpty()) {
 			if (states.isEmpty()) {
 				listener.notify("end", threadID,new ConcurrentSkipListSet<String>(), real_past);
-				System.out.println("This transaction is end!state is empty!!");
+				LOGGER.fine("This transaction is end!state is empty!!");
 				ddes.remove(id);
 			} else {
 				listener.notify("end", threadID, states.get(currentState).getFuture(), real_past);
-				System.out.println("This transaction is end!");
+				LOGGER.fine("This transaction is end!");
 				ddes.remove(id);
 			}
 		} else {
@@ -174,17 +160,17 @@ public class DynamicDependency {
 					currentState = Integer.parseInt(e.split("-")[1]);
 					if(states.isEmpty()){
 						listener.notify("running", threadID, new ConcurrentSkipListSet<String>(), real_past);
-						System.out.println("Event=" + e.split("-")[0]
+						LOGGER.fine("Event=" + e.split("-")[0]
 								+ ";Now,state is empty;Future=[];Past="
 								+ real_past);
 					}else{
 					listener.notify("running", threadID,states.get(currentState).getFuture(), real_past);
-					System.out.println("Event=" + e.split("-")[0] + ";Now,state=" + currentState + ";Future=" + states.get(currentState).getFuture() + ";Past="	+ real_past);}
+					LOGGER.fine("Event=" + e.split("-")[0] + ";Now,state=" + currentState + ";Future=" + states.get(currentState).getFuture() + ";Past="	+ real_past);}
 					return;
 				}
 
 			}
-			System.out.println("The input event is wrong!");
+			LOGGER.fine("The input event is wrong!");
 		}
 
 	}

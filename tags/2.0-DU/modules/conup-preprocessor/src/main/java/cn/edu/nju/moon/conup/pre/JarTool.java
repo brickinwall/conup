@@ -14,6 +14,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides utility services for jarring and unjarring files and directories.
@@ -24,6 +26,11 @@ import java.util.jar.Manifest;
  * modify version ( Patrick Calahan <pcal@bea.com>)
  */
 public class JarTool {
+	private final static Logger LOGGER = Logger.getLogger(JarTool.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 	// ========================================================================
 	// Constants
@@ -103,7 +110,7 @@ public class JarTool {
 	private void jarDir(File dirOrFile2jar, JarOutputStream jos, String path)
 			throws IOException {
 		if (mVerbose)
-			System.out.println("checking " + dirOrFile2jar);
+			LOGGER.fine("checking " + dirOrFile2jar);
 		if (dirOrFile2jar.isDirectory()) {
 			String[] dirList = dirOrFile2jar.list();
 			String subPath = (path == null) ? "" : (path
@@ -122,12 +129,12 @@ public class JarTool {
 		} else {
 			if (dirOrFile2jar.getCanonicalPath().equals(mDestJarName)) {
 				if (mVerbose)
-					System.out.println("skipping " + dirOrFile2jar.getPath());
+					LOGGER.fine("skipping " + dirOrFile2jar.getPath());
 				return;
 			}
 
 			if (mVerbose)
-				System.out.println("adding " + dirOrFile2jar.getPath());
+				LOGGER.fine("adding " + dirOrFile2jar.getPath());
 			FileInputStream fis = new FileInputStream(dirOrFile2jar);
 			try {
 				JarEntry entry = new JarEntry(path + dirOrFile2jar.getName());
@@ -136,7 +143,7 @@ public class JarTool {
 				while ((mByteCount = fis.read(mBuffer)) != -1) {
 					jos.write(mBuffer, 0, mByteCount);
 					if (mVerbose)
-						System.out.println("wrote " + mByteCount + " bytes");
+						LOGGER.fine("wrote " + mByteCount + " bytes");
 				}
 				jos.flush();
 				jos.closeEntry();

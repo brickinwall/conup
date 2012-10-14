@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 /**
@@ -18,6 +19,11 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
  */
 public class UnjarTool {
+	private final static Logger LOGGER = Logger.getLogger(UnjarTool.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 	public static void main(String args[]) {
 
@@ -37,32 +43,32 @@ public class UnjarTool {
 		try {
 			//execute unjar 
 			decompress(jarFileName, outputPath);
-			//System.out.println("Extracting  OK!");
+			//LOGGER.fine("Extracting  OK!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Extracting File Failed!");
+			LOGGER.warning("Extracting File Failed!");
 			dealError(outputPath);
-			System.out.println("Installing output file Failed");
+			LOGGER.warning("Installing output file Failed");
 			return;
 		}
 
 		String systemName = System.getProperty("os.name");
-		//System.out.println("System is " + systemName);
+		//LOGGER.fine("System is " + systemName);
 		// command in unix 
 		if (!systemName.toLowerCase().contains("windows")) {
-//			System.out.println("Start Granting User Excecute Rights......");
+//			LOGGER.fine("Start Granting User Excecute Rights......");
 			try {
 				Process p1 = Runtime.getRuntime().exec("chmod +x portal.sh");
 				p1.waitFor();
-//				System.out.println("OK......");
+//				LOGGER.fine("OK......");
 //				Process p2 = Runtime.getRuntime().exec("portal.sh");
 //				p2.waitFor();
-//				System.out.println("Granting User Excecute Rights OK!");
+//				LOGGER.fine("Granting User Excecute Rights OK!");
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("Granting User Excecute Rights Failed!");
+				LOGGER.warning("Granting User Excecute Rights Failed!");
 				dealError(outputPath);
-				System.out.println("Installing output file Failed");
+				LOGGER.warning("Installing output file Failed");
 				return;
 			}
 		}
@@ -93,7 +99,7 @@ public class UnjarTool {
 			JarEntry je = (JarEntry) e.nextElement();
 			String outFileName = outputPath + je.getName();
 			File f = new File(outFileName);
-			//System.out.println(f.getAbsolutePath());
+			//LOGGER.fine(f.getAbsolutePath());
 
 			// create  path and all the father path
 			makeSupDir(outFileName);
@@ -161,7 +167,7 @@ public class UnjarTool {
 		File file = new File(path);
 		// if path is not exist
 		if (!file.exists()) {
-			System.out.println(path + " Not Exist!");
+			LOGGER.fine(path + " Not Exist!");
 		} else {
 			// if a directory, delete iteraterly
 			if (file.isDirectory()) {
@@ -179,7 +185,7 @@ public class UnjarTool {
 						File subFile = new File(fileName);
 						clean(path + File.separator + subFile);
 					}
-					//System.out.println(file.getAbsolutePath());
+					//LOGGER.fine(file.getAbsolutePath());
 					// delete the super dir
 					file.delete();
 
@@ -187,7 +193,7 @@ public class UnjarTool {
 			}
 			// if a file,delete it
 			else {
-//				System.out.println(file.getAbsolutePath());
+//				LOGGER.fine(file.getAbsolutePath());
 				file.delete();
 			}
 		}
@@ -203,13 +209,13 @@ public class UnjarTool {
 	 */
 	public void dealError(String outputPath) {
 		// delete the unjared files
-		System.out.println("Start Deleting Files......");
+		LOGGER.fine("Start Deleting Files......");
 		try {
 			clean(outputPath);
-			System.out.println("Deleting Files OK!");
+			LOGGER.fine("Deleting Files OK!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Deleting Files Failed!");
+			LOGGER.warning("Deleting Files Failed!");
 		}
 	}
 

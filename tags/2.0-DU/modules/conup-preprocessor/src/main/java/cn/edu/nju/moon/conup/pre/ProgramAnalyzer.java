@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -31,6 +32,11 @@ import org.objectweb.asm.util.TraceClassVisitor;
  * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
  */
 public class ProgramAnalyzer {
+	private final static Logger LOGGER = Logger.getLogger(ProgramAnalyzer.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 
 	List<String> coms = new LinkedList<String>();
@@ -48,14 +54,14 @@ public class ProgramAnalyzer {
 			while (i.hasNext()) {
 				AnnotationNode an = i.next();
 				if (an.desc.contains("Ljavax/aejb/Adaptive")) {
-					// System.out.println(an.desc);
+					// LOGGER.fine(an.desc);
 					for (FieldNode fn : (List<FieldNode>) cn.fields) {
 						if (fn.visibleAnnotations != null) {
 							Iterator<AnnotationNode> fi = fn.visibleAnnotations
 									.iterator();
 							while (fi.hasNext()) {
 								AnnotationNode fa = fi.next();
-								// System.out.println(fa.desc);
+								// LOGGER.fine(fa.desc);
 								if (fa.desc.contains("AEjb")
 										|| fa.desc.contains("Ejb")) {
 									return true;
@@ -78,7 +84,7 @@ public class ProgramAnalyzer {
 	 * 
 	 */
 	public void transform(ClassNode cn, String analyzername) {
-//		System.out.println("Begin analyzing class:" + cn.name);
+//		LOGGER.fine("Begin analyzing class:" + cn.name);
 		for (MethodNode mn : (List<MethodNode>) cn.methods) {
 			MethodAnalyzer methodtransform = new MethodAnalyzer();
 			// methodtransform.setCom(findComponents("D:\\program files\\vc-policy-proc-node\\target\\classes\\proc.composite"));
@@ -118,7 +124,7 @@ public class ProgramAnalyzer {
 							+ "/"
 							+ tempString.split("/")[4].substring(0,
 									tempString.split("/")[4].length() - 2));
-					System.out.println("com"
+					LOGGER.fine("com"
 							+ tempString.split("/")[3]
 							+ "/"
 							+ tempString.split("/")[4].substring(0,
@@ -150,7 +156,7 @@ public class ProgramAnalyzer {
 		if (tempFile.isDirectory()) {
 			File file[] = tempFile.listFiles();
 			for (int i = 0; i < file.length; i++) {
-				System.out.println("Analyze file:" + file[i].getName());
+				LOGGER.fine("Analyze file:" + file[i].getName());
 				findAllCom(file[i]);
 			}
 		} else {
@@ -187,13 +193,13 @@ public class ProgramAnalyzer {
 		if (tempFile.isDirectory()) {
 			File file[] = tempFile.listFiles();
 			for (int i = 0; i < file.length; i++) {
-//				System.out.println("Analyze file:" + file[i].getName());
+//				LOGGER.fine("Analyze file:" + file[i].getName());
 				begin_analyze(file[i], analyzername);
 			}
 		} else {
 			try {
 				if (tempFile.getName().endsWith(".class")) {
-					System.out.println("Analyze file:" + tempFile.getName());
+					LOGGER.fine("Analyze file:" + tempFile.getName());
 					FileInputStream input = new FileInputStream(
 							tempFile.getAbsolutePath());
 					ClassReader cr = new ClassReader(input);
@@ -317,27 +323,27 @@ public class ProgramAnalyzer {
 /*			File file = new File("");
 			String absolutePath = file.getAbsolutePath();
 			System.out.print(absolutePath);*/
-			ProgramAnalyzer analyse = new ProgramAnalyzer();
+//			ProgramAnalyzer analyse = new ProgramAnalyzer();
 //			analyse.analyzeApplication("/home/analyzed/conup-sample-portal.jar", "/home/temp/", "/home/analyzed/");
-			analyse.analyzeApplication("/home/analyzed/conup-sample-auth.jar", "/home/temp/");
+//			analyse.analyzeApplication("/home/analyzed/conup-sample-auth.jar", "/home/temp/");
 			// test a source application
-//			 String projectPath ="/home/nju/workspace/conup-sample-db/target/classes/";
-//			 String projectPath ="/home/nju/workspace/conup-sample-auth/target/classes/";
-//			 String projectPath ="/home/nju/workspace/conup-sample-proc/target/classes/";
-//			 String projectPath ="/home/nju/workspace/conup-sample-portal/target/classes/";
+//			 String projectPath ="/home/nju/2.0-DU/samples/authUpdate/conup-sample-auth/target/classes/";
+//			 String projectPath ="/home/nju/2.0-DU/samples/authUpdate/conup-sample-db/target/classes/";
+//			 String projectPath ="/home/nju/2.0-DU/samples/authUpdate/conup-sample-proc/target/classes/";
+//			 String projectPath ="/home/nju/2.0-DU/samples/authUpdate/conup-sample-portal/target/classes/";
 //			 ProgramAnalyzer analyse=new ProgramAnalyzer();
 //			 analyse.analyzeSource(projectPath);
-/*			ProgramAnalyzer analyse = new ProgramAnalyzer();
+			ProgramAnalyzer analyse = new ProgramAnalyzer();
 			String[] classesToBeAnalysed = new String[] {
-					"/home/nju/workspace/conup-sample-db/target/classes/",
-					"/home/nju/workspace/conup-sample-auth/target/classes/",
-					"/home/nju/workspace/conup-sample-proc/target/classes/",
-					"/home/nju/workspace/conup-sample-portal/target/classes/" };
+					"/home/nju/2.0-DU/samples/authUpdate/conup-sample-db/target/classes/",
+					"/home/nju/2.0-DU/samples/authUpdate/conup-sample-auth/target/classes/",
+					"/home/nju/2.0-DU/samples/authUpdate/conup-sample-proc/target/classes/",
+					"/home/nju/2.0-DU/samples/authUpdate/conup-sample-portal/target/classes/" };
 
 			for (int i = 0; i < classesToBeAnalysed.length; i++) {
 				analyse.analyzeSource(classesToBeAnalysed[i]);
 			}
-*/
+
 			
 			// test jar,war,ear
 /*			ProgramAnalyzer analyse = new ProgramAnalyzer();
@@ -349,7 +355,7 @@ public class ProgramAnalyzer {
 	
 /*			// Test all!
 			ProgramAnalyzer analyse = new ProgramAnalyzer();
-			System.out.println("Please input the application path to be analyze:(For example : /home/nju/workspace/conup-sample-auth/target/classes/)");
+			LOGGER.fine("Please input the application path to be analyze:(For example : /home/nju/workspace/conup-sample-auth/target/classes/)");
 			InputStreamReader is = new InputStreamReader(System.in);
 			BufferedReader br = new BufferedReader(is);			
 //			String classesToBeAnalyse = br.readLine();
@@ -357,7 +363,7 @@ public class ProgramAnalyzer {
 			String[] names = classesToBeAnalyse.split("/");
 			String fileName = names[names.length-1];
 			if(fileName.endsWith(".jar")||fileName.endsWith(".war")||fileName.endsWith(".ear")||fileName.endsWith(".zip")){
-				System.out.println("It is a .jar,.war or an .ear,please input the unjared file path and the dest file path:(For example: /home/analyzed/ /home/temp/)");
+				LOGGER.fine("It is a .jar,.war or an .ear,please input the unjared file path and the dest file path:(For example: /home/analyzed/ /home/temp/)");
 //				String infos = br.readLine();
 				String infos = "/home/temp/ /home/analyzed/";
 				String tempLocation = infos.split(" ")[0]+fileName.substring(0, fileName.length()-4);

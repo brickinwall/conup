@@ -3,6 +3,8 @@ package cn.edu.nju.moon.conup.pre;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -12,6 +14,11 @@ import org.objectweb.asm.tree.MethodNode;
  * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
  */
 public class ControlFlow {
+	private final static Logger LOGGER = Logger.getLogger(ControlFlow.class.getName());
+	
+	public static Logger getLogger() {
+		return LOGGER;
+	}
 
 	List<flow> con = new LinkedList<flow>();
 
@@ -33,7 +40,7 @@ public class ControlFlow {
 		} else {
 			con.add(new flow(src, dst));
 		}
-//		System.out.println(src+"->"+dst);
+		LOGGER.fine(src+"->"+dst);
 	}
 
 	public int getDstSize(int src) {
@@ -63,7 +70,7 @@ public class ControlFlow {
 			for (int i = 0; i < d.size(); i++) {
 //				System.out.print(d.get(i) + ",");
 			}
-			System.out.println();
+//			System.out.println();
 		}
 
 	}
