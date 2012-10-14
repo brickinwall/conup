@@ -2,6 +2,7 @@ package cn.edu.nju.moon.conup.printer.container;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ public class ContainerPrinter {
 	
 	public void printTransactionRegistry(TransactionRegistry registry){
 //		System.out.println("TransactionRegistry:" + registry.hashCode());
+		LOGGER.setLevel(Level.FINE);
 		LOGGER.info("** TransactionRegistry: " + registry.hashCode());
 		Iterator<Entry<String, TransactionDependency>> txIterator;
 		txIterator = registry.getDependencies().entrySet().iterator();
@@ -80,6 +82,7 @@ public class ContainerPrinter {
 	}
 	
 	public void printArcRegistry(String regsitryType, ArcRegistry arcRegistry){
+		LOGGER.setLevel(Level.INFO);
 		Set<Arc> arcs = arcRegistry.getArcs();
 		Iterator<Arc> arcIterator = arcs.iterator();
 		Arc arc;
