@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -138,14 +139,14 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 //			System.out.println("in Buffer interceptor operation =" + operation.toString());
 			ComponentStatus componentStatus = ComponentStatus.getInstance();
 			if (phase.equals(Phase.SERVICE_POLICY)) {
-				LOGGER.info("in Buffer interceptor operation =" + operation.toString() +
+				LOGGER.fine("in Buffer interceptor operation =" + operation.toString() +
 						"\n\twe currnet in " + phase);
 //				System.out.println("ELSE: we current in " + phase);
 				MessageQueue msgQueue = MessageQueue.getInstance();
 //				System.out.println(msgQueue);
 				String currentStatus = componentStatus.getCurrentStatus();
 				String freenessSetup = componentStatus.getFreenessSetup();
-				System.out.println("componentStatus.getFreenessSetup(): " + componentStatus.getFreenessSetup());
+//				System.out.println("componentStatus.getFreenessSetup(): " + componentStatus.getFreenessSetup());
 				//TODO  have a bug!!!! fix it
 //				if(currentStatus.equals(ComponentStatus.CONCURRENT) || currentStatus.equals(ComponentStatus.FREE) || currentStatus.equals(ComponentStatus.UPDATING))
 				if(freenessSetup.equals(ComponentStatus.CONCURRENT) && 
@@ -181,7 +182,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 					if(OldVersionRootTransation.getInstance().getOldRootTxIds().isEmpty() 
 						&& componentStatus.getCurrentStatus().equals(ComponentStatus.UPDATING)){
 						componentStatus.getNext();							// updating----------> updated
-						LOGGER.info("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be UPDATED.");
+						LOGGER.fine("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be UPDATED.");
 						rcfgVersion.setOldVersion(rcfgVersion.getNewVersion());
 						try {
 							instanceFactory.setCtr(rcfgVersion.getNewVersion().getConstructor());
@@ -192,7 +193,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 							e.printStackTrace();
 						}
 						componentStatus.getNext();							// updated--------> activated
-						LOGGER.info("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be ACTIVATED.");
+						LOGGER.fine("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be ACTIVATED.");
 //						System.out.println("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + ", which is supposed to be ACTIVATED.");
 					}
 					
@@ -207,7 +208,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 						if(freenessFlag){
 							if(currentStatus.equals(ComponentStatus.WAITING))
 								componentStatus.getNext();					// WAITING------------------->FREE
-							LOGGER.info("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be FREENESS.");
+							LOGGER.fine("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be FREENESS.");
 //							System.out.println("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be FREENESS.");
 							// go to update
 							if(currentStatus.equals(ComponentStatus.FREE))
@@ -237,7 +238,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 							}
 							if(currentStatus.equals(ComponentStatus.UPDATED))
 								componentStatus.getNext();					// updated--------> activated
-							LOGGER.info("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be ACTIVATED.");
+							LOGGER.fine("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be ACTIVATED.");
 //							System.out.println("CurrentComponentStatus: " + componentStatus.getCurrentStatus() + "which is supposed to be ACTIVATED.");
 							return returnMsg;
 							
@@ -353,7 +354,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 	public boolean queryComponentStatus() {
 		boolean cacheFlag = false;
 		ComponentStatus componentStatus = ComponentStatus.getInstance();
-		System.out.println("current status is: " + componentStatus.getCurrentStatus());
+//		System.out.println("current status is: " + componentStatus.getCurrentStatus());
 		if (componentStatus.getCurrentStatus().equals(ComponentStatus.FREE)
 				|| componentStatus.getCurrentStatus().equals(ComponentStatus.UPDATING)
 				|| componentStatus.getCurrentStatus().equals(ComponentStatus.BLOCKING)) {
