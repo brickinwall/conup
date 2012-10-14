@@ -115,7 +115,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				return getNext().invoke(msg);
 		} else{
 //			System.out.println("operation =" + operation.toString());
-			LOGGER.info("operation =" + operation.toString());
+			LOGGER.fine("operation =" + operation.toString());
 //			exchangeViaMsgHeader(msg);
 			msg = exchangeViaMsgBody(msg);
 			return getNext().invoke(msg);
@@ -249,7 +249,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		
 		if(phase.equals(Phase.REFERENCE_POLICY)
 				|| phase.equals(Phase.SERVICE_POLICY)){
-			LOGGER.info(phase + " TraceInterceptor" +
+			LOGGER.fine(phase + " TraceInterceptor" +
 					"\n\t" + "messageID:" + msg.getMessageID() +
 					"\n\t" + "msgFrom:" + msg.getFrom() +
 					"\n\t" + "msgTo:" + msg.getTo() +
@@ -309,9 +309,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		int index = raw.indexOf(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER);
 		int head = raw.substring(index).indexOf("[")+1;
-		System.out.println(raw.substring(0, head));
+//		System.out.println(raw.substring(0, head));
 		int tail = raw.substring(index).indexOf("]");
-		System.out.println(raw.substring(head, tail));
+//		System.out.println(raw.substring(head, tail));
 		return raw.substring(head, tail);
 	}
 	
