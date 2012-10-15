@@ -23,15 +23,10 @@ import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Composite;
 import org.apache.tuscany.sca.impl.DeployedComposite;
 import org.apache.tuscany.sca.impl.NodeImpl;
-import org.apache.tuscany.sca.implementation.java.JavaConstructorImpl;
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
-import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceWrapper;
 import org.apache.tuscany.sca.implementation.java.impl.JavaImplementationImpl;
 import org.apache.tuscany.sca.implementation.java.invocation.JavaComponentContextProvider;
 import org.apache.tuscany.sca.implementation.java.invocation.JavaImplementationProvider;
-import org.apache.tuscany.sca.invocation.Interceptor;
-import org.apache.tuscany.sca.invocation.Message;
-import org.apache.tuscany.sca.invocation.PhasedInterceptor;
 import org.apache.tuscany.sca.provider.ImplementationProvider;
 import org.apache.tuscany.sca.runtime.RuntimeComponent;
 import org.jdom.Document;
@@ -39,10 +34,6 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.oasisopen.sca.NoSuchServiceException;
-import org.oasisopen.sca.annotation.Reference;
-
-import cn.edu.nju.moon.conup.algorithm.VcAlgorithmImpl;
-import cn.edu.nju.moon.conup.communication.convention.CompositeConvention;
 import cn.edu.nju.moon.conup.communication.launcher.LaunchCommunication;
 import cn.edu.nju.moon.conup.communication.services.OndemandService;
 import cn.edu.nju.moon.conup.container.VcContainer;
@@ -52,15 +43,12 @@ import cn.edu.nju.moon.conup.container.contribution.DirectoryContributionResolve
 import cn.edu.nju.moon.conup.container.contribution.JarContributionResolver;
 import cn.edu.nju.moon.conup.data.ArcRegistry;
 import cn.edu.nju.moon.conup.data.InArcRegistryImpl;
-import cn.edu.nju.moon.conup.data.MessageQueue;
 import cn.edu.nju.moon.conup.data.OndemandThreadBuffer;
 import cn.edu.nju.moon.conup.data.OutArcRegistryImpl;
 import cn.edu.nju.moon.conup.data.TransactionRegistry;
 import cn.edu.nju.moon.conup.data.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.def.Arc;
 import cn.edu.nju.moon.conup.def.ComponentStatus;
-import cn.edu.nju.moon.conup.def.InterceptorCache;
-import cn.edu.nju.moon.conup.def.InterceptorCacheImpl;
 import cn.edu.nju.moon.conup.def.OldVersionRootTransation;
 import cn.edu.nju.moon.conup.def.ReconfigurationVersion;
 import cn.edu.nju.moon.conup.def.Scope;
@@ -70,8 +58,6 @@ import cn.edu.nju.moon.conup.def.TransactionSnapshot;
 import cn.edu.nju.moon.conup.domain.services.StaticConfigService;
 import cn.edu.nju.moon.conup.domain.services.TransactionIDService;
 import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
-import cn.edu.nju.moon.conup.update.DynamicUpdate;
-import cn.edu.nju.moon.conup.update.JavaDynamicUpdateImpl;
 import cn.edu.nju.moon.conup.update.ReplaceClassLoader;
 
 import org.oasisopen.sca.annotation.*;
@@ -1451,6 +1437,11 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 		dependency = txRegistry.getDependency(parentTx);
 		String rootTxID = dependency.getRootTx();
 		
+//		//if current tx is a root, then return
+//		if(rootTxID.equals(parentTx)){
+//			return;
+//		}
+		
 		subTxs = dependency.getSubTxs();
 		subTx = dependency.getSubTx(subTxID);
 		if(subTx == null){
@@ -1593,7 +1584,7 @@ public class VcServiceImplTemplate implements ArcService, FreenessService, Ondem
 			OndemandService ondemandService;
 			try {
 				ondemandService = communicationNode.getService(OndemandService.class, endPoint);
-				return ondemandService.reqOndemandSetup(targetComponent, 
+				ondemandService.reqOndemandSetup(targetComponent, 
 						targetComponent, cs.getScope(), cs.getFreenessSetup());
 			} catch (NoSuchServiceException e) {
 				e.printStackTrace();
