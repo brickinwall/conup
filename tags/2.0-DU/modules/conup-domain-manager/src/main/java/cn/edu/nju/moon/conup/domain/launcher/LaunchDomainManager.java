@@ -2,6 +2,7 @@ package cn.edu.nju.moon.conup.domain.launcher;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
@@ -10,7 +11,7 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 
 public class LaunchDomainManager {
-	public static Set<String> createdTransactions = new HashSet<String>();
+	public static Set<String> createdTransactions = new ConcurrentSkipListSet<String>();
 	public static Node node = null;
 	/**
 	 * @param args
