@@ -105,42 +105,22 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * */
 	public Message invoke(Message msg) {
 		//ignore messages that is passing through communication component
+//		System.out.println(operation.toString() + "\n\n");
 		if(operation.toString().contains("cn.edu.nju.moon.conup.communication.services")
-			|| operation.toString().contains("NotifyService")
+			|| operation.toString().contains("VisitorService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.VcService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")){
-//				System.out.println("In trace, ignore operation: " + operation.toString());
 				return getNext().invoke(msg);
 		} else{
-//			System.out.println("operation =" + operation.toString());
 			LOGGER.fine("operation =" + operation.toString());
-//			exchangeViaMsgHeader(msg);
 			msg = exchangeViaMsgBody(msg);
 			return getNext().invoke(msg);
 		}//else
 		
 	}
 	
-	private Message exchangeViaMsgHeader(Message msg){
-		if (phase.equals(Phase.SERVICE_POLICY)) {
-			System.out.println("\n\n\nservice interceptor: ");
-			System.out.println(msg.getHeaders().get("conup"));
-		} else if(phase.equals(Phase.REFERENCE_POLICY)){
-			System.out.println("\n\n\nreference interceptor: ");
-			System.out.println(msg.getHeaders());
-			msg.getHeaders().put("conup", "testing");
-		} else if(phase.equals(Phase.SERVICE_INTERFACE)){
-			System.out.println("\n\n\n " + Phase.SERVICE_INTERFACE);
-			System.out.println(msg.getHeaders());
-		} else if(phase.equals(Phase.IMPLEMENTATION_POLICY)){
-			System.out.println("\n\n\n " + Phase.IMPLEMENTATION_POLICY);
-			System.out.println(msg.getHeaders());
-		} 
-		
-		return msg;
-	}
 	
 	/* This method is supposed to exchange root/parent transaction id via Message body.
 	 * 
@@ -176,20 +156,24 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 
 		if (phase.equals(Phase.SERVICE_POLICY)) {
+			System.out.println(phase + " " +operation.toString() + "\nTracePolicyInterceptor\n");
 			if(transactionTag==null || transactionTag.equals("")){
 				//an exception is preferred
-				LOGGER.warning("Error: message body cannot be null in a service body");
-//				System.out.println("Error: message body cannot be null in a service body");
+				rootTx = null;
+				rootComponent = null;
+				parentTx = null;
+				parentComponent = null;
+				
+			}else{
+				//get root, parent and current transaction id
+				String target = getTargetString(transactionTag);
+				String rootInfo = target.split(",")[0];
+				String parentInfo = target.split(",")[1];
+				rootTx = rootInfo.split(":")[0].equals("null") ? null : rootInfo.split(":")[0];
+				rootComponent = rootInfo.split(":")[1].equals("null") ? null : rootInfo.split(":")[1];
+				parentTx = parentInfo.split(":")[0].equals("null") ? null : parentInfo.split(":")[0];
+				parentComponent = parentInfo.split(":")[1].equals("null") ? null : parentInfo.split(":")[1];
 			}
-			
-			//get root, parent and current transaction id
-			String target = getTargetString(transactionTag);
-			String rootInfo = target.split(",")[0];
-			String parentInfo = target.split(",")[1];
-			rootTx = rootInfo.split(":")[0].equals("null") ? null : rootInfo.split(":")[0];
-			rootComponent = rootInfo.split(":")[1].equals("null") ? null : rootInfo.split(":")[1];
-			parentTx = parentInfo.split(":")[0].equals("null") ? null : parentInfo.split(":")[0];
-			parentComponent = parentInfo.split(":")[1].equals("null") ? null : parentInfo.split(":")[1];
 			
 			//get host component name
 			hostComponent = getComponent().getName();
@@ -197,7 +181,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			// check interceptor cache
 			InterceptorCache cache = InterceptorCacheImpl.getInstance();
 			threadID = getThreadID();
-//			System.out.println("threadId: " + threadID);
 			LOGGER.fine("threadId: " + threadID);
 			TransactionDependency dependency = cache.getDependency(threadID);
 			if(dependency == null){
@@ -261,33 +244,18 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					"\n\t" + "parentComponent:" + parentComponent + 
 					"\n\t" + "currentTx:" + currentTx + 
 					"\n\t" + "hostComponent:" + hostComponent);
-//			System.out.println(phase + " Interceptor");
-//			System.out.println("\t" + "messageID:" + msg.getMessageID());
-//			System.out.println("\t" + "msgFrom:" + msg.getFrom());
-//			System.out.println("\t" + "msgTo:" + msg.getTo());
-//			System.out.println("\t" + "msgOperation:" + msg.getOperation());
-//			System.out.println("\t" + "threadID:" + threadID);
-//			System.out.println("\t" + "rootTx:" + rootTx);
-//			System.out.println("\t" + "rootComponent:" + rootComponent);
-//			System.out.println("\t" + "parentTx:" + parentTx);
-//			System.out.println("\t" + "parentComponent:" + parentComponent);
-//			System.out.println("\t" + "currentTx:" + currentTx);
-//			System.out.println("\t" + "hostComponent:" + hostComponent);
 
-//			System.out.println("\t" + "Message body:");
 			msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
 			List<Object> copy = new ArrayList<Object>();
 			copy.addAll(msgBodyOriginal);
 			String msgBodyStr = new String();
-			msgBodyStr += "\t" + "Message body:";
+			msgBodyStr += "\t " + phase +" Message body:";
 			for(Object object : copy){
 				String tmp = object.toString();
 				msgBodyStr += "\n\t\t" + tmp;
-//				System.out.println("\t\t" + tmp);
 			}
 			msgBodyStr += "\n";
 			LOGGER.info(msgBodyStr);
-//			System.out.println();
 		}
 		
 		
@@ -309,9 +277,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		int index = raw.indexOf(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER);
 		int head = raw.substring(index).indexOf("[")+1;
-//		System.out.println(raw.substring(0, head));
 		int tail = raw.substring(index).indexOf("]");
-//		System.out.println(raw.substring(head, tail));
 		return raw.substring(head, tail);
 	}
 	
