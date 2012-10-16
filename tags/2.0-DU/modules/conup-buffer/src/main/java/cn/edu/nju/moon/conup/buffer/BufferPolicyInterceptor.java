@@ -118,10 +118,11 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 	 * later coming msgs, and after update, restore these msgs
 	 * */
 	public Message invoke(Message msg) {
+//		System.out.println(phase + " " +operation.toString() + "\nBufferPolicyInterceptor\n");
 		// ignore messages that is passing through communication component
 		if (operation.toString().contains("cn.edu.nju.moon.conup.communication.services")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.VcService")
-//				|| operation.toString().contains("NotifyService")
+				|| operation.toString().contains("cn.edu.nju.moon.conup.sample.visitor.services.VisitorService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")) {
