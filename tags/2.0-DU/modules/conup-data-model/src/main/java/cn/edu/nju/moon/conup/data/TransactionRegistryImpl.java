@@ -9,10 +9,13 @@ import cn.edu.nju.moon.conup.def.TransactionDependency;
 
 public class TransactionRegistryImpl implements TransactionRegistry {
 	private static TransactionRegistry transactionRegistry = new TransactionRegistryImpl();
+	/**
+	 * @param
+	 * tx id as key
+	 */
 	private Map<String, TransactionDependency> dependencies;
 	
 	private TransactionRegistryImpl(){
-//		dependencies = new HashMap<String, TransactionDependency>();
 		dependencies = new ConcurrentHashMap<String, TransactionDependency>();
 	}
 	
