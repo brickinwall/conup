@@ -1,22 +1,13 @@
 package cn.edu.nju.moon.conup.pre;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
-
-import cn.edu.nju.moon.conup.def.VcTransaction;
 import cn.edu.nju.moon.conup.listener.ComponentListener;
 import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
-import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
 
 public class DynamicDependency {
 	private final static Logger LOGGER = Logger.getLogger(DynamicDependency.class.getName());
@@ -24,7 +15,7 @@ public class DynamicDependency {
 		return LOGGER;
 	}
 
-	ComponentListener listener = ComponentListenerImpl.getInstance();
+	ComponentListener listener = null;
 	String transactionid;
 	String className;
 	String methodName;
@@ -98,6 +89,7 @@ public class DynamicDependency {
 	}
 
 	public void notifyRun() {
+		listener = new ComponentListenerImpl();
 		if (states.isEmpty()) {
 			listener.notify("running", threadID,
 					new ConcurrentSkipListSet<String>(), real_past);
@@ -112,7 +104,7 @@ public class DynamicDependency {
 	 * @param event
 	 */
 	public void trigger(String id, String event) {
-		// Set<String> fut = new ConcurrentSkipListSet<String>();
+		listener = new ComponentListenerImpl();		
 		if (event.contains("Start")) {
 			currentState = 0;
 			if (states.isEmpty()) {
