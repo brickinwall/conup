@@ -7,15 +7,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
-
-import cn.edu.nju.moon.conup.algorithm.VcAlgorithm;
 import cn.edu.nju.moon.conup.algorithm.VcAlgorithmImpl;
 import cn.edu.nju.moon.conup.communication.services.ArcService;
 import cn.edu.nju.moon.conup.container.VcContainer;
@@ -26,14 +24,12 @@ import cn.edu.nju.moon.conup.data.OndemandThreadBuffer;
 import cn.edu.nju.moon.conup.data.OutArcRegistryImpl;
 import cn.edu.nju.moon.conup.data.TransactionRegistry;
 import cn.edu.nju.moon.conup.data.TransactionRegistryImpl;
-import cn.edu.nju.moon.conup.def.Arc;
 import cn.edu.nju.moon.conup.def.ComponentStatus;
 import cn.edu.nju.moon.conup.def.InterceptorCache;
 import cn.edu.nju.moon.conup.def.InterceptorCacheImpl;
 import cn.edu.nju.moon.conup.def.Scope;
 import cn.edu.nju.moon.conup.def.TransactionDependency;
 import cn.edu.nju.moon.conup.def.TransactionSnapshot;
-import cn.edu.nju.moon.conup.domain.services.TransactionIDService;
 import cn.edu.nju.moon.conup.printer.container.ContainerPrinter;
 
 
@@ -66,7 +62,9 @@ public class ComponentListenerImpl implements ComponentListener{
 	 * 			from PingSu exactly before root tx starts its first sub-tx.
 	 * 	
 	 *  */
-	private Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
+	public static Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
+	
+	public static Map<String,String> ThreadIDs = new ConcurrentHashMap<String, String>();
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -78,37 +76,33 @@ public class ComponentListenerImpl implements ComponentListener{
 	private TransactionRegistry transactionRegistry;
 	private Node commNode;
 
-	private ComponentListenerImpl(){
+	public ComponentListenerImpl(){
 	}
 	
-	/** Get the ComponentListenerImpl instance.*/
-	public static ComponentListenerImpl getInstance(){
-		return instance;
-	}
 	
 	/** when an event occurs, this method will be called. */
 	public boolean notify(String transactionStatus, String threadID, Set<String> futureC, Set<String> pastC){
 //		LOGGER.info("\n\ntransaction.status: " + transactionStatus);
 //TODO just for suping's test, delete in the future!!!
-		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
-		Iterator iterator = futureC.iterator();
-		while(iterator.hasNext()){
-			String temp = (String) iterator.next();
-			String[] strs = temp.split("/");
-			futureTempSet.add(strs[0]);
-		}
-		futureC.removeAll(futureC);
-		futureC.addAll(futureTempSet);
-		
-		Set<String> pastTempSet = new ConcurrentSkipListSet<String>();
-		iterator = pastC.iterator();
-		while(iterator.hasNext()){
-			String temp = (String) iterator.next();
-			String[] strs = temp.split("/");
-			pastTempSet.add(strs[0]);
-		}
-		pastC.removeAll(pastC);
-		pastC.addAll(pastTempSet);
+//		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
+//		Iterator iterator = futureC.iterator();
+//		while(iterator.hasNext()){
+//			String temp = (String) iterator.next();
+//			String[] strs = temp.split("/");
+//			futureTempSet.add(strs[0]);
+//		}
+//		futureC.removeAll(futureC);
+//		futureC.addAll(futureTempSet);
+//		
+//		Set<String> pastTempSet = new ConcurrentSkipListSet<String>();
+//		iterator = pastC.iterator();
+//		while(iterator.hasNext()){
+//			String temp = (String) iterator.next();
+//			String[] strs = temp.split("/");
+//			pastTempSet.add(strs[0]);
+//		}
+//		pastC.removeAll(pastC);
+//		pastC.addAll(pastTempSet);
 		
 //		Set<String> pastTempSet = new HashSet<String>();
 //		for(String component : pastC){
@@ -149,6 +143,14 @@ public class ComponentListenerImpl implements ComponentListener{
 		}// END IF
 
 		// get root, parent and current transaction id from InterceptorCache
+//		for(Entry<String, TransactionDependency> c : cache.getDependencies()){
+////			if(c.getKey().equals(threadID)){
+//				System.out.println(c.getKey() + "|||| true " + c.getValue());
+////				if(c.getValue() == null)
+////					System.out.println("c.getValue == null");
+////			}
+//		}
+//		System.out.println("\n\n threadID " + threadID);
 		TransactionDependency dependency = cache.getDependency(threadID);
 		currentTransaction = dependency.getCurrentTx();
 		parentTransaction = dependency.getParentTx();
@@ -160,11 +162,12 @@ public class ComponentListenerImpl implements ComponentListener{
 		boolean isRoot = false;
 		
 		if (transactionStatus.equals("start")) {
+//			assert(!ComponentListenerImpl.threadID.contains(threadID));
 			if(rootTransaction==null && parentTransaction==null 
 					&& currentTransaction==null && hostComponent!=null){
 				//current transaction is root
 				isRoot = true;
-				currentTransaction = createTransactionID();
+				currentTransaction = createTransactionID(hostComponent);
 				rootTransaction = currentTransaction;
 				parentTransaction = currentTransaction;
 				//update interceptor cache dependency
@@ -179,7 +182,7 @@ public class ComponentListenerImpl implements ComponentListener{
 			} else if(rootTransaction!=null && parentTransaction!=null 
 					&& currentTransaction==null && hostComponent!=null){
 				//current transaction is a sub-transaction
-				currentTransaction = createTransactionID();
+				currentTransaction = createTransactionID(hostComponent);
 				//update interceptor cache dependency
 				dependency.setCurrentTx(currentTransaction);
 			} else{
@@ -200,12 +203,13 @@ public class ComponentListenerImpl implements ComponentListener{
 			transactionRegistry.addDependency(currentTransaction,
 					currentTransactionDependency);
 			
-//			LOGGER.info(">>>>In ComponentListenerImpl.notify(before start, ,...)");
+			//for debug
+			String value = "";
+			value = ThreadIDs.get(currentTransaction);
+			value += threadID + " |||| "+ Thread.currentThread() + "tx start, add to txRegistry, " + "<" + currentTransaction + ", " + rootTransaction + ", " + parentTransaction + ">\n";
+			ThreadIDs.put(currentTransaction, value);
+			
 			ContainerPrinter containerPrinter = new ContainerPrinter();
-//			containerPrinter.printInArcRegistry(inArcRegistry);
-//			containerPrinter.printOutArcRegistry(outArcRegistry);
-//			containerPrinter.printTransactionRegistry(transactionRegistry);
-//			LOGGER.info("<<<<In ComponentListenerImpl.notify(before start, ,...)");
 			
 			//setup is not needed immediately when a root transaction starts
 			if(isRoot){
@@ -268,9 +272,7 @@ public class ComponentListenerImpl implements ComponentListener{
 				containerPrinter.printInArcRegistry(inArcRegistry);
 				containerPrinter.printOutArcRegistry(outArcRegistry);
 				containerPrinter.printTransactionRegistry(transactionRegistry);
-//				LOGGER.info("<<<<In ComponentListenerImpl.notify(start, ,...)");
 			}
-			
 			
 		} else if (transactionStatus.equals("running")) {
 			currentTransaction = cache.getDependency(threadID).getCurrentTx();
@@ -285,6 +287,11 @@ public class ComponentListenerImpl implements ComponentListener{
 			tmpDependency.setFutureComponents(futureC);
 			tmpDependency.setPastComponents(pastC);
 			
+			//for debug
+			String value = ThreadIDs.get(currentTransaction);
+			value += threadID + " |||| " + Thread.currentThread() +" tx runnng, update txRegistry, " + "<" + currentTransaction + ", " + rootTransaction + ", " + parentTransaction + ">\n";
+			ThreadIDs.put(currentTransaction, value);
+			
 			//If ComponentStatus isn't NORMAL/ON_DEMAND, arcs need to be maintained.
 			String currentStatus = componentStatus.getCurrentStatus();
 			LOGGER.info(componentStatus.getComponentName() + "'s status: " + currentStatus);
@@ -298,7 +305,6 @@ public class ComponentListenerImpl implements ComponentListener{
 					try {
 						LOGGER.info("ComponentStatus is ON_DEMAND, now wait()...");
 						threads.add(Thread.currentThread());
-//						Thread.currentThread().wait();
 						threadBuffer.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -331,9 +337,22 @@ public class ComponentListenerImpl implements ComponentListener{
 			}
 			
 		} else { // transactionStatus.equals("end")
+			
+//			if(ComponentListenerImpl.threadID.contains(threadID)){
+//				System.err.println("ComponentListenerImpl.threadID.contains(threadID)" + threadID);
+//			}else{
+//				ComponentListenerImpl.threadID.add(threadID, );
+//			}
+			
 			currentTransaction = cache.getDependency(threadID).getCurrentTx();
-			rootTransaction = transactionRegistry.
-					getDependency(currentTransaction).getRootTx();
+			try{
+				rootTransaction = transactionRegistry.
+						getDependency(currentTransaction).getRootTx();
+			} catch(NullPointerException e){
+				e.printStackTrace();
+			}
+			
+//			rootTransaction = cache.getDependency(threadID).getRootTx();
 			
 			//update TransactionRegistry
 			TransactionRegistry txRegistry;
@@ -430,19 +449,13 @@ public class ComponentListenerImpl implements ComponentListener{
 		return true;
 	}
 	
-	private String createTransactionID(){
-		String result = null;
-		String targetEndpoint = 
-				"DomainManagerComponent#service-binding(TransactionIDService/TransactionIDService)";
-		TransactionIDService transactionIDService;
-		try {
-			transactionIDService = vcContainer.getCommunicationNode().getService(
-					TransactionIDService.class, targetEndpoint);
-			result = transactionIDService.createID();
-		} catch (NoSuchServiceException e) {
-			e.printStackTrace();
-		}
+	private synchronized String createTransactionID(String hostComponent){
 		
+		String result = null;
+		
+		Random random = new Random(System.currentTimeMillis());
+		result = hostComponent + Long.toString(System.currentTimeMillis()) + "." +
+				random.nextInt() + Thread.currentThread().hashCode();
 		return result;
 	}
 
@@ -456,7 +469,6 @@ public class ComponentListenerImpl implements ComponentListener{
 		String tmp = "";
 		while(iterator.hasNext()){
 			tmp += "\n\t" + iterator.next().toString();
-//			LOGGER.info("\t" + iterator.next().toString());
 		}
 		LOGGER.info(tmp);
 	}

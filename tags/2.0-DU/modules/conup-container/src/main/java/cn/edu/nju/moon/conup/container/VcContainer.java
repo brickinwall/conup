@@ -31,7 +31,6 @@ public abstract class VcContainer {
 	InterceptorCache interceptorCache;
 	ComponentStatus componentStatus;
 	
-	ComponentListener listener;
 	VcAlgorithm vcAlgorithm;
 	
 	CompositeAnalyzer compositeAnalyser;
@@ -72,7 +71,6 @@ public abstract class VcContainer {
 		componentStatus.setFreenessSetup(ComponentStatus.CONCURRENT);
 //		componentStatus.setFreenessSetup(ComponentStatus.WAITING);
 		
-		listener = ComponentListenerImpl.getInstance();
 		vcAlgorithm = new VcAlgorithmImpl(this);
 		compositeAnalyser = CompositeAnalyzerImpl.getInstance();
 	}
@@ -123,14 +121,6 @@ public abstract class VcContainer {
 
 	public void setBusinessNode(Node businessNode, String componentName) {
 		this.businessNode = businessNode;
-		// start communication component
-		// try {
-		// // String componentName =
-		// businessNode.getDomainComposite().getComponents().get(0).getName();
-		// communicationNode = LaunchCommunication.launch(componentName);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 	}
 	
 
@@ -221,12 +211,4 @@ public abstract class VcContainer {
 		this.domainUri = domainUri;
 	}
 
-	public ComponentListener getListener() {
-		return listener;
-	}
-
-	public void setListener(ComponentListener listener) {
-		this.listener = listener;
-	}
-	
 }
