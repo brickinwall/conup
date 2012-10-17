@@ -122,7 +122,7 @@ public class BufferPolicyInterceptor implements PhasedInterceptor {
 		// ignore messages that is passing through communication component
 		if (operation.toString().contains("cn.edu.nju.moon.conup.communication.services")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.VcService")
-				|| operation.toString().contains("cn.edu.nju.moon.conup.sample.visitor.services.VisitorService")
+				|| operation.toString().contains("cn.edu.nju.moon.conup.sample.visitor.services")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
 				|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")) {

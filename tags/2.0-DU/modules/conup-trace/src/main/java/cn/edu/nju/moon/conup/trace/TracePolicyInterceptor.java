@@ -107,7 +107,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		//ignore messages that is passing through communication component
 //		System.out.println(operation.toString() + "\n\n");
 		if(operation.toString().contains("cn.edu.nju.moon.conup.communication.services")
-			|| operation.toString().contains("VisitorService")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.sample.visitor.services")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.VcService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
