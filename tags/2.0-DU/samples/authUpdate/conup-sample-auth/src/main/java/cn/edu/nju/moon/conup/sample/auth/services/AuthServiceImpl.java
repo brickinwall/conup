@@ -13,34 +13,47 @@ import org.oasisopen.sca.annotation.Service;
 @Service({TokenService.class, VerificationService.class })
 public class AuthServiceImpl implements TokenService,VerificationService {
 	Logger logger = Logger.getLogger(AuthServiceImpl.class.getName());
+	private String versionTag = "_is_old_version";
+//	private String versionTag = "_is_new_version";
+	
 	@VcTransaction
 	public String getToken(String cred) {
-//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		ComponentListener listener = new ComponentListenerImpl();//.getInstance();
 //		Set<String> futureC = new HashSet<String>();
 //		Set<String> pastC = new HashSet<String>();
 //		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
 //		listener.notify("start", threadID, futureC, pastC);
 ////		
-//		listener.notify("running", threadID, futureC, pastC);
 		
-//		System.out.println("\n\n\n\n======================version 23======================\n\n\n\n");
-		logger.info("\n\n\n\n======================version 23======================\n\n\n\n");
+		logger.info("\n\n=======" + Thread.currentThread().hashCode() + " " + Thread.currentThread().toString() +": getToken()" + versionTag + "========\n\n");
 		String[] creds = cred.split(",");
 		if("nju".equals(creds[0]) && "cs".equals(creds[1])){
 			StringBuilder sb = new StringBuilder(cred);
 			sb.append(",pass") ;
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 //			listener.notify("end", threadID, futureC, pastC);
-			return sb.toString();
+			return sb.append(",thread=" + Thread.currentThread().hashCode() + "_" + Thread.currentThread().toString().replace(",", "_") + "getToken()" + versionTag).toString();
+//			return sb.toString();
 		}
 		StringBuilder tmp = new StringBuilder(cred);
 		tmp.append(",fail") ;
-//		listener.notify("end", threadID, futureC, pastC);
 		
-		return tmp.toString();
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		listener.notify("end", threadID, futureC, pastC);
+		return tmp.append(",thread=" + Thread.currentThread().hashCode() + "_" + Thread.currentThread().toString() + "getToken()" + versionTag).toString();
+//		return tmp.toString();
 	}
 	@VcTransaction
 	public Boolean verify(String token) {
-//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		ComponentListener listener = new ComponentListenerImpl();//.getInstance();
 //		Set<String> futureC = new HashSet<String>();
 //		Set<String> pastC = new HashSet<String>();
 //		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
@@ -48,15 +61,34 @@ public class AuthServiceImpl implements TokenService,VerificationService {
 		
 //		listener.notify("running", threadID, futureC, pastC);
 		String[] tokens = token.split(",");
+		
 		if(tokens[2].equals("pass")){
+			logger.info("\n\n=======verify for " + tokens[3] + "===verify()" + versionTag + "========\n\n");
+			
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 //			listener.notify("end", threadID, futureC, pastC);
 			return true;
 		}
 		else if(tokens[2].equals("fail")){
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 //			listener.notify("end", threadID, futureC, pastC);
 			return false;
 		}
 		else{
+			
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 //			listener.notify("end", threadID, futureC, pastC);
 			return false;
 		}

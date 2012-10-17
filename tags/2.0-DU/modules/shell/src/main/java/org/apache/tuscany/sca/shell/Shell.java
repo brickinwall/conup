@@ -145,9 +145,9 @@ public class Shell {
                 String curi = shell.getNode().installContribution(contribution);
                 shell.getNode().startDeployables(curi);
                 
+                Node node = shell.getNode();
                 if(requireContainer){
                 	 //added for conup
-                    Node node = shell.getNode();
                     Contribution cont = node.getContribution(curi);
                     List<Composite> composites = cont.getDeployables();
                     Composite composite = composites.get(0);
@@ -170,12 +170,13 @@ public class Shell {
 //                        container.analyseNodeComposite(compositeLocation);
                         //add current business node to container
                         container.setBusinessNode(node, componentName);
-                    } else{
-                    	NodeHolder nodeHolder = null;
-                    	nodeHolder = NodeHolder.getInstance();
-                    	nodeHolder.setNode(node);
                     }
                 }//END IF
+                if(absContributionPath.contains("conup-domain-manager")){
+                	NodeHolder nodeHolder = null;
+                	nodeHolder = NodeHolder.getInstance();
+                	nodeHolder.setNode(node);
+                }
                
             }//END IF
         }

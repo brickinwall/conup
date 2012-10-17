@@ -22,14 +22,14 @@ import com.mysql.jdbc.Statement;
 public class DBServiceImpl implements DBService {
 	
 	public DBServiceImpl(){
-		System.out.println("New DBServiceImpl");
+//		System.out.println("New DBServiceImpl");
 	}
 
 	@Override
 	@VcTransaction
 	public List<String> dbOperation() {
 		List<String> result = new ArrayList<String>();
-//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		ComponentListener listener = new ComponentListenerImpl();//.getInstance();
 //		Set<String> futureC = new HashSet<String>();
 //		Set<String> pastC = new HashSet<String>();
 //		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
@@ -37,7 +37,15 @@ public class DBServiceImpl implements DBService {
 //		
 //		listener.notify("running", threadID, futureC, pastC);
 		
-		result.add("hello tuscany...");
+		
+//		try {
+//			Thread.sleep((long) (Math.random()*200));
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+		result.add("hello tuscany");
+		result.add("dynamic update");
+		result.add(Thread.currentThread().hashCode() + "_" + Thread.currentThread().toString().replace(",", "_"));
 
 //		listener.notify("end", threadID, futureC, pastC);
 		return result;
