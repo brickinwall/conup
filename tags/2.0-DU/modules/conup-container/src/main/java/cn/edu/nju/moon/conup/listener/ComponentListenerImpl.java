@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -84,25 +85,25 @@ public class ComponentListenerImpl implements ComponentListener{
 	public boolean notify(String transactionStatus, String threadID, Set<String> futureC, Set<String> pastC){
 //		LOGGER.info("\n\ntransaction.status: " + transactionStatus);
 //TODO just for suping's test, delete in the future!!!
-//		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
-//		Iterator iterator = futureC.iterator();
-//		while(iterator.hasNext()){
-//			String temp = (String) iterator.next();
-//			String[] strs = temp.split("/");
-//			futureTempSet.add(strs[0]);
-//		}
-//		futureC.removeAll(futureC);
-//		futureC.addAll(futureTempSet);
-//		
-//		Set<String> pastTempSet = new ConcurrentSkipListSet<String>();
-//		iterator = pastC.iterator();
-//		while(iterator.hasNext()){
-//			String temp = (String) iterator.next();
-//			String[] strs = temp.split("/");
-//			pastTempSet.add(strs[0]);
-//		}
-//		pastC.removeAll(pastC);
-//		pastC.addAll(pastTempSet);
+		Set<String> futureTempSet = new ConcurrentSkipListSet<String>();
+		Iterator iterator = futureC.iterator();
+		while(iterator.hasNext()){
+			String temp = (String) iterator.next();
+			String[] strs = temp.split("/");
+			futureTempSet.add(strs[0]);
+		}
+		futureC.removeAll(futureC);
+		futureC.addAll(futureTempSet);
+		
+		Set<String> pastTempSet = new ConcurrentSkipListSet<String>();
+		iterator = pastC.iterator();
+		while(iterator.hasNext()){
+			String temp = (String) iterator.next();
+			String[] strs = temp.split("/");
+			pastTempSet.add(strs[0]);
+		}
+		pastC.removeAll(pastC);
+		pastC.addAll(pastTempSet);
 		
 //		Set<String> pastTempSet = new HashSet<String>();
 //		for(String component : pastC){
