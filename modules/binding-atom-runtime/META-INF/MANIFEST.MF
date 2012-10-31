@@ -1,0 +1,55 @@
+Manifest-Version: 1.0
+Export-Package: 
+ org.apache.tuscany.sca.binding.atom.collection,
+ org.apache.tuscany.sca.binding.atom.js.dojo;version="2.0.0";
+  uses:="org.apache.tuscany.sca.assembly,
+   org.apache.tuscany.sca.web.javascript,
+   org.apache.tuscany.sca.binding.atom,
+   javax.xml.namespace"
+SCA-Version: 1.1
+Bundle-Name: Apache Tuscany SCA Abdera Atom Feed Binding Extension
+Bundle-Vendor: The Apache Software Foundation
+Bundle-Version: 2.0.0
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: Apache Tuscany SCA Abdera Atom Feed Binding Extens
+ ion
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ org.apache.abdera,
+ org.apache.abdera.factory,
+ org.apache.abdera.i18n.iri,
+ org.apache.abdera.model,
+ org.apache.abdera.parser,
+ org.apache.abdera.protocol,
+ org.apache.abdera.protocol.client,
+ org.apache.abdera.protocol.client.util,
+ org.apache.abdera.writer,
+ org.apache.commons.codec.binary,
+ org.apache.http,
+ org.apache.http.client,
+ org.apache.http.client.entity,
+ org.apache.http.client.methods,
+ org.apache.http.conn,
+ org.apache.http.entity,
+ org.apache.http.message,
+ org.apache.tuscany.sca.assembly;version="2.0.0",
+ org.apache.tuscany.sca.binding.atom;version="2.0.0",
+ org.apache.tuscany.sca.common.http;version="2.0.0",
+ org.apache.tuscany.sca.core;version="2.0.0",
+ org.apache.tuscany.sca.data.collection;version="2.0.0",
+ org.apache.tuscany.sca.databinding;version="2.0.0",
+ org.apache.tuscany.sca.host.http;version="2.0.0",
+ org.apache.tuscany.sca.host.http.client;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.impl;version="2.0.0";resolution:=optional,
+ org.apache.tuscany.sca.interfacedef.util;version="2.0.0",
+ org.apache.tuscany.sca.invocation;version="2.0.0",
+ org.apache.tuscany.sca.provider;version="2.0.0",
+ org.apache.tuscany.sca.runtime;version="2.0.0",
+ org.apache.tuscany.sca.web.javascript;version="2.0.0",
+ org.oasisopen.sca;version="2.0.0",
+ org.oasisopen.sca.annotation;version="2.0.0";resolution:=optional
+Bundle-SymbolicName: org.apache.tuscany.sca.binding.atom.abdera
+Bundle-DocURL: http://www.apache.org/
+
