@@ -150,7 +150,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		for(Object object : msgBody){
 			if(object.toString().contains(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER)){
 				transactionTag = object.toString();
-				msgBody.remove(object);
+//				msgBody.remove(object);
 				break;
 			}
 		}
@@ -232,7 +232,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		
 		if(phase.equals(Phase.REFERENCE_POLICY)
 				|| phase.equals(Phase.SERVICE_POLICY)){
-			LOGGER.fine(phase + " TraceInterceptor" +
+			LOGGER.info(phase + " TraceInterceptor" +
 					"\n\t" + "messageID:" + msg.getMessageID() +
 					"\n\t" + "msgFrom:" + msg.getFrom() +
 					"\n\t" + "msgTo:" + msg.getTo() +

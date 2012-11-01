@@ -18,11 +18,13 @@
  */
 package org.apache.tuscany.sca.implementation.java.invocation;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.ws.Holder;
@@ -52,6 +54,8 @@ import org.apache.tuscany.sca.runtime.RuntimeComponentService;
 import org.oasisopen.sca.ServiceReference;
 import org.oasisopen.sca.ServiceRuntimeException;
 
+import cn.edu.nju.moon.conup.communication.generator.TxLifeCycleManager;
+
 /**
  * Responsible for synchronously dispatching an invocation to a Java component
  * implementation instance
@@ -67,6 +71,8 @@ public class JavaImplementationInvoker implements Invoker, DataExchangeSemantics
     @SuppressWarnings("unchecked")
     protected final ScopeContainer scopeContainer;
 	private final InterfaceContract interfaze;
+	
+	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
 
     public JavaImplementationInvoker(Operation operation, Method method, RuntimeComponent component, RuntimeComponentService service) {
         assert method != null : "Operation method cannot be null";
@@ -88,7 +94,43 @@ public class JavaImplementationInvoker implements Invoker, DataExchangeSemantics
 
     @SuppressWarnings("unchecked")
     public Message invoke(Message msg) {
-        
+    	
+    	String transactionTag = null;
+ 		List<Object> originalMsgBody = Arrays.asList((Object [])msg.getBody());
+ 		List<Object> msgBody = new ArrayList<Object>();
+ 		msgBody.addAll(originalMsgBody);
+ 		for(Object obj : msgBody){
+ 			if(obj.toString().contains(ROOT_PARENT_IDENTIFIER)){
+ 				transactionTag = obj.toString();
+ 				msgBody.remove(obj);
+ 				break;
+ 			}
+ 			
+ 		}
+ 		// after remove txTag, reset msgBody
+ 		msg.setBody((Object [])msgBody.toArray());
+ 		
+ 		String rootTx;
+ 		String rootComponent;
+ 		String parentTx;
+ 		String parentComponent;
+ 		if(transactionTag==null || transactionTag.equals("")){
+			rootTx = null;
+			rootComponent = null;
+			parentTx = null;
+			parentComponent = null;
+			
+		}else{
+			//get root, parent and current transaction id
+			String target = getTargetString(transactionTag);
+			String rootInfo = target.split(",")[0];
+			String parentInfo = target.split(",")[1];
+			rootTx = rootInfo.split(":")[0].equals("null") ? null : rootInfo.split(":")[0];
+			rootComponent = rootInfo.split(":")[1].equals("null") ? null : rootInfo.split(":")[1];
+			parentTx = parentInfo.split(":")[0].equals("null") ? null : parentInfo.split(":")[0];
+			parentComponent = parentInfo.split(":")[1].equals("null") ? null : parentInfo.split(":")[1];
+		}
+    	
         Operation op = msg.getOperation();
         if (op == null) {
             op = this.operation;
@@ -131,6 +173,33 @@ public class JavaImplementationInvoker implements Invoker, DataExchangeSemantics
             }
             
             final Object instance = wrapper.getInstance();
+            
+            //inject TxLifeCycleManager by rgc
+            TxLifeCycleManager txLifeCycleManager = null;
+            try {
+    			if(instance.getClass().getDeclaredField("tlcm") != null){
+    				Field tlcm = instance.getClass().getDeclaredField("tlcm");
+    				tlcm.setAccessible(true);
+    				if(tlcm.get(instance) == null){
+    					txLifeCycleManager = new TxLifeCycleManager();
+    					txLifeCycleManager.setParentComponent(parentComponent);
+    					txLifeCycleManager.setParentTxID(parentTx);
+    					txLifeCycleManager.setRootComponent(rootComponent);
+    					txLifeCycleManager.setRootTxID(rootTx);
+    					tlcm.set(instance, txLifeCycleManager);
+    				}
+    				System.out.println("inject TxLifeCycleManager....");
+    			}
+    		} catch (NoSuchFieldException e) {
+    			e.printStackTrace();
+    		} catch (SecurityException e) {
+    			e.printStackTrace();
+    		} catch (IllegalArgumentException e) {
+    			e.printStackTrace();
+    		} catch (IllegalAccessException e) {
+    			e.printStackTrace();
+    		}
+            
 
             // If the method couldn't be computed statically, or the instance being
             // invoked is a user-specified callback object that doesn't implement
@@ -184,6 +253,13 @@ public class JavaImplementationInvoker implements Invoker, DataExchangeSemantics
             }
 
             Object ret;
+//          Object[] newPayLoad = (Object[])payload;
+//          List<Object> payloadList = Arrays.asList((Object[])payload);
+//     		List<Object> newpayloadList = new ArrayList<Object>();
+//     		newpayloadList.addAll(payloadList);
+//     		newpayloadList.add(txLifeCycleManager.getParentComponent() + " " + txLifeCycleManager.getParentTxID() + " " + txLifeCycleManager.getRootComponent() + " " + txLifeCycleManager.getRootTxID());
+            
+//     		payload = newpayloadList;
             if (payload != null && !payload.getClass().isArray()) {
                 ret = imethod.invoke(instance, payload);
             } else {
@@ -312,6 +388,25 @@ public class JavaImplementationInvoker implements Invoker, DataExchangeSemantics
     @Override
     public boolean allowsPassByReference() {
         return allowsPBR;
-    }		
+    }
+    
+    /**
+	 * root and parent transaction id is stored in the format: VcTransactionRootAndParentIdentifier[ROOT_ID,PARENT_ID].
+	 * 
+	 * @return ROOT_ID,PARENT_ID
+	 * 
+	 * */
+	private String getTargetString(String raw){
+		if(raw.startsWith("\"")){
+			raw = raw.substring(1);
+		}
+		if(raw.endsWith("\"")){
+			raw = raw.substring(0, raw.length()-1);
+		}
+		int index = raw.indexOf(ROOT_PARENT_IDENTIFIER);
+		int head = raw.substring(index).indexOf("[")+1;
+		int tail = raw.substring(index).indexOf("]");
+		return raw.substring(head, tail);
+	}
 
 }
