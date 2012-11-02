@@ -15,10 +15,11 @@ import cn.edu.nju.moon.conup.spi.datamodel.OndemandSetup;
 public class OndemandSetupFactory {
 	/**
 	 * 
-	 * @param algorithmTyep Algorithm.CONSISTENCY_ALGORITHM/QUIESCENCE_ALGORITHM/TRANQUILLITY_ALGORITHM
-	 * @return according to the algorithmType, return related OndemandSetup implementation
+	 * according to the user configuration, creating an on-demand setup implementation
+	 * 
+	 * @return OndemandSetup
 	 */
-	public OndemandSetup getOndemand(String algorithmTyep){
+	public OndemandSetup getOndemandSetup(){
 		return null;
 	}
 }

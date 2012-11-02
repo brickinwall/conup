@@ -39,12 +39,18 @@ public class TransactionContext {
 	private Set<String> pastComponents;
 	/** components that will be used later. */
 	private Set<String> futureComponents;
-	/** current tx's subTx */
-	private Map<String, SubTransaction> subTxs;
+	
+//	private Map<String, SubTransaction> subTxs;
+	/** subTx's host components, it takes current tx id as the key */
+	private Map<String, String> subTxHostComps;
+	/** subTx's statuses, it takes current tx id as the key */
+	private Map<String, String> subTxStatuses;
 	
 	public TransactionContext(){
-		if(subTxs == null)
-			subTxs = new HashMap<String, SubTransaction>();
+		if(subTxHostComps == null)
+			subTxHostComps = new HashMap<String, String>();
+		if(subTxStatuses == null)
+			subTxStatuses = new HashMap<String, String>();
 	}
 	
 	/**
@@ -157,19 +163,14 @@ public class TransactionContext {
 	public void setFutureComponents(Set<String> futureComponents) {
 		this.futureComponents = futureComponents;
 	}
-	
-	/** get current transaction's sub-transactions */
-	public Map<String, SubTransaction> getSubTxs() {
-		return subTxs;
-	}
-	
-	public SubTransaction getSubTx(String subTxID){
-		return subTxs.get(subTxID);
+
+	public Map<String, String> getSubTxHostComps() {
+		return subTxHostComps;
 	}
 
-	/** set current transaction's sub-transactions */
-	public void setSubTx(Map<String, SubTransaction> subTxs) {
-		this.subTxs = subTxs;
+	public Map<String, String> getSubTxStatuses() {
+		return subTxStatuses;
 	}
+
 
 }

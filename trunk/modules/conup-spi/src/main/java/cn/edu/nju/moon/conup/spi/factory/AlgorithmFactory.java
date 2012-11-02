@@ -16,10 +16,12 @@ public class AlgorithmFactory {
 	
 	/**
 	 * 
-	 * @param algorithmTyep Algorithm.CONSISTENCY_ALGORITHM/QUIESCENCE_ALGORITHM/TRANQUILLITY_ALGORITHM
-	 * @return according to the algorithmType, return related algorithm
+	 * According to the algorithmTyep, i.e., Algorithm.CONSISTENCY_ALGORITHM/QUIESCENCE_ALGORITHM/TRANQUILLITY_ALGORITHM
+	 * creating an Algorithm implementation
+	 * 
+	 * @return Algorithm
 	 */
-	public Algorithm getAlgorithm(String algorithmTyep){
+	public Algorithm getAlgorithm(){
 		return null;
 	}
 	

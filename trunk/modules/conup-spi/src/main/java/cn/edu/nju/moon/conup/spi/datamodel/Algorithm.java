@@ -23,11 +23,8 @@ public interface Algorithm {
 	
 	/**
 	 * 	It's used to analyze txStatus and maintain related dependences for it.
-	 * 	@param txStatus transaction's status, i.e., start, running, end
-	 * 	@param txID	transaction ID
-	 * 	@param futureC components that will be used in future
-	 * 	@param pastC components that have been used
+	 * 	@param txContext 
 	 * 
 	 * */
-	public void analyze(String txStatus, String txID, Set<String> futureC, Set<String> pastC);
+	public void analyze(TransactionContext txContext);
 }

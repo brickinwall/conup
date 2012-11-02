@@ -1,16 +1,21 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
 /**
- * This POJO is used for describing a future/past arc between components.
+ * Arc is an abstract concept for different algorithms.
+ * For example, 
+ * as to Version_Consistency, it means future/past arcs.
+ * as to Quiescence, it means static dependences between components
  * 
  * @author nju
  * 
  */
 public class Arc implements Comparable<Arc>{
 	/** arc type is "future" */
-	public static String FUTURE = "future";
+	public final static String FUTURE = "FUTURE";
 	/** arc type is "past" */
-	public static String PAST = "past";
+	public final static String PAST = "PAST";
+	/** arc type is static dependent */
+	public final static String STATIC_DEP = "STATIC_DEP";
 
 	/** arc type can be either future or past. */
 	private String type;

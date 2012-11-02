@@ -5,6 +5,8 @@ package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import java.util.Set;
 
+import cn.edu.nju.moon.conup.spi.datamodel.EventType;
+
 /**
  * It's used to monitor transaction status, maintain transaction context 
  * and possibly invoke related algorithm
