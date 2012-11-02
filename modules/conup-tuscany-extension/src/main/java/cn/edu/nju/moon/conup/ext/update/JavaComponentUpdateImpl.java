@@ -36,4 +36,10 @@ public class JavaComponentUpdateImpl implements ComponentUpdate {
 		return false;
 	}
 
+	@Override
+	public String getImplementationType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

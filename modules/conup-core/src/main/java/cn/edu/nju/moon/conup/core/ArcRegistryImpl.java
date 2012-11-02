@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.core.datamodel;
+package cn.edu.nju.moon.conup.core;
 
 import java.util.HashSet;
 import java.util.Iterator;

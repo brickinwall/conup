@@ -14,6 +14,11 @@ import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
  *
  */
 public class DynamicDepManager {
+	private Algorithm algorithm = null;
+	
+	public DynamicDepManager(){
+		algorithm = new AlgorithmFactory().getAlgorithm();
+	}
 	
 	/**
 	 * maintain tx
@@ -37,9 +42,7 @@ public class DynamicDepManager {
 	 * @return
 	 */
 	public boolean manageDep(TransactionContext txContext){
-		Algorithm algorithm;
-		algorithm = new AlgorithmFactory().getAlgorithm(null);
-//		algorithm.analyze(txStatus, txID, futureC, pastC);
+		algorithm.analyze(txContext);
 		return true;
 	}
 	

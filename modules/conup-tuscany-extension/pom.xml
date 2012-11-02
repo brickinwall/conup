@@ -3,4 +3,12 @@
   <groupId>cn.edu.nju.moon</groupId>
   <artifactId>conup-tuscany-extension</artifactId>
   <version>2.0.1-DU-SNAPSHOT</version>
+  
+  <dependencies>
+	<dependency>
+	  <groupId>cn.edu.nju.moon</groupId>
+	  <artifactId>conup-spi</artifactId>
+	  <version>2.0.1-DU-SNAPSHOT</version>
+	</dependency>
+  </dependencies>
 </project>

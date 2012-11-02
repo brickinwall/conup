@@ -13,13 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class TxLifecycleManager {
+	/**
+	 * TX_IDS takes transactionID and component name as key and value respectively.
+	 */
 	public static Map<String, String> TX_IDS = new ConcurrentHashMap<String, String>();
+	
 	/**
 	 * create transaction id
-	 * @param componentName
 	 * @return
 	 */
-	public String createID(String componentName){
+	public String createID(){
 		String txID = null;
 		
 		return txID;

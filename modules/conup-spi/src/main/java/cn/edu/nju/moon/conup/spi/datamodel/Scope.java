@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jdom.Element;
@@ -8,8 +9,8 @@ import org.jdom.Element;
 public class Scope {
 	
 	private Element scope = null;
-	private Set<String> parentComponents;
-	private Set<String> subComponents;
+	private Map<String, Set<String>> parentComponents;
+	private Map<String, Set<String>> subComponents;
 	
 //	public Element getScope() {
 //		return scope;

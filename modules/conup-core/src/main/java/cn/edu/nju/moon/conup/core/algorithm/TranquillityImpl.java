@@ -6,6 +6,7 @@ package cn.edu.nju.moon.conup.core.algorithm;
 import java.util.Set;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 
 /**
@@ -14,13 +15,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
  */
 public class TranquillityImpl implements Algorithm {
 
-	/* (non-Javadoc)
-	 * @see cn.edu.nju.moon.conup.core.algorithm.Algorithm#analyze(java.lang.String, java.lang.String, java.util.Set, java.util.Set)
-	 */
-	public void analyze(String txStatus, String txID, Set<String> futureC,
-			Set<String> pastC) {
+	@Override
+	public void analyze(TransactionContext txContext) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

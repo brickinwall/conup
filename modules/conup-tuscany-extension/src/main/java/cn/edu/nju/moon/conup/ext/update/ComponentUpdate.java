@@ -4,7 +4,10 @@
 package cn.edu.nju.moon.conup.ext.update;
 
 /**
- * 	A uniform interface for updating components implemented in different technologies, e.g., Java POJO, EJB.
+ * 	A uniform interface for updating components implemented in different implementation type, 
+ * 	e.g., Java POJO, EJB.
+ * 	
+ * 	Each implementation type should implement the interface
  * 	@author Jiang Wang
  *
  */
@@ -32,4 +35,8 @@ public interface ComponentUpdate {
 	 */
 	public boolean cleanUpdate();
 	
+	/**
+	 * @return 
+	 */
+	public String getImplementationType();
 }
