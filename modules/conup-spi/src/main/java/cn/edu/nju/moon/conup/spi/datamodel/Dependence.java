@@ -6,16 +6,10 @@ package cn.edu.nju.moon.conup.spi.datamodel;
  * as to Version_Consistency, it means future/past arcs.
  * as to Quiescence, it means static dependences between components
  * 
- * @author nju
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  * 
  */
-public class Arc implements Comparable<Arc>{
-	/** arc type is "future" */
-	public final static String FUTURE = "FUTURE";
-	/** arc type is "past" */
-	public final static String PAST = "PAST";
-	/** arc type is static dependent */
-	public final static String STATIC_DEP = "STATIC_DEP";
+public class Dependence implements Comparable<Dependence>{
 
 	/** arc type can be either future or past. */
 	private String type;
@@ -26,11 +20,11 @@ public class Arc implements Comparable<Arc>{
 	private String sourceService;
 	private String targetService;
 
-	public Arc() {
+	public Dependence() {
 
 	}
 
-	public Arc(String type, String rootTransaction, String sourceComponent,
+	public Dependence(String type, String rootTransaction, String sourceComponent,
 			String targetComponent, String sourceService, String targetService) {
 		this.type = type;
 		this.rootTransaction = rootTransaction;
@@ -54,11 +48,11 @@ public class Arc implements Comparable<Arc>{
 
 	@Override
 	public boolean equals(Object obj) {
-		Arc arc = (Arc) obj;
-		if (arc.getRootTransaction().equals(this.rootTransaction)
-				&& arc.getSourceComponent().equals(this.sourceComponent)
-				&& arc.getTargetComponent().equals(this.targetComponent)
-				&& arc.getType().equals(this.type)) {
+		Dependence dependence = (Dependence) obj;
+		if (dependence.getRootTransaction().equals(this.rootTransaction)
+				&& dependence.getSourceComponent().equals(this.sourceComponent)
+				&& dependence.getTargetComponent().equals(this.targetComponent)
+				&& dependence.getType().equals(this.type)) {
 			return true;
 		} else
 			return false;
@@ -116,7 +110,7 @@ public class Arc implements Comparable<Arc>{
 	}
 
 	@Override
-	public int compareTo(Arc anotherArc) {
+	public int compareTo(Dependence anotherArc) {
 		String current = this.rootTransaction + this.sourceComponent +
 				this.targetComponent + this.type;
 		String another = anotherArc.rootTransaction + anotherArc.sourceComponent +

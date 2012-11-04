@@ -9,7 +9,7 @@ import java.util.Set;
  * Interface for different dynamic update algorithm, i.e., Version-consistency, Quiescence 
  * and Tranquillity
  * 
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  */
 public interface Algorithm {
 	/** represent version-consistency algorithm */
@@ -27,4 +27,25 @@ public interface Algorithm {
 	 * 
 	 * */
 	public void analyze(TransactionContext txContext);
+	
+	/**
+	 * It's used by interceptor for deciding whether a request needs to be intercepted
+	 * @param compName component name
+	 * @return
+	 */
+	public boolean isInterceptRequired(String compName);
+	
+	/**
+	 * is a component valid?
+	 * @param compName
+	 * @return 
+	 */
+	public boolean isValid(String compName);
+	
+	/**
+	 * is a component ready?
+	 * @param compName
+	 * @return 
+	 */
+	public boolean isReadyForUpdate(String compName);
 }

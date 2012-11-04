@@ -6,7 +6,7 @@ package cn.edu.nju.moon.conup.ext.lifecycle;
 /**
  * Component life cycle manager
  * 
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class CompLifecycleManager {
@@ -24,7 +24,7 @@ public class CompLifecycleManager {
 	
 	/**
 	 * 
-	 * @param contributionUri
+	 * @param contributionUril
 	 * @return
 	 */
 	public boolean install(String contributionUri){
@@ -33,7 +33,7 @@ public class CompLifecycleManager {
 		return isInstalled;
 	}
 	
-	/**
+	/**l
 	 * stop a contribution
 	 * @param contributionUri
 	 * @return

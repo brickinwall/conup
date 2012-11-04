@@ -6,7 +6,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 /**
  * A interface for remote management, such as on-demand, update
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface ComponentUpdateService {

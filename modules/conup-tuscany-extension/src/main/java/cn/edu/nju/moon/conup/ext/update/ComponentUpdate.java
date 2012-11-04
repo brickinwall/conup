@@ -8,7 +8,7 @@ package cn.edu.nju.moon.conup.ext.update;
  * 	e.g., Java POJO, EJB.
  * 	
  * 	Each implementation type should implement the interface
- * 	@author Jiang Wang
+ * 	@author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface ComponentUpdate {

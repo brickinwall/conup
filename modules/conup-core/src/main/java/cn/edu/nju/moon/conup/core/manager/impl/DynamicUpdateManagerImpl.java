@@ -1,5 +1,8 @@
-package cn.edu.nju.moon.conup.spi.manager;
+package cn.edu.nju.moon.conup.core.manager.impl;
 
+import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
+import cn.edu.nju.moon.conup.spi.manager.DynamicUpdateManager;
 
 /**
  * DynamicUpdateManager provides a series of method for dynamic update.
@@ -10,7 +13,12 @@ package cn.edu.nju.moon.conup.spi.manager;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface DynamicUpdateManager {
+public class DynamicUpdateManagerImpl implements DynamicUpdateManager {
+	private FreenessStrategy freenessStrategy = null;
+	
+	public DynamicUpdateManagerImpl(){
+		freenessStrategy = new AlgorithmFactory().getFreenessStrategy();
+	}
 	
 	/**
 	 * manage() is an abstract operation for different freeness strategy.
@@ -24,8 +32,10 @@ public interface DynamicUpdateManager {
 	 * @param curTxID current transaction id
 	 * @param hostComp host component name
 	 */
+	@Override
 	public void manage(String rootTxID, String rootComp, String parentComp, 
-			String curTxID, String hostComp);
-	
+			String curTxID, String hostComp){
+		freenessStrategy.manage(rootTxID, rootComp, parentComp, curTxID, hostComp);
+	}
 	
 }
