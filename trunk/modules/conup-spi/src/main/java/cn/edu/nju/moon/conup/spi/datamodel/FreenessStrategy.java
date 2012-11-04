@@ -6,7 +6,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 /**
  * An abstract description of the strategies for achieving freeness, 
  * i.e., Blocking, waiting and concurrent_version
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface FreenessStrategy {
@@ -34,25 +34,5 @@ public interface FreenessStrategy {
 	public void manage(String rootTxID, String rootComp, String parentComp, 
 			String curTxID, String hostComp);
 	
-	/**
-	 * It's used by interceptor for deciding whether a request needs to be intercepted
-	 * @param compName component name
-	 * @return
-	 */
-	public boolean isInterceptRequired(String compName);
-	
-	/**
-	 * is a component valid?
-	 * @param compName
-	 * @return 
-	 */
-	public boolean isValid(String compName);
-	
-	/**
-	 * is a component ready?
-	 * @param compName
-	 * @return 
-	 */
-	public boolean isReadyForUpdate(String compName);
 
 }

@@ -6,7 +6,7 @@ package cn.edu.nju.moon.conup.ext.update;
 
 /**
  * A class for update components implemented in Java POJO.
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class JavaComponentUpdateImpl implements ComponentUpdate {

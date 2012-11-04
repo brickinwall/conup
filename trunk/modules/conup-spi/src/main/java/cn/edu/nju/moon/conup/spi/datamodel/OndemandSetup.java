@@ -9,7 +9,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
  * A general interface for different update algorithm(Version-consistency, quiescence and tranquillity).
  * Since the process of on-demand setup is different,  each algorithm should provide a class implements the interface
  * 
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface OndemandSetup {

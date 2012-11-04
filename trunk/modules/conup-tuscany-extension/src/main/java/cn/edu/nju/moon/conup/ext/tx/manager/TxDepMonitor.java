@@ -11,7 +11,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.EventType;
  * It's used to monitor transaction status, maintain transaction context 
  * and possibly invoke related algorithm
  * 
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class TxDepMonitor {

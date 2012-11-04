@@ -5,14 +5,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import cn.edu.nju.moon.conup.spi.datamodel.Arc;
+import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
 
 /** arcs that entering a component. */
 public class ArcRegistryImpl {
 	private static ArcRegistryImpl arcRegistryImpl = new ArcRegistryImpl();
 //	private Set<Arc> inArcs = new HashSet<Arc>();
-	private Set<Arc> arcs = new ConcurrentSkipListSet<Arc>();
+	private Set<Dependence> dependences = new ConcurrentSkipListSet<Dependence>();
 	
 	private ArcRegistryImpl(){
 	}
@@ -21,93 +21,93 @@ public class ArcRegistryImpl {
 		return arcRegistryImpl;
 	}
 	
-	public void addArc(Arc arc) {
-		arcs.add(arc);
+	public void addArc(Dependence dependence) {
+		dependences.add(dependence);
 	}
 
-	public void removeArc(Arc arc) {
-		Iterator<Arc> it = arcs.iterator();
+	public void removeArc(Dependence dependence) {
+		Iterator<Dependence> it = dependences.iterator();
 		while(it.hasNext()){
-			if(it.next().equals(arc))
+			if(it.next().equals(dependence))
 				it.remove();
 		}
 	}
 
-	public Set<Arc> getArcs() {
-		return arcs;
+	public Set<Dependence> getArcs() {
+		return dependences;
 	}
 
-	public Set<Arc> getArcsViaType(String type) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getType().equals(type)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaType(String type) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getType().equals(type)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public Set<Arc> getArcsViaRootTransaction(String rootTransaction) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getRootTransaction().equals(rootTransaction)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaRootTransaction(String rootTransaction) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getRootTransaction().equals(rootTransaction)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public Set<Arc> getArcsViaSourceComponent(String sourceComponent) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getSourceComponent().equals(sourceComponent)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaSourceComponent(String sourceComponent) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getSourceComponent().equals(sourceComponent)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public Set<Arc> getArcsViaTargetComponent(String targetComponent) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getTargetComponent().equals(targetComponent)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaTargetComponent(String targetComponent) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getTargetComponent().equals(targetComponent)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public Set<Arc> getArcsViaSourceService(String sourceService) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getSourceService().equals(sourceService)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaSourceService(String sourceService) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getSourceService().equals(sourceService)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public Set<Arc> getArcsViaTargetService(String targetService) {
-		Set<Arc> returnArcs = new HashSet<Arc>();
-		for(Arc arc : arcs){
-			if(arc.getTargetService().equals(targetService)){
-				returnArcs.add(arc);
+	public Set<Dependence> getArcsViaTargetService(String targetService) {
+		Set<Dependence> returnArcs = new HashSet<Dependence>();
+		for(Dependence dependence : dependences){
+			if(dependence.getTargetService().equals(targetService)){
+				returnArcs.add(dependence);
 			}
 		}
 		return returnArcs;
 	}
 
-	public boolean update(Arc arc) {
-		if(arc.getType().equals("future")){
-			for(Arc arcInArcRegistry : arcs){
-				if(arcInArcRegistry.equals(arc)){
-					Arc updatedArc = new Arc();
+	public boolean update(Dependence dependence) {
+		if(dependence.getType().equals("future")){
+			for(Dependence arcInArcRegistry : dependences){
+				if(arcInArcRegistry.equals(dependence)){
+					Dependence updatedArc = new Dependence();
 					updatedArc.setRootTransaction(arcInArcRegistry.getRootTransaction());
 					updatedArc.setSourceComponent(arcInArcRegistry.getSourceComponent());
 					updatedArc.setTargetComponent(arcInArcRegistry.getTargetComponent());
 					updatedArc.setType("past");
-					arcs.remove(arcInArcRegistry);
-					arcs.add(updatedArc);
+					dependences.remove(arcInArcRegistry);
+					dependences.add(updatedArc);
 					return true;
 				}
 			}
@@ -115,9 +115,9 @@ public class ArcRegistryImpl {
 		return false;
 	}
 
-	public boolean contain(Arc arc) {
-		for(Arc inArc : arcs){
-			if(inArc.equals(arc))
+	public boolean contain(Dependence dependence) {
+		for(Dependence inArc : dependences){
+			if(inArc.equals(dependence))
 				return true;
 		}
 		return false;

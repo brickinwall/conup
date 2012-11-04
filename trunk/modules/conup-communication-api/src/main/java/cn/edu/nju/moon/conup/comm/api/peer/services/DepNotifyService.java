@@ -3,7 +3,7 @@ package cn.edu.nju.moon.conup.comm.api.peer.services;
 
 /**
  * exchange dependences between different nodes
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface DepNotifyService {

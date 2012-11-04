@@ -7,37 +7,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 
 /**
  * Implementation of blocking strategy for achieving freeness
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class BlockingStrategy implements FreenessStrategy {
-
-	/* (non-Javadoc)
-	 * @see cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy#isInterceptRequired(java.lang.String)
-	 */
-	@Override
-	public boolean isInterceptRequired(String compName) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy#isValid(java.lang.String)
-	 */
-	@Override
-	public boolean isValid(String compName) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy#isReadyForUpdate(java.lang.String)
-	 */
-	@Override
-	public boolean isReadyForUpdate(String compName) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public void manage(String rootTxID, String rootComp, String parentComp,

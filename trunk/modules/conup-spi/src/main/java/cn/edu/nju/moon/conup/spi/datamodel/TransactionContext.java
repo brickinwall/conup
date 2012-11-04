@@ -16,7 +16,7 @@ import java.util.Set;
  * 		<li>
  * </ul>
  * 
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class TransactionContext {

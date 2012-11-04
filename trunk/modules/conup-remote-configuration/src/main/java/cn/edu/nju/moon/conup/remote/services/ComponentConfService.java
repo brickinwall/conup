@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * A interface for querying component status
- * @author Jiang Wang
+ * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public interface ComponentConfService {
