@@ -10,16 +10,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
 /** arcs that entering a component. */
 public class ArcRegistryImpl {
-	private static ArcRegistryImpl arcRegistryImpl = new ArcRegistryImpl();
 //	private Set<Arc> inArcs = new HashSet<Arc>();
 	private Set<Dependence> dependences = new ConcurrentSkipListSet<Dependence>();
 	
-	private ArcRegistryImpl(){
+	public ArcRegistryImpl(){
 	}
 	
-	public static ArcRegistryImpl getInstance(){
-		return arcRegistryImpl;
-	}
 	
 	public void addArc(Dependence dependence) {
 		dependences.add(dependence);
