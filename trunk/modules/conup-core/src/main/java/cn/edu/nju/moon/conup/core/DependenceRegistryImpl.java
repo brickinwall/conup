@@ -10,15 +10,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
 /** dependences for a component. */
 public class DependenceRegistryImpl {
-	private static DependenceRegistryImpl depRegistryImpl = new DependenceRegistryImpl();
-//	private Set<Arc> inArcs = new HashSet<Arc>();
 	private Set<Dependence> dependences = new ConcurrentSkipListSet<Dependence>();
 	
-	private DependenceRegistryImpl(){
-	}
-	
-	public static DependenceRegistryImpl getInstance(){
-		return depRegistryImpl;
+	public DependenceRegistryImpl(){
 	}
 	
 	public void addDependence(Dependence dependence) {
