@@ -5,7 +5,7 @@ package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import java.util.Set;
 
-import cn.edu.nju.moon.conup.spi.datamodel.EventType;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 /**
  * It's used to monitor transaction status, maintain transaction context 
@@ -17,11 +17,11 @@ import cn.edu.nju.moon.conup.spi.datamodel.EventType;
 public class TxDepMonitor {
 	/**
 	 * 
-	 * @param EventType 
+	 * @param TxEventType 
 	 * @param curTxID current tx id
 	 * @return
 	 */
-	public boolean notify(EventType et, String curTxID){
+	public boolean notify(TxEventType et, String curTxID){
 		
 		return true;
 	}
