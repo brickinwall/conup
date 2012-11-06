@@ -1,8 +1,7 @@
 package cn.edu.nju.moon.conup.spi.factory;
 
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.DynamicUpdateManager;
-import cn.edu.nju.moon.conup.spi.manager.OndemandSetupManager;
 
 /**
  * A factory for creating different managers. 
@@ -27,20 +26,20 @@ public class ManagerFactory {
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @return an instance of DynamicUpdateManager
-	 */
-	public DynamicUpdateManager createDynamicUpdateManager(){
-		
-		return null;
-	}
+//	/**
+//	 * 
+//	 * @return an instance of DynamicUpdateManager
+//	 */
+//	public DynamicUpdateManager createDynamicUpdateManager(){
+//		
+//		return null;
+//	}
 	
 	/**
 	 * 
 	 * @return an instance of OndemandSetupManager
 	 */
-	public OndemandSetupManager createOndemandSetupManager(){
+	public OndemandSetupHelper createOndemandSetupManager(){
 		
 		return null;
 	}

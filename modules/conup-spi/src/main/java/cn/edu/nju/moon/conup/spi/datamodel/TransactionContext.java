@@ -33,8 +33,8 @@ public class TransactionContext {
 	private String parentTx;
 	/** parent component */
 	private String parentComponent;
-	/** transaction status: idle, start, running, end. */
-	private String status = null;
+	/** TxEventType */
+	private TxEventType eventType = null;
 	/** components that will never be used. */
 	private Set<String> pastComponents;
 	/** components that will be used later. */
@@ -138,16 +138,6 @@ public class TransactionContext {
 		this.hostComponent = hostComponent;
 	}
 
-	/** a transaction's status can be idle, start, running and end */
-	public String getStatus() {
-		return status;
-	}
-
-	/** a transaction's status can be idle, start, running and end */
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
 	public Set<String> getPastComponents() {
 		return pastComponents;
 	}
@@ -170,6 +160,14 @@ public class TransactionContext {
 
 	public Map<String, String> getSubTxStatuses() {
 		return subTxStatuses;
+	}
+
+	public TxEventType getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(TxEventType eventType) {
+		this.eventType = eventType;
 	}
 
 
