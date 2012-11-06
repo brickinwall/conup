@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitor;
-import cn.edu.nju.moon.conup.spi.datamodel.EventType;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 
 
@@ -151,7 +151,7 @@ public class LocalDynamicDependencesManager {
 	 * EventType : first request service from other component
 	 */
 	public void notifyFirstRequestService() {
-		monitor.notify(EventType.FirstRequestService,transactionID);
+		monitor.notify(TxEventType.FirstRequestService,transactionID);
 	}
 
 	/**
@@ -162,13 +162,13 @@ public class LocalDynamicDependencesManager {
 	public void trigger(String event) {	
 		if (event.contains("Start")) {
 			currentState = 0;
-			monitor.notify(EventType.TransactionStart, transactionID);
+			monitor.notify(TxEventType.TransactionStart, transactionID);
 			LOGGER.fine("Transaction  " + transactionID + "  is start!");			
 			}
 		else {
 			if (event.isEmpty()) {	
 				ddes.remove(transactionID);
-				monitor.notify(EventType.TransactionEnd, transactionID);
+				monitor.notify(TxEventType.TransactionEnd, transactionID);
 				LOGGER.fine("Transaction  " + transactionID + "  is end!");	}
 			else {
 				//if it is a component-invoked event, change past set. else,leave unchaged.			
@@ -182,7 +182,7 @@ public class LocalDynamicDependencesManager {
 				for (String e : eveinf) {
 					if (e.contains(event)) {
 						currentState = Integer.parseInt(e.split("-")[1]);
-						monitor.notify(EventType.DependencesChanged, transactionID);						
+						monitor.notify(TxEventType.DependencesChanged, transactionID);						
 						LOGGER.fine("Transaction  " + transactionID + "  dynamic dependences have been changed!");
 						return;
 				}

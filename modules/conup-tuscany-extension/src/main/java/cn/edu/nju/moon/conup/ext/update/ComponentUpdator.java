@@ -11,7 +11,7 @@ package cn.edu.nju.moon.conup.ext.update;
  * 	@author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface ComponentUpdate {
+public interface ComponentUpdator {
 	/**
 	 * This method is used to load new version component/classes, and initiate update environment.
 	 * e.g., for concurrent version, it may create dispatcher.
@@ -22,6 +22,24 @@ public interface ComponentUpdate {
 	 * @return if loaded successfully return true, otherwise return false
 	 */
 	public boolean start(String baseDir, String classPath, String contributionURI, String compositeURI);
+	
+	/**
+	 * finalize old version component
+	 * @param compName
+	 * @param oldVersion
+	 * @param newVersion
+	 * @return
+	 */
+	public boolean finalizeOld(String compName, String oldVersion, String newVersion);
+	
+	/**
+	 * initiate new version component
+	 * @param compName
+	 * @param oldVersion
+	 * @param newVersion
+	 * @return
+	 */
+	public boolean initNewVersion(String compName, String oldVersion, String newVersion);
 	
 	/**
 	 * 
