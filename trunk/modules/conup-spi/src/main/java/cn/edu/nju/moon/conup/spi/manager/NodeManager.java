@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.spi.manager;
 
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+
 /**
  * A Tuscany node can host many components, we provide one NodeManager for each node.
  * It's responsible for managing multiple component managers on the node.
@@ -15,18 +17,18 @@ public interface NodeManager {
 	 */
 	public DynamicDepManager getDynamicDepManager(String compName);
 	
-	/**
-	 * each component has only one DynamicUpdateManager
-	 * @param compName
-	 * @return
-	 */
-	public DynamicUpdateManager getDynamicUpdateManager(String compName);
+//	/**
+//	 * each component has only one DynamicUpdateManager
+//	 * @param compName
+//	 * @return
+//	 */
+//	public DynamicUpdateManager getDynamicUpdateManager(String compName);
 	
 	/**
 	 * each component has only one OndemandSetupManager
 	 * @param compName
 	 * @return
 	 */
-	public OndemandSetupManager getOndemandSetupManager(String compName);
+	public OndemandSetupHelper getOndemandSetupManager(String compName);
 	
 }

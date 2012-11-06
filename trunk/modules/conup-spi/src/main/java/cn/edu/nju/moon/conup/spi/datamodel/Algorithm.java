@@ -26,26 +26,32 @@ public interface Algorithm {
 	 * 	@param txContext 
 	 * 
 	 * */
-	public void analyze(TransactionContext txContext);
+	public void manageDependence(TransactionContext txContext);
+	
+	/**
+	 * received dependences notification from peer component
+	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
+	 * @param msgType XML, JSON, etc.
+	 * @param payload
+	 * @return
+	 */
+	public boolean manageDependence(String proctocol, String msgType, String payload);
 	
 	/**
 	 * It's used by interceptor for deciding whether a request needs to be intercepted
-	 * @param compName component name
 	 * @return
 	 */
-	public boolean isInterceptRequired(String compName);
+	public boolean isInterceptRequired();
 	
 	/**
 	 * is a component valid?
-	 * @param compName
 	 * @return 
 	 */
-	public boolean isValid(String compName);
+	public boolean isValid();
 	
 	/**
 	 * is a component ready?
-	 * @param compName
 	 * @return 
 	 */
-	public boolean isReadyForUpdate(String compName);
+	public boolean isReadyForUpdate();
 }

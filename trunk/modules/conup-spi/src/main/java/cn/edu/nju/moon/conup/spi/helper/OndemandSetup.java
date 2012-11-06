@@ -1,7 +1,9 @@
 /**
  * 
  */
-package cn.edu.nju.moon.conup.spi.datamodel;
+package cn.edu.nju.moon.conup.spi.helper;
+
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 
 /**
@@ -15,16 +17,25 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 public interface OndemandSetup {
 	/**
 	 * represent the process of on-demand setup
-	 * @param targetComponent name of the component needs to be updated
 	 * @param freenessSetup the strategy used to achieve freeness, i.e., CV/BF/WF
+	 * @param scope
 	 */
-	public void ondemand(String targetComponent, String freenessSetup, Scope scope);
+	public void ondemand(String freenessSetup, Scope scope);
+	
+	/**
+	 * received on-demand notification from peer component
+	 * @param sourceComp source component's name
+	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
+	 * @param msgType XML, JSON, etc.
+	 * @param payload
+	 * @return
+	 */
+	public boolean ondemandSetup(String sourceComp, String proctocol, String msgType, String payload);
 	
 	/**
 	 * Since the on-demand setup is asynchronous, the method is used to query on-demand setup status
 	 * @return
 	 */
 	public boolean isOndemandDone();
-	
 	
 }

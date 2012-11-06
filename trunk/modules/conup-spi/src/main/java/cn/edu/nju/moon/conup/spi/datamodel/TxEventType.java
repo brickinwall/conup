@@ -8,7 +8,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
  *its dynamicdenpendencesManager will notify the transaction manager. 
  *
  */
-public enum EventType{
+public enum TxEventType{
 	TransactionStart,
 	TransactionEnd,
 	FirstRequestService,

@@ -5,7 +5,7 @@ package cn.edu.nju.moon.conup.spi.factory;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.datamodel.OndemandSetup;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 
 
 /**
@@ -23,7 +23,7 @@ public class AlgorithmFactory {
 	 * 
 	 * @return Algorithm
 	 */
-	public Algorithm getAlgorithm(){
+	public Algorithm createAlgorithm(){
 		return null;
 	}
 	
@@ -33,7 +33,7 @@ public class AlgorithmFactory {
 	 * 
 	 * @return OndemandSetup
 	 */
-	public OndemandSetup getOndemandSetup(){
+	public OndemandSetup createOndemandSetup(){
 		return null;
 	}
 	
@@ -44,7 +44,7 @@ public class AlgorithmFactory {
 	 * 
 	 * @return FreenessStrategy
 	 */
-	public FreenessStrategy getFreenessStrategy(){
+	public FreenessStrategy createFreenessStrategy(){
 		
 		return null;
 	}
