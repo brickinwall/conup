@@ -1,19 +1,19 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
-import cn.edu.nju.moon.conup.spi.datamodel.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
-import cn.edu.nju.moon.conup.spi.manager.OndemandSetupManager;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public class OndemandSetupManagerImpl implements OndemandSetupManager{
+public class OndemandSetupManagerImpl implements OndemandSetupHelper{
 	private OndemandSetup ondemandSetup = null;
 	
 	public OndemandSetupManagerImpl(){
-		ondemandSetup = new AlgorithmFactory().getOndemandSetup();
+		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
 	}
 	
 	/**
@@ -21,8 +21,15 @@ public class OndemandSetupManagerImpl implements OndemandSetupManager{
 	 * @return
 	 */
 	@Override
-	public boolean ondemandSetup(String targetComponent, String freenessSetup, Scope scope){
-		ondemandSetup.ondemand(targetComponent, freenessSetup, scope);
+	public boolean ondemandSetup(String freenessSetup, Scope scope){
+		ondemandSetup.ondemand(freenessSetup, scope);
 		return true;
+	}
+
+	@Override
+	public boolean ondemandSetup(String sourceComp, String proctocol,
+			String msgType, String payload) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
