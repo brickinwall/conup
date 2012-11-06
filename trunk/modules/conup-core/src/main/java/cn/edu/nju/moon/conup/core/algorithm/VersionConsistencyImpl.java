@@ -18,25 +18,32 @@ public class VersionConsistencyImpl implements Algorithm {
 	public final static String PAST_DEP = "PAST_DEP";
 	
 	@Override
-	public void analyze(TransactionContext txContext) {
+	public void manageDependence(TransactionContext txContext) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean isInterceptRequired(String compName) {
+	public boolean isInterceptRequired() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean isValid(String compName) {
+	public boolean isValid() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean isReadyForUpdate(String compName) {
+	public boolean isReadyForUpdate() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean manageDependence(String proctocol,
+			String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;
 	}

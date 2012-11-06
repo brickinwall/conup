@@ -1,9 +1,8 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.DynamicUpdateManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.manager.OndemandSetupManager;
 
 /**
  * A Tuscany node can host many components, we provide one NodeManager for each node.
@@ -29,14 +28,14 @@ public class NodeManagerImpl implements NodeManager{
 		return null;
 	}
 
-	@Override
-	public DynamicUpdateManager getDynamicUpdateManager(String compName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public DynamicUpdateManager getDynamicUpdateManager(String compName) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
-	public OndemandSetupManager getOndemandSetupManager(String compName) {
+	public OndemandSetupHelper getOndemandSetupManager(String compName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
