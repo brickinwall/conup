@@ -9,24 +9,24 @@ package cn.edu.nju.moon.conup.comm.api.peer.services;
 public interface OndemandDynDepSetupService {
 	/**
 	 * synchronously notify target component
-	 * @param sourceComp 
-	 * @param targetComp target component's name
+	 * @param srcIdentifier 
+	 * @param targetIdentifier target component object identifier
 	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
 	 * @param msgType XML, JSON, etc.
 	 * @param payload
 	 * @return
 	 */
-	public String synPost(String sourceComp, String targetComp, String proctocol, String msgType, String payload);
+	public String synPost(String srcIdentifier, String targetIdentifier, String proctocol, String msgType, String payload);
 	
 	/**
 	 * asynchronously notify target component
-	 * @param sourceComp  
-	 * @param targetComp target component's name
+	 * @param srcIdentifier  
+	 * @param targetIdentifier target component object identifier
 	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
 	 * @param msgType XML, JSON, etc.
 	 * @param payload
 	 * @return
 	 */
-	public String asynPost(String sourceComp, String targetComp, String proctocol, String msgType, String payload);
+	public String asynPost(String srcIdentifier, String targetIdentifier, String proctocol, String msgType, String payload);
 
 }

@@ -6,6 +6,8 @@ package cn.edu.nju.moon.conup.ext.tx.manager;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+
 /**
  * 
  * It's supposed to manage the transactions that are running on a tuscany node.
@@ -14,9 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TxLifecycleManager {
 	/**
-	 * TX_IDS takes transactionID and component name as key and value respectively.
+	 * TX_IDS takes transactionID and ComponentObject as key and value respectively.
 	 */
-	public static Map<String, String> TX_IDS = new ConcurrentHashMap<String, String>();
+	public static Map<String, ComponentObject> TX_IDS = new ConcurrentHashMap<String, ComponentObject>();
 	
 	/**
 	 * create transaction id

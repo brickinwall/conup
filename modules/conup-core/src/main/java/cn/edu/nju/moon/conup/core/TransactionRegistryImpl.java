@@ -33,6 +33,10 @@ public class TransactionRegistryImpl  {
 		dependencies.put(key, transactionDependency);
 	}
 
+	/**
+	 * 
+	 * @param key current transaction id
+	 */
 	public void removeDependecy(String key) {
 		dependencies.remove(key);
 	}

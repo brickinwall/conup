@@ -16,7 +16,7 @@ public interface OndemandSetupHelper {
 	
 	/**
 	 * received on-demand notification from peer component
-	 * @param sourceComponent source component's name
+	 * @param sourceComponent source component object identifier
 	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
 	 * @param msgType XML, JSON, etc.
 	 * @param payload

@@ -1,25 +1,32 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
 /**
+ * A abstract component model, which is supposed to be independent to concrete component model,
+ * e.g., tuscany component model.
+ * 
+ * With this abstract component model, conup is decoupled from different platform.
+ * 
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class ComponentObject {
-	private String componentName = null;
+	/** an identifier should exclusively identify a component  */
+	private String identifier = null;
+	/** version of the component */
 	private String componentVersion = null;
 	
 	/**
-	 * @return the componentName
+	 * @return the identifier
 	 */
-	public String getComponentName() {
-		return componentName;
+	public String getIdentifier() {
+		return identifier;
 	}
 	
 	/**
-	 * @param componentName the componentName to set
+	 * @param identifier the identifier to set
 	 */
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 	
 	/**

@@ -68,14 +68,14 @@ public class TransactionContext {
 	}
 
 	/**
-	 * @return root transaction's component
+	 * @return root transaction's component object identifier
 	 */
 	public String getRootComponent() {
 		return rootComponent;
 	}
 
 	/**
-	 * @param rootComponent root transaction's component
+	 * @param rootComponent root transaction's component object identifier
 	 */
 	public void setRootComponent(String rootComponent) {
 		this.rootComponent = rootComponent;
@@ -96,14 +96,14 @@ public class TransactionContext {
 	}
 
 	/**
-	 * @return parent transaction's component
+	 * @return parent transaction's component object identifier
 	 */
 	public String getParentComponent() {
 		return parentComponent;
 	}
 
 	/**
-	 * @param parentComponent parent transaction's component
+	 * @param parentComponent parent transaction's component object identifier
 	 */
 	public void setParentComponent(String parentComponent) {
 		this.parentComponent = parentComponent;

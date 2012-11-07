@@ -23,10 +23,10 @@ public class QuiescenceImpl implements Algorithm {
 	
 	/**
 	 * 
-	 * @param compName
+	 * @param compIdentifier
 	 * @return
 	 */
-	public boolean isPassive(String compName){
+	public boolean isPassive(String compIdentifier){
 		return false;
 	}
 

@@ -27,7 +27,7 @@ public class OndemandSetupManagerImpl implements OndemandSetupHelper{
 	}
 
 	@Override
-	public boolean ondemandSetup(String sourceComp, String proctocol,
+	public boolean ondemandSetup(String srcIdentifier, String proctocol,
 			String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;

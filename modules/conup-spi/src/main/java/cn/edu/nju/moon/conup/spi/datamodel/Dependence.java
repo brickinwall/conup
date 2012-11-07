@@ -11,12 +11,12 @@ package cn.edu.nju.moon.conup.spi.datamodel;
  */
 public class Dependence implements Comparable<Dependence>{
 
-	/** arc type can be either future or past. */
+	/** different algorithm can define its own dependence type. */
 	private String type;
-	/** root transaction this Arc corresponding to. */
-	private String rootTransaction;
-	private String sourceComponent;
-	private String targetComponent;
+	/** root transaction this dependence corresponding to. */
+	private String rootTx;
+	private String srcCompObjIdentifier;
+	private String targetCompObjIdentifer;
 	private String sourceService;
 	private String targetService;
 
@@ -27,9 +27,9 @@ public class Dependence implements Comparable<Dependence>{
 	public Dependence(String type, String rootTransaction, String sourceComponent,
 			String targetComponent, String sourceService, String targetService) {
 		this.type = type;
-		this.rootTransaction = rootTransaction;
-		this.sourceComponent = sourceComponent;
-		this.targetComponent = targetComponent;
+		this.rootTx = rootTransaction;
+		this.srcCompObjIdentifier = sourceComponent;
+		this.targetCompObjIdentifer = targetComponent;
 		this.sourceService = sourceService;
 		this.targetService = targetService;
 	}
@@ -42,16 +42,12 @@ public class Dependence implements Comparable<Dependence>{
 		this.type = type;
 	}
 
-	public String getRootTransaction() {
-		return rootTransaction;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		Dependence dependence = (Dependence) obj;
-		if (dependence.getRootTransaction().equals(this.rootTransaction)
-				&& dependence.getSourceComponent().equals(this.sourceComponent)
-				&& dependence.getTargetComponent().equals(this.targetComponent)
+		if (dependence.getRootTx().equals(this.rootTx)
+				&& dependence.getSrcCompObjIdentifier().equals(this.srcCompObjIdentifier)
+				&& dependence.getTargetCompObjIdentifer().equals(this.targetCompObjIdentifer)
 				&& dependence.getType().equals(this.type)) {
 			return true;
 		} else
@@ -60,28 +56,50 @@ public class Dependence implements Comparable<Dependence>{
 
 	@Override
 	public int hashCode() {
-		int result = Math.abs(this.rootTransaction.hashCode()+ this.sourceComponent.hashCode() + this.targetComponent.hashCode() + this.type.hashCode()) % 997;
+		int result = Math.abs(this.rootTx.hashCode()+ this.srcCompObjIdentifier.hashCode() + this.targetCompObjIdentifer.hashCode() + this.type.hashCode()) % 997;
 		return result;
 	}
 
-	public void setRootTransaction(String rootTransaction) {
-		this.rootTransaction = rootTransaction;
+	/**
+	 * @return the rootTx
+	 */
+	public String getRootTx() {
+		return rootTx;
 	}
 
-	public String getSourceComponent() {
-		return sourceComponent;
+	/**
+	 * @param rootTx the rootTx to set
+	 */
+	public void setRootTx(String rootTx) {
+		this.rootTx = rootTx;
 	}
 
-	public void setSourceComponent(String sourceComponent) {
-		this.sourceComponent = sourceComponent;
+	/**
+	 * @return the srcCompObjIdentifier
+	 */
+	public String getSrcCompObjIdentifier() {
+		return srcCompObjIdentifier;
 	}
 
-	public String getTargetComponent() {
-		return targetComponent;
+	/**
+	 * @param srcCompObjIdentifier the srcCompObjIdentifier to set
+	 */
+	public void setSrcCompObjIdentifier(String srcCompObjIdentifier) {
+		this.srcCompObjIdentifier = srcCompObjIdentifier;
 	}
 
-	public void setTargetComponent(String targetComponent) {
-		this.targetComponent = targetComponent;
+	/**
+	 * @return the targetCompObjIdentifer
+	 */
+	public String getTargetCompObjIdentifer() {
+		return targetCompObjIdentifer;
+	}
+
+	/**
+	 * @param targetCompObjIdentifer the targetCompObjIdentifer to set
+	 */
+	public void setTargetCompObjIdentifer(String targetCompObjIdentifer) {
+		this.targetCompObjIdentifer = targetCompObjIdentifer;
 	}
 
 	public String getSourceService() {
@@ -102,19 +120,19 @@ public class Dependence implements Comparable<Dependence>{
 
 	@Override
 	public String toString() {
-		return "type: " + getType() + " rootTransaction: "
-				+ getRootTransaction() + " sourceComponent: "
-				+ getSourceComponent() + " targetComponent: "
-				+ getTargetComponent() + " sourceService: "
+		return "type: " + getType() + " rootTx: "
+				+ getRootTx() + " srcCompObjIdentifier: "
+				+ getSrcCompObjIdentifier() + " targetCompObjIdentifer: "
+				+ getTargetCompObjIdentifer() + " sourceService: "
 				+ getSourceService() + " targetService: " + getTargetService();
 	}
 
 	@Override
 	public int compareTo(Dependence anotherArc) {
-		String current = this.rootTransaction + this.sourceComponent +
-				this.targetComponent + this.type;
-		String another = anotherArc.rootTransaction + anotherArc.sourceComponent +
-				anotherArc.targetComponent + anotherArc.type;
+		String current = this.rootTx + this.srcCompObjIdentifier +
+				this.targetCompObjIdentifer + this.type;
+		String another = anotherArc.rootTx + anotherArc.srcCompObjIdentifier +
+				anotherArc.targetCompObjIdentifer + anotherArc.type;
 		return current.compareTo(another);
 	}
 

@@ -24,13 +24,13 @@ public interface OndemandSetup {
 	
 	/**
 	 * received on-demand notification from peer component
-	 * @param sourceComp source component's name
+	 * @param srcIdentifier source component object identifier
 	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
 	 * @param msgType XML, JSON, etc.
 	 * @param payload
 	 * @return
 	 */
-	public boolean ondemandSetup(String sourceComp, String proctocol, String msgType, String payload);
+	public boolean ondemandSetup(String srcIdentifier, String proctocol, String msgType, String payload);
 	
 	/**
 	 * Since the on-demand setup is asynchronous, the method is used to query on-demand setup status

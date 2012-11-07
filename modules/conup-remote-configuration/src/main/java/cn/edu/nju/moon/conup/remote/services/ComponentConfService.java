@@ -17,28 +17,28 @@ public interface ComponentConfService {
 	
 	/** 
 	 *  component's current status
-	 * 	@param compName component name
+	 * 	@param compIdentifier component object identifier
 	 *  
 	 *  */
-	public String getCurrentStatus(String compName);
+	public String getCurrentStatus(String compIdentifier);
 	
 	/** 
 	 *  component's default status
-	 *  @param compName component name
+	 *  @param compIdentifier component object identifier
 	 * */
-	public String getDefaultStatus(String compName);
+	public String getDefaultStatus(String compIdentifier);
 	
 	/** 
 	 *  component's freenessSetup strategy 
-	 *  @param compName component name
+	 *  @param compIdentifier component object identifier
 	 * */
-	public String getFreenessSetup(String compName);
+	public String getFreenessSetup(String compIdentifier);
 	
 	/** 
 	 *  all statuses defined for the component 
-	 *  @param compName component name
+	 *  @param compIdentifier component object identifier
 	 * */
-	public List<String> getAllStatuses(String compName);
+	public List<String> getAllStatuses(String compIdentifier);
 	
 	/** 
 	 *  ForTest: started composite in the current node 

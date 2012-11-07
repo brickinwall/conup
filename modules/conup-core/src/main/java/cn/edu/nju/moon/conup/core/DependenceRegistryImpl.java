@@ -44,7 +44,7 @@ public class DependenceRegistryImpl {
 	public Set<Dependence> getDependencesViaRootTransaction(String rootTransaction) {
 		Set<Dependence> returnDependences = new HashSet<Dependence>();
 		for(Dependence dependence : dependences){
-			if(dependence.getRootTransaction().equals(rootTransaction)){
+			if(dependence.getRootTx().equals(rootTransaction)){
 				returnDependences.add(dependence);
 			}
 		}
@@ -54,7 +54,7 @@ public class DependenceRegistryImpl {
 	public Set<Dependence> getDependencesViaSourceComponent(String sourceComponent) {
 		Set<Dependence> returnDependences = new HashSet<Dependence>();
 		for(Dependence dependence : dependences){
-			if(dependence.getSourceComponent().equals(sourceComponent)){
+			if(dependence.getSrcCompObjIdentifier().equals(sourceComponent)){
 				returnDependences.add(dependence);
 			}
 		}
@@ -64,7 +64,7 @@ public class DependenceRegistryImpl {
 	public Set<Dependence> getDependencesViaTargetComponent(String targetComponent) {
 		Set<Dependence> returnDependences = new HashSet<Dependence>();
 		for(Dependence dependence : dependences){
-			if(dependence.getTargetComponent().equals(targetComponent)){
+			if(dependence.getTargetCompObjIdentifer().equals(targetComponent)){
 				returnDependences.add(dependence);
 			}
 		}
@@ -96,9 +96,9 @@ public class DependenceRegistryImpl {
 			for(Dependence depRegistry : dependences){
 				if(depRegistry.equals(dependence)){
 					Dependence updatedDependence = new Dependence();
-					updatedDependence.setRootTransaction(depRegistry.getRootTransaction());
-					updatedDependence.setSourceComponent(depRegistry.getSourceComponent());
-					updatedDependence.setTargetComponent(depRegistry.getTargetComponent());
+					updatedDependence.setRootTx(depRegistry.getRootTx());
+					updatedDependence.setSrcCompObjIdentifier(depRegistry.getSrcCompObjIdentifier());
+					updatedDependence.setTargetCompObjIdentifer(depRegistry.getTargetCompObjIdentifer());
 					updatedDependence.setType("past");
 					dependences.remove(depRegistry);
 					dependences.add(updatedDependence);

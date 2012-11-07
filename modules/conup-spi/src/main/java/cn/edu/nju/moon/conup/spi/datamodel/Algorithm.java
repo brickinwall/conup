@@ -3,7 +3,6 @@
  */
 package cn.edu.nju.moon.conup.spi.datamodel;
 
-import java.util.Set;
 
 /**
  * Interface for different dynamic update algorithm, i.e., Version-consistency, Quiescence 
