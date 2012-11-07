@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 /**
  * 
  * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su
  */
 public class Event {
     private final static Logger LOGGER = Logger.getLogger(Event.class.getName());
@@ -78,9 +78,10 @@ public class Event {
 
 	public String getPort() {
 		if (event.contains("COM")) {
-			String comAndMethod = event.split("\\.")[1];
+//			String comAndMethod = event.split("\\.")[1];
 //			System.out.println(event.split("\\.")[1]);
-			return comAndMethod.split(":")[0];
+			return event.split("\\.")[1];
+//			return comAndMethod.split(":")[0];
 			
 		}
 		return null;

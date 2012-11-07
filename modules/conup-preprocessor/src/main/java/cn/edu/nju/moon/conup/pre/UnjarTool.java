@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * 
  * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su
  */
 public class UnjarTool {
 	private final static Logger LOGGER = Logger.getLogger(UnjarTool.class.getName());

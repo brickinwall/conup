@@ -2,10 +2,11 @@ package cn.edu.nju.moon.conup.pre;
 import java.util.LinkedList;
 import java.util.List;
 
+
 /**
  * 
- * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su
+ *
  */
 public class State {
 	
