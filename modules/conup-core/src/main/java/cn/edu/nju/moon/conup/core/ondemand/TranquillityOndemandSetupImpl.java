@@ -7,13 +7,13 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public class QuiescenceOndemandSetup implements OndemandSetup {
+public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 	@Override
 	public void ondemand(String freenessSetup,
 			Scope scope) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
