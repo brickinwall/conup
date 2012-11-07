@@ -4,8 +4,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 /**
  * 
- * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su <njupsu@gmail.com>
+ *
  */
 public class SetState {
 	
@@ -39,12 +39,5 @@ public class SetState {
 	public void addPast(String p){
 		past.add(p);
 	}
-	public static String printSet(Set<String> str){
-		String strTemp="";
-		for(String s : str){
-			strTemp = s + ",";
-		}
-		return strTemp;
-	}
-
+	
 }
