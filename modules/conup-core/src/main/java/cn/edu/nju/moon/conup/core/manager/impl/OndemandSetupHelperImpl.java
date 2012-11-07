@@ -9,10 +9,10 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public class OndemandSetupManagerImpl implements OndemandSetupHelper{
+public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	private OndemandSetup ondemandSetup = null;
 	
-	public OndemandSetupManagerImpl(){
+	public OndemandSetupHelperImpl(){
 		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
 	}
 	
