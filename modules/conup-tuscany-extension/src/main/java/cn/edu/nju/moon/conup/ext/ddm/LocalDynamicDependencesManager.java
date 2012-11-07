@@ -13,13 +13,13 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 
 /**
- * A {@link LocalDynamicDependencesManager} can manage dynamic dependences of a tansaction, 
+ * A {@link LocalDynamicDependencesManager} can manage dynamic dependences of a transaction, 
  * that is, get its components to be used in future called future and the components 
  * having been used in the past called real past. It can be used alone, or when events 
  * happen, such as, transaction start, end, first invoke component, its dynamic dependences
  * changed, it will notify you.
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 
 public class LocalDynamicDependencesManager {
@@ -27,17 +27,7 @@ public class LocalDynamicDependencesManager {
 	public static Logger getLogger() {
 		return LOGGER;
 	}
-	/**
-	 *when the event, including TransactionStart, TransactionEnd, FirstRequestService, DependencesChanged, happen, 
-	 *its dynamicdenpendencesManager will notify the transaction manager. 
-	 *
-	 */
-	/*private enum EventType{
-		TransactionStart,
-		TransactionEnd,
-		FirstRequestService,
-		DependencesChanged;
-	}*/
+	
 	/**
 	 * The object to notify the events they cared happens.
 	 */	
@@ -93,8 +83,7 @@ public class LocalDynamicDependencesManager {
 	private LocalDynamicDependencesManager(String transactionID,String statesDDA,String nextsDDA) {
 		this.transactionID = transactionID;	
 		String[] stateAnno = statesDDA.split(";");
-		String[] eventAnno = nextsDDA.split(";");
-		LOGGER.fine("---------states:" + states.size());
+		String[] eventAnno = nextsDDA.split(";");		
 		for (int i = 0; i < stateAnno.length; i++) {
 			String[] si = stateAnno[i].split(",");
 			Set<String> stateFuture = new ConcurrentSkipListSet<String>();
@@ -109,6 +98,7 @@ public class LocalDynamicDependencesManager {
 			state.setFuture(stateFuture);
 			states.add(state);
 		}
+		LOGGER.info("---------states:" + states.size());
 		// get event information
 		events = new String[eventAnno.length];
 		for (int i = 0; i < eventAnno.length; i++) {
@@ -144,13 +134,35 @@ public class LocalDynamicDependencesManager {
 	 *            Service name	     	
 	 */
 	public boolean isThisLastUsed(String reference){
-		return false;
+		if(getFuture().contains(reference)){
+			LOGGER.info(reference + "now is in the future set!");
+			String eve = events[currentState];
+			String eveinf[] = eve.split(",");
+			for (String e : eveinf) {
+				if (e.contains(reference)) {
+					int tempNextState = Integer.parseInt(e.split("-")[1]);									
+					LOGGER.info(reference + "is now in use in transaction"+transactionID);
+					if(states.get(tempNextState).getFuture().contains(reference)){
+						LOGGER.info(reference + "will use in transaction "+transactionID);
+						return true;
+					}
+					else{
+						LOGGER.info(reference + "will not use in transaction "+transactionID);
+						return false;
+					}}}
+			LOGGER.info(reference + "is not in the next event set! your input service may be wrong!");			
+			return false;
+		}
+		else{
+			LOGGER.info(reference + "now is not in the future set!");
+			return false;		}
+		
 	}
 
 	/**
 	 * EventType : first request service from other component
 	 */
-	public void notifyFirstRequestService() {
+	public void FirstRequestService() {
 		monitor.notify(TxEventType.FirstRequestService,transactionID);
 	}
 
@@ -163,13 +175,13 @@ public class LocalDynamicDependencesManager {
 		if (event.contains("Start")) {
 			currentState = 0;
 			monitor.notify(TxEventType.TransactionStart, transactionID);
-			LOGGER.fine("Transaction  " + transactionID + "  is start!");			
+			LOGGER.info("Transaction  " + transactionID + "  is start!");			
 			}
 		else {
 			if (event.isEmpty()) {	
 				ddes.remove(transactionID);
 				monitor.notify(TxEventType.TransactionEnd, transactionID);
-				LOGGER.fine("Transaction  " + transactionID + "  is end!");	}
+				LOGGER.info("Transaction  " + transactionID + "  is end!");	}
 			else {
 				//if it is a component-invoked event, change past set. else,leave unchaged.			
 				if (event.contains("COM")) {			
@@ -183,12 +195,20 @@ public class LocalDynamicDependencesManager {
 					if (e.contains(event)) {
 						currentState = Integer.parseInt(e.split("-")[1]);
 						monitor.notify(TxEventType.DependencesChanged, transactionID);						
-						LOGGER.fine("Transaction  " + transactionID + "  dynamic dependences have been changed!");
+						LOGGER.info("Transaction  " + transactionID + "  dynamic dependences have been changed!");
 						return;
 				}
-				LOGGER.fine("The input event is wrong!");
+				LOGGER.info("The input event is wrong!");
 				}
 				}
 			}
 		}
+	public static void main(String args[]){
+		String tid = "1234";
+		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("Start");
+		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").FirstRequestService();
+		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("COM.TokenService.23");
+		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("COM.ProcService.35");
+		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("");
+	}
 }
