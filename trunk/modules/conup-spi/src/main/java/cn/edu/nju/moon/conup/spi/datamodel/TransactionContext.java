@@ -33,7 +33,9 @@ public class TransactionContext {
 	private String parentTx;
 	/** parent component */
 	private String parentComponent;
-	/** TxEventType */
+	/** TxEventType: 
+	 * TransactionStart,TransactionEnd,	FirstRequestService,DependencesChanged
+	 */
 	private TxEventType eventType = null;
 	/** components that will never be used. */
 	private Set<String> pastComponents;
