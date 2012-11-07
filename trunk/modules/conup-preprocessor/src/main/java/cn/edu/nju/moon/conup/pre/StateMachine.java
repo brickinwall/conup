@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * 
  * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su
  */
 public class StateMachine {
 

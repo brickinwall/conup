@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 /**
  * 
  * 
- * @author <a href="mailto:njupsu@gmail.com">Su Ping</a>
+ * @author Ping Su
  */
 public class ControlFlow {
 	private final static Logger LOGGER = Logger.getLogger(ControlFlow.class.getName());
@@ -19,13 +19,13 @@ public class ControlFlow {
 		return LOGGER;
 	}
 
-	List<NodeAndOutarcs> con = new LinkedList<NodeAndOutarcs>();
+	private List<NodeAndOutarcs> con = new LinkedList<NodeAndOutarcs>();
 
 	public NodeAndOutarcs getFlow(int src) {
 		Iterator<NodeAndOutarcs> f = con.iterator();
 		while (f.hasNext()) {
 			NodeAndOutarcs fn = f.next();
-			if (fn.src == src) {
+			if (fn.getSrc()== src) {
 				return fn;
 			}
 		}
@@ -43,7 +43,7 @@ public class ControlFlow {
 	}
 
 	public int getDstSize(int src) {
-		return getFlow(src).dst.size();
+		return getFlow(src).getDst().size();
 	}
 
 	public List<Integer> getDst(int src) {
@@ -64,8 +64,8 @@ public class ControlFlow {
 		Iterator<NodeAndOutarcs> f = con.iterator();
 		while (f.hasNext()) {
 			NodeAndOutarcs fn = f.next();
-			System.out.print(fn.src + "->");
-			List<Integer> d = getDst(fn.src);
+			System.out.print(fn.getSrc() + "->");
+			List<Integer> d = getDst(fn.getSrc());
 			for (int i = 0; i < d.size(); i++) {
 //				System.out.print(d.get(i) + ",");
 			}
@@ -77,9 +77,9 @@ public class ControlFlow {
 }
 
 class NodeAndOutarcs {
-	int src;
-	boolean isWhile;
-	List<Integer> dst = new LinkedList<Integer>();
+	private int src;
+	private boolean isWhile;
+	private List<Integer> dst = new LinkedList<Integer>();
 
 	public NodeAndOutarcs(int src, int dst) {
 		this.src = src;
