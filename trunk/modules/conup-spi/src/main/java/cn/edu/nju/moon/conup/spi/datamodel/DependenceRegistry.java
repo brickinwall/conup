@@ -1,9 +1,6 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
@@ -18,11 +15,19 @@ public interface DependenceRegistry {
 
 	public Set<Dependence> getDependencesViaType(String type);
 
-	public Set<Dependence> getDependencesViaRootTransaction(String rootTransaction);
+	public Set<Dependence> getDependencesViaRootTransaction(String rootTx);
 
-	public Set<Dependence> getDependencesViaSourceComponent(String sourceComponent) ;
+	/**
+	 * @param srcIdentifer source component object identifier
+	 * @return
+	 */
+	public Set<Dependence> getDependencesViaSourceComponent(String srcIdentifer);
 
-	public Set<Dependence> getDependencesViaTargetComponent(String targetComponent);
+	/**
+	 * @param targetIdentifer target component object identifier
+	 * @return
+	 */
+	public Set<Dependence> getDependencesViaTargetComponent(String targetIdentifer);
 
 	public Set<Dependence> getDependencesViaSourceService(String sourceService);
 

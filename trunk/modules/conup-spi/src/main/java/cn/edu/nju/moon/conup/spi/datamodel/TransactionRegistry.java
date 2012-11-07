@@ -16,8 +16,9 @@ public interface TransactionRegistry  {
 	 * @param transactionDependency */
 	public void addDependency(String key, TransactionContext transactionDependency);
 
+	/**
+	 * @param key current transaction id
+	 */
 	public void removeDependecy(String key);
 	
-	
-
 }

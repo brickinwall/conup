@@ -14,28 +14,28 @@ public interface ComponentUpdateService {
 	
 	/**
 	 * a user can start a dynamic update
-	 * @param targetComp
+	 * @param targetIdentifier target component object identifier
 	 * @param baseDir
 	 * @param classPath
 	 * @param contributionURI
 	 * @param compositeURI
 	 * @return
 	 */
-	public boolean update(String targetComp, String baseDir, String classPath, String contributionURI, String compositeURI);
+	public boolean update(String targetIdentifier, String baseDir, String classPath, String contributionURI, String compositeURI);
 	
 	/**
 	 * A user can start a on-demand setup by invoking the method
-	 * @param targetComponent
+	 * @param targetIdentifier target component object identifier
 	 * @param freenessSetup
 	 * @param scope a Scope object
 	 * @return
 	 */
-	public boolean ondemand(String targetComponent, String freenessSetup, Scope scope);
+	public boolean ondemand(String targetIdentifier, String freenessSetup, Scope scope);
 	
 	/**
 	 * create a version number for each component
-	 * @param targetComponent
+	 * @param targetIdentifier target component object identifier
 	 * @return
 	 */
-	public boolean isUpdated(String targetComponent);
+	public boolean isUpdated(String targetIdentifier);
 }

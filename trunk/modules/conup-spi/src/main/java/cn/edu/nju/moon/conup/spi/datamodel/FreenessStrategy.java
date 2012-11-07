@@ -6,6 +6,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 /**
  * An abstract description of the strategies for achieving freeness, 
  * i.e., Blocking, waiting and concurrent_version
+ * 
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
@@ -26,10 +27,10 @@ public interface FreenessStrategy {
 	 * FOr CONCURRENT_VERSION, it will create a dispatcher.
 	 * 
 	 * @param rootTxID root transaction id
-	 * @param rootComp root component name
-	 * @param parentComp parent component name
+	 * @param rootComp root component object identifier
+	 * @param parentComp parent component object identifier
 	 * @param curTxID current transaction id
-	 * @param hostComp host component name
+	 * @param hostComp host component object identifier
 	 */
 	public void manage(String rootTxID, String rootComp, String parentComp, 
 			String curTxID, String hostComp);

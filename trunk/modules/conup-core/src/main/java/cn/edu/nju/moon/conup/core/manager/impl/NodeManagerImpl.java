@@ -23,7 +23,7 @@ public class NodeManagerImpl implements NodeManager{
 	}
 
 	@Override
-	public DynamicDepManager getDynamicDepManager(String compName) {
+	public DynamicDepManager getDynamicDepManager(String compIdentifier) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -35,7 +35,7 @@ public class NodeManagerImpl implements NodeManager{
 //	}
 
 	@Override
-	public OndemandSetupHelper getOndemandSetupManager(String compName) {
+	public OndemandSetupHelper getOndemandSetupManager(String compIdentifier) {
 		// TODO Auto-generated method stub
 		return null;
 	}

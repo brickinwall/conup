@@ -32,7 +32,7 @@ public class VersionConsistencyOndemandImpl implements OndemandSetup {
 	}
 
 	@Override
-	public boolean ondemandSetup(String targetComp, String proctocol,
+	public boolean ondemandSetup(String targetIdentifier, String proctocol,
 			String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;

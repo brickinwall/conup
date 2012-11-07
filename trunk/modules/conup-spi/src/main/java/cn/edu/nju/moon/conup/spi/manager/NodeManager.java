@@ -12,10 +12,10 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 public interface NodeManager {
 	/**
 	 * each component has only one DynamicDepManager
-	 * @param compName
+	 * @param compIdentifier component object identifier
 	 * @return
 	 */
-	public DynamicDepManager getDynamicDepManager(String compName);
+	public DynamicDepManager getDynamicDepManager(String compIdentifier);
 	
 //	/**
 //	 * each component has only one DynamicUpdateManager
@@ -26,9 +26,9 @@ public interface NodeManager {
 	
 	/**
 	 * each component has only one OndemandSetupManager
-	 * @param compName
+	 * @param compIdentifier component object identifier
 	 * @return
 	 */
-	public OndemandSetupHelper getOndemandSetupManager(String compName);
+	public OndemandSetupHelper getOndemandSetupManager(String compIdentifier);
 	
 }
