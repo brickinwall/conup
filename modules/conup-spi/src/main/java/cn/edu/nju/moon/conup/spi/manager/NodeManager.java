@@ -9,26 +9,40 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface NodeManager {
+public class NodeManager{
+	private static NodeManager nodeManager = new NodeManager();
+	
+	
+	private NodeManager(){
+	}
+	
+	public static NodeManager getInstance(){
+		return nodeManager;
+	}
+
 	/**
 	 * each component has only one DynamicDepManager
 	 * @param compIdentifier component object identifier
 	 * @return
 	 */
-	public DynamicDepManager getDynamicDepManager(String compIdentifier);
-	
-//	/**
-//	 * each component has only one DynamicUpdateManager
-//	 * @param compName
-//	 * @return
-//	 */
-//	public DynamicUpdateManager getDynamicUpdateManager(String compName);
-	
+	public DynamicDepManager getDynamicDepManager(String compIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+//	@Override
+//	public DynamicUpdateManager getDynamicUpdateManager(String compName) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 	/**
-	 * each component has only one OndemandSetupManager
+	 * each component has only one OndemandSetupHelper
 	 * @param compIdentifier component object identifier
 	 * @return
 	 */
-	public OndemandSetupHelper getOndemandSetupManager(String compIdentifier);
-	
+	public OndemandSetupHelper getOndemandSetupHelper(String compIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

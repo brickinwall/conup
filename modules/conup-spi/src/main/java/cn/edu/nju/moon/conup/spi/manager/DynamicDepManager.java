@@ -5,6 +5,7 @@ package cn.edu.nju.moon.conup.spi.manager;
 
 
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 
@@ -65,6 +66,10 @@ public interface DynamicDepManager {
 	 */
 	public TransactionRegistry getTxRegisty();
 	
+	/**
+	 * @return the Scope
+	 */
+	public Scope getScope();
 	/**
 	 * 
 	 * @return DependenceRegistry
