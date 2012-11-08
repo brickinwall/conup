@@ -58,7 +58,7 @@ public class LocalDynamicDependencesManager {
 
 
 	/**
-	 * 
+	 * This is for java implementation to get its LDDM to manage its dynamic dependences
 	 * @param name
 	 * 			transaction id
 	 * @param states	 
@@ -72,6 +72,19 @@ public class LocalDynamicDependencesManager {
 			LocalDynamicDependencesManager instance = new LocalDynamicDependencesManager(transactionID,states,nexts);
 			ddes.put(transactionID, instance);
 			return instance;
+		}
+	}
+	/**
+	 * This is for Tsuscany to get transaction's dynamic dependences
+	 * @param transactionID
+	 * @return
+	 */
+	public static LocalDynamicDependencesManager getInstance(String transactionID) {
+		if (ddes.containsKey(transactionID)) {
+			return ddes.get(transactionID);
+		} else {
+			LOGGER.info("The transaction id is wrong!");
+			return null;
 		}
 	}
 
