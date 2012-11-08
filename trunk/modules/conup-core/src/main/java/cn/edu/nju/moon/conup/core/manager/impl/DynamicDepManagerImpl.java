@@ -6,6 +6,7 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
@@ -86,6 +87,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	public boolean isReadyForUpdate() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Scope getScope() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
