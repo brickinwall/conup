@@ -1,24 +1,22 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 
 public interface TransactionRegistry  {
 	
-	public TransactionContext getDependency(String currentTransaction);
+	public TransactionContext getTransactionContext(String currentTransactionID);
 
-	public Map<String, TransactionContext> getDependencies();
+	public Map<String, TransactionContext> getTransactionContexts();
 
-	/** @param key current transaction
+	/** @param key current transaction id
 	 * @param transactionDependency */
-	public void addDependency(String key, TransactionContext transactionDependency);
+	public void addTransactionContext(String transactionID, TransactionContext transactionContext);
 
 	/**
 	 * @param key current transaction id
 	 */
-	public void removeDependecy(String key);
+	public void removeTransactionContext(String transactionID);
 	
 }
