@@ -17,14 +17,11 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public class ManagerFactory {
+public interface ManagerFactory {
 	/**
 	 * @return an instance of DynamicDepManager
 	 */
-	public DynamicDepManager createDynamicDepManager(){
-		
-		return null;
-	}
+	public DynamicDepManager createDynamicDepManager();
 	
 //	/**
 //	 * 
@@ -39,8 +36,5 @@ public class ManagerFactory {
 	 * 
 	 * @return an instance of OndemandSetupManager
 	 */
-	public OndemandSetupHelper createOndemandSetupManager(){
-		
-		return null;
-	}
+	public OndemandSetupHelper createOndemandSetupManager();
 }
