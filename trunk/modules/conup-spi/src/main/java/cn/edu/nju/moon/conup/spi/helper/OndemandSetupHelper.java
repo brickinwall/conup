@@ -3,6 +3,9 @@ package cn.edu.nju.moon.conup.spi.helper;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 /**
+ * An OndemandSetupHelper may be invoked by tuscany-extension module
+ * or peer commponents.
+ * 
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */

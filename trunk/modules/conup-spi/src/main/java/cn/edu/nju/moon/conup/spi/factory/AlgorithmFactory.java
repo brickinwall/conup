@@ -3,6 +3,8 @@
  */
 package cn.edu.nju.moon.conup.spi.factory;
 
+import java.util.ServiceLoader;
+
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
@@ -14,7 +16,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public class AlgorithmFactory {
+public interface AlgorithmFactory {
 	
 	/**
 	 * 
@@ -23,9 +25,7 @@ public class AlgorithmFactory {
 	 * 
 	 * @return Algorithm
 	 */
-	public Algorithm createAlgorithm(){
-		return null;
-	}
+	public Algorithm createAlgorithm();
 	
 	/**
 	 * 
@@ -33,9 +33,7 @@ public class AlgorithmFactory {
 	 * 
 	 * @return OndemandSetup
 	 */
-	public OndemandSetup createOndemandSetup(){
-		return null;
-	}
+	public OndemandSetup createOndemandSetup();
 	
 	/**
 	 * Currently, we have three strategies for achieving freeness,
@@ -44,9 +42,6 @@ public class AlgorithmFactory {
 	 * 
 	 * @return FreenessStrategy
 	 */
-	public FreenessStrategy createFreenessStrategy(){
-		
-		return null;
-	}
+	public FreenessStrategy createFreenessStrategy();
 	
 }
