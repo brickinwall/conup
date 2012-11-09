@@ -75,7 +75,7 @@ public class LocalDynamicDependencesManager {
 		}
 	}
 	/**
-	 * This is for Tsuscany to get transaction's dynamic dependences
+	 * This is for Tuscany to get transaction's dynamic dependences
 	 * @param transactionID
 	 * @return
 	 */
