@@ -4,12 +4,12 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
 
+import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
-import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 /**
@@ -21,7 +21,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	private Algorithm algorithm = null;
 	
 	public DynamicDepManagerImpl(){
-		algorithm = new AlgorithmFactory().createAlgorithm();
+		algorithm = new AlgorithmFactoryImpl().createAlgorithm();
 	}
 	
 	/**

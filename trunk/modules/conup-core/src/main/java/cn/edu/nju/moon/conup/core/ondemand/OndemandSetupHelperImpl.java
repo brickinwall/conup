@@ -1,7 +1,7 @@
-package cn.edu.nju.moon.conup.core.manager.impl;
+package cn.edu.nju.moon.conup.core.ondemand;
 
+import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
-import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
@@ -13,7 +13,7 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	private OndemandSetup ondemandSetup = null;
 	
 	public OndemandSetupHelperImpl(){
-		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
+		ondemandSetup = new AlgorithmFactoryImpl().createOndemandSetup();
 	}
 	
 	/**
