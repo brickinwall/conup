@@ -7,11 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionRegistryImpl  {
 	private static TransactionRegistryImpl transactionRegistry = new TransactionRegistryImpl();
-	private Map<String, TransactionContext> dependencies;
+	private Map<String, TransactionContext> txContexts;
 	
 	private TransactionRegistryImpl(){
 //		dependencies = new HashMap<String, TransactionDependency>();
-		dependencies = new ConcurrentHashMap<String, TransactionContext>();
+		txContexts = new ConcurrentHashMap<String, TransactionContext>();
 	}
 	
 	public static TransactionRegistryImpl getInstance(){
@@ -19,26 +19,26 @@ public class TransactionRegistryImpl  {
 	}
 	
 	public TransactionContext getTransactionContext(String transactionID) {
-		return dependencies.get(transactionID);
+		return txContexts.get(transactionID);
 	}
 
 	public Map<String, TransactionContext> getTransactionContexts() {
-		return dependencies;
+		return txContexts;
 	}
 
 	/**
 	 * @param transactionID
-	 * @param transactionDependency
+	 * @param transactionContext
 	 */
-	public void addTransactionContext(String transactionID, TransactionContext transactionDependency) {
-		dependencies.put(transactionID, transactionDependency);
+	public void addTransactionContext(String transactionID, TransactionContext transactionContext) {
+		txContexts.put(transactionID, transactionContext);
 	}
 
 	/**
 	 * @param transactionID
 	 */
 	public void removeTransactionContext(String transactionID) {
-		dependencies.remove(transactionID);
+		txContexts.remove(transactionID);
 	}
 	
 	
