@@ -3,11 +3,13 @@
  */
 package cn.edu.nju.moon.conup.ext.tx.manager;
 
+import java.util.Map;
 import java.util.Set;
 
 import cn.edu.nju.moon.conup.ext.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -27,33 +29,20 @@ public class TxDepMonitor {
 	 * @return
 	 */
 	public boolean notify(TxEventType et, String curTxID){
+		Map<String, TransactionContext> TX_IDS = TxLifecycleManager.TX_IDS;
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
-		
-		TransactionContext txContext = new TransactionContext();
-		txContext.setCurrentTx(curTxID);
+		TransactionContext txContext = TX_IDS.get(curTxID);
 		txContext.setEventType(et);
 		txContext.setFutureComponents(ddm.getFuture());
 		txContext.setPastComponents(ddm.getRealPast());
 		
-		/*
-		 * get info from interceptor cache
-		 * according threadID 
-		 */
-		InterceptorCache interceptorCache = InterceptorCache.getInstance();
-		String threadID = getThreadID();
-		TransactionContext txContextInCache = interceptorCache.getTxContext(threadID);
-		
-		txContext.setHostComponent(txContextInCache.getHostComponent());
-		txContext.setParentComponent(txContextInCache.getParentComponent());
-		txContext.setParentTx(txContextInCache.getParentTx());
-		txContext.setRootComponent(txContextInCache.getRootComponent());
-		txContext.setRootTx(txContextInCache.getRootTx());
-		
+		TransactionRegistryImpl txRegistry = TransactionRegistryImpl.getInstance();
+		txRegistry.addTransactionContext(curTxID, txContext);
 		/*
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
 		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(txContextInCache.getHostComponent());
+		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(txContext.getHostComponent());
 		return dynamicDepMgr.manageTx(txContext);
 		
 	}
@@ -76,8 +65,8 @@ public class TxDepMonitor {
 		return true;
 	}
 	
-	/* return current thread ID. */
-	private String getThreadID() {
-		return new Integer(Thread.currentThread().hashCode()).toString();
-	}
+//	/* return current thread ID. */
+//	private String getThreadID() {
+//		return new Integer(Thread.currentThread().hashCode()).toString();
+//	}
 }
