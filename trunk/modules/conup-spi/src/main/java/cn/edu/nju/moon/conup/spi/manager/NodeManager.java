@@ -1,5 +1,9 @@
 package cn.edu.nju.moon.conup.spi.manager;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
 /**
@@ -12,6 +16,13 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 public class NodeManager{
 	private static NodeManager nodeManager = new NodeManager();
 	
+	/**
+	 * 	A node may host many components. In our implementation, each component is mapped to 
+	 * 	a ComponentObject. 
+	 * 	Map<String, ComponentObject> takes component identifier as the key.
+	 */
+	private Map<String, ComponentObject> compObjects = 
+			new ConcurrentHashMap<String, ComponentObject>();
 	
 	private NodeManager(){
 	}
@@ -30,12 +41,6 @@ public class NodeManager{
 		return null;
 	}
 
-//	@Override
-//	public DynamicUpdateManager getDynamicUpdateManager(String compName) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
 	/**
 	 * each component has only one OndemandSetupHelper
 	 * @param compIdentifier component object identifier
@@ -44,5 +49,17 @@ public class NodeManager{
 	public OndemandSetupHelper getOndemandSetupHelper(String compIdentifier) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/**
+	 * @param identifier the identifier of the component
+	 * @return
+	 */
+	public ComponentObject getComponentObject(String identifier){
+		return null;
+	}
+	
+	public void setComponentObject(String identifier, ComponentObject compObj){
+		compObjects.put(identifier, compObj);
 	}
 }
