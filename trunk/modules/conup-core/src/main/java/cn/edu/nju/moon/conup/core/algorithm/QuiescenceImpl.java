@@ -33,24 +33,6 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean isInterceptRequired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isReadyForUpdate() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean manageDependence(String proctocol,
 			String msgType, String payload) {
 		// TODO Auto-generated method stub
