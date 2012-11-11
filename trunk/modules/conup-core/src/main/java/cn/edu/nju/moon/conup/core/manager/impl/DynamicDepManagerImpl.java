@@ -11,6 +11,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
+import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 /**
@@ -21,20 +22,14 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 public class DynamicDepManagerImpl implements DynamicDepManager{
 	private Algorithm algorithm = null;
 	private ComponentObject compObj;
+	private String compStatus = null;
 	
 	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
 	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
 	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
 	
 	public DynamicDepManagerImpl(){
-//		System.out.println("no param");
 	}
-	
-//	public DynamicDepManagerImpl(ComponentObject compObj){
-//		System.out.println("with param");
-//		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
-//		this.compObj = compObj;
-//	}
 	
 	/**
 	 * maintain tx
@@ -46,16 +41,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	 */
 	@Override
 	public boolean manageTx(TransactionContext txContext){
-//		String currentTxID = txContext.getCurrentTx();
-//		if(!txRegistry.contains(currentTxID)){
-//			txRegistry.addTransactionContext(currentTxID, txContext);
-//		}else{
-//			//if this tx id already in txRegistry, update it...
-//			txRegistry.updateTransactionContext(currentTxID, txContext);
-//		}
-//		
-//		manageDependence(txContext);
-		return true;
+		String currentTxID = txContext.getCurrentTx();
+		if(!txRegistry.contains(currentTxID)){
+			txRegistry.addTransactionContext(currentTxID, txContext);
+		}else{
+			//if this tx id already in txRegistry, update it...
+			txRegistry.updateTransactionContext(currentTxID, txContext);
+		}
+		
+		return manageDependence(txContext);
 	}
 	
 	/**
@@ -74,20 +68,18 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public boolean isInterceptRequired() {
-		return algorithm.isInterceptRequired();
+		return false;
 	}
 
 	@Override
 	public boolean manageDependence(String proctocol,
 			String msgType, String payload) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public TransactionRegistry getTxRegisty() {
-		return null;
-//		return this.txRegistry;
+		return this.txRegistry;
 	}
 
 	@Override
@@ -98,12 +90,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public boolean isValid() {
-		return algorithm.isValid();
+		return false;
 	}
 
 	@Override
 	public boolean isReadyForUpdate() {
-		return algorithm.isReadyForUpdate();
+		return false;
 	}
 
 	@Override
@@ -132,9 +124,23 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	public void setOutDepRegistry(DependenceRegistryImpl outDepRegistry) {
 		this.outDepRegistry = outDepRegistry;
 	}
-	
-	public void setCompObject(ComponentObject compObj){
+	@Override
+	public void setCompObject(ComponentObject compObj) {
 		this.compObj = compObj;
+	}
+	@Override
+	public void setAlgorithm(String algorithmType){
+		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
+	}
+	
+	public String getCompStatus() {
+		return compStatus;
+	}
+
+	public void setCompStatus(String compStatus) {
+		synchronized (this) {
+			this.compStatus = compStatus;
+		}
 	}
 	
 }
