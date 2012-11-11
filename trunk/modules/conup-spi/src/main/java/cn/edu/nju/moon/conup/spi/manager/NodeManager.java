@@ -68,6 +68,10 @@ public class NodeManager{
 				depMgrs.put(compObj, depMgr);
 			}
 			depMgr.setCompObject(compObj);
+			depMgr.setAlgorithm(compObj.getAlgorithmConf());
+			
+			//TODO read conf.xml, set compStatus
+			
 		}
 		return depMgrs.get(compObj);
 	}
@@ -106,6 +110,10 @@ public class NodeManager{
 	public void setComponentObject(String identifier, ComponentObject compObj){
 		compObjects.put(identifier, compObj);
 	}
+	
+//	public void setDynamicDependencyMgr(ComponentObject cmpObj, DynamicDepManager ddm){
+//		depMgrs.put(cmpObj, ddm);
+//	}
 	
 	/**
 	 * remove a component.
