@@ -16,6 +16,8 @@ public class VersionConsistencyImpl implements Algorithm {
 	public final static String FUTURE_DEP = "FUTURE_DEP";
 	/** dependence type is "past" */
 	public final static String PAST_DEP = "PAST_DEP";
+	/** represent version-consistency algorithm */
+	public final static String ALGORITHM_TYPE = "CONSISTENCY_ALGORITHM";
 	
 	@Override
 	public void manageDependence(TransactionContext txContext) {
@@ -50,7 +52,7 @@ public class VersionConsistencyImpl implements Algorithm {
 
 	@Override
 	public String getAlgorithmType() {
-		return Algorithm.CONSISTENCY_ALGORITHM;
+		return VersionConsistencyImpl.ALGORITHM_TYPE;
 	}
 
 }

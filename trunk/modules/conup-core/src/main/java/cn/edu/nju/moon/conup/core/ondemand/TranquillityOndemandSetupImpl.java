@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
+import cn.edu.nju.moon.conup.core.algorithm.TranquillityImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 
@@ -27,6 +28,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public String getAlgorithmType() {
+		return TranquillityImpl.ALGORITHM_TYPE;
 	}
 
 }

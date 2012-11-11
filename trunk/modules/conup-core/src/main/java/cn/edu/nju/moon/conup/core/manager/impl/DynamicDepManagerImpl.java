@@ -5,15 +5,13 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 
 
 import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
-import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
->>>>>>> .r335
+import cn.edu.nju.moon.conup.core.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
-import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 /**
@@ -27,17 +25,17 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	
 	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
 	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
-	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
+	private TransactionRegistryImpl txRegistry = TransactionRegistryImpl.getInstance();
 	
 	public DynamicDepManagerImpl(){
-		System.out.println("no param");
+//		System.out.println("no param");
 	}
 	
-	public DynamicDepManagerImpl(ComponentObject compObj){
-		System.out.println("with param");
-		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
-		this.compObj = compObj;
-	}
+//	public DynamicDepManagerImpl(ComponentObject compObj){
+//		System.out.println("with param");
+//		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
+//		this.compObj = compObj;
+//	}
 	
 	/**
 	 * maintain tx
@@ -49,15 +47,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	 */
 	@Override
 	public boolean manageTx(TransactionContext txContext){
-		String currentTxID = txContext.getCurrentTx();
-		if(!txRegistry.contains(currentTxID)){
-			txRegistry.addTransactionContext(currentTxID, txContext);
-		}else{
-			//if this tx id already in txRegistry, update it...
-			txRegistry.updateTransactionContext(currentTxID, txContext);
-		}
-		
-		manageDependence(txContext);
+//		String currentTxID = txContext.getCurrentTx();
+//		if(!txRegistry.contains(currentTxID)){
+//			txRegistry.addTransactionContext(currentTxID, txContext);
+//		}else{
+//			//if this tx id already in txRegistry, update it...
+//			txRegistry.updateTransactionContext(currentTxID, txContext);
+//		}
+//		
+//		manageDependence(txContext);
 		return true;
 	}
 	
@@ -89,7 +87,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public TransactionRegistry getTxRegisty() {
-		return this.txRegistry;
+		return null;
+//		return this.txRegistry;
 	}
 
 	@Override
@@ -133,6 +132,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	public void setOutDepRegistry(DependenceRegistryImpl outDepRegistry) {
 		this.outDepRegistry = outDepRegistry;
+	}
+	
+	public void setCompObject(ComponentObject compObj){
+		this.compObj = compObj;
 	}
 	
 }
