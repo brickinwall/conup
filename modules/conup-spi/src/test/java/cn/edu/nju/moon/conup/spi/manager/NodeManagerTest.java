@@ -8,8 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -17,6 +18,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
  */
 public class NodeManagerTest {
 	NodeManager nodeMgr = null;
+	private ComponentObject compObj;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -28,8 +31,17 @@ public class NodeManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		nodeMgr = NodeManager.getInstance();
-		nodeMgr.setComponentObject("AuthComponent", 
-				new ComponentObject("AuthComponent", null, Algorithm.CONSISTENCY_ALGORITHM, null));
+		
+		String compIdentifier = null;
+		String compVer = null;
+		String algorithmConf = null;
+		String freenessConf = null;
+		compIdentifier = "AuthComponent";
+		compVer = "oldVersion";
+		algorithmConf = "";
+		freenessConf = FreenessStrategy.CONCURRENT_VERSION;
+		compObj = new ComponentObject(compIdentifier, compVer, algorithmConf, freenessConf);
+	
 	}
 
 	@After
@@ -38,14 +50,31 @@ public class NodeManagerTest {
 
 	@Test
 	public void testGetDynamicDepManager() {
-		System.out.println("mgr" + nodeMgr.getDynamicDepManager("AuthComponent"));
-		System.out.println("compObj" + nodeMgr.getComponentObject("AuthComponent"));
-//		assertTrue(nodeMgr.getDynamicDepManager("AuthComponent") != null);
+		DynamicDepManager depMgr;
+		
+		depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
+		assertNull(depMgr);
+		
+		nodeMgr.setComponentObject(compObj.getIdentifier(), compObj);
+		depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
+		assertNotNull(depMgr);
+		assertNotNull(depMgr.getCompObject());
+		assertEquals(compObj, depMgr.getCompObject());
 	}
 
 	@Test
 	public void testGetOndemandSetupHelper() {
-		assertTrue(nodeMgr.getOndemandSetupHelper("AuthComponent") != null);
+		OndemandSetupHelper helper;
+		
+		nodeMgr.removeCompObject(compObj);
+		helper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		assertNull(helper);
+		
+		nodeMgr.setComponentObject(compObj.getIdentifier(), compObj);
+		helper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		assertNotNull(helper);
+		assertNotNull(helper.getCompObject());
+		assertEquals(compObj, helper.getCompObject());
 	}
 
 }

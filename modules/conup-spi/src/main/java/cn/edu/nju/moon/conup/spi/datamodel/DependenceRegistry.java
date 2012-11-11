@@ -7,6 +7,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
 /** dependences for a component. */
 public interface DependenceRegistry {
+	
 	public void addDependence(Dependence dependence);
 
 	public void removeDependence(Dependence dependence);
@@ -15,19 +16,11 @@ public interface DependenceRegistry {
 
 	public Set<Dependence> getDependencesViaType(String type);
 
-	public Set<Dependence> getDependencesViaRootTransaction(String rootTx);
+	public Set<Dependence> getDependencesViaRootTransaction(String rootTransaction);
 
-	/**
-	 * @param srcIdentifer source component object identifier
-	 * @return
-	 */
-	public Set<Dependence> getDependencesViaSourceComponent(String srcIdentifer);
+	public Set<Dependence> getDependencesViaSourceComponent(String sourceComponent);
 
-	/**
-	 * @param targetIdentifer target component object identifier
-	 * @return
-	 */
-	public Set<Dependence> getDependencesViaTargetComponent(String targetIdentifer);
+	public Set<Dependence> getDependencesViaTargetComponent(String targetComponent);
 
 	public Set<Dependence> getDependencesViaSourceService(String sourceService);
 

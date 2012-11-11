@@ -38,4 +38,11 @@ public interface OndemandSetup {
 	 */
 	public boolean isOndemandDone();
 	
+	/**
+	 * Each algorithm implementation should have an identifier/type that 
+	 * uniquely identify itself.
+	 * @return
+	 */
+	public String getAlgorithmType();
+	
 }

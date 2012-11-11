@@ -8,6 +8,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 
 /**
  * For managing/maintaining transactions and dependences
@@ -81,5 +82,10 @@ public interface DynamicDepManager {
 	 * @return corresponding component object of the mgr
 	 */
 	public ComponentObject getCompObject();
+	
+	/**
+	 * @param compObj ComponentObject
+	 */
+	public void setCompObject(ComponentObject compObj);
 	
 }
