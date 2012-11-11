@@ -88,4 +88,10 @@ public interface DynamicDepManager {
 	 */
 	public void setCompObject(ComponentObject compObj);
 	
+	/**
+	 * 
+	 * @param algorithmType
+	 */
+	public void setAlgorithm(String algorithmType);
+	
 }
