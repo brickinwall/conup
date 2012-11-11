@@ -28,23 +28,23 @@ public interface Algorithm {
 	 */
 	public boolean manageDependence(String proctocol, String msgType, String payload);
 	
-	/**
-	 * It's used by interceptor for deciding whether a request needs to be intercepted
-	 * @return
-	 */
-	public boolean isInterceptRequired();
-	
-	/**
-	 * is a component valid?
-	 * @return 
-	 */
-	public boolean isValid();
-	
-	/**
-	 * is a component ready?
-	 * @return 
-	 */
-	public boolean isReadyForUpdate();
+//	/**
+//	 * It's used by interceptor for deciding whether a request needs to be intercepted
+//	 * @return
+//	 */
+//	public boolean isInterceptRequired();
+//	
+//	/**
+//	 * is a component valid?
+//	 * @return 
+//	 */
+//	public boolean isValid();
+//	
+//	/**
+//	 * is a component ready?
+//	 * @return 
+//	 */
+//	public boolean isReadyForUpdate();
 	
 	/**
 	 * Each algorithm implementation should have an identifier/type that 
