@@ -14,6 +14,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 public class QuiescenceImpl implements Algorithm {
 	/** dependence type is static dependent */
 	public final static String STATIC_DEP = "STATIC_DEP";
+	/** represent quiescence algorithm */
+	public final static String ALGORITHM_TYPE = "QUIESCENCE_ALGORITHM";
 
 	@Override
 	public void manageDependence(TransactionContext txContext) {
@@ -57,8 +59,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public String getAlgorithmType() {
-		// TODO Auto-generated method stub
-		return null;
+		return QuiescenceImpl.ALGORITHM_TYPE;
 	}
 
 }

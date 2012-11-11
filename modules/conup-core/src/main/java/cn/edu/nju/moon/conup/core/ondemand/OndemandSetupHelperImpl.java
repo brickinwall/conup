@@ -14,10 +14,14 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	private OndemandSetup ondemandSetup = null;
 	private ComponentObject compObj;
 	
-	public OndemandSetupHelperImpl(ComponentObject compObj){
-		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
-		this.compObj = compObj;
+	public OndemandSetupHelperImpl(){
+		
 	}
+	
+//	public OndemandSetupHelperImpl(ComponentObject compObj){
+//		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
+//		this.compObj = compObj;
+//	}
 	
 	/**
 	 * invoke OndemandSetup and begin on-demand setup
@@ -32,7 +36,6 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	@Override
 	public boolean ondemandSetup(String srcIdentifier, String proctocol,
 			String msgType, String payload) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -40,4 +43,10 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	public ComponentObject getCompObject() {
 		return compObj;
 	}
+
+	@Override
+	public void setCompObject(ComponentObject compObj) {
+		this.compObj = compObj;
+	}
+
 }

@@ -12,7 +12,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
  *
  */
 public class TranquillityImpl implements Algorithm {
-
+	/** represent tranquillity algorithm */
+	public final static String ALGORITHM_TYPE = "TRANQUILLITY_ALGORITHM";
+	
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 		// TODO Auto-generated method stub
@@ -46,8 +48,7 @@ public class TranquillityImpl implements Algorithm {
 
 	@Override
 	public String getAlgorithmType() {
-		// TODO Auto-generated method stub
-		return null;
+		return TranquillityImpl.ALGORITHM_TYPE;
 	}
 
 }
