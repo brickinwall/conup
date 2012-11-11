@@ -112,7 +112,7 @@ public class TxLifecycleManager {
 	 * @param id the transaction id that needs to be destroyed
 	 */
 	public void destroyID(String id){
-		
+		TX_IDS.remove(id);
 	}
 	
 	/**
@@ -120,8 +120,7 @@ public class TxLifecycleManager {
 	 * @return total transactions that are running
 	 */
 	public int getTxs(){
-
-		return 0;
+		return TX_IDS.size();
 	}
 
 	private String getThreadID() {
