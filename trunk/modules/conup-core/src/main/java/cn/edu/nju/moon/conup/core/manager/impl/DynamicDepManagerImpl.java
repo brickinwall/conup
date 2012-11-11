@@ -5,7 +5,6 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 
 
 import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
-import cn.edu.nju.moon.conup.core.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
@@ -25,7 +24,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	
 	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
 	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
-	private TransactionRegistryImpl txRegistry = TransactionRegistryImpl.getInstance();
+	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
 	
 	public DynamicDepManagerImpl(){
 //		System.out.println("no param");
