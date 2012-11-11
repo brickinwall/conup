@@ -9,7 +9,10 @@ import org.junit.Test;
 
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
-
+/**
+ * @author rgc 
+ * test commit
+ */
 public class DependenceRegistryImplTest {
 	
 	DependenceRegistryImpl dependenceRegistry = null; 
