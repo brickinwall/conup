@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.spi.factory;
 
+import java.util.ServiceLoader;
+
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
@@ -8,8 +10,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * We've got several managers here:
  * <ul>
  * 	<li> DynamicDepManager
- *  <li> DynamicUpdateManager
- *  <li> OndemandSetupManager
+ *  <li> OndemandSetupHelper
  * </ul>
  * 
  * This factory is not visible to other modules.
@@ -17,11 +18,17 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface ManagerFactory {
+public class ManagerFactory {
 	/**
-	 * @return an instance of DynamicDepManager
+	 * @return an instance of DynamicDepManager. if no DynamicDepManager is available, return null 
 	 */
-	public DynamicDepManager createDynamicDepManager();
+	public DynamicDepManager createDynamicDepManager(){
+		ServiceLoader<DynamicDepManager> depMgrs = ServiceLoader.load(DynamicDepManager.class); 
+		for(DynamicDepManager mgr : depMgrs){
+			return mgr;
+		}
+		return null;
+	}
 	
 //	/**
 //	 * 
@@ -33,8 +40,13 @@ public interface ManagerFactory {
 //	}
 	
 	/**
-	 * 
-	 * @return an instance of OndemandSetupManager
+	 * @return an instance of OndemandSetupHelper
 	 */
-	public OndemandSetupHelper createOndemandSetupManager();
+	public OndemandSetupHelper createOndemandSetupHelper(){
+		ServiceLoader<OndemandSetupHelper> helpers = ServiceLoader.load(OndemandSetupHelper.class); 
+		for(OndemandSetupHelper helper : helpers){
+			return helper;
+		}
+		return null;
+	}
 }

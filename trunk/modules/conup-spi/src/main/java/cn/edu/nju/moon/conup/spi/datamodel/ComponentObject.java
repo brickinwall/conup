@@ -14,6 +14,24 @@ public class ComponentObject {
 	private String identifier = null;
 	/** version of the component */
 	private String componentVersion = null;
+	/** user specified algorithm in the configuration file */
+	private String algorithmConf = null;
+	/** user specified freeness strategy in the configuration file */
+	private String freenessConf = null;
+	
+	/**
+	 * @param identifier
+	 * @param compVersion
+	 * @param algorithmConf
+	 * @param freenessConf
+	 */
+	public ComponentObject(String identifier, String compVersion, 
+			String algorithmConf, String freenessConf){
+		this.identifier = identifier;
+		this.componentVersion = compVersion;
+		this.algorithmConf = algorithmConf;
+		this.freenessConf = freenessConf;
+	}
 	
 	/**
 	 * @return the identifier
@@ -43,4 +61,32 @@ public class ComponentObject {
 		this.componentVersion = componentVersion;
 	}
 
+	/**
+	 * @return the algorithmConf
+	 */
+	public String getAlgorithmConf() {
+		return algorithmConf;
+	}
+
+	/**
+	 * @param algorithmConf the algorithmConf to set
+	 */
+	public void setAlgorithmConf(String algorithmConf) {
+		this.algorithmConf = algorithmConf;
+	}
+
+	/**
+	 * @return the freenessConf
+	 */
+	public String getFreenessConf() {
+		return freenessConf;
+	}
+
+	/**
+	 * @param freenessConf the freenessConf to set
+	 */
+	public void setFreenessConf(String freenessConf) {
+		this.freenessConf = freenessConf;
+	}
+	
 }

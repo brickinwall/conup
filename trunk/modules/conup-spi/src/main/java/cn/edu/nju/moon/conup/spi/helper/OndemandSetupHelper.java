@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.helper;
 
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 /**
@@ -26,4 +27,9 @@ public interface OndemandSetupHelper {
 	 * @return
 	 */
 	public boolean ondemandSetup(String sourceComponent, String proctocol, String msgType, String payload);
+
+	/**
+	 * @return corresponding component object of the helper
+	 */
+	public ComponentObject getCompObject();
 }
