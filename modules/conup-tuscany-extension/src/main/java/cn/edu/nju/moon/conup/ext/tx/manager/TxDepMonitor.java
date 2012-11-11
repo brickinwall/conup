@@ -6,10 +6,8 @@ package cn.edu.nju.moon.conup.ext.tx.manager;
 import java.util.Map;
 import java.util.Set;
 
-import cn.edu.nju.moon.conup.ext.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -36,9 +34,9 @@ public class TxDepMonitor {
 		txContext.setFutureComponents(ddm.getFuture());
 		txContext.setPastComponents(ddm.getRealPast());
 		
-		TransactionRegistryImpl txRegistry = TransactionRegistryImpl.getInstance();
-		txRegistry.addTransactionContext(curTxID, txContext);
-		/*
+//		TransactionRegistry txRegistry = TransactionRegistry.getInstance();
+//		txRegistry.addTransactionContext(curTxID, txContext);
+		/**
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
 		NodeManager nodeManager = NodeManager.getInstance();

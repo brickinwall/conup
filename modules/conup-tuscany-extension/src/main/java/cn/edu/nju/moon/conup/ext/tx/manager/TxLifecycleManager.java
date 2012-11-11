@@ -9,10 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.datamodel.InterceptorCache;
-import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
-import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistryImpl;
 
 /**
  * 
