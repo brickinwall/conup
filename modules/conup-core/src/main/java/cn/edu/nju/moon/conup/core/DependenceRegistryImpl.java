@@ -18,15 +18,18 @@ public class DependenceRegistryImpl {
 		dependences.add(dependence);
 	}
 
-	public void removeDependence(Dependence dependence) {
+	public boolean removeDependence(Dependence dependence) {
 		Iterator<Dependence> it = dependences.iterator();
 		while (it.hasNext()) {
-			if (it.next().equals(dependence))
+			if (it.next().equals(dependence)){
 				it.remove();
+				return true;
+			}
 		}
+		return false;
 	}
 
-	public void removeDependence(String type, String rootTx,
+	public boolean removeDependence(String type, String rootTx,
 			String srcCompObjIdentifier, String targetCompObjIdentifer) {
 		Iterator<Dependence> it = dependences.iterator();
 		while (it.hasNext()) {
@@ -36,8 +39,10 @@ public class DependenceRegistryImpl {
 					&& dep.getSrcCompObjIdentifier().equals(srcCompObjIdentifier)
 					&& dep.getTargetCompObjIdentifer().equals(targetCompObjIdentifer)) {
 				it.remove();
+				return true;
 			}
 		}
+		return false;
 	}
 
 	public Set<Dependence> getDependences() {
@@ -106,7 +111,13 @@ public class DependenceRegistryImpl {
 		}
 		return returnDependences;
 	}
-
+	
+	/**
+	 * this method should not conforms to algorithm
+	 * @param dependence
+	 * @return
+	 */
+	@Deprecated
 	public boolean update(Dependence dependence) {
 		if (dependence.getType().equals("future")) {
 			for (Dependence depRegistry : dependences) {
