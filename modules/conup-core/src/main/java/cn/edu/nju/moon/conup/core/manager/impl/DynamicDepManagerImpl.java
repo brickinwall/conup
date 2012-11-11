@@ -6,11 +6,14 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 
 import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
 import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
+>>>>>>> .r335
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
+import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 /**
@@ -20,13 +23,20 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  */
 public class DynamicDepManagerImpl implements DynamicDepManager{
 	private Algorithm algorithm = null;
+	private ComponentObject compObj;
 	
 	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
 	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
 	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
 	
 	public DynamicDepManagerImpl(){
-		algorithm = new AlgorithmFactoryImpl().createAlgorithm();
+		System.out.println("no param");
+	}
+	
+	public DynamicDepManagerImpl(ComponentObject compObj){
+		System.out.println("with param");
+		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
+		this.compObj = compObj;
 	}
 	
 	/**
@@ -104,6 +114,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 		return null;
 	}
 	
+	@Override
+	public ComponentObject getCompObject(){
+		return compObj;
+	}
+	
 	public DependenceRegistryImpl getInDepRegistry() {
 		return inDepRegistry;
 	}
@@ -119,6 +134,5 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	public void setOutDepRegistry(DependenceRegistryImpl outDepRegistry) {
 		this.outDepRegistry = outDepRegistry;
 	}
-
 	
 }

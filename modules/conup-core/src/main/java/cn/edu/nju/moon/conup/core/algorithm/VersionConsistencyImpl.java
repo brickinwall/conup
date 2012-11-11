@@ -48,4 +48,9 @@ public class VersionConsistencyImpl implements Algorithm {
 		return false;
 	}
 
+	@Override
+	public String getAlgorithmType() {
+		return Algorithm.CONSISTENCY_ALGORITHM;
+	}
+
 }
