@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.factory.ManagerFactory;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
 /**
@@ -21,12 +22,28 @@ public class NodeManager{
 	 * 	a ComponentObject. 
 	 * 	Map<String, ComponentObject> takes component identifier as the key.
 	 */
-	private Map<String, ComponentObject> compObjects = 
-			new ConcurrentHashMap<String, ComponentObject>();
+	private Map<String, ComponentObject> compObjects;
+	
+	/**
+	 * 	Each component has one DynamicDepManager
+	 */
+	private Map<ComponentObject, DynamicDepManager> depMgrs;
+	
+	/**
+	 * 	Each component has one OndemandSetupHelper
+	 */
+	private Map<ComponentObject, OndemandSetupHelper> ondemandHelpers;
 	
 	private NodeManager(){
+		compObjects = new ConcurrentHashMap<String, ComponentObject>();
+		depMgrs = new ConcurrentHashMap<ComponentObject, DynamicDepManager>();
+		ondemandHelpers = new ConcurrentHashMap<ComponentObject, OndemandSetupHelper>();
 	}
 	
+	/**
+	 * NodeManager is implemented as a singleton
+	 * @return
+	 */
 	public static NodeManager getInstance(){
 		return nodeManager;
 	}
@@ -37,8 +54,16 @@ public class NodeManager{
 	 * @return
 	 */
 	public DynamicDepManager getDynamicDepManager(String compIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
+		synchronized (this) {
+			if( !depMgrs.containsKey(compIdentifier) ){
+				ComponentObject compObj;
+				compObj = getComponentObject(compIdentifier);
+				if(compObj == null)
+					return null;
+				depMgrs.put(compObj, new ManagerFactory().createDynamicDepManager());
+			}
+		}
+		return depMgrs.get(compIdentifier);
 	}
 
 	/**
@@ -47,8 +72,17 @@ public class NodeManager{
 	 * @return
 	 */
 	public OndemandSetupHelper getOndemandSetupHelper(String compIdentifier) {
-		// TODO Auto-generated method stub
-		return null;
+		synchronized (this) {
+			if( !ondemandHelpers.containsKey(compIdentifier) ){
+				ComponentObject compObj;
+				compObj = getComponentObject(compIdentifier);
+				if(compObj == null)
+					return null;
+				ondemandHelpers.put(compObj, 
+						new ManagerFactory().createOndemandSetupHelper());
+			}
+		}
+		return ondemandHelpers.get(compIdentifier);
 	}
 	
 	/**
@@ -56,7 +90,7 @@ public class NodeManager{
 	 * @return
 	 */
 	public ComponentObject getComponentObject(String identifier){
-		return null;
+		return compObjects.get(identifier);
 	}
 	
 	public void setComponentObject(String identifier, ComponentObject compObj){

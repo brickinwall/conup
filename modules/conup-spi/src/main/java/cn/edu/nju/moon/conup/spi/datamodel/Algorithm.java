@@ -53,4 +53,6 @@ public interface Algorithm {
 	 * @return 
 	 */
 	public boolean isReadyForUpdate();
+	
+	public String getAlgorithmType();
 }
