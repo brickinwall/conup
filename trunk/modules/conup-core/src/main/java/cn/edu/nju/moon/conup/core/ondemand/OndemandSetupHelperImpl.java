@@ -1,7 +1,8 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
-import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
+import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
@@ -11,9 +12,11 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
  */
 public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	private OndemandSetup ondemandSetup = null;
+	private ComponentObject compObj;
 	
-	public OndemandSetupHelperImpl(){
-		ondemandSetup = new AlgorithmFactoryImpl().createOndemandSetup();
+	public OndemandSetupHelperImpl(ComponentObject compObj){
+		ondemandSetup = new AlgorithmFactory().createOndemandSetup();
+		this.compObj = compObj;
 	}
 	
 	/**
@@ -31,5 +34,10 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 			String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public ComponentObject getCompObject() {
+		return compObj;
 	}
 }

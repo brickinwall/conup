@@ -55,4 +55,10 @@ public class QuiescenceImpl implements Algorithm {
 		return false;
 	}
 
+	@Override
+	public String getAlgorithmType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
