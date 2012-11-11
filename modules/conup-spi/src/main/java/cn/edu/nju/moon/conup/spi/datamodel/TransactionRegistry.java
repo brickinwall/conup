@@ -5,16 +5,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 
-public class TransactionRegistryImpl  {
-	private static TransactionRegistryImpl transactionRegistry = new TransactionRegistryImpl();
+public class TransactionRegistry  {
+	private static TransactionRegistry transactionRegistry = new TransactionRegistry();
 	private Map<String, TransactionContext> txContexts;
 	
-	private TransactionRegistryImpl(){
+	private TransactionRegistry(){
 //		dependencies = new HashMap<String, TransactionDependency>();
 		txContexts = new ConcurrentHashMap<String, TransactionContext>();
 	}
 	
-	public static TransactionRegistryImpl getInstance(){
+	public static TransactionRegistry getInstance(){
 		return transactionRegistry;
 	}
 	
@@ -41,6 +41,22 @@ public class TransactionRegistryImpl  {
 		txContexts.remove(transactionID);
 	}
 	
-	
+	/**
+	 * check whether this transactionID have been stored in txRegistry?
+	 * @param transactionID
+	 * @return 
+	 */
+	public boolean contains(String transactionID){
+		return txContexts.containsKey(transactionID);
+	}
 
+	/**
+	 * update TransactionContext in txContexts with respect transactionID
+	 * @param transactionID
+	 * @param transactionContext
+	 */
+	public void updateTransactionContext(String transactionID, TransactionContext transactionContext){
+		txContexts.remove(transactionID);
+		txContexts.put(transactionID, transactionContext);
+	}
 }
