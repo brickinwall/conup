@@ -51,19 +51,25 @@ public class NodeManager{
 	/**
 	 * each component has only one DynamicDepManager
 	 * @param compIdentifier component object identifier
-	 * @return
+	 * @return corresponding DynamicDepManager of the specified compIdentifier, 
+	 * 		   if the compIdentifier is invalid, return null
 	 */
 	public DynamicDepManager getDynamicDepManager(String compIdentifier) {
+		ComponentObject compObj;
+		DynamicDepManager depMgr;
 		synchronized (this) {
-			if( !depMgrs.containsKey(compIdentifier) ){
-				ComponentObject compObj;
-				compObj = getComponentObject(compIdentifier);
-				if(compObj == null)
-					return null;
-				depMgrs.put(compObj, new ManagerFactory().createDynamicDepManager());
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			
+			depMgr = depMgrs.get(compObj);
+			if( !depMgrs.containsKey(compObj) ){
+				depMgr = new ManagerFactory().createDynamicDepManager();
+				depMgrs.put(compObj, depMgr);
 			}
+			depMgr.setCompObject(compObj);
 		}
-		return depMgrs.get(compIdentifier);
+		return depMgrs.get(compObj);
 	}
 
 	/**
@@ -72,17 +78,21 @@ public class NodeManager{
 	 * @return
 	 */
 	public OndemandSetupHelper getOndemandSetupHelper(String compIdentifier) {
+		ComponentObject compObj;
+		OndemandSetupHelper helper;
 		synchronized (this) {
-			if( !ondemandHelpers.containsKey(compIdentifier) ){
-				ComponentObject compObj;
-				compObj = getComponentObject(compIdentifier);
-				if(compObj == null)
-					return null;
-				ondemandHelpers.put(compObj, 
-						new ManagerFactory().createOndemandSetupHelper());
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			
+			helper = ondemandHelpers.get(compObj);
+			if( !ondemandHelpers.containsKey(compObj) ){
+				helper = new ManagerFactory().createOndemandSetupHelper();
+				ondemandHelpers.put(compObj, helper);
 			}
+			helper.setCompObject(compObj);
 		}
-		return ondemandHelpers.get(compIdentifier);
+		return ondemandHelpers.get(compObj);
 	}
 	
 	/**
@@ -96,4 +106,24 @@ public class NodeManager{
 	public void setComponentObject(String identifier, ComponentObject compObj){
 		compObjects.put(identifier, compObj);
 	}
-}
+	
+	/**
+	 * remove a component.
+	 * When a component stopped or leave from the domain, this method should be invoked.
+	 * @param compIdentifier
+	 */
+	public void removeCompObject(String compIdentifier){
+		depMgrs.remove(getComponentObject(compIdentifier));
+		ondemandHelpers.remove(getComponentObject(compIdentifier));
+		compObjects.remove(compIdentifier);
+	}
+	
+	/**
+	 * remove a component.
+	 * When a component stopped or leave from the domain, this method should be invoked.
+	 * @param compObj
+	 */
+	public void removeCompObject(ComponentObject compObj){
+		removeCompObject(compObj.getIdentifier());
+	}
+} 
