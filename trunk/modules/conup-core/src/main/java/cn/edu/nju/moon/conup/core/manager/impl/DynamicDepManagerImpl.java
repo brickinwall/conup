@@ -4,6 +4,7 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
 
+import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
 import cn.edu.nju.moon.conup.core.factory.impl.AlgorithmFactoryImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.DependenceRegistry;
@@ -20,6 +21,10 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 public class DynamicDepManagerImpl implements DynamicDepManager{
 	private Algorithm algorithm = null;
 	
+	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
+	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
+	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
+	
 	public DynamicDepManagerImpl(){
 		algorithm = new AlgorithmFactoryImpl().createAlgorithm();
 	}
@@ -34,7 +39,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 	 */
 	@Override
 	public boolean manageTx(TransactionContext txContext){
-
+		String currentTxID = txContext.getCurrentTx();
+		if(!txRegistry.contains(currentTxID)){
+			txRegistry.addTransactionContext(currentTxID, txContext);
+		}else{
+			//if this tx id already in txRegistry, update it...
+			txRegistry.updateTransactionContext(currentTxID, txContext);
+		}
+		
+		manageDependence(txContext);
 		return true;
 	}
 	
@@ -54,8 +67,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public boolean isInterceptRequired() {
-		// TODO Auto-generated method stub
-		return false;
+		return algorithm.isInterceptRequired();
 	}
 
 	@Override
@@ -67,8 +79,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public TransactionRegistry getTxRegisty() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.txRegistry;
 	}
 
 	@Override
@@ -79,14 +90,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 
 	@Override
 	public boolean isValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return algorithm.isValid();
 	}
 
 	@Override
 	public boolean isReadyForUpdate() {
-		// TODO Auto-generated method stub
-		return false;
+		return algorithm.isReadyForUpdate();
 	}
 
 	@Override
@@ -94,5 +103,22 @@ public class DynamicDepManagerImpl implements DynamicDepManager{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public DependenceRegistryImpl getInDepRegistry() {
+		return inDepRegistry;
+	}
+
+	public void setInDepRegistry(DependenceRegistryImpl inDepRegistry) {
+		this.inDepRegistry = inDepRegistry;
+	}
+
+	public DependenceRegistryImpl getOutDepRegistry() {
+		return outDepRegistry;
+	}
+
+	public void setOutDepRegistry(DependenceRegistryImpl outDepRegistry) {
+		this.outDepRegistry = outDepRegistry;
+	}
+
 	
 }
