@@ -348,8 +348,8 @@ public class MethodAnalyzer {
 	}
 
 	/**
-	 * 閸掋倖鏌囩拠銉︽煙濞夋洘妲搁崥锔芥Ц闂囷拷顪呴崚鍡橈拷?閻ㄥ嫭鏌熷▔锟? * @param mn
-	 * 
+	 * Whether the method has the specified annotation
+	 * @param mn
 	 * @param annotationDesc
 	 * @return
 	 */
