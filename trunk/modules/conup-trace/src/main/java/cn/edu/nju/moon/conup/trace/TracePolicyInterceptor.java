@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -14,16 +15,20 @@ import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
 import org.apache.tuscany.sca.assembly.Implementation;
+import org.apache.tuscany.sca.context.CompositeContext;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointImpl;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointReferenceImpl;
 import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Invoker;
 import org.apache.tuscany.sca.invocation.Message;
 import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.invocation.PhasedInterceptor;
 import org.apache.tuscany.sca.policy.PolicySubject;
+import org.apache.tuscany.sca.runtime.RuntimeComponent;
 
-import cn.edu.nju.moon.conup.def.InterceptorCache;
-import cn.edu.nju.moon.conup.def.InterceptorCacheImpl;
-import cn.edu.nju.moon.conup.def.TransactionDependency;
+import cn.edu.nju.moon.conup.ext.datamodel.InterceptorCache;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 
 public class TracePolicyInterceptor implements PhasedInterceptor {
@@ -41,6 +46,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	/** The identifier of parent transaction in Message header. */
 	private static String parentIdentifier = "ParentVcTransaction";
 	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
+	private static String HOSTIDENTIFIER = "HostIdentifier";
 
 	private Invoker next;
 	private Operation operation;
@@ -57,8 +63,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		this.subject = subject;
 		this.phase = phase;
 		this.context = getContext();
+		
 		init();
-		// System.out.println("TracePolicyInterceptor...");
 	}
 
 	private void init() {
@@ -111,12 +117,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
 			|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")){
-//				System.out.println("In trace, ignore operation: " + operation.toString());
 				return getNext().invoke(msg);
 		} else{
-//			System.out.println("operation =" + operation.toString());
 			LOGGER.info("operation =" + operation.toString());
-//			exchangeViaMsgHeader(msg);
 			msg = exchangeViaMsgBody(msg);
 			return getNext().invoke(msg);
 		}//else
@@ -142,9 +145,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		return msg;
 	}
 	
-	/* This method is supposed to exchange root/parent transaction id via Message body.
-	 * 
-	 * */
+	 /**
+	  *  This method is supposed to exchange root/parent transaction id via Message body.
+	  */
 	private Message exchangeViaMsgBody(Message msg){
 		String currentTx = null;
 		String hostComponent = null;
@@ -176,10 +179,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 
 		if (phase.equals(Phase.SERVICE_POLICY)) {
+			CompositeContext compositeContext = null;
+			
 			if(transactionTag==null || transactionTag.equals("")){
 				//an exception is preferred
 				LOGGER.warning("Error: message body cannot be null in a service body");
-//				System.out.println("Error: message body cannot be null in a service body");
 			}
 			
 			//get root, parent and current transaction id
@@ -195,31 +199,36 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			hostComponent = getComponent().getName();
 			
 			// check interceptor cache
-			InterceptorCache cache = InterceptorCacheImpl.getInstance();
+			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
 			threadID = getThreadID();
-//			System.out.println("threadId: " + threadID);
-			LOGGER.fine("threadId: " + threadID);
-			TransactionDependency dependency = cache.getDependency(threadID);
-			if(dependency == null){
+			TransactionContext txContext = cache.getTxContext(hostComponent);
+			if(txContext == null){
 				// generate and init TransactionDependency
-				dependency = new TransactionDependency();
-				dependency.setCurrentTx(null);
-				dependency.setHostComponent(hostComponent);
-				dependency.setParentTx(parentTx);
-				dependency.setParentComponent(parentComponent);
-				dependency.setRootTx(rootTx);
-				dependency.setRootComponent(rootComponent);
+				txContext = new TransactionContext();
+				txContext.setCurrentTx(null);
+				txContext.setHostComponent(hostComponent);
+				txContext.setParentTx(parentTx);
+				txContext.setParentComponent(parentComponent);
+				txContext.setRootTx(rootTx);
+				txContext.setRootComponent(rootComponent);
 				//add to InterceptorCacheImpl
-				cache.setCache(threadID, dependency);
+				cache.setCache(threadID, txContext);
 			} else{
-				dependency.setHostComponent(hostComponent);
+				txContext.setHostComponent(hostComponent);
 			}
+			
+			String hostInfo = TracePolicyInterceptor.HOSTIDENTIFIER + "," + threadID + "," + hostComponent;
+			msgBody.add(hostInfo);
+			msg.setBody((Object [])msgBody.toArray());
+			
 		} else if (phase.equals(Phase.REFERENCE_POLICY)) {
+			
+			hostComponent = getComponent().getName();
 			//get root and parent id from InterceptorCacheImpl
-			InterceptorCache cache = InterceptorCacheImpl.getInstance();
+			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
 			threadID = getThreadID();
-			TransactionDependency dependency = cache.getDependency(threadID);
-			if(dependency == null){	//current transaction is a root transaction 
+			TransactionContext txContext = cache.getTxContext(threadID);
+			if(txContext == null){	//the invoked transaction is a root transaction 
 				currentTx = null;
 				hostComponent = null;
 				parentTx = null;
@@ -227,17 +236,17 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				rootTx = null;
 				rootComponent = null;
 			} else{
-				rootTx = dependency.getRootTx();
-				rootComponent = dependency.getRootComponent();
-				currentTx = dependency.getCurrentTx();
-				hostComponent = dependency.getHostComponent();
+				rootTx = txContext.getRootTx();
+				rootComponent = txContext.getRootComponent();
+				currentTx = txContext.getCurrentTx();
+				hostComponent = txContext.getHostComponent();
 				parentTx = currentTx;
 				parentComponent = hostComponent;
 			}//else(dependency != null)
 			
+			
 			//generate transaction tag(identifier)
 			String newRootParent;
-//			newRootParent = TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER + "[" + root + "," + parent + "]";
 			newRootParent = TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER + 
 					"[" + rootTx + ":" + rootComponent + 
 					"," + parentTx + ":" + parentComponent + "]";
@@ -261,20 +270,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					"\n\t" + "parentComponent:" + parentComponent + 
 					"\n\t" + "currentTx:" + currentTx + 
 					"\n\t" + "hostComponent:" + hostComponent);
-//			System.out.println(phase + " Interceptor");
-//			System.out.println("\t" + "messageID:" + msg.getMessageID());
-//			System.out.println("\t" + "msgFrom:" + msg.getFrom());
-//			System.out.println("\t" + "msgTo:" + msg.getTo());
-//			System.out.println("\t" + "msgOperation:" + msg.getOperation());
-//			System.out.println("\t" + "threadID:" + threadID);
-//			System.out.println("\t" + "rootTx:" + rootTx);
-//			System.out.println("\t" + "rootComponent:" + rootComponent);
-//			System.out.println("\t" + "parentTx:" + parentTx);
-//			System.out.println("\t" + "parentComponent:" + parentComponent);
-//			System.out.println("\t" + "currentTx:" + currentTx);
-//			System.out.println("\t" + "hostComponent:" + hostComponent);
 
-//			System.out.println("\t" + "Message body:");
 			msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
 			List<Object> copy = new ArrayList<Object>();
 			copy.addAll(msgBodyOriginal);
@@ -283,11 +279,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			for(Object object : copy){
 				String tmp = object.toString();
 				msgBodyStr += "\n\t\t" + tmp;
-//				System.out.println("\t\t" + tmp);
 			}
 			msgBodyStr += "\n";
 			LOGGER.info(msgBodyStr);
-//			System.out.println();
 		}
 		
 		
@@ -315,7 +309,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		return raw.substring(head, tail);
 	}
 	
-	/* return current thread ID. */
+	/** return current thread ID. */
 	private String getThreadID(){
 		return new Integer(Thread.currentThread().hashCode()).toString();
 	}
