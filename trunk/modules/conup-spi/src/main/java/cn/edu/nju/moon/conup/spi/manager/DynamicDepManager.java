@@ -4,6 +4,7 @@
 package cn.edu.nju.moon.conup.spi.manager;
 
 
+import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
@@ -91,5 +92,11 @@ public interface DynamicDepManager {
 	 * @param algorithmType
 	 */
 	public void setAlgorithm(String algorithmType);
+	
+	/**
+	 * 
+	 * @param compStatus
+	 */
+	public void setCompStatus(CompStatus compStatus);
 	
 }
