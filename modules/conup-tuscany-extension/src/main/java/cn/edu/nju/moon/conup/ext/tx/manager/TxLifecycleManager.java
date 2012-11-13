@@ -72,7 +72,7 @@ public class TxLifecycleManager {
 			currentTx = txID;
 			rootTx = currentTx;
 			parentTx = currentTx;
-			//update interceptor cache dependency
+			//update interceptor cache transactionContext
 			txContextInCache.setCurrentTx(currentTx);
 			txContextInCache.setParentTx(parentTx);
 			txContextInCache.setRootTx(rootTx);

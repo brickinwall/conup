@@ -13,6 +13,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
+/**
+ * @author rgc
+ */
 public class TxLifecycleManagerTest {
 	TxLifecycleManager txLifecycleMgr = null;
 	ComponentObject compObj = null;
