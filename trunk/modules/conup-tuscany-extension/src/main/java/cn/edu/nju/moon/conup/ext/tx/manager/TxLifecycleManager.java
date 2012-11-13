@@ -12,10 +12,8 @@ import cn.edu.nju.moon.conup.ext.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 /**
- * 
  * It's supposed to manage the transactions that are running on a tuscany node.
  * @author Jiang Wang <jiang.wang88@gmail.com>
- *
  */
 public class TxLifecycleManager {
 	
@@ -116,7 +114,6 @@ public class TxLifecycleManager {
 	}
 	
 	/**
-	 * 
 	 * @return total transactions that are running
 	 */
 	public int getTxs(){
@@ -128,11 +125,13 @@ public class TxLifecycleManager {
 	}
 	
 	/**
-	 * invoked by trace interceptor
+	 * invoked by JavaImplementationInvoker
+	 * add <threadID, componentIdentifier> To AssociateTx
 	 * @param threadID
 	 * @param txContext
 	 */
-	public void addTx(String threadID, String identifier){
+	public void addToAssociateTx(String threadID, String identifier){
 		associateTx.put(threadID, identifier);
 	}
+	
 }

@@ -34,9 +34,7 @@ public class TxDepMonitor {
 		txContext.setFutureComponents(ddm.getFuture());
 		txContext.setPastComponents(ddm.getRealPast());
 		
-//		TransactionRegistry txRegistry = TransactionRegistry.getInstance();
-//		txRegistry.addTransactionContext(curTxID, txContext);
-		/**
+		/*
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
 		NodeManager nodeManager = NodeManager.getInstance();
@@ -63,8 +61,4 @@ public class TxDepMonitor {
 		return true;
 	}
 	
-//	/* return current thread ID. */
-//	private String getThreadID() {
-//		return new Integer(Thread.currentThread().hashCode()).toString();
-//	}
 }
