@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import cn.edu.nju.moon.conup.comm.api.peer.services.DepNotifyService;
-import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
+import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.core.ondemand.VersionConsistencyOndemandSetupImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
@@ -33,23 +33,16 @@ public class VersionConsistencyImpl implements Algorithm {
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 
-//		TxEventType txEventType = txContext.getEventType();
-//		String rootTx = txContext.getRootTx();
-//		String currentTx = txContext.getCurrentTx();
-//		String parentTx = txContext.getParentTx();
 		String hostComponent = txContext.getHostComponent();
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(hostComponent);
 		CompStatus compStatus = dynamicDepMgr.getCompStatus();
 		
 		assert dynamicDepMgr != null;
-//		DependenceRegistryImpl inDepRegistry = dynamicDepMgr.getInDepRegistry();
-//		DependenceRegistryImpl outDepRegistry = dynamicDepMgr.getOutDepRegistry();
-//		Set<String> pastComponents = txContext.getPastComponents();
-//		Set<String> futureComponents = txContext.getFutureComponents();
 		
 		boolean isRoot = false;
 		
+		assert compStatus != null;
 		switch (compStatus) {
 		case NORMAL:
 			doNormal(txContext, dynamicDepMgr);
@@ -112,8 +105,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		String parentTx = txContext.getParentTx();
 		String hostComponent = txContext.getHostComponent();
 		
-		DependenceRegistryImpl inDepRegistry = dynamicDepMgr.getInDepRegistry();
-		DependenceRegistryImpl outDepRegistry = dynamicDepMgr.getOutDepRegistry();
+		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
+		DependenceRegistry outDepRegistry = dynamicDepMgr.getOutDepRegistry();
 		Set<String> futureComponents = txContext.getFutureComponents();
 		boolean isRoot = false;
 		
@@ -228,8 +221,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean manageDependence(String proctocol, String msgType,
-			String payload) {
+	public boolean manageDependence(String proctocol, String msgType, String payload) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -3,7 +3,7 @@
  */
 package cn.edu.nju.moon.conup.core.manager.impl;
 
-import cn.edu.nju.moon.conup.core.DependenceRegistryImpl;
+import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -23,8 +23,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	private ComponentObject compObj;
 	private CompStatus compStatus = null;
 
-	private DependenceRegistryImpl inDepRegistry = new DependenceRegistryImpl();
-	private DependenceRegistryImpl outDepRegistry = new DependenceRegistryImpl();
+	private DependenceRegistry inDepRegistry = new DependenceRegistry();
+	private DependenceRegistry outDepRegistry = new DependenceRegistry();
 	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
 
 	public DynamicDepManagerImpl() {
@@ -97,19 +97,19 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return compObj;
 	}
 
-	public DependenceRegistryImpl getInDepRegistry() {
+	public DependenceRegistry getInDepRegistry() {
 		return inDepRegistry;
 	}
 
-	public void setInDepRegistry(DependenceRegistryImpl inDepRegistry) {
+	public void setInDepRegistry(DependenceRegistry inDepRegistry) {
 		this.inDepRegistry = inDepRegistry;
 	}
 
-	public DependenceRegistryImpl getOutDepRegistry() {
+	public DependenceRegistry getOutDepRegistry() {
 		return outDepRegistry;
 	}
 
-	public void setOutDepRegistry(DependenceRegistryImpl outDepRegistry) {
+	public void setOutDepRegistry(DependenceRegistry outDepRegistry) {
 		this.outDepRegistry = outDepRegistry;
 	}
 
