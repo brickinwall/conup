@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 
 /** dependences for a component. */
-public class DependenceRegistryImpl {
+public class DependenceRegistry {
 	private Set<Dependence> dependences = new ConcurrentSkipListSet<Dependence>();
 
-	public DependenceRegistryImpl() {
+	public DependenceRegistry() {
 	}
 
 	public void addDependence(Dependence dependence) {

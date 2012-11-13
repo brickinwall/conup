@@ -15,10 +15,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
  */
 public class DependenceRegistryImplTest {
 	
-	DependenceRegistryImpl dependenceRegistry = null; 
+	DependenceRegistry dependenceRegistry = null; 
 	@Before
 	public void setUp() throws Exception {
-		dependenceRegistry = new DependenceRegistryImpl();
+		dependenceRegistry = new DependenceRegistry();
 	}
 
 	@Test
