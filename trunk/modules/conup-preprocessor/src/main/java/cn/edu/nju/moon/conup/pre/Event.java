@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 /**
  * 
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 public class Event {
     private final static Logger LOGGER = Logger.getLogger(Event.class.getName());

@@ -31,7 +31,7 @@ import org.objectweb.asm.tree.analysis.BasicInterpreter;
 /**
  * 
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 public class MethodAnalyzer {
 	private final static Logger LOGGER = Logger.getLogger(MethodAnalyzer.class
@@ -50,7 +50,7 @@ public class MethodAnalyzer {
 	 * CFG of the method
 	 */
 	private ControlFlow controlflow = new ControlFlow();
-	
+
 	/**
 	 * Branch event infor like this:BranchType(if, or while).branchNum.location
 	 */
@@ -70,7 +70,7 @@ public class MethodAnalyzer {
 	 */
 	private List<AbstractInsnNode> runinf = new LinkedList<AbstractInsnNode>();
 	private int runNum = 0;
-	private boolean isBranch = false;
+	private boolean isBranch = false;	
 	/**
 	 * TxLifecycleManager name for creating transaction id.
 	 */
@@ -87,34 +87,18 @@ public class MethodAnalyzer {
 	 * All State objects in DDA
 	 */
 	private List<State> states = new LinkedList<State>();
-	/**
-	 * Past compoments of every state
-	 */
-	private List<String>[] past;
-	/**
-	 * Future compoments of every state
-	 */
-	private List<String>[] future;
 	
 	/**
 	 * Parameter for transfer DDA info, including all states and its nexts
 	 */
 	private String statesDDA = "";
-	private String nextsDDA = "";
-	/**
-	 * event-nextState in current state
-	 */
-	private List<String> next = new LinkedList<String>();
-	/**
-	 * All states info
-	 */
-	private List<String> stateall = new LinkedList<String>();
+	private String nextsDDA = "";	
 	/**
 	 * whether the bytecode is analyzed;
 	 */
 	private int[] isAnalyze;
 
-	public MethodAnalyzer(List<String> serviceList,String tlm,String tlmDesc) {
+	public MethodAnalyzer(List<String> serviceList, String tlm, String tlmDesc) {
 		com = serviceList;
 		TxlcMgr = tlm;
 		TxlcMgrDesc = tlmDesc;
@@ -127,13 +111,30 @@ public class MethodAnalyzer {
 	/**
 	 * 
 	 * @param n
-	 *     the number of bytecodes in the program to be analyzed
+	 *            the number of bytecodes in the program to be analyzed
 	 */
-	private void initIsAnalyze(int n) {
+	public void initIsAnalyze(int n) {
 		isAnalyze = new int[n];
 		for (int i = 0; i < n; i++) {
 			isAnalyze[i] = 0;
 		}
+	}
+	public int[] getIsAnalyze(){
+		return isAnalyze;
+	}
+	public void printIsAnalyzed(int n){
+		for (int i = 0; i < n; i++) {
+			System.out.println(i+": "+isAnalyze[i]);
+		}
+	}
+	public StateMachine getStateMachine(){
+		return stateMachine;
+	}
+	public String getStatesDDA(){
+		return statesDDA;
+	}
+	public String getNextsDDA(){
+		return nextsDDA;
 	}
 
 	/**
@@ -145,14 +146,14 @@ public class MethodAnalyzer {
 		com = c;
 	}
 
-	private String getServiceName(String desc) {
+	public String getServiceName(String desc) {
 		String[] fields = desc.split(File.separator);
 		String serviceName = fields[fields.length - 1];
-//		System.out.println(desc + " Servic Name is " + serviceName);
+		// System.out.println(desc + " Servic Name is " + serviceName);
 		return serviceName;
 	}
 
-	public void writeState(MethodNode mn) {
+	public void writeDDA(MethodNode mn,List<String> stateall,List<String> next) {
 		statesDDA = "";
 		nextsDDA = "";
 		for (String s : stateall) {
@@ -160,16 +161,15 @@ public class MethodAnalyzer {
 				s = "_E";
 			}
 			statesDDA = statesDDA + s + ";";
-		}
-		statesDDA = statesDDA.subSequence(0, statesDDA.length() - 1).toString();
-		// System.out.println("---------state size:"+stateall.size()+"!statesDDA"+statesDDA);
+		}		
+		statesDDA = statesDDA.substring(0, statesDDA.length() - 1);
 		for (String s : next) {
 			if (s.isEmpty()) {
 				s = "_E";
 			}
 			nextsDDA = nextsDDA + s + ";";
 		}
-		nextsDDA = nextsDDA.subSequence(0, nextsDDA.length() - 1).toString();
+		nextsDDA = nextsDDA.substring(0, nextsDDA.length() - 1);
 		LOGGER.info("statesDDA = " + statesDDA + ", nextsDDA = " + nextsDDA);
 
 	}
@@ -195,22 +195,25 @@ public class MethodAnalyzer {
 			initIsAnalyze(mn.instructions.size());
 			recognizeState(0, 0, mn.instructions);
 			mergeState();
-			ExtractMetaData();
-			setStates();		
-			setStateAll();
-			setNext();
-			writeState(mn);
+			List<String>[] future = ExtractMetaData();
+			setStates(future);
+			List<String> stateall = setStateAll();
+			List<String> next = setNext();
+			writeDDA(mn,stateall,next);
 			int localNum = mn.localVariables.size();
 			// insert annotation
-//			Iterator<AnnotationNode> iter = mn.visibleAnnotations.iterator();		
+			// Iterator<AnnotationNode> iter = mn.visibleAnnotations.iterator();
 			// insert transaction id
-			InsnList trigstart = new InsnList();			
+			InsnList trigstart = new InsnList();
 			trigstart.add(new VarInsnNode(ALOAD, 0));
-			trigstart.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr, TxlcMgrDesc));
-			trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1), "createID", "()Ljava/lang/String;"));
-//			System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+			trigstart.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr,
+					TxlcMgrDesc));
+			trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc
+					.substring(1, TxlcMgrDesc.length() - 1), "createID",
+					"()Ljava/lang/String;"));
+			// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 			trigstart.add(new VarInsnNode(ASTORE, localNum));
-//insert start inf
+			// insert start inf
 			trigstart.add(new VarInsnNode(ALOAD, localNum));
 			trigstart.add(new LdcInsnNode(statesDDA));
 			// System.out.println("----------------------StatesDDA"+statesDDA);
@@ -222,11 +225,13 @@ public class MethodAnalyzer {
 							"getInstance",
 							"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 			trigstart.add(new LdcInsnNode("Start"));
-			trigstart.add(new MethodInsnNode(INVOKEVIRTUAL,
-					"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-					"trigger", "(Ljava/lang/String;)V"));
+			trigstart
+					.add(new MethodInsnNode(
+							INVOKEVIRTUAL,
+							"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
+							"trigger", "(Ljava/lang/String;)V"));
 			insns.insert(insns.getFirst(), trigstart);
-			
+
 			Iterator<AbstractInsnNode> i = insns.iterator();
 			while (i.hasNext()) {
 				AbstractInsnNode i1 = i.next();
@@ -269,7 +274,7 @@ public class MethodAnalyzer {
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 								"getInstance",
 								"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
-	
+
 						trig.add(new LdcInsnNode(cominf.get(i1)));
 						trig.add(new MethodInsnNode(
 								INVOKEVIRTUAL,
@@ -298,7 +303,7 @@ public class MethodAnalyzer {
 									"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 									"getInstance",
 									"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
-			
+
 							trig.add(new LdcInsnNode(jumpE));
 							trig.add(new MethodInsnNode(
 									INVOKEVIRTUAL,
@@ -338,7 +343,7 @@ public class MethodAnalyzer {
 
 			}
 			LabelNode last = ((LocalVariableNode) mn.localVariables.get(0)).end;
-			LabelNode start = ((LocalVariableNode) mn.localVariables.get(0)).start;			
+			LabelNode start = ((LocalVariableNode) mn.localVariables.get(0)).start;
 			mn.localVariables.add(new LocalVariableNode("transactionID",
 					"Ljava/lang/String;", null, start, last, localNum));
 			mn.maxLocals = mn.maxLocals + 1;
@@ -349,6 +354,7 @@ public class MethodAnalyzer {
 
 	/**
 	 * Whether the method has the specified annotation
+	 * 
 	 * @param mn
 	 * @param annotationDesc
 	 * @return
@@ -457,7 +463,7 @@ public class MethodAnalyzer {
 				isAnalyze[src] = 1;
 				int next = (Integer) controlflow.getFlow(src).getDst().get(0);
 				MethodInsnNode method = ((MethodInsnNode) an);
-//				System.out.println(an.toString()+"'owner is "+method.owner);
+				// System.out.println(an.toString()+"'owner is "+method.owner);
 				if (com.contains(method.owner)) {
 					String serName = getServiceName(method.owner);
 					if (runNum == 0 || (runNum == 1 && isBranch)) {
@@ -628,30 +634,21 @@ public class MethodAnalyzer {
 	/**
 	 * get future and past components in every state of DDA
 	 */
-	public void ExtractMetaData() {
-
+	public List<String>[] ExtractMetaData() {
+		
+		
 		int states_count = stateMachine.getStatesCount();
-
-		List[] state = new LinkedList[states_count];
-		for (int i = 0; i < states_count; i++)
-			state[i] = new LinkedList();
-
 		List<Integer> s = stateMachine.getStates();
-
-		for (int i = 0; i < states_count; i++) {
-			LOGGER.info(i + ":" + s.get(i));
-
-		}
-
 		List<Event> e = stateMachine.getEvents();
 
-		past = new LinkedList[states_count];
+		for (int i = 0; i < states_count; i++) {
+			LOGGER.fine(i + ":" + s.get(i));
+		}
+		
+		//get the static past that may be used in the future, not used now
+		List<String>[] past = new LinkedList[states_count];
 		for (int i = 0; i < states_count; i++)
-			past[i] = new LinkedList<String>();
-		future = new LinkedList[states_count];
-		for (int i = 0; i < states_count; i++)
-			future[i] = new LinkedList<String>();
-
+			past[i] = new LinkedList<String>();		
 		boolean changed = true;
 		while (changed) {
 			changed = false;
@@ -676,7 +673,10 @@ public class MethodAnalyzer {
 					}
 			}
 		}
-
+		
+		List<String>[] future = new LinkedList[states_count];
+		for (int i = 0; i < states_count; i++)
+			future[i] = new LinkedList<String>();		
 		changed = true;
 		while (changed) {
 			changed = false;
@@ -685,7 +685,7 @@ public class MethodAnalyzer {
 				int head = event.getHead();
 				int tail = event.getTail();
 				String port = event.getPort();
-				LOGGER.fine(port);
+//				LOGGER.fine(port);
 				int headindex = s.indexOf(head);
 				int tailindex = s.indexOf(tail);
 				if (port != null && !future[headindex].contains(port)) {
@@ -703,24 +703,20 @@ public class MethodAnalyzer {
 					}
 			}
 		}
+		return future;
 
 	}
-/**
- * put the states content in every state
- */
-	public void setStates() {
+
+	/**
+	 * put the states content in every state
+	 */
+	public void setStates(List<String>[] future) {
 		int states_count = stateMachine.getStatesCount();
 		for (int i = 0; i < states_count; i++) {
-			State state = new State(stateMachine.getStates().get(i));
-			/*
-			 * for(int j=0; j<future[i].size(); j++){
-			 * state.addFuture(future[i].get(j)); } for(int j=0;
-			 * j<past[i].size(); j++){ state.addPast(past[i].get(j)); }
-			 */
+			State state = new State(stateMachine.getStates().get(i));			
 			state.setFuture(future[i]);
-			state.setPast(past[i]);
 			states.add(state);
-			LOGGER.info(i + ":" + future[i] + ";" + past[i]);
+			LOGGER.info(i + ":" + future[i]);
 		}
 	}
 
@@ -830,7 +826,8 @@ public class MethodAnalyzer {
 	/**
 	 * set the state information in transaction annotation or parameter to use
 	 */
-	public void setStateAll() {
+	public List<String> setStateAll() {
+		List<String> stateall = new LinkedList<String>();
 		for (int i = 0; i < states.size(); i++) {
 			State s = states.get(i);
 			List<String> fu = s.getFuture();
@@ -843,21 +840,16 @@ public class MethodAnalyzer {
 				}
 				sall = sall + fu.get(k);
 			}
-			/*
-			 * List<String> pa = s.getPast(); int palen = pa.size(); int p = 0;
-			 * sall = sall + ";"; if (palen > 0) { for (p = 0; p < palen - 1;
-			 * p++) { sall = sall + pa.get(p) + ","; } sall = sall + pa.get(p);
-			 * }
-			 */
-			// System.out.println(i + ":" + sall);
 			stateall.add(sall);
 		}
+		return stateall;
 	}
 
 	/**
 	 * set the trigger event and the next state for every state
 	 */
-	public void setNext() {
+	public List<String> setNext() {
+		List<String> next = new LinkedList<String>();
 		List<Event> event = stateMachine.getEvents();
 		// List state = stateMachine.getStates();
 		for (int i = 0; i < states.size(); i++) {
@@ -877,6 +869,7 @@ public class MethodAnalyzer {
 				next.add((String) nexts.subSequence(0, nexts.length() - 1));
 			LOGGER.info(i + "next:" + nexts);
 		}
+		return next;
 	}
 
 }

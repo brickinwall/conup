@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * Note that a given instance of JarHelper is not threadsafe with respect to
  * multiple jar operations.
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  * modify version ( Patrick Calahan <pcal@bea.com>)
  */
 public class JarTool {

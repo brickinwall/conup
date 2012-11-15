@@ -30,7 +30,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 /**
  * EJBProgramAnalyzer is used to analyze the EJB applications
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 public class EJBProgramAnalyzer {
 	private final static Logger LOGGER = Logger.getLogger(EJBProgramAnalyzer.class.getName());
