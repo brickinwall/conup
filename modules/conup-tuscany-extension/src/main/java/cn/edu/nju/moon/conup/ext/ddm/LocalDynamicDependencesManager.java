@@ -42,7 +42,7 @@ public class LocalDynamicDependencesManager {
 	 * Whether a transaction is in a response of the given method of the given component.
 	 * the identifier of the method like this : componentName; methodName 
 	 */
-	private Set<String> real_past = new ConcurrentSkipListSet<String>();
+	private Set<String> past = null;
 	/**
 	 * All states in the transaction's Dynamic Dependency Automaton
 	 */
@@ -57,9 +57,9 @@ public class LocalDynamicDependencesManager {
 	private int currentState = 0;
 
 
-	/**
+	/**TxDepMonitor
 	 * This is for java implementation to get its LDDM to manage its dynamic dependences
-	 * @param name
+	 * @param namemonitor
 	 * 			transaction id
 	 * @param states	 
 	 * @param nexts
@@ -101,17 +101,14 @@ public class LocalDynamicDependencesManager {
 			String[] si = stateAnno[i].split(",");
 			Set<String> stateFuture = new ConcurrentSkipListSet<String>();
 			for (int j = 0; j < si.length; j++) {
-				if (si[j].equals("_E")) {
-					si[j] = "";
+				if (!si[j].equals("_E")) {					
+					stateFuture.add(si[j]);
 				}
-				// System.out.print(si[j]+"   ");
-				stateFuture.add(si[j]);
 			}
 			SetState state = new SetState();
 			state.setFuture(stateFuture);
 			states.add(state);
 		}
-		LOGGER.info("---------states:" + states.size());
 		// get event information
 		events = new String[eventAnno.length];
 		for (int i = 0; i < eventAnno.length; i++) {
@@ -121,6 +118,12 @@ public class LocalDynamicDependencesManager {
 			events[i] = eventAnno[i];
 		}
 
+	}
+	public int getCurrentState(){
+		return currentState;
+	}
+	public void setCurrentState(int cur){
+		currentState = cur;
 	}
 	/**
 	 * 
@@ -137,37 +140,36 @@ public class LocalDynamicDependencesManager {
 		}		
 	}
 
-	public Set<String> getRealPast() {
-		return real_past;
+	public Set<String> getPast() {
+		return past;
 	}
 	
 	/**	
-	 * When a subtransaction begin, you can get whether the component will be used
+	 * When a subtransaction begin, you can get whether the component will be used in the future
 	 * @param reference
 	 *            Service name	     	
 	 */
-	public boolean isThisLastUsed(String reference){
+	public boolean whetherUseInFuture(String reference){
 		if(getFuture().contains(reference)){
-			LOGGER.info(reference + "now is in the future set!");
 			String eve = events[currentState];
 			String eveinf[] = eve.split(",");
 			for (String e : eveinf) {
 				if (e.contains(reference)) {
-					int tempNextState = Integer.parseInt(e.split("-")[1]);									
-					LOGGER.info(reference + "is now in use in transaction"+transactionID);
+					int tempNextState = Integer.parseInt(e.split("-")[1]);				
 					if(states.get(tempNextState).getFuture().contains(reference)){
-						LOGGER.info(reference + "will use in transaction "+transactionID);
+						LOGGER.info(reference + "is in use now and will be used in transaction "+transactionID+" in future!");
 						return true;
 					}
 					else{
-						LOGGER.info(reference + "will not use in transaction "+transactionID);
+						LOGGER.info(reference + " is in use now, but will not use in transaction "+transactionID+" in future!");
 						return false;
-					}}}
-			LOGGER.info(reference + "is not in the next event set! your input service may be wrong!");			
-			return false;
+					}}
+			}
+			LOGGER.info(reference + " is not in use now, but will be used in the future!");			
+			return true;
 		}
 		else{
-			LOGGER.info(reference + "now is not in the future set!");
+			LOGGER.info(reference + " is not in use now, and won't in future!");
 			return false;		}
 		
 	}
@@ -187,6 +189,7 @@ public class LocalDynamicDependencesManager {
 	public void trigger(String event) {	
 		if (event.contains("Start")) {
 			currentState = 0;
+			past = new ConcurrentSkipListSet<String>();
 			monitor.notify(TxEventType.TransactionStart, transactionID);
 			LOGGER.info("Transaction  " + transactionID + "  is start!");			
 			}
@@ -199,7 +202,7 @@ public class LocalDynamicDependencesManager {
 				//if it is a component-invoked event, change past set. else,leave unchaged.			
 				if (event.contains("COM")) {			
 				String port = event.split("\\.")[1];
-				real_past.add(port);
+				past.add(port);
 				}
 				//find the next state, get precise future set.
 				String eve = events[currentState];
@@ -215,13 +218,5 @@ public class LocalDynamicDependencesManager {
 				}
 				}
 			}
-		}
-	public static void main(String args[]){
-		String tid = "1234";
-		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("Start");
-		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").FirstRequestService();
-		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("COM.TokenService.23");
-		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("COM.ProcService.35");
-		LocalDynamicDependencesManager.getInstance(tid, "TokenService,ProcService;ProcService;_E", "COM.TokenService.23-1;COM.ProcService.35-2;_E").trigger("");
-	}
+		}	
 }
