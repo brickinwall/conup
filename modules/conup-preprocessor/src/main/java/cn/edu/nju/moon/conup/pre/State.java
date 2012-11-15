@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  *
  */
 public class State {

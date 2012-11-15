@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 /**
  * 
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 public class ControlFlow {
 	private final static Logger LOGGER = Logger.getLogger(ControlFlow.class.getName());
@@ -20,6 +20,15 @@ public class ControlFlow {
 	}
 
 	private List<NodeAndOutarcs> con = new LinkedList<NodeAndOutarcs>();
+	public ControlFlow(){
+		
+	}
+	public ControlFlow(List<NodeAndOutarcs> cons){
+		con = cons;
+	}
+	public List<NodeAndOutarcs> getFlow(){
+		return con;
+	}
 
 	public NodeAndOutarcs getFlow(int src) {
 		Iterator<NodeAndOutarcs> f = con.iterator();

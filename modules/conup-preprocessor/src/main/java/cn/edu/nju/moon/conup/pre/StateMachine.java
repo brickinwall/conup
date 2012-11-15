@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * 
  * 
- * @author Ping Su
+ * @author Ping Su<njupsu@gmail.com>
  */
 public class StateMachine {
 
@@ -18,11 +18,13 @@ public class StateMachine {
 	
 	private List<Event> events = new LinkedList<Event>();
 
-	/**
-	 * 
-	 */
+	
 	public StateMachine() {
 
+	}
+	public StateMachine(List<Integer> states,List<Event> events) {		
+		this.states = states;
+		this.events = events;
 	}
 
 	/**
@@ -69,7 +71,8 @@ public class StateMachine {
 	public void setStates(List<Integer> states) {
 		this.states = states;
 	}
-
+	
+	@Deprecated
 	public int getstate(int head, String event) {
 		for (int i = 0; i < events.size(); i++) {
 			Event e = events.get(i);
@@ -78,7 +81,7 @@ public class StateMachine {
 		}
 		return -1;
 	}
-
+	@Deprecated
 	public int stateindex(int index) {
 		for (int i = 0; i < states.size(); i++) {
 			if ((Integer) states.get(i) == index)
@@ -98,7 +101,13 @@ public class StateMachine {
 				states.remove(i);
 		}
 	}
-
+	/**
+	 * merge the two states into one(the latter one)
+	 * @param s1
+	 *  state location
+	 * @param s2
+	 *  state location
+	 */
 	public void mergeStates(int s1, int s2) {
 
 		int s1_index = states.indexOf(s1);
@@ -132,6 +141,7 @@ public class StateMachine {
 	public List<Event> getEvents() {
 		return events;
 	}
+	
 	public Event getEvent(String eve){
 		for(Event e : events){
 			if(e.getEvent().equals(eve)){
