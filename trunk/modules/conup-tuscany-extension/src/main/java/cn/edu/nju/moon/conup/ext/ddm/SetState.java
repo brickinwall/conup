@@ -11,6 +11,9 @@ public class SetState {
 	
 	
 	Set<String> future = new ConcurrentSkipListSet<String>();
+	/**
+	 * past is not used now, it maybe used in future.
+	 */
 	Set<String> past = new ConcurrentSkipListSet<String>();
 
 	public SetState(){
