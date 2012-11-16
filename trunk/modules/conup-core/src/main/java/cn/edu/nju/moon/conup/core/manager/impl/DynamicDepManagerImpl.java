@@ -119,6 +119,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
+	public boolean isDynamicUpdateReceived() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
 	public void setAlgorithm(String algorithmType) {
 		algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
 	}
