@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Private-Package: org.apache.tuscany.sca.core.databinding.module;versio
+ n="2.0.0",org.apache.tuscany.sca.core.databinding.processor;version="2.0.0",
+ org.apache.tuscany.sca.core.databinding.transformers;version="2.0.0"
+ ,org.apache.tuscany.sca.core.databinding.wire;version="2.0.0"
+SCA-Version: 1.1
+Bundle-Name: Apache Tuscany SCA Core/DataBinding Integration
+Bundle-Vendor: The Apache Software Foundation
+Bundle-Version: 2.0.0
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: Apache Tuscany SCA Core/DataBinding Integration
+Import-Package: javax.xml.namespace,
+ org.apache.tuscany.sca.core;version="2.0.0",
+ org.apache.tuscany.sca.core.invocation;version="2.0.0",
+ org.apache.tuscany.sca.databinding;version="2.0.0",
+ org.apache.tuscany.sca.databinding.annotation;version="2.0.0",
+ org.apache.tuscany.sca.databinding.impl;version="2.0.0",
+ org.apache.tuscany.sca.databinding.javabeans;version="2.0.0",
+ org.apache.tuscany.sca.databinding.util;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.java;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.java.introspect;version="2.0.0",
+ org.apache.tuscany.sca.interfacedef.util;version="2.0.0",
+ org.apache.tuscany.sca.invocation;version="2.0.0",
+ org.apache.tuscany.sca.runtime;version="2.0.0",
+ org.oasisopen.sca;version="2.0.0"
+Bundle-SymbolicName: org.apache.tuscany.sca.core.databinding
+Bundle-DocURL: http://www.apache.org/
+Export-Package: org.apache.tuscany.sca.core.databinding.processor;
+ version="2.0.0";uses:="org.w3c.dom"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,JavaSE-1.6

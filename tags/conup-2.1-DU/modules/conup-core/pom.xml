@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cn.edu.nju.moon</groupId>
+	<artifactId>conup-core</artifactId>
+	<version>2.1-DU</version>
+	<name>conup-core</name>
+	<description>conup-core</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>cn.edu.nju.moon</groupId>
+			<artifactId>conup-spi</artifactId>
+			<version>2.1-DU</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.edu.nju.moon</groupId>
+			<artifactId>conup-communication-api</artifactId>
+			<version>2.1-DU</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
