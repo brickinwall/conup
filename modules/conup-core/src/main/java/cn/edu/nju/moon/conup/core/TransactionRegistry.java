@@ -9,10 +9,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 public class TransactionRegistry  {
 	private static TransactionRegistry transactionRegistry = new TransactionRegistry();
+	/** take tx_id as key*/
 	private Map<String, TransactionContext> txContexts;
 	
 	private TransactionRegistry(){
-//		dependencies = new HashMap<String, TransactionDependency>();
 		txContexts = new ConcurrentHashMap<String, TransactionContext>();
 	}
 	

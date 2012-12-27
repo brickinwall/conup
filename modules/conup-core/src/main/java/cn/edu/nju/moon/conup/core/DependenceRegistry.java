@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 /** dependences for a component. */
 public class DependenceRegistry {
@@ -16,12 +17,28 @@ public class DependenceRegistry {
 
 	public void addDependence(Dependence dependence) {
 		dependences.add(dependence);
+		
+		DepRecorder depRecorder = DepRecorder.getInstance();
+		String key = dependence.getSrcCompObjIdentifier() + DepRecorder.SEPERATOR
+				+ dependence.getTargetCompObjIdentifer() + DepRecorder.SEPERATOR + dependence.getRootTx();
+		String action = dependence.getType() + DepRecorder.SEPERATOR + DepRecorder.CREATION;
+		depRecorder.addAction(key, action);
 	}
 
 	public boolean removeDependence(Dependence dependence) {
 		Iterator<Dependence> it = dependences.iterator();
 		while (it.hasNext()) {
 			if (it.next().equals(dependence)){
+				
+				// for test
+				DepRecorder depRecorder = DepRecorder.getInstance();
+				String key = dependence.getSrcCompObjIdentifier() + DepRecorder.SEPERATOR
+						+ dependence.getTargetCompObjIdentifer() + DepRecorder.SEPERATOR + 
+						dependence.getRootTx();
+				String action = dependence.getType() + DepRecorder.SEPERATOR + DepRecorder.REMOVAL;
+				depRecorder.addAction(key, action);
+				
+				
 				it.remove();
 				return true;
 			}
@@ -38,6 +55,15 @@ public class DependenceRegistry {
 					&& dep.getRootTx().equals(rootTx)
 					&& dep.getSrcCompObjIdentifier().equals(srcCompObjIdentifier)
 					&& dep.getTargetCompObjIdentifer().equals(targetCompObjIdentifer)) {
+				
+				// for test
+				DepRecorder depRecorder = DepRecorder.getInstance();
+				String key = dep.getSrcCompObjIdentifier() + DepRecorder.SEPERATOR
+						+ dep.getTargetCompObjIdentifer() + DepRecorder.SEPERATOR + 
+						dep.getRootTx();
+				String action = dep.getType() + DepRecorder.SEPERATOR + DepRecorder.REMOVAL;
+				depRecorder.addAction(key, action);
+				
 				it.remove();
 				return true;
 			}
@@ -117,26 +143,26 @@ public class DependenceRegistry {
 	 * @param dependence
 	 * @return
 	 */
-	@Deprecated
-	public boolean update(Dependence dependence) {
-		if (dependence.getType().equals("future")) {
-			for (Dependence depRegistry : dependences) {
-				if (depRegistry.equals(dependence)) {
-					Dependence updatedDependence = new Dependence();
-					updatedDependence.setRootTx(depRegistry.getRootTx());
-					updatedDependence.setSrcCompObjIdentifier(depRegistry
-							.getSrcCompObjIdentifier());
-					updatedDependence.setTargetCompObjIdentifer(depRegistry
-							.getTargetCompObjIdentifer());
-					updatedDependence.setType("past");
-					dependences.remove(depRegistry);
-					dependences.add(updatedDependence);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+//	@Deprecated
+//	public boolean update(Dependence dependence) {
+//		if (dependence.getType().equals("future")) {
+//			for (Dependence depRegistry : dependences) {
+//				if (depRegistry.equals(dependence)) {
+//					Dependence updatedDependence = new Dependence();
+//					updatedDependence.setRootTx(depRegistry.getRootTx());
+//					updatedDependence.setSrcCompObjIdentifier(depRegistry
+//							.getSrcCompObjIdentifier());
+//					updatedDependence.setTargetCompObjIdentifer(depRegistry
+//							.getTargetCompObjIdentifer());
+//					updatedDependence.setType("past");
+//					dependences.remove(depRegistry);
+//					dependences.add(updatedDependence);
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
 
 	public boolean contain(Dependence dependence) {
 		for (Dependence dep : dependences) {
@@ -144,6 +170,16 @@ public class DependenceRegistry {
 				return true;
 		}
 		return false;
+	}
+	
+	public int size(){
+		int num = 0;
+		Iterator<Dependence> iterator = dependences.iterator();
+		while(iterator.hasNext()){
+			iterator.next();
+			num ++;
+		}
+		return num;
 	}
 
 }

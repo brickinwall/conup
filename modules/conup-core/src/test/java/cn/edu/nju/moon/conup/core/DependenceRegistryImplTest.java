@@ -23,11 +23,12 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testAddDependence() {
-		Dependence dependence = new Dependence();
-		dependence.setRootTx(UUID.randomUUID().toString());
-		dependence.setSrcCompObjIdentifier("PortalComponent");
-		dependence.setTargetCompObjIdentifer("AuthComponent");
-		dependence.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence dependence = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				UUID.randomUUID().toString(), "PortalComponent", "AuthComponent", null, null);
+//		dependence.setRootTx(UUID.randomUUID().toString());
+//		dependence.setSrcCompObjIdentifier("PortalComponent");
+//		dependence.setTargetCompObjIdentifer("AuthComponent");
+//		dependence.setType(VersionConsistencyImpl.FUTURE_DEP);
 		dependenceRegistry.addDependence(dependence);
 		
 		assertTrue(dependenceRegistry.contain(dependence));
@@ -35,13 +36,13 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testRemoveDependenceDependence() {
-		
-		Dependence dependence = new Dependence();
 		String rootTx = UUID.randomUUID().toString();
-		dependence.setRootTx(rootTx);
-		dependence.setSrcCompObjIdentifier("PortalComponent");
-		dependence.setTargetCompObjIdentifer("AuthComponent");
-		dependence.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence dependence = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		dependence.setRootTx(rootTx);
+//		dependence.setSrcCompObjIdentifier("PortalComponent");
+//		dependence.setTargetCompObjIdentifer("AuthComponent");
+//		dependence.setType(VersionConsistencyImpl.FUTURE_DEP);
 		
 		/**
 		 * test removeDependence(dependence)
@@ -67,22 +68,25 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testGetDependencesViaType() {
-		Dependence d1 = new Dependence();
 		String rootTx = UUID.randomUUID().toString();
-		d1.setRootTx(rootTx);
-		d1.setSrcCompObjIdentifier("PortalComponent");
-		d1.setTargetCompObjIdentifer("AuthComponent");
-		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
-		Dependence d2 = new Dependence();
-		d2.setRootTx(rootTx);
-		d2.setSrcCompObjIdentifier("PortalComponent");
-		d2.setTargetCompObjIdentifer("ProcComponent");
-		d2.setType(VersionConsistencyImpl.PAST_DEP);
-		Dependence d3 = new Dependence();
-		d3.setRootTx(rootTx);
-		d3.setSrcCompObjIdentifier("PortalComponent");
-		d3.setTargetCompObjIdentifer("AuthComponent");
-		d3.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d1 = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d1.setRootTx(rootTx);
+//		d1.setSrcCompObjIdentifier("PortalComponent");
+//		d1.setTargetCompObjIdentifer("AuthComponent");
+//		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence d2 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "ProcComponent", null, null);
+//		d2.setRootTx(rootTx);
+//		d2.setSrcCompObjIdentifier("PortalComponent");
+//		d2.setTargetCompObjIdentifer("ProcComponent");
+//		d2.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d3 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d3.setRootTx(rootTx);
+//		d3.setSrcCompObjIdentifier("PortalComponent");
+//		d3.setTargetCompObjIdentifer("AuthComponent");
+//		d3.setType(VersionConsistencyImpl.PAST_DEP);
 		
 		dependenceRegistry.addDependence(d1);
 		dependenceRegistry.addDependence(d2);
@@ -96,23 +100,27 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testGetDependencesViaRootTransaction() {
-		Dependence d1 = new Dependence();
 		String rootTx1 = UUID.randomUUID().toString();
-		d1.setRootTx(rootTx1);
-		d1.setSrcCompObjIdentifier("PortalComponent");
-		d1.setTargetCompObjIdentifer("AuthComponent");
-		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
-		Dependence d2 = new Dependence();
+		Dependence d1 = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx1, "PortalComponent", "AuthComponent", null, null );
+//		d1.setRootTx(rootTx1);
+//		d1.setSrcCompObjIdentifier("PortalComponent");
+//		d1.setTargetCompObjIdentifer("AuthComponent");
+//		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
+		
 		String rootTx2 = UUID.randomUUID().toString();
-		d2.setRootTx(rootTx2);
-		d2.setSrcCompObjIdentifier("PortalComponent");
-		d2.setTargetCompObjIdentifer("ProcComponent");
-		d2.setType(VersionConsistencyImpl.PAST_DEP);
-		Dependence d3 = new Dependence();
-		d3.setRootTx(rootTx2);
-		d3.setSrcCompObjIdentifier("PortalComponent");
-		d3.setTargetCompObjIdentifer("AuthComponent");
-		d3.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d2 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx2, "PortalComponent", "ProcComponent", null, null);
+//		d2.setRootTx(rootTx2);
+//		d2.setSrcCompObjIdentifier("PortalComponent");
+//		d2.setTargetCompObjIdentifer("ProcComponent");
+//		d2.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d3 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx2, "PortalComponent", "AuthComponent", null, null);
+//		d3.setRootTx(rootTx2);
+//		d3.setSrcCompObjIdentifier("PortalComponent");
+//		d3.setTargetCompObjIdentifer("AuthComponent");
+//		d3.setType(VersionConsistencyImpl.PAST_DEP);
 		
 		dependenceRegistry.addDependence(d1);
 		dependenceRegistry.addDependence(d2);
@@ -126,22 +134,25 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testGetDependencesViaSourceComponent() {
-		Dependence d1 = new Dependence();
 		String rootTx = UUID.randomUUID().toString();
-		d1.setRootTx(rootTx);
-		d1.setSrcCompObjIdentifier("PortalComponent");
-		d1.setTargetCompObjIdentifer("AuthComponent");
-		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
-		Dependence d2 = new Dependence();
-		d2.setRootTx(rootTx);
-		d2.setSrcCompObjIdentifier("PortalComponent");
-		d2.setTargetCompObjIdentifer("ProcComponent");
-		d2.setType(VersionConsistencyImpl.PAST_DEP);
-		Dependence d3 = new Dependence();
-		d3.setRootTx(rootTx);
-		d3.setSrcCompObjIdentifier("PortalComponent");
-		d3.setTargetCompObjIdentifer("AuthComponent");
-		d3.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d1 = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d1.setRootTx(rootTx);
+//		d1.setSrcCompObjIdentifier("PortalComponent");
+//		d1.setTargetCompObjIdentifer("AuthComponent");
+//		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence d2 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "ProcComponent", null, null);
+//		d2.setRootTx(rootTx);
+//		d2.setSrcCompObjIdentifier("PortalComponent");
+//		d2.setTargetCompObjIdentifer("ProcComponent");
+//		d2.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d3 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d3.setRootTx(rootTx);
+//		d3.setSrcCompObjIdentifier("PortalComponent");
+//		d3.setTargetCompObjIdentifer("AuthComponent");
+//		d3.setType(VersionConsistencyImpl.PAST_DEP);
 		
 		dependenceRegistry.addDependence(d1);
 		dependenceRegistry.addDependence(d2);
@@ -154,22 +165,25 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testGetDependencesViaTargetComponent() {
-		Dependence d1 = new Dependence();
 		String rootTx = UUID.randomUUID().toString();
-		d1.setRootTx(rootTx);
-		d1.setSrcCompObjIdentifier("PortalComponent");
-		d1.setTargetCompObjIdentifer("AuthComponent");
-		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
-		Dependence d2 = new Dependence();
-		d2.setRootTx(rootTx);
-		d2.setSrcCompObjIdentifier("PortalComponent");
-		d2.setTargetCompObjIdentifer("ProcComponent");
-		d2.setType(VersionConsistencyImpl.PAST_DEP);
-		Dependence d3 = new Dependence();
-		d3.setRootTx(rootTx);
-		d3.setSrcCompObjIdentifier("PortalComponent");
-		d3.setTargetCompObjIdentifer("AuthComponent");
-		d3.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d1 = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d1.setRootTx(rootTx);
+//		d1.setSrcCompObjIdentifier("PortalComponent");
+//		d1.setTargetCompObjIdentifer("AuthComponent");
+//		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence d2 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "ProcComponent", null, null);
+//		d2.setRootTx(rootTx);
+//		d2.setSrcCompObjIdentifier("PortalComponent");
+//		d2.setTargetCompObjIdentifer("ProcComponent");
+//		d2.setType(VersionConsistencyImpl.PAST_DEP);
+		Dependence d3 = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d3.setRootTx(rootTx);
+//		d3.setSrcCompObjIdentifier("PortalComponent");
+//		d3.setTargetCompObjIdentifer("AuthComponent");
+//		d3.setType(VersionConsistencyImpl.PAST_DEP);
 		
 		dependenceRegistry.addDependence(d1);
 		dependenceRegistry.addDependence(d2);
@@ -183,12 +197,13 @@ public class DependenceRegistryImplTest {
 
 	@Test
 	public void testContain() {
-		Dependence d1 = new Dependence();
 		String rootTx = UUID.randomUUID().toString();
-		d1.setRootTx(rootTx);
-		d1.setSrcCompObjIdentifier("PortalComponent");
-		d1.setTargetCompObjIdentifer("AuthComponent");
-		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
+		Dependence d1 = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+				rootTx, "PortalComponent", "AuthComponent", null, null);
+//		d1.setRootTx(rootTx);
+//		d1.setSrcCompObjIdentifier("PortalComponent");
+//		d1.setTargetCompObjIdentifer("AuthComponent");
+//		d1.setType(VersionConsistencyImpl.FUTURE_DEP);
 		
 		dependenceRegistry.addDependence(d1);
 		assertTrue(dependenceRegistry.getDependencesViaTargetComponent("AuthComponent").contains(d1));
