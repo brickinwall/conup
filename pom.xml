@@ -36,9 +36,9 @@
     <version>2.0.1-DU-SNAPSHOT</version>
 
     <scm>
-        <connection>scm:svn:https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</connection>
-        <developerConnection>scm:svn:https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</developerConnection>
-        <url>https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</url>
+        <connection>scm:svn:https://conup.googlecode.com/svn/trunk</connection>
+        <developerConnection>scm:svn:https://conup.googlecode.com/svn/trunk</developerConnection>
+        <url>https://conup.googlecode.com/svn/trunk</url>
     </scm>
 
     <prerequisites>
