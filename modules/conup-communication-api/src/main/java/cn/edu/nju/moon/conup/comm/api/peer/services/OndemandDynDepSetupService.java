@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.comm.api.peer.services;
 
+import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 
 /**
  * on-demand setup between different nodes
@@ -16,7 +17,7 @@ public interface OndemandDynDepSetupService {
 	 * @param payload
 	 * @return
 	 */
-	public String synPost(String srcIdentifier, String targetIdentifier, String proctocol, String msgType, String payload);
+	public String synPost(String srcIdentifier, String targetIdentifier, String proctocol, MsgType msgType, String payload);
 	
 	/**
 	 * asynchronously notify target component
@@ -27,6 +28,6 @@ public interface OndemandDynDepSetupService {
 	 * @param payload
 	 * @return
 	 */
-	public String asynPost(String srcIdentifier, String targetIdentifier, String proctocol, String msgType, String payload);
+	public void asynPost(String srcIdentifier, String targetIdentifier, String proctocol, MsgType msgType, String payload);
 
 }
