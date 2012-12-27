@@ -168,10 +168,11 @@
         <module>base-runtime</module>
         <module>base-runtime-pom</module>
         <module>osgi-runtime-pom</module>
-		<module>conup-buffer</module>
+
 		<module>conup-communication</module>
 		<module>conup-communication-api</module>
 		<module>conup-core</module>
+		<module>conup-preprocessor</module>
 		<module>conup-remote-configuration</module>
 		<module>conup-spi</module>
 		<module>conup-trace</module>
