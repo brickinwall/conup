@@ -1,33 +1,25 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
 import cn.edu.nju.moon.conup.core.algorithm.QuiescenceImpl;
-import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
 public class QuiescenceOndemandSetupImpl implements OndemandSetup {
-
+	private OndemandSetupHelper ondemandHelper;
 	@Override
-	public void ondemand(String freenessSetup,
-			Scope scope) {
-		// TODO Auto-generated method stub
-		
+	public boolean ondemand() {
+		ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+		return true;
 	}
 
 	@Override
-	public boolean isOndemandDone() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean ondemandSetup(String targetIdentifier, String proctocol,
-			String msgType, String payload) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean ondemandSetup(String targetIdentifier, String proctocol, String payload) {
+		ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+		return true;
 	}
 
 	@Override
@@ -35,4 +27,13 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		return QuiescenceImpl.ALGORITHM_TYPE;
 	}
 
+	@Override
+	public void setOndemandHelper(OndemandSetupHelper ondemandHelper) {
+		this.ondemandHelper = ondemandHelper;
+	}
+
+	@Override
+	public boolean isOndemandDone() {
+		return true;
+	}
 }
