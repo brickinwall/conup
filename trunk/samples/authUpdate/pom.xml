@@ -33,7 +33,6 @@
     <modules>
         <module>conup-sample-auth</module>
         <module>conup-sample-db</module>
-        <module>conup-sample-home</module>
         <module>conup-sample-portal</module>
         <module>conup-sample-proc</module>
     </modules>
