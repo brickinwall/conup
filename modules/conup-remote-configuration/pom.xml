@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cn.edu.nju.moon</groupId>
+	<artifactId>conup-remote-configuration</artifactId>
+	<version>2.0.1-DU-SNAPSHOT</version>
+	<name>conup-remote-configuration</name>
+	<description>conup-remote-configuration</description>
+
+	<properties>
+		<conup.version>2.0.1-DU-SNAPSHOT</conup.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>cn.edu.nju.moon</groupId>
+			<artifactId>conup-spi</artifactId>
+			<version>${conup.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.edu.nju.moon</groupId>
+			<artifactId>conup-communication</artifactId>
+			<version>2.0.1-DU-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>
