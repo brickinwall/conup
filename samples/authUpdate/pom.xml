@@ -22,11 +22,11 @@
     <parent>
         <groupId>org.apache.tuscany.sca.samples</groupId>
         <artifactId>tuscany-samples</artifactId>
-        <version>2.1-DU</version>
+        <version>2.0.1-DU-SNAPSHOT</version>
     </parent>
 
     <artifactId>authUpdate</artifactId>
-    <version>2.1-DU</version>
+    <version>2.0.1-DU-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Dynamic update samples</name>
 
