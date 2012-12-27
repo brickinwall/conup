@@ -33,12 +33,12 @@
     <packaging>pom</packaging>
     <name>Apache Tuscany SCA Implementation Project (2.x)</name>
     <url>http://tuscany.apache.org</url>
-    <version>2.0.1-DU-SNAPSHOT</version>
+    <version>2.1-DU</version>
 
     <scm>
-        <connection>scm:svn:https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</connection>
-        <developerConnection>scm:svn:https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</developerConnection>
-        <url>https://conup.googlecode.com/svn/tags/2.0.1-DU-SNAPSHOT</url>
+        <connection>scm:svn:https://conup.googlecode.com/svn/tags/conup-2.1-DU</connection>
+        <developerConnection>scm:svn:https://conup.googlecode.com/svn/tags/conup-2.1-DU</developerConnection>
+        <url>https://conup.googlecode.com/svn/tags/conup-2.1-DU</url>
     </scm>
 
     <prerequisites>
