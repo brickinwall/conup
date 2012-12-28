@@ -6,15 +6,11 @@
 	<name>conup-remote-configuration</name>
 	<description>conup-remote-configuration</description>
 
-	<properties>
-		<conup.version>2.1-DU</conup.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>${conup.version}</version>
+			<version>2.2-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
