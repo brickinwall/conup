@@ -6,11 +6,7 @@
 	</configuration>
 
 	<staticDeps>
-		<component name="FirstComponent">
-			<child>PortalComponent</child>
-		</component>
 		<component name="PortalComponent">
-			<parent>FirstComponent</parent>
 			<child>AuthComponent</child>
 			<child>ProcComponent</child>
 		</component>

@@ -961,7 +961,47 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		XMLUtil xmlUtil = new XMLUtil();
 		String compIdentifier = ondemandHelper.getCompObject().getIdentifier();
 		
-//		Set<String> scopeComps = xmlUtil.getParents(compIdentifier);
+		Set<String> scopeComps = new HashSet<String>();
+		
+		Queue<String>  queue= new LinkedBlockingQueue<String>();
+		queue.add(compIdentifier);
+
+		while(!queue.isEmpty()){
+			String compInQueue = queue.poll();
+			Set<String> parents = xmlUtil.getParents(compInQueue);
+			queue.addAll(parents);
+			scopeComps.addAll(parents);
+		}
+		scopeComps.add(compIdentifier);
+		
+		for (Iterator<String> iterator = scopeComps.iterator(); iterator.hasNext();) {
+			String compName = (String) iterator.next();
+			Set<String> subs = xmlUtil.getChildren(compName);
+			for (String string : subs) {
+				if(!scopeComps.contains(string))
+					subs.remove(string);
+			}
+			scope.addComponent(compName, xmlUtil.getParents(compName), subs);
+			
+		}
+		
+		Set<String> targetComps = new HashSet<String>();
+		targetComps.add(ondemandHelper.getCompObject().getIdentifier());
+		scope.setTarget(targetComps);
+		
+		return scope;
+	}
+	
+	/**
+	 * calc all involved components with target component 
+	 * @return
+	 */
+	public Scope calcScope(String xmlPath){
+		Scope scope = new Scope();
+		
+		XMLUtil xmlUtil = new XMLUtil(xmlPath);
+		String compIdentifier = ondemandHelper.getCompObject().getIdentifier();
+		
 		Set<String> scopeComps = new HashSet<String>();
 		
 		Queue<String>  queue= new LinkedBlockingQueue<String>();

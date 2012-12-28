@@ -33,10 +33,10 @@ public class VersionConsistencyOndemandSetupImplTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
 	@Test
-	public void testCalcScope() {
-		Scope scope = vc.calcScope();
+	public void testCalcScopeString() {
+		Scope scope = vc.calcScope("src/test/resources/Conup.xml");
 		Set<String> allCompnents = scope.getAllComponents();
 		for (String string : allCompnents) {
 			System.out.println(string);
