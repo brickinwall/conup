@@ -1,6 +1,10 @@
 package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import static org.junit.Assert.*;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +25,14 @@ public class TxLifecycleManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		txLifecycleMgr = new TxLifecycleManager();
+		if(txLifecycleMgr.getTxs() != 0){
+			Map<String, TransactionContext> txCtxs = txLifecycleMgr.TX_IDS;
+			Iterator<Entry<String, TransactionContext>> iterator = txCtxs.entrySet().iterator();
+			while(iterator.hasNext()){
+				String key = iterator.next().getKey();
+				txLifecycleMgr.destroyID(key);
+			}
+		}
 		
 		nodeMgr = NodeManager.getInstance();
 		
