@@ -108,10 +108,10 @@ public class TuscanyProgramAnalyzerTest {
 			byte[] b = cw.toByteArray();
 			try {
 				FileOutputStream fout = new FileOutputStream(new File(
-						"/home/PortalServiceImpl.class"));				
+						"src/test/resources/PortalServiceImpl.class"));				
 				fout.write(b);
 				fout.close();
-				tuscanyProgramAnalyzer.showClassSource("/home/PortalServiceImpl.class");
+				tuscanyProgramAnalyzer.showClassSource("src/test/resources/PortalServiceImpl.class");
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println(e);
