@@ -242,26 +242,21 @@ public class TranquillityImpl implements Algorithm {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(currentComp);
 		TransactionContext txCtx = null;
-		Iterator<Entry<String, TransactionContext>>  txIterator = depMgr.getTxs().entrySet().iterator();
-		while(txIterator.hasNext()){
-			txCtx = txIterator.next().getValue();
-			if(txCtx.getParentTx().equals(rootTx) ){
-				txIterator.remove();
+		
+		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		synchronized (ondemandSyncMonitor) {
+			Iterator<Entry<String, TransactionContext>>  txIterator = depMgr.getTxs().entrySet().iterator();
+			while(txIterator.hasNext()){
+				txCtx = txIterator.next().getValue();
+				if(txCtx.getParentTx().equals(rootTx) ){
+					txIterator.remove();
+				}
+			}
+			if(txCtx != null){
+				//TODO Bug comes here: the third parameter is extremely confusing.
+				txCtx.getTxDepMonitor().rootTxEnd(currentComp, rootTx, rootTx);
 			}
 		}
-		if(txCtx != null){
-//			txCtx.getTxDepMonitor().rootTxEnd(currentComp, rootTx);
-			//TODO Bug comes here: the third parameter is extremely confusing.
-			txCtx.getTxDepMonitor().rootTxEnd(currentComp, rootTx, rootTx);
-		}
-		
-//		Set<String> targetRef;
-//		targetRef = depMgr.getStaticDeps();
-//		for(String subComp : targetRef){
-//			String payload = TranquillityPayloadCreator.createNormalRootTxEndPayload(currentComp, subComp, rootTx, TranquillityOperationType.NORMAL_ROOT_TX_END);
-//			DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//			depNotifyService.synPost(currentComp, subComp, CommProtocol.TRANQUILLITY, MsgType.DEPENDENCE_MSG, payload);
-//		}
 		
 		return true;
 	}
@@ -291,7 +286,6 @@ public class TranquillityImpl implements Algorithm {
 		
 		//calculate target(sub) components
 		if(scope == null){
-//			scope = calcScope(hostComponent);
 			targetRef.addAll(dynamicDepMgr.getStaticDeps());
 		}
 		else{
@@ -335,10 +329,10 @@ public class TranquillityImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			
-				/* ACK_SUBTX_INIT
-				 * current transaction is not root
-				 * notify parent that a new sub-tx start
-				 */
+			/* ACK_SUBTX_INIT
+			 * current transaction is not root
+			 * notify parent that a new sub-tx start
+			 */
 			if( !parentTx.equals(currentTx) ) {
 				String payload = TranquillityPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), parentTx, TranquillityOperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
@@ -396,30 +390,6 @@ public class TranquillityImpl implements Algorithm {
 				outDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
 				removeAllEdges(hostComponent, currentTx, dynamicDepMgr);
 			}
-			
-//			if(!currentTx.equals(parentTx)){
-//				//need to notify parent sub_tx_end
-//				String payload = TranquillityPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), parentTx, TranquillityOperationType.NOTIFY_SUBTX_END, txContext.getParentTx(), txContext.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.TRANQUILLITY,  MsgType.DEPENDENCE_MSG, payload);
-//				return;
-//			}
-//				/** current tx is root tx */
-//				//start cleanup
-//				//remove lfe,lpe from OES,IES
-//				inDepRegistry.removeDependence(FUTURE_DEP, currentTx, hostComponent, hostComponent);
-//				inDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
-//				outDepRegistry.removeDependence(FUTURE_DEP, currentTx, hostComponent, hostComponent);
-//				outDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
-//				
-//				Set<Dependence> outDepsInODR = outDepRegistry.getDependences();
-////				for(Dependence dep : outDepsInODR){
-////					if(dep.getRootTx().equals(currentTx)){
-//						removeAllEdges(hostComponent, currentTx, dynamicDepMgr);
-////					}
-//					
-////				}
-////			}
 			
 		} else {
 			Set<String> fDeps = txContext.getFutureComponents();
@@ -582,6 +552,7 @@ public class TranquillityImpl implements Algorithm {
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
 		Dependence dependence = new Dependence(PAST_DEP, rootTx, srcComp, targetComp, null, null);
+		LOGGER.fine(PAST_DEP + " create rootTx:" + rootTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 		inDepRegistry.addDependence(dependence);
 		
 		Map<String, TransactionContext> txs = dynamicDepMgr.getTxs();
@@ -620,14 +591,7 @@ public class TranquillityImpl implements Algorithm {
 		
 		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
-//			if(dynamicDepMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
-//System.out.println("in algorithm, wait when ondemand:doNotifySubTxEnd(...)");
-//				try {
-//					ondemandSyncMonitor.wait();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
+			LOGGER.fine("doNotifySubTxEnd rootTx:" + rootTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 			//maintain tx
 			Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
 			TransactionContext txCtx;
@@ -637,6 +601,7 @@ public class TranquillityImpl implements Algorithm {
 			Map<String, TxEventType> subTxStatuses = txCtx.getSubTxStatuses();
 			subTxHostComps.put(subTx, srcComp);
 			subTxStatuses.put(subTx, TxEventType.TransactionEnd);
+//			txCtx.getPastComponents().add(srcComp);
 			
 			if(dynamicDepMgr.getCompStatus().equals(CompStatus.NORMAL))
 				return true;
@@ -690,14 +655,6 @@ public class TranquillityImpl implements Algorithm {
 		
 		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
-//			if(dynamicDepMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
-//System.out.println("in algorithm, wait when ondemand:doAckSubTxInit(...)");
-//				try {
-//					ondemandSyncMonitor.wait();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
 			Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
 			TransactionContext txCtx;
 			txCtx = allTxs.get(parentTxID);
@@ -728,6 +685,7 @@ public class TranquillityImpl implements Algorithm {
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
 		
+		LOGGER.fine(FUTURE_DEP + " remove rootTx:" + rootTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 		inDepRegistry.removeDependence(FUTURE_DEP, rootTx, srcComp, targetComp);
 		
 		return true;
@@ -801,9 +759,30 @@ public class TranquillityImpl implements Algorithm {
 	
 	private boolean removeAllEdges(String hostComponent, String rootTx, DynamicDepManager depMgr){
 		Set<Dependence> rtOutDeps;
+		rtOutDeps = depMgr.getRuntimeDeps();
+
+		TransactionContext curTxCtx = depMgr.getTxs().get(rootTx);
+		Map<String, String> subTxHostComps = curTxCtx.getSubTxHostComps();
+		Iterator<Entry<String, String>> subCompsIterator = subTxHostComps
+				.entrySet().iterator();
+		while (subCompsIterator.hasNext()) {
+			Entry<String, String> subCompEntry = subCompsIterator.next();
+			String subComp = subCompEntry.getValue();
+			Dependence dep = new Dependence(PAST_DEP, rootTx, hostComponent,
+					subComp, null, null);
+			if (!rtOutDeps.contains(dep)) {
+				String payload = TranquillityPayloadCreator
+						.createNormalRootTxEndPayload(hostComponent, subComp,
+								rootTx,
+								TranquillityOperationType.NORMAL_ROOT_TX_END);
+				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+				depNotifyService.synPost(hostComponent, subComp,
+						CommProtocol.TRANQUILLITY, MsgType.DEPENDENCE_MSG,
+						payload);
+			}
+		}
 		
 		//remove deps
-		rtOutDeps = depMgr.getRuntimeDeps();
 		for(Dependence dep : rtOutDeps){
 			if(dep.getRootTx().equals(rootTx) && dep.getType().equals(FUTURE_DEP)
 				&& !dep.getSrcCompObjIdentifier().equals(dep.getTargetCompObjIdentifer())){
@@ -832,8 +811,6 @@ public class TranquillityImpl implements Algorithm {
 				TransactionContext txCtx = entry.getValue();
 //				if (txCtx.getParentTx().equals(rootTx)) {
 				if(txCtx.getCurrentTx().equals(rootTx)){
-//					txCtx.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
-//					txCtx.getTxDepMonitor().rootTxEnd(hostComponent, rootTx, rootTx);
 					txCtx.getTxDepMonitor().rootTxEnd(hostComponent, txCtx.getParentTx(), txCtx.getRootTx());
 					depMgr.getTxs().remove(entry.getKey());
 				}
