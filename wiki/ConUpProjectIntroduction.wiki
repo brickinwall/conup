@@ -8,6 +8,6 @@ The goal of this project is to extend the [http://http://tuscany.apache.org/ Apa
 = Background Information =
 
 Please refer to the following papers for the problem and solutions of dynamic component update:
-  * Version-Consistency
+  * [http://conup.googlecode.com/svn/wiki/esec121-ma.pdf Version-Consistency]
   * Tranquility
   * Quiescence
