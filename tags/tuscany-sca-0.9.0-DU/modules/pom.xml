@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.tuscany.sca</groupId>
+        <artifactId>tuscany-sca</artifactId>
+        <version>0.9.0-DU</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>tuscany-modules</artifactId>
+    <packaging>pom</packaging>
+    <name>Apache Tuscany SCA Implementation Modules</name>
+
+    <modules>
+        <module>assembly</module>
+        <module>assembly-xml</module>
+        <module>assembly-xsd</module>
+        <module>binding-atom</module>
+        <module>binding-atom-runtime</module>
+        <module>binding-comet</module>
+        <!-- This is broken due to changes in the external Maven repos for its dependencies module>binding-comet-runtime</module -->
+        <module>binding-ejb</module>
+        <module>binding-ejb-runtime</module>
+        <module>binding-http</module>
+        <module>binding-http-runtime</module>
+        <module>binding-jms</module>
+        <module>binding-jms-runtime</module>
+        <module>binding-jms-runtime-activemq</module>
+        <module>binding-jsonp</module>
+        <module>binding-jsonp-runtime</module>
+        <module>binding-jsonrpc</module>        
+        <module>binding-jsonrpc-runtime</module>
+        <module>binding-rest</module>
+        <module>binding-rest-runtime</module>
+        <module>binding-rmi</module>
+        <module>binding-rmi-runtime</module>
+        <module>binding-sca-runtime</module>
+		<module>binding-websocket</module>
+        <module>binding-ws</module>
+        <module>binding-ws-runtime-axis2</module>
+        <module>binding-ws-runtime-jaxws</module>
+        <module>binding-ws-runtime-jaxws-ri</module>		
+        <module>binding-ws-wsdlgen</module>
+        <module>builder</module>
+        <module>common-http</module>        
+        <module>common-java</module>
+        <module>common-xml</module>
+        <module>contribution</module>
+        <module>contribution-resource</module>
+        <module>core</module>
+        <module>core-databinding</module>
+        <module>core-spi</module>
+        <module>data-api</module>
+        <module>databinding</module>
+        <module>databinding-axiom</module>
+        <module>databinding-jaxb</module>
+        <module>databinding-jaxb-axiom</module>
+        <module>databinding-sdo</module>
+        <module>databinding-sdo-axiom</module>
+        <module>databinding-json</module>
+        <module>deployment</module>
+        <module>domain-hazelcast</module>
+        <module>domain-node</module>
+        <module>endpoint-tribes</module>
+        <module>extensibility</module>
+        <module>extensibility-equinox</module>
+        <module>host-http</module>
+        <module>host-http-osgi</module>
+        <module>host-jetty</module>
+        <module>host-rmi</module>
+        <module>host-webapp</module>
+        <module>implementation-bpel</module>
+        <module>implementation-bpel-runtime</module>
+        <module>implementation-java</module>
+        <module>implementation-java-runtime</module>
+        <module>implementation-jaxrs</module>
+        <module>implementation-jaxrs-runtime</module>		
+        <module>implementation-python</module>
+        <module>implementation-python-runtime</module>
+        <module>implementation-script</module>
+        <module>implementation-script-runtime</module>		
+        <module>implementation-spring</module>
+        <module>implementation-spring-runtime</module>
+        <module>implementation-spring-webapp</module>
+        <module>implementation-spring-stub</module>
+        <module>implementation-spring-tie</module>
+        <module>implementation-web</module>
+        <module>implementation-web-client</module>
+        <module>implementation-web-runtime</module>
+        <module>implementation-widget</module>
+        <module>implementation-widget-runtime</module>
+        <module>implementation-widget-runtime-dojo</module>
+        <module>interface-java</module>
+        <module>interface-java-jaxrs</module>		
+        <module>interface-java-jaxws</module>
+        <module>interface-wsdl</module>
+        <module>launcher</module>
+        <module>monitor</module>
+        <module>myfaces</module>
+        <module>node-api</module>
+        <module>node-impl</module>
+        <module>node-launcher</module>
+        <module>node-launcher-equinox</module>
+        <module>node-manager</module>
+        <module>policy-logging</module>
+        <module>policy-security</module>
+        <module>policy-security-jsr250</module>
+        <module>policy-transaction</module>
+        <module>policy-transaction-runtime</module>
+        <module>policy-transaction-runtime-geronimo</module>
+        <module>policy-wspolicy</module>        
+        <module>shell</module>
+        <module>sca-api</module>
+        <module>sca-client-impl</module>
+        <!-- module>sca-client-javascript</module -->
+        <module>stripes</module>
+        <module>tracing-aspectj</module>
+        <module>xsd</module>
+        <module>web-javascript</module>
+        <module>web-javascript-dojo</module>
+        <module>wink</module>
+        <!-- OSGi Remote Services with SCA -->
+        <module>contribution-osgi</module>
+        <module>implementation-osgi</module>
+        <module>implementation-osgi-runtime</module>
+        <module>node-impl-osgi</module>
+
+        <module>host-corba</module>
+        <module>host-corba-jee</module>
+        <module>host-corba-jse</module>
+        <module>host-corba-jse-tns</module>
+        <module>binding-corba</module>
+        <module>binding-corba-runtime</module>
+
+        <!-- Composite diagram generator -->
+        <module>composite-diagram</module>
+
+        <!-- 
+            Runtime collection features 
+
+            Non-overallapping groups of Tuscany modules that define the 
+            core runtime modules, containing the Tuscany extension SPI, 
+            and the base runtime that defines the minimal Tuscany runtime
+            to which other extensions can be added
+       
+            Extensions are included using maven dependencies on the *-runtime
+            modules in the /modules directory 
+        -->
+        <module>core-runtime-pom</module>
+        <module>base-runtime</module>
+        <module>base-runtime-pom</module>
+        <module>osgi-runtime-pom</module>
+
+		<module>conup-communication</module>
+		<module>conup-communication-api</module>
+		<module>conup-core</module>
+		<module>conup-preprocessor</module>
+		<module>conup-remote-configuration</module>
+		<module>conup-spi</module>
+		<module>conup-trace</module>
+		<module>conup-tuscany-extension</module>
+
+    </modules>
+
+    <profiles>
+         <profile>
+            <id>eclipse</id>
+            <build>
+                <defaultGoal>org.apache.tuscany.maven.plugins:maven-bundle-plugin:eclipse</defaultGoal>
+                <!--
+                <plugins>
+	            <plugin> 	 
+	                <groupId>org.apache.tuscany.maven.plugins</groupId> 	 
+	                <artifactId>maven-bundle-plugin</artifactId> 	 
+	                <version>1.0.6</version> 	 
+	                <extensions>true</extensions> 	 
+	                <executions> 	 
+	                    <execution> 	 
+	                        <id>generate-pde</id> 	 
+	                        <phase>generate-resources</phase> 	 
+	                        <goals> 	 
+	                                <goal>eclipse</goal> 	 
+	                        </goals> 	 
+	                        <configuration> 	 
+	                        </configuration> 	 
+	                    </execution> 	 
+	                </executions> 	 
+	            </plugin> 	 
+              </plugins>
+              -->
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+               <plugin>
+                   <artifactId>maven-jar-plugin</artifactId>
+                   <configuration>
+                       <archive>
+                           <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
+                       </archive>
+                   </configuration>
+               </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-source-plugin</artifactId>
+               <version>2.1.1</version>
+               <executions>
+                  <execution>
+                     <id>attach-sources</id>
+                     <goals>
+                        <goal>jar-no-fork</goal>
+                     </goals>
+                  </execution>
+               </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
