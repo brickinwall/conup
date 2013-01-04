@@ -4,7 +4,7 @@
     
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-sample-db</artifactId>
-    <version>0.9.0-DU</version>
+    <version>0.9.1-DU-SNAPSHOT</version>
     <name>conup-sample-db</name>
     <description>sample-conup-sample-db</description>
 
@@ -12,12 +12,12 @@
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-host-jetty</artifactId>
-            <version>0.9.0-DU</version>
+            <version>0.9.1-DU-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
-            <version>0.9.0-DU</version>
+            <version>0.9.1-DU-SNAPSHOT</version>
              <exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -34,17 +34,17 @@
         <dependency>
         	<groupId>org.apache.tuscany.sca</groupId>
         	<artifactId>tuscany-domain-hazelcast</artifactId>
-        	<version>0.9.0-DU</version>
+        	<version>0.9.1-DU-SNAPSHOT</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-trace</artifactId>
-        	<version>0.9.0-DU</version>
+        	<version>0.9.1-DU-SNAPSHOT</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-communication-api</artifactId>
-        	<version>0.9.0-DU</version>
+        	<version>0.9.1-DU-SNAPSHOT</version>
         </dependency>
 	</dependencies>
 
