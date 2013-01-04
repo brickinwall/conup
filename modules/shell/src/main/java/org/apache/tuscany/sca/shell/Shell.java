@@ -30,17 +30,13 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.assembly.Binding;
-import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Composite;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.SCABinding;
@@ -51,28 +47,24 @@ import org.apache.tuscany.sca.contribution.Contribution;
 import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
 import org.apache.tuscany.sca.extensibility.ServiceDeclaration;
 import org.apache.tuscany.sca.extensibility.ServiceDiscovery;
-import org.apache.tuscany.sca.impl.DeployedComposite;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
 import org.apache.tuscany.sca.runtime.ContributionDescription;
 import org.apache.tuscany.sca.runtime.DomainRegistry;
-import org.apache.tuscany.sca.runtime.RuntimeComponent;
 import org.apache.tuscany.sca.runtime.Version;
 import org.apache.tuscany.sca.shell.jline.JLine;
 
-import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.apppre.TuscanyProgramAnalyzer;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
-
+import cn.edu.nju.moon.conup.container.VcContainer;
+import cn.edu.nju.moon.conup.container.VcContainerImpl;
+import cn.edu.nju.moon.conup.def.NodeHolder;
+import cn.edu.nju.moon.conup.pre.ProgramAnalyzer;
 
 /**
  * A little SCA command shell.
  */
 public class Shell {
-	private static final Logger LOGGER = Logger.getLogger(Shell.class.getName());
+
     private boolean useJline;
     final List<String> history = new ArrayList<String>();
     private TuscanyRuntime runtime;
@@ -87,10 +79,9 @@ public class Shell {
     public static void main(final String[] args) throws Exception {
         boolean useJline = true;
         boolean requirePreprocessor = true;
-//        boolean requireContainer = true;
+        boolean requireContainer = true;
         String domainURI = "uri:default";
         String compositeFileName = null;
-        NodeManager nodeMgr = NodeManager.getInstance();
         
         boolean showHelp = false;
         String contribution = null;
@@ -104,6 +95,8 @@ public class Shell {
             	nodeXML = s.substring("-nodeXML:".length());
             } else if("-noPreprocessor".equals(s)){
             	requirePreprocessor = false;
+            } else if("-noContainer".equals(s)){
+            	requireContainer = false;
             } else {
                 if (s.startsWith("uri:") || s.startsWith("properties:")) {
                     domainURI = s;
@@ -115,65 +108,79 @@ public class Shell {
             }
         }
         Shell shell;
-		if (nodeXML != null) {
-			shell = new Shell(new File(nodeXML), useJline);
-		} else {
-			shell = new Shell(domainURI, useJline);
-			if (showHelp || contribution == null) {
-				shell.help(null);
-			}
-			if (contribution != null) {
-				// added for conup
-				File file = new File(contribution);
-				String absContributionPath = file.getAbsolutePath();
-
-				System.out.println("Try to preprocess source code...");
-				if(!absContributionPath.contains("conup-sample-visitor"))
-					requirePreprocessor = false;
-				// preprocess
-//				if (!absContributionPath.contains("conup-sample-visitor")) {
-					if (requirePreprocessor) {
-						TuscanyProgramAnalyzer analyzer;
-						analyzer = new TuscanyProgramAnalyzer();
-						analyzer.analyzeApplication(absContributionPath,
-								absContributionPath);
-						System.out.println("Preprocessing is done...");
-					} else {
-						System.out.println("Skipped preprocessing...");
-					}
-
-					System.out.println();
-					System.out.println("install " + contribution + " -start");
-					String curi = shell.getNode().installContribution(contribution);
-					shell.getNode().startDeployables(curi);
-
-					Node node = shell.getNode();
-					Map<String, DeployedComposite> startedComposites = ((NodeImpl)node).getStartedComposites();
-					Iterator<Entry<String, DeployedComposite>> iterator = startedComposites.entrySet().iterator();
-					while(iterator.hasNext()){
-						Entry<String, DeployedComposite> entry = iterator.next();
-						String uri = entry.getKey();
-						DeployedComposite deployComposite = entry.getValue();
-						if(uri.contains(curi)){
-							Composite composite = deployComposite.getBuiltComposite();
-							List<Component> components = composite.getComponents();
-							for(Component comp : components){
-								RuntimeComponent runtimeComponent = (RuntimeComponent)comp;
-								String componentName = runtimeComponent.getName();
-								nodeMgr.loadConupConf(componentName, "Version");
-								CompLifecycleManager.getInstance(componentName).setNode(node);
-							    CommServerManager.getInstance().start(componentName);
-							}
-						}
-					}
-					
-					 //launch DepRecorder
-			        DepRecorder depRecorder;
-			        depRecorder = DepRecorder.getInstance();
-					
-//				}// END IF
-			}
-		}
+        if (nodeXML != null) {
+            shell = new Shell(new File(nodeXML), useJline);
+        } else {
+            shell = new Shell(domainURI, useJline);
+            if (showHelp || contribution==null) {
+            	shell.help(null);
+            }
+            if (contribution != null) {
+            	//added for conup
+                File file = new File(contribution);
+                String absContributionPath = file.getAbsolutePath();
+                
+                System.out.println("Try to preprocess source code...");
+                //preprocess
+//                if(!absContributionPath.contains("conup-domain-manager")
+//                	&& !absContributionPath.contains("conup-sample-visitor")){
+                if(requirePreprocessor){
+                	if(!absContributionPath.contains("conup-domain-manager")){
+                		ProgramAnalyzer analyzer;
+                        analyzer = new ProgramAnalyzer();
+                        analyzer.analyzeApplication(absContributionPath, absContributionPath);
+                        
+                        System.out.println("Preprocessing is done...");
+                	} else{
+                		System.out.println("Skip preprocessing...");
+                	}
+                	
+                } else {
+                	System.out.println("Skip preprocessing...");
+                }
+                
+                
+                System.out.println();
+                System.out.println("install " + contribution + " -start");
+                String curi = shell.getNode().installContribution(contribution);
+                shell.getNode().startDeployables(curi);
+                
+                Node node = shell.getNode();
+                if(requireContainer){
+                	 //added for conup
+                    Contribution cont = node.getContribution(curi);
+                    List<Composite> composites = cont.getDeployables();
+                    Composite composite = composites.get(0);
+                    String componentName = null;
+                    String compositeName = null;
+                    //get component name
+                    componentName = composite.getComponents().get(0).getName();
+                    compositeName = composite.getURI();
+                    if(compositeFileName == null){
+                    	compositeFileName = compositeName;
+                    }
+                    System.out.println("absContributionPath: " + absContributionPath);
+                    System.out.println("compositeFileName: " + compositeFileName);
+                    //get VcContainer
+                    String compositeLocation = curi + File.separator + compositeName;
+                    if(!absContributionPath.contains("conup-domain-manager")){
+                    	VcContainer container = VcContainerImpl.getInstance();
+                        container.setBusinessComponentName(componentName, compositeLocation, 
+                        		absContributionPath, compositeFileName, domainURI);
+//                        container.analyseNodeComposite(compositeLocation);
+                        //add current business node to container
+                        container.setBusinessNode(node, componentName);
+                    }
+                }//END IF
+                if(absContributionPath.contains("conup-domain-manager")){
+                	NodeHolder nodeHolder = null;
+                	nodeHolder = NodeHolder.getInstance();
+                	nodeHolder.setNode(node);
+                }
+               
+            }//END IF
+        }
+        
         shell.run();
     }
 
@@ -941,5 +948,6 @@ public class Shell {
         out.println("      -nojline    (optional) use plain Java System.in/out instead of JLine");
         out.println("                             (no tab completion or advanced line editing will be available)");
         out.println("      -noPreprocessor(optional) don't execute conup-preprocess");
+        out.println("      -noContainer(optional)  don't create a VcContainer for the contribution");
     }
 }

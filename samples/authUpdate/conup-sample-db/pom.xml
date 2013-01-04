@@ -4,26 +4,48 @@
     
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-sample-db</artifactId>
-    <version>0.9.1-DU-SNAPSHOT</version>
+    <version>2.0-DU</version>
     <name>conup-sample-db</name>
-    <description>sample-conup-sample-db</description>
 
 	<dependencies>
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-host-jetty</artifactId>
-            <version>0.9.1-DU-SNAPSHOT</version>
-        </dependency>
+            <version>2.0-DU</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tuscany.sca</groupId>
+                    <artifactId>tuscany-core-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>   
+        <dependency>
+        	<groupId>org.apache.tuscany.sca</groupId>
+        	<artifactId>tuscany-common-java</artifactId>
+        	<version>2.0-DU</version>
+        </dependency>         
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
-            <version>0.9.1-DU-SNAPSHOT</version>
-             <exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
+            <version>2.0-DU</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <version>2.6</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -34,17 +56,38 @@
         <dependency>
         	<groupId>org.apache.tuscany.sca</groupId>
         	<artifactId>tuscany-domain-hazelcast</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>2.0-DU</version>
         </dependency>
+        <dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.20</version>
+		</dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-trace</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>2.0-DU</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
-        	<artifactId>conup-communication-api</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<artifactId>conup-container</artifactId>
+        	<version>2.0-DU</version>
+        </dependency>
+        <dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-printer</artifactId>
+        	<version>2.0-DU</version>
+        </dependency>
+        <dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-buffer</artifactId>
+        	<version>2.0-DU</version>
+        </dependency>
+
+        <dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-preprocessor</artifactId>
+        	<version>2.0-DU</version>
         </dependency>
 	</dependencies>
 
@@ -90,16 +133,14 @@
                     </lifecycleMappingMetadata>
                 </configuration>
             </plugin>
-	<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-
+	   <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                        <source>1.6</source>
+                                        <target>1.6</target>
+                                </configuration>
+                        </plugin>
         </plugins>
     </pluginManagement>
 

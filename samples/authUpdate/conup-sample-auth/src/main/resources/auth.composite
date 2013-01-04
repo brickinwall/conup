@@ -10,11 +10,11 @@
 		 
 	<component name="AuthComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl" />
-		<service name="TokenService" requires="trace" policySets="traceBindingPolicySet">
+		<service name="TokenService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/TokenService" />
 		</service>
 		
-		<service name="VerificationService" requires="trace" policySets="traceBindingPolicySet">
+		<service name="VerificationService" requires="trace buffer" policySets="traceBindingPolicySet bufferBindingPolicySet">
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/VerificationService" />
 		</service>
 	</component>

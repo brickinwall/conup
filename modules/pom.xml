@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.tuscany.sca</groupId>
         <artifactId>tuscany-sca</artifactId>
-        <version>0.9.1-DU-SNAPSHOT</version>
+        <version>2.0-DU</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>tuscany-modules</artifactId>
@@ -168,15 +168,13 @@
         <module>base-runtime</module>
         <module>base-runtime-pom</module>
         <module>osgi-runtime-pom</module>
-
-		<module>conup-communication</module>
-		<module>conup-communication-api</module>
-		<module>conup-core</module>
+		<module>conup-buffer</module>
+		<module>conup-container</module>
+		<module>conup-data-model</module>
+		<module>conup-domain-manager</module>
 		<module>conup-preprocessor</module>
-		<module>conup-remote-configuration</module>
-		<module>conup-spi</module>
+		<module>conup-printer</module>
 		<module>conup-trace</module>
-		<module>conup-tuscany-extension</module>
 
     </modules>
 

@@ -1,23 +1,25 @@
 package cn.edu.nju.moon.conup.sample.proc.services;
 
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
-import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
+import cn.edu.nju.moon.conup.def.VcTransaction;
+import cn.edu.nju.moon.conup.listener.ComponentListener;
+import cn.edu.nju.moon.conup.listener.ComponentListenerImpl;
 
 @Service(ProcService.class)
 public class ProcServiceImpl implements ProcService {
 	private VerificationService verify;
 	private DBService db;
-	String version = "version.1";
+
 	public VerificationService getVerify() {
 		return verify;
 	}
-
 	@Reference
 	public void setVerify(VerificationService verify) {
 		this.verify = verify;
@@ -31,65 +33,47 @@ public class ProcServiceImpl implements ProcService {
 	public void setDb(DBService db) {
 		this.db = db;
 	}
-
-	@ConupTransaction
-	public String process(String exeProc, String token, String data) {
-		String threadID = getThreadID();
-		InterceptorCache interceptorCache = InterceptorCache.getInstance("ProcComponent");
-		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
-		String rootTx = txContextInCache.getRootTx();
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance("ProcComponent");
-//		exeRecorder.addAction(rootTx, exeProc);
-//		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
-		exeProc += ", ProcComponent.process." + version;
+	@VcTransaction
+	public List<String> process(String token, String data) {
+//		ComponentListener listener = ComponentListenerImpl.getInstance();
+//		Set<String> futureC = new HashSet<String>();
+//		futureC.add("DBComponent");
+//		futureC.add("AuthComponent");
+//		Set<String> pastC = new HashSet<String>();
+//		String threadID = new Integer(Thread.currentThread().hashCode()).toString();
+//		
+//		listener.notify("start", threadID, futureC, pastC);
+//		listener.notify("running", threadID, futureC, pastC);
 		
-		exeProc = verify.verify(exeProc, token);
+		Boolean authResult = verify.verify(token);
 		
-		exeProc = db.dbOperation(exeProc);
+//		futureC.remove("AuthComponent");
+//		pastC.add("AuthComponent");
 		
-		exeRecorder.addAction(rootTx, exeProc);
-		
-		return exeRecorder.getAction(rootTx);
-		
-		//test dynamic update
-//		testUpdate();
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
-//		if (authResult) {
-//
-//			List<String> result = db.dbOperation(exeProc);
-//			return result;
-//		} else {
-//			return null;
-//		}
+//		listener.notify("running", threadID, futureC, pastC);
+		if (authResult) {
+			List<String> result = db.dbOperation();
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
+//			printContainerInfo();
+			return result;
+		} else{
+//			futureC.remove("DBComponent");
+//			pastC.add("DBComponent");
+//			listener.notify("end", threadID, futureC, pastC);
+//			printContainerInfo();
+			return null;
+		}
 	}
 	
-	private void testUpdate() {
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-				String targetIdentifier = "AuthComponent";
-				int port = 18082;
-				String baseDir = "/home/nju/deploy/sample/update";
-				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
-				String contributionUri = "conup-sample-auth";
-				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-				
-			}
-		});
-		
-		thread.start();
-	}
-	
-	private String getThreadID(){
-		return new Integer(Thread.currentThread().hashCode()).toString();
-	}
+//	private void printContainerInfo(){
+//		System.out.println("In ProcServiceImpl.printContainerInfo()...");
+//		ContainerPrinter containerPrinter = new ContainerPrinter();
+//		containerPrinter.printInArcRegistry(InArcRegistryImpl.getInstance());
+//		containerPrinter.printOutArcRegistry(OutArcRegistryImpl.getInstance());
+//		System.out.println("outArcRegistry" + OutArcRegistryImpl.getInstance());
+//		containerPrinter.printTransactionRegistry(TransactionRegistryImpl.getInstance());
+//	}
+
 }

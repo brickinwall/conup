@@ -34,6 +34,9 @@ import org.apache.tuscany.sca.shell.jline.CompositeURICompletor;
 import org.apache.tuscany.sca.shell.jline.ICURICompletor;
 import org.apache.tuscany.sca.shell.jline.RemoteNodeCompletor;
 
+import cn.edu.nju.moon.conup.container.VcContainer;
+import cn.edu.nju.moon.conup.container.VcContainerImpl;
+import cn.edu.nju.moon.conup.def.NodeHolder;
 
 public class Start implements Command {
 
@@ -88,36 +91,36 @@ public class Start implements Command {
         }
         
       //added for conup
-//        String curi = args[0];
-//        File file = new File(curi);
-//        String absContributionPath = file.getAbsolutePath();
-//        Node node = shell.getNode();
-//        Contribution cont = node.getContribution(curi);
-//        List<Composite> composites = cont.getDeployables();
-//        Composite composite = composites.get(0);
-//        String componentName = null;
-//        String compositeName = null;
-//        String compositeFileName = null;
-//        //get component name
-//        componentName = composite.getComponents().get(0).getName();
-//        compositeName = composite.getURI();
-//        compositeFileName = args[1];
-//        System.out.println("absContributionPath: " + absContributionPath);
-//        System.out.println("compositeFileName: " + compositeFileName);
-//        //get VcContainer
-//        String compositeLocation = curi + File.separator + compositeName;
-//        if(!absContributionPath.contains("conup-domain-manager")){
-//        	VcContainer container = VcContainerImpl.getInstance();
-//            container.setBusinessComponentName(componentName, compositeLocation, 
-//            		absContributionPath, compositeFileName, shell.getCurrentDomain());
-////            container.analyseNodeComposite(compositeLocation);
-//            //add current business node to container
-//            container.setBusinessNode(node, componentName);
-//        }  else{
-//        	NodeHolder nodeHolder = null;
-//        	nodeHolder = NodeHolder.getInstance();
-//        	nodeHolder.setNode(node);
-//        }
+        String curi = args[0];
+        File file = new File(curi);
+        String absContributionPath = file.getAbsolutePath();
+        Node node = shell.getNode();
+        Contribution cont = node.getContribution(curi);
+        List<Composite> composites = cont.getDeployables();
+        Composite composite = composites.get(0);
+        String componentName = null;
+        String compositeName = null;
+        String compositeFileName = null;
+        //get component name
+        componentName = composite.getComponents().get(0).getName();
+        compositeName = composite.getURI();
+        compositeFileName = args[1];
+        System.out.println("absContributionPath: " + absContributionPath);
+        System.out.println("compositeFileName: " + compositeFileName);
+        //get VcContainer
+        String compositeLocation = curi + File.separator + compositeName;
+        if(!absContributionPath.contains("conup-domain-manager")){
+        	VcContainer container = VcContainerImpl.getInstance();
+            container.setBusinessComponentName(componentName, compositeLocation, 
+            		absContributionPath, compositeFileName, shell.getCurrentDomain());
+//            container.analyseNodeComposite(compositeLocation);
+            //add current business node to container
+            container.setBusinessNode(node, componentName);
+        }  else{
+        	NodeHolder nodeHolder = null;
+        	nodeHolder = NodeHolder.getInstance();
+        	nodeHolder.setNode(node);
+        }
         return true;
     }
 

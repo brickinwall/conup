@@ -6,5 +6,5 @@ import org.oasisopen.sca.annotation.Remotable;
 
 @Remotable
 public interface DBService {
-	String dbOperation(String exeProc);
+	List<String> dbOperation();
 }

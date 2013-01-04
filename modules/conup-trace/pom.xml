@@ -4,15 +4,14 @@
 
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-trace</artifactId>
-	<version>0.9.1-DU-SNAPSHOT</version>
-	<name>conup-trace</name>
-	<description>conup-trace</description>
+	<version>2.0-DU</version>
 
-	<!-- <properties>
+	<name>conup-trace</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<conup.version>2.0.1-DU-SNAPSHOT</conup.version>
-	</properties> -->
-	
+	</properties>
 
 	<dependencies>
 
@@ -22,23 +21,18 @@
 			<version>1.1</version>
 		</dependency>
 
-		<!-- <dependency>
+
+		<dependency>
 			<groupId>net.sourceforge.htmlunit</groupId>
 			<artifactId>htmlunit</artifactId>
 			<version>2.6</version>
 			<scope>test</scope>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.1</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jmock</groupId>
-			<artifactId>jmock-junit4</artifactId>
-			<version>2.5.1</version>
 		</dependency>
 
 		<dependency>
@@ -51,53 +45,11 @@
 			<artifactId>neethi</artifactId>
 			<version>2.0.4</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-core-spi</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-domain-node</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>cn.edu.nju.moon</groupId>
-			<artifactId>conup-tuscany-extension</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
-		</dependency>
-		
-		<!-- <dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-host-jetty</artifactId>
-			<version>2.0.1-DU-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
-			<version>2.0.1-DU-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-domain-node</artifactId>
-			<version>2.0.1-DU-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-domain-hazelcast</artifactId>
-			<version>2.0.1-DU-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency> -->
-		
-		<dependency>
-			<groupId>org.apache.tuscany.sca</groupId>
-			<artifactId>tuscany-core</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
-			<scope>test</scope>
+			<groupId>cn.edu.nju.moon</groupId>
+			<artifactId>conup-data-model</artifactId>
+			<version>2.0-DU</version>
 		</dependency>
 	</dependencies>
 
@@ -147,22 +99,13 @@
 				</plugin>
 
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.0</version>
-					<configuration>
-						<tagBase>https://conup.googlecode.com/svn/tags</tagBase>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.2</version>
-					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
-					</configuration>
-				</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 
 			</plugins>
 		</pluginManagement>

@@ -2,9 +2,14 @@ package cn.edu.nju.moon.conup.trace;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
+
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
@@ -16,16 +21,9 @@ import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.invocation.PhasedInterceptor;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
-import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.def.InterceptorCache;
+import cn.edu.nju.moon.conup.def.InterceptorCacheImpl;
+import cn.edu.nju.moon.conup.def.TransactionDependency;
 
 
 public class TracePolicyInterceptor implements PhasedInterceptor {
@@ -39,12 +37,10 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	} 
 	
 	/** The identifier of root transaction in Message header. */
-//	private static String rootIdentifier = "RootVcTransaction";
+	private static String rootIdentifier = "RootVcTransaction";
 	/** The identifier of parent transaction in Message header. */
-//	private static String parentIdentifier = "ParentVcTransaction";
+	private static String parentIdentifier = "ParentVcTransaction";
 	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
-	private static String HOSTIDENTIFIER = "HostIdentifier";
-	private static String COMP_CLASS_OBJ_IDENTIFIER = "COMP_CLASS_OBJ_IDENTIFIER";
 
 	private Invoker next;
 	private Operation operation;
@@ -61,8 +57,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		this.subject = subject;
 		this.phase = phase;
 		this.context = getContext();
-		
 		init();
+		// System.out.println("TracePolicyInterceptor...");
 	}
 
 	private void init() {
@@ -87,6 +83,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	}
 
 	public void setNext(Invoker next) {
+//		System.out.println("TracePolicyInterceptor.setNext()=" + next);
 		this.next = next;
 	}
 
@@ -107,182 +104,28 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * 
 	 * */
 	public Message invoke(Message msg) {
-		LOGGER.fine("operation =" + operation.toString());
-		msg = exchangeViaMsgBody(msg);
+		//ignore messages that is passing through communication component
+//		System.out.println(operation.toString() + "\n\n");
+		if(operation.toString().contains("cn.edu.nju.moon.conup.communication.services")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.sample.visitor.services")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.VcService")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.ArcService")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.communication.services.FreenessService")
+			|| operation.toString().contains("cn.edu.nju.moon.conup.domain.services")){
+				return getNext().invoke(msg);
+		} else{
+			LOGGER.fine("operation =" + operation.toString());
+			msg = exchangeViaMsgBody(msg);
+			return getNext().invoke(msg);
+		}//else
 		
-		msg = buffer(msg);
-		
-		return getNext().invoke(msg);
-	}
-
-	private Message buffer(Message msg) {
-		if (phase.equals(Phase.SERVICE_POLICY)) {
-			String compIdentifier = getComponent().getName();
-			NodeManager nodeMgr = NodeManager.getInstance();
-			DynamicDepManager depMgr = nodeMgr
-					.getDynamicDepManager(compIdentifier);
-			CompLifecycleManager clMgr;
-			clMgr = CompLifecycleManager.getInstance(compIdentifier);
-			String hostComp;
-			String threadID;
-			hostComp = getComponent().getName();
-			InterceptorCache cache = InterceptorCache.getInstance(hostComp);
-			threadID = getThreadID();
-			TransactionContext txCtx = cache.getTxCtx(threadID);
-			
-//			System.out.println("\n\n\n ThreadID=" + getThreadID() + ", in buffer, compStatus=" + depMgr.getCompStatus() + " \n\n\n");
-
-			if (depMgr.isNormal()) {
-				TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-				return msg;
-			}
-
-			// waiting during on-demand setup
-			Object syncMonitor = depMgr.getOndemandSyncMonitor();
-			synchronized (syncMonitor) {
-				try {
-					if (depMgr.isOndemandSetting()) {
-						LOGGER.warning("ThreadID=" + getThreadID() + "----------------syncMonitor.wait();buffer------------");
-						syncMonitor.wait();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			String freenessConf = depMgr.getCompObject().getFreenessConf();
-			FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
-			if(freeness == null){
-				throw new NullPointerException("NullPointerException because freeness == null");
-			}
-			if(txCtx == null){
-//				getNext().invoke(msg);
-				throw new NullPointerException("NullPointerException because txCtx == null");
-			}
-
-			// haven't received update request yet
-			Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
-			synchronized (waitingRemoteCompUpdateDoneMonitor) {
-				if (clMgr.getUpdateCtx() == null || clMgr.getUpdateCtx().isLoaded() == false) {
-//					System.out.println("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
-					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), compIdentifier, txCtx, false)){
-						try {
-							waitingRemoteCompUpdateDoneMonitor.wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-					return msg;
-				}
-			}
-			
-			// try to be ready for update
-			Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
-			synchronized (validToFreeSyncMonitor) {
-				if(depMgr.getCompStatus().equals(CompStatus.VALID)
-					&& clMgr.getUpdateCtx() != null && clMgr.getUpdateCtx().isLoaded() ){
-					// add root tx to
-					TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-					// calculate old version root txs
-					if (!clMgr.getUpdateCtx().isOldRootTxsInitiated()) {
-						clMgr.initOldRootTxs();
-//						Printer printer = new Printer();
-//						printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
-					}
-					if (!freeness.isReadyForUpdate(hostComp)) {
-//						System.out.println("ThreadID=" + getThreadID()
-//								+ "compStatus=" + depMgr.getCompStatus()
-//								+ ", in buffer, try to be free via "
-//								+ freeness.getFreenessType());
-						Class<?> compClass = freeness.achieveFreeness(
-								txCtx.getRootTx(), txCtx.getRootComponent(),
-								txCtx.getParentComponent(),
-								txCtx.getCurrentTx(), hostComp,
-								UpdateFactory.createFreenessCallback(null));
-						if (compClass != null) {
-							addBufferMsgBody(msg, compClass);
-						}
-					}
-					if (freeness.isReadyForUpdate(hostComp)) {
-						depMgr.achievedFree();
-					} else if (freeness.isInterceptRequiredForFree(
-							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
-						try {
-							TxLifecycleManager.removeRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
-//							clMgr.getUpdateCtx().removeBufferOldRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-							validToFreeSyncMonitor.wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					} else {
-						// clMgr.getUpdateCtx().getBufferOldRootTxs().add(txCtx.getRootTx());
-					}
-				}
-			}
-
-//			// if ready for update
-			Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
-			synchronized (updatingSyncMonitor) {
-				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
-					LOGGER.warning("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + ", in buffer updatingSyncMonitor, is Free for update now, try to execute update...");
-					clMgr.executeUpdate();
-					clMgr.cleanupUpdate();
-				}
-				
-				if (depMgr.isInterceptRequired()) {
-					LOGGER.warning("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------updatingSyncMonitor.wait();buffer------------");
-					try {
-						updatingSyncMonitor.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
-		}// END IF(SERVICE_POLICY)
-		return msg;
-	}
-
-	private void addBufferMsgBody(Message msg, Class<?> compClass) {
-		String className = compClass.getName();
-		List<Object> originalMsgBody;
-		List<Object> copyOfMsgBody = new ArrayList<Object>();
-		originalMsgBody = Arrays.asList((Object [])msg.getBody());
-		copyOfMsgBody.addAll(originalMsgBody);
-		copyOfMsgBody.add(COMP_CLASS_OBJ_IDENTIFIER + ":" + className);
-		copyOfMsgBody.add(compClass);
-		msg.setBody((Object [])copyOfMsgBody.toArray());
-	}
-
-	@Deprecated
-	private Message exchangeViaMsgHeader(Message msg){
-		if (phase.equals(Phase.SERVICE_POLICY)) {
-			System.out.println("\n\n\nservice interceptor: ");
-			System.out.println(msg.getHeaders().get("conup"));
-		} else if(phase.equals(Phase.REFERENCE_POLICY)){
-			System.out.println("\n\n\nreference interceptor: ");
-			System.out.println(msg.getHeaders());
-			msg.getHeaders().put("conup", "testing");
-		} else if(phase.equals(Phase.SERVICE_INTERFACE)){
-			System.out.println("\n\n\n " + Phase.SERVICE_INTERFACE);
-			System.out.println(msg.getHeaders());
-		} else if(phase.equals(Phase.IMPLEMENTATION_POLICY)){
-			System.out.println("\n\n\n " + Phase.IMPLEMENTATION_POLICY);
-			System.out.println(msg.getHeaders());
-		} 
-		
-		return msg;
 	}
 	
-	/**
-	 * This method is supposed to exchange root/parent transaction id via
-	 * Message body.
-	 */
-	public Message exchangeViaMsgBody(Message msg){
+	
+	/* This method is supposed to exchange root/parent transaction id via Message body.
+	 * 
+	 * */
+	private Message exchangeViaMsgBody(Message msg){
 		String currentTx = null;
 		String hostComponent = null;
 		String rootTx = null;
@@ -307,29 +150,28 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		for(Object object : msgBody){
 			if(object.toString().contains(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER)){
 				transactionTag = object.toString();
-				msgBody.remove(object);
+//				msgBody.remove(object);
 				break;
 			}
 		}
 
 		if (phase.equals(Phase.SERVICE_POLICY)) {
-			
+			System.out.println(phase + " " +operation.toString() + "\nTracePolicyInterceptor\n");
 			if(transactionTag==null || transactionTag.equals("")){
 				//an exception is preferred
-				LOGGER.fine("Error: message body cannot be null in a service body");
-			}
-			
-			//get root, parent and current transaction id
-			if(transactionTag != null){
+				rootTx = null;
+				rootComponent = null;
+				parentTx = null;
+				parentComponent = null;
+				
+			}else{
+				//get root, parent and current transaction id
 				String target = getTargetString(transactionTag);
 				String rootInfo = target.split(",")[0];
 				String parentInfo = target.split(",")[1];
-				rootTx = rootInfo.split(":")[0].equals("null") ? null
-						: rootInfo.split(":")[0];
-				rootComponent = rootInfo.split(":")[1].equals("null") ? null
-						: rootInfo.split(":")[1];
-				parentTx = parentInfo.split(":")[0].equals("null") ? null
-						: parentInfo.split(":")[0];
+				rootTx = rootInfo.split(":")[0].equals("null") ? null : rootInfo.split(":")[0];
+				rootComponent = rootInfo.split(":")[1].equals("null") ? null : rootInfo.split(":")[1];
+				parentTx = parentInfo.split(":")[0].equals("null") ? null : parentInfo.split(":")[0];
 				parentComponent = parentInfo.split(":")[1].equals("null") ? null : parentInfo.split(":")[1];
 			}
 			
@@ -337,36 +179,30 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			hostComponent = getComponent().getName();
 			
 			// check interceptor cache
-			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
+			InterceptorCache cache = InterceptorCacheImpl.getInstance();
 			threadID = getThreadID();
-			TransactionContext txContext = cache.getTxCtx(hostComponent);
-			if(txContext == null){
+			LOGGER.fine("threadId: " + threadID);
+			TransactionDependency dependency = cache.getDependency(threadID);
+			if(dependency == null){
 				// generate and init TransactionDependency
-				txContext = new TransactionContext();
-				txContext.setCurrentTx(null);
-				txContext.setHostComponent(hostComponent);
-				txContext.setParentTx(parentTx);
-				txContext.setParentComponent(parentComponent);
-				txContext.setRootTx(rootTx);
-				txContext.setRootComponent(rootComponent);
+				dependency = new TransactionDependency();
+				dependency.setCurrentTx(null);
+				dependency.setHostComponent(hostComponent);
+				dependency.setParentTx(parentTx);
+				dependency.setParentComponent(parentComponent);
+				dependency.setRootTx(rootTx);
+				dependency.setRootComponent(rootComponent);
 				//add to InterceptorCacheImpl
-				cache.addTxCtx(threadID, txContext);
+				cache.setCache(threadID, dependency);
 			} else{
-				txContext.setHostComponent(hostComponent);
+				dependency.setHostComponent(hostComponent);
 			}
-			
-			String hostInfo = TracePolicyInterceptor.HOSTIDENTIFIER + "," + threadID + "," + hostComponent;
-			msgBody.add(hostInfo);
-			msg.setBody((Object [])msgBody.toArray());
-			
 		} else if (phase.equals(Phase.REFERENCE_POLICY)) {
-			
-			hostComponent = getComponent().getName();
 			//get root and parent id from InterceptorCacheImpl
-			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
+			InterceptorCache cache = InterceptorCacheImpl.getInstance();
 			threadID = getThreadID();
-			TransactionContext txContext = cache.getTxCtx(threadID);
-			if(txContext == null){	//the invoked transaction is a root transaction 
+			TransactionDependency dependency = cache.getDependency(threadID);
+			if(dependency == null){	//current transaction is a root transaction 
 				currentTx = null;
 				hostComponent = null;
 				parentTx = null;
@@ -374,17 +210,17 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				rootTx = null;
 				rootComponent = null;
 			} else{
-				rootTx = txContext.getRootTx();
-				rootComponent = txContext.getRootComponent();
-				currentTx = txContext.getCurrentTx();
-				hostComponent = txContext.getHostComponent();
+				rootTx = dependency.getRootTx();
+				rootComponent = dependency.getRootComponent();
+				currentTx = dependency.getCurrentTx();
+				hostComponent = dependency.getHostComponent();
 				parentTx = currentTx;
 				parentComponent = hostComponent;
 			}//else(dependency != null)
 			
-			
 			//generate transaction tag(identifier)
 			String newRootParent;
+//			newRootParent = TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER + "[" + root + "," + parent + "]";
 			newRootParent = TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER + 
 					"[" + rootTx + ":" + rootComponent + 
 					"," + parentTx + ":" + parentComponent + "]";
@@ -396,18 +232,30 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		
 		if(phase.equals(Phase.REFERENCE_POLICY)
 				|| phase.equals(Phase.SERVICE_POLICY)){
+			LOGGER.info(phase + " TraceInterceptor" +
+					"\n\t" + "messageID:" + msg.getMessageID() +
+					"\n\t" + "msgFrom:" + msg.getFrom() +
+					"\n\t" + "msgTo:" + msg.getTo() +
+					"\n\t" + "msgOperation:" + msg.getOperation() +
+					"\n\t" + "threadID:" + threadID +
+					"\n\t" + "rootTx:" + rootTx +
+					"\n\t" + "rootComponent:" + rootComponent +
+					"\n\t" + "parentTx:" + parentTx +
+					"\n\t" + "parentComponent:" + parentComponent + 
+					"\n\t" + "currentTx:" + currentTx + 
+					"\n\t" + "hostComponent:" + hostComponent);
 
 			msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
 			List<Object> copy = new ArrayList<Object>();
 			copy.addAll(msgBodyOriginal);
 			String msgBodyStr = new String();
-			msgBodyStr += "\t" + "Message body:";
+			msgBodyStr += "\t " + phase +" Message body:";
 			for(Object object : copy){
 				String tmp = object.toString();
 				msgBodyStr += "\n\t\t" + tmp;
 			}
 			msgBodyStr += "\n";
-			LOGGER.fine(msgBodyStr);
+			LOGGER.info(msgBodyStr);
 		}
 		
 		
@@ -421,9 +269,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * 
 	 * */
 	private String getTargetString(String raw){
-		if(raw == null){
-			return null;
-		}
 		if(raw.startsWith("\"")){
 			raw = raw.substring(1);
 		}
@@ -432,13 +277,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		int index = raw.indexOf(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER);
 		int head = raw.substring(index).indexOf("[")+1;
-//		System.out.println(raw.substring(0, head));
 		int tail = raw.substring(index).indexOf("]");
-//		System.out.println(raw.substring(head, tail));
 		return raw.substring(head, tail);
 	}
 	
-	/** return current thread ID. */
+	/* return current thread ID. */
 	private String getThreadID(){
 		return new Integer(Thread.currentThread().hashCode()).toString();
 	}

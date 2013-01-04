@@ -29,4 +29,10 @@
 	<sca:policySet name="traceBindingPolicySet" provides="sca:trace" appliesTo="binding">
 	</sca:policySet>
 	
+	<sca:policySet name="bufferImplPolicySet" provides="sca:buffer" appliesTo="implementation">
+	</sca:policySet>
+	
+	<sca:policySet name="bufferBindingPolicySet" provides="sca:buffer" appliesTo="binding">
+	</sca:policySet>
+ 
  </sca:definitions>

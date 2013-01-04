@@ -8,6 +8,6 @@ public interface PortalService {
 
 //	String getToken(String cred);
 //	List<String> process(String token, String data);
-	String execute(String exeProc, String userName, String passwd);
+	List<String> execute(String userName, String passwd);
 	
 }
