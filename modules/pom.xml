@@ -32,15 +32,16 @@
     <modules>
         <module>domain-node</module>
         <module>implementation-java-runtime</module>   
-        <module>shell</module>
+	<module>core-databinding</module>        
+	<module>shell</module>
        	<module>conup-communication</module>
-		<module>conup-communication-api</module>
-		<module>conup-core</module>
-		<module>conup-preprocessor</module>
-		<module>conup-remote-configuration</module>
-		<module>conup-spi</module>
-		<module>conup-trace</module>
-		<module>conup-tuscany-extension</module>
+	<module>conup-communication-api</module>
+	<module>conup-core</module>
+	<module>conup-preprocessor</module>
+	<module>conup-remote-configuration</module>
+	<module>conup-spi</module>
+	<module>conup-trace</module>
+	<module>conup-tuscany-extension</module>
 
     </modules>
 
