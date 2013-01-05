@@ -34,4 +34,22 @@ public class VersionConsistencyOndemandSetupImplTest {
 	public void tearDown() throws Exception {
 	}
 
+	@Test
+	public void testCalcScope() {
+		Scope scope = vc.calcScope();
+		Set<String> allCompnents = scope.getAllComponents();
+		for (String string : allCompnents) {
+			System.out.println(string);
+		}
+		Set<String> comps = new HashSet<String>();
+		comps.add("PortalComponent");
+		comps.add("ProcComponent");
+		comps.add("AuthComponent");
+		assertEquals(comps.size(), allCompnents.size());
+		assertTrue(allCompnents.equals(comps));
+		Set<String> procSubComps = new HashSet<String>();
+		procSubComps.add("AuthComponent");
+		assertTrue(scope.getSubComponents("ProcComponent").equals(procSubComps));
+	}
+
 }

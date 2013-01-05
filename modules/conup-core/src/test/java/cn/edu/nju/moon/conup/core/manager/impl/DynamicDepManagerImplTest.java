@@ -31,5 +31,21 @@ public class DynamicDepManagerImplTest {
 	@Test
 	public void testManageTx() {
 		
+//		ddm = (DynamicDepManagerImpl)nodeManager.getDynamicDepManager("AuthComponent");
+//		ddm.setCompStatus(CompStatus.NORMAL);
+//		
+//		TransactionContext tc = new TransactionContext();
+//		tc.setCurrentTx(UUID.randomUUID().toString());
+//		tc.setEventType(TxEventType.TransactionStart);
+//		tc.setFutureComponents(new HashSet<String>());
+//		tc.setHostComponent("AuthComponent");
+//		tc.setParentComponent("PortalComponent");
+//		String rootTx = UUID.randomUUID().toString();
+//		tc.setParentTx(rootTx);
+//		tc.setPastComponents(new HashSet<String>());
+//		tc.setRootComponent("PortalComponent");
+//		tc.setRootTx(rootTx);
+//		
+//		assertTrue(ddm.manageTx(tc));
 	}
 }

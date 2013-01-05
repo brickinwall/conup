@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.apache.tuscany.sca</groupId>
 		<artifactId>tuscany-sca</artifactId>
-		<version>0.9.1-DU-SNAPSHOT</version>
+		<version>0.9.0-DU</version>
     </parent>
 
     <groupId>org.apache.tuscany.sca.samples</groupId>
     <artifactId>tuscany-samples</artifactId>
-    <version>0.9.1-DU-SNAPSHOT</version>
+    <version>0.9.0-DU</version>
     <packaging>pom</packaging>
     <name>Apache Tuscany SCA Samples</name>
 
