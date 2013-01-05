@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.edu.nju.moon.conup.core.ConventionTest;
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -24,7 +23,7 @@ public class DynamicDepManagerImplTest {
 		final String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
 		ComponentObject compObj = new ComponentObject("AuthComponent", "1.1", 
 				VersionConsistencyImpl.ALGORITHM_TYPE, CONCURRENT_VERSION,
-				null,null, ConventionTest.JAVA_POJO_IMPL_TYPE);
+				null,null, "JAVA_POJO");
 		nodeManager.addComponentObject("AuthComponent", compObj);
 		
 	}
