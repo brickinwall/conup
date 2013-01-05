@@ -4,7 +4,7 @@
 
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-trace</artifactId>
-	<version>0.9.1-DU-SNAPSHOT</version>
+	<version>0.9.0-DU</version>
 	<name>conup-trace</name>
 	<description>conup-trace</description>
 
@@ -47,12 +47,12 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-domain-node</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.0-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-tuscany-extension</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.0-DU</version>
 		</dependency>
 		
 		<dependency>
