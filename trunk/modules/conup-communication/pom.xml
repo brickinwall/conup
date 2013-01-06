@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-communication</artifactId>
-	<version>0.9.1-DU</version>
+	<version>0.9.2-DU-SNAPSHOT</version>
 	<name>conup-communication</name>
 	<description>conup-communication</description>
 
@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>0.9.1-DU</version>
+			<version>0.9.2-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

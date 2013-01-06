@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-tuscany-extension</artifactId>
-	<version>0.9.1-DU</version>
+	<version>0.9.2-DU-SNAPSHOT</version>
 	<name>conup-tuscany-extension</name>
 	<description>conup-tuscany-extension</description>
 
@@ -16,12 +16,12 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-implementation-java-runtime</artifactId>
-			<version>0.9.1-DU</version>
+			<version>0.9.2-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>0.9.1-DU</version>
+			<version>0.9.2-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-domain-node</artifactId>
-			<version>0.9.1-DU</version>
+			<version>0.9.2-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
