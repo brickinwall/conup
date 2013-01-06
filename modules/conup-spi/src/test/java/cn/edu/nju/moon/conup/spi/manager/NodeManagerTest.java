@@ -52,7 +52,8 @@ public class NodeManagerTest {
 	@Test
 	public void testGetDynamicDepManager() {
 		DynamicDepManager depMgr;
-		
+		if(nodeMgr.getComponentObject("AuthComponent") != null)
+			nodeMgr.removeCompObject(compObj);
 		depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
 		assertNull(depMgr);
 		
