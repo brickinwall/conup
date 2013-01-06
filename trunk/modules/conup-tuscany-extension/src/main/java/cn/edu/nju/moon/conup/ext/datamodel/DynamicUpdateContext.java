@@ -28,12 +28,14 @@ public class DynamicUpdateContext {
 	}
 	
 	public void removeAlgorithmOldRootTx(String oldRootTx){
-		System.out.println("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
+		LOGGER.fine("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
+//		System.out.println("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
 		algorithmOldRootTxs.remove(oldRootTx);
 	}
 	
 	public void removeBufferOldRootTx(String oldRootTx){
-		System.out.println("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
+		LOGGER.fine("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
+//		System.out.println("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
 		bufferOldRootTxs.remove(oldRootTx);
 	}
 
@@ -79,10 +81,10 @@ public class DynamicUpdateContext {
 	
 	public boolean isOldRootTxsEquals(){
 		boolean isEquals = false;
-		LOGGER.info("algorithmOldRootTxs.size()=" + algorithmOldRootTxs.size() + 
+		LOGGER.fine("algorithmOldRootTxs.size()=" + algorithmOldRootTxs.size() + 
 				", bufferOldRootTxs.size()=" + bufferOldRootTxs.size());
-		LOGGER.info("algorithmOldRootTxs: " + algorithmOldRootTxs);
-		LOGGER.info("bufferOldRootTxs: " + bufferOldRootTxs);
+		LOGGER.fine("algorithmOldRootTxs: " + algorithmOldRootTxs);
+		LOGGER.fine("bufferOldRootTxs: " + bufferOldRootTxs);
 		if(algorithmOldRootTxs.containsAll(bufferOldRootTxs)
 				&& bufferOldRootTxs.containsAll(algorithmOldRootTxs)){
 			isEquals = true;
