@@ -4,7 +4,7 @@
     
     <groupId>cn.edu.nju.moon</groupId>
     <artifactId>conup-sample-proc</artifactId>
-    <version>0.9.1-DU-SNAPSHOT</version>
+    <version>0.9.1-DU</version>
     <name>conup-sample-proc</name>
     <description>sample-conup-sample-proc</description>
 
@@ -39,17 +39,17 @@
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-trace</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.1-DU</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-communication-api</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.1-DU</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-remote-configuration</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.1-DU</version>
         </dependency>
 	</dependencies>
 
