@@ -27,6 +27,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	private CompStatus compStatus = CompStatus.NORMAL;
 	
+	private Algorithm algorithm = null;
+	
 	@Override
 	public boolean manageTx(TransactionContext txContext) {
 		// TODO Auto-generated method stub
@@ -87,8 +89,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void setAlgorithm(Algorithm algorithm) {
-		// TODO Auto-generated method stub
-
+		this.algorithm = algorithm;
 	}
 
 	@Override
