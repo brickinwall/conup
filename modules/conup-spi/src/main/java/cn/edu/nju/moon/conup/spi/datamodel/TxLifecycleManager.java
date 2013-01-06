@@ -202,9 +202,9 @@ public class TxLifecycleManager {
 		synchronized (OLD_ROOT_TXS) {
 			DynamicDepManager depMgr;
 			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
-			System.out.println("\nOLD_ROOT_TXS,size:" + OLD_ROOT_TXS.size() + " before convertToAlgorithmRoots:" + OLD_ROOT_TXS);
+//			System.out.println("\nOLD_ROOT_TXS,size:" + OLD_ROOT_TXS.size() + " before convertToAlgorithmRoots:" + OLD_ROOT_TXS);
 			Set<String> result = depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS);
-			System.out.println("\ncopyOfOldRootTxs,size:" + result.size() + " after convertToAlgorithmRoots:" + result);
+//			System.out.println("\ncopyOfOldRootTxs,size:" + result.size() + " after convertToAlgorithmRoots:" + result);
 			return result;
 		}
 ////		Set<String> copy = new HashSet<String>();

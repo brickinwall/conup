@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.spi.utils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,16 +20,24 @@ import org.jdom.input.SAXBuilder;
  * @version Nov 29, 2012 7:25:53 PM
  */
 public class XMLUtil {
-//	private String conupXmlPath = "/home/nju/localsvn/conup-spi/src/main/resources/Conup.xml";
-	private String conupXmlPath = "../bin/Conup.xml";
+//	private String conupXmlPath = "/home/rgc/Documents/conup/tags/conup-2.1-DU/distribution/tuscany-sca-2.1-DU/bin/Conup.xml";
+//	private String conupXmlPath = "src/main/resources/Conup.xml";
 	Element root = null;
 
 	public XMLUtil() {
+		//development version
+		String xmlUtilLocation = XMLUtil.class.getResource("").toString();
+//		System.out.println("xmlUtilLocation:" + xmlUtilLocation);
+		int beginIndex = xmlUtilLocation.indexOf(":") + 1;
+		int endIndex = xmlUtilLocation.indexOf("cn/edu/nju/moon/conup/spi/utils/");
+		String conupXmlPath = xmlUtilLocation.substring(beginIndex, endIndex) + "Conup.xml";
+//		System.out.println("conupXmlPath:" + conupXmlPath);
 		
-		String disPath = getDistributionEnvPath();
-		if(disPath != null){
-			conupXmlPath = disPath + "/Conup.xml";
-		}
+		//distribution version
+//		String disPath = getDistributionEnvPath();
+//		if(disPath != null){
+//			conupXmlPath = disPath + "/Conup.xml";
+//		}
 		SAXBuilder sb = new SAXBuilder();
 		try {
 			Document doc = sb.build(conupXmlPath);
