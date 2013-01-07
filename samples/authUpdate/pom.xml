@@ -33,9 +33,10 @@
     <modules>
         <module>conup-sample-auth</module>
         <module>conup-sample-db</module>
-        
         <module>conup-sample-portal</module>
         <module>conup-sample-proc</module>
+	<module>conup-sample-configuration-client</module>
+	<module>conup-sample-visitor</module>
     </modules>
 
 </project>
