@@ -134,6 +134,7 @@
                 -->
 		<module>samples</module>
                 <module>modules</module>
+		<module>distribution</module>
             </modules>
         </profile>
         <!-- ====================================================================== -->
@@ -262,7 +263,7 @@
             	-->
                 <module>samples</module>
                 <module>modules</module>
-                
+                <module>distribution</module>
             </modules>
            <build>
               <plugins>
@@ -352,6 +353,7 @@
             <modules>
                 <module>modules</module>
 		<module>samples</module>
+		<module>distribution</module>
 				<!--
                 <module>samples</module>
                 <module>tutorials</module>
