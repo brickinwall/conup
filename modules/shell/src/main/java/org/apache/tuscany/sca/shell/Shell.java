@@ -128,7 +128,7 @@ public class Shell {
 				String absContributionPath = file.getAbsolutePath();
 
 				System.out.println("Try to preprocess source code...");
-				if(!absContributionPath.contains("conup-sample-visitor"))
+				if(absContributionPath.contains("conup-sample-visitor") || absContributionPath.contains("conup-sample-configuration-client"))
 					requirePreprocessor = false;
 				// preprocess
 //				if (!absContributionPath.contains("conup-sample-visitor")) {
