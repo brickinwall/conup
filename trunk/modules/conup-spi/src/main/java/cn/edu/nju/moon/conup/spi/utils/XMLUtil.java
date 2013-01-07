@@ -21,23 +21,23 @@ import org.jdom.input.SAXBuilder;
  */
 public class XMLUtil {
 //	private String conupXmlPath = "/home/rgc/Documents/conup/tags/conup-2.1-DU/distribution/tuscany-sca-2.1-DU/bin/Conup.xml";
-//	private String conupXmlPath = "src/main/resources/Conup.xml";
+	private String conupXmlPath = "src/main/resources/Conup.xml";
 	Element root = null;
 
 	public XMLUtil() {
 		//development version
-		String xmlUtilLocation = XMLUtil.class.getResource("").toString();
-//		System.out.println("xmlUtilLocation:" + xmlUtilLocation);
-		int beginIndex = xmlUtilLocation.indexOf(":") + 1;
-		int endIndex = xmlUtilLocation.indexOf("cn/edu/nju/moon/conup/spi/utils/");
-		String conupXmlPath = xmlUtilLocation.substring(beginIndex, endIndex) + "Conup.xml";
-//		System.out.println("conupXmlPath:" + conupXmlPath);
+//		String xmlUtilLocation = XMLUtil.class.getResource("").toString();
+////		System.out.println("xmlUtilLocation:" + xmlUtilLocation);
+//		int beginIndex = xmlUtilLocation.indexOf(":") + 1;
+//		int endIndex = xmlUtilLocation.indexOf("cn/edu/nju/moon/conup/spi/utils/");
+//		String conupXmlPath = xmlUtilLocation.substring(beginIndex, endIndex) + "Conup.xml";
+////		System.out.println("conupXmlPath:" + conupXmlPath);
 		
 		//distribution version
-//		String disPath = getDistributionEnvPath();
-//		if(disPath != null){
-//			conupXmlPath = disPath + "/Conup.xml";
-//		}
+		String disPath = getDistributionEnvPath();
+		if(disPath != null){
+			conupXmlPath = disPath + "/Conup.xml";
+		}
 		SAXBuilder sb = new SAXBuilder();
 		try {
 			Document doc = sb.build(conupXmlPath);
