@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.tuscany.sca</groupId>
         <artifactId>tuscany-modules</artifactId>
-        <version>0.9.1-DU-SNAPSHOT</version>
+        <version>0.9.0-DU</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-domain-node</artifactId>
-            <version>0.9.1-DU-SNAPSHOT</version>
+            <version>0.9.0-DU</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
@@ -50,17 +50,17 @@
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-preprocessor</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.0-DU</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-spi</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.0-DU</version>
         </dependency>
         <dependency>
         	<groupId>cn.edu.nju.moon</groupId>
         	<artifactId>conup-communication-api</artifactId>
-        	<version>0.9.1-DU-SNAPSHOT</version>
+        	<version>0.9.0-DU</version>
         </dependency>
     </dependencies>
     
@@ -92,8 +92,7 @@
 							<target>
 								<property name="module.dir" value="modules/" />
 
-								<copy file="target/${project.artifactId}-${project.version}.jar"
-									todir="${env.TUSCANY_HOME}/${module.dir}" />
+								<copy file="target/${project.artifactId}-${project.version}.jar" todir="${env.TUSCANY_HOME}/${module.dir}" />
 
 								<echo>Module tuscany-shell has been created in the TUSCANY_HOME/modules directory.</echo>
 							</target>
