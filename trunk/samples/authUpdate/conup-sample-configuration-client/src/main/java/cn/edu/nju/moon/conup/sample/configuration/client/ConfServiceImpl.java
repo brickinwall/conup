@@ -11,14 +11,14 @@ public class ConfServiceImpl implements ConfService {
 	private static final Logger LOGGER = Logger.getLogger(ConfServiceImpl.class.getName());
 
 	@Override
-	public void ondemand() {
+	public void ondemand(String targetCompIP) {
 		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 		String targetIdentifier = "AuthComponent";
 		int port = 18082;
-		rcs.ondemand("10.0.2.15", port, targetIdentifier, "CONSISTENCY");
+		rcs.ondemand(targetCompIP, port, targetIdentifier, "CONSISTENCY");
 	}
 	@Override
-	public void update(String compIdentifier, String baseDir) {
+	public void update(String targetCompIP, String compIdentifier, String baseDir) {
 		String classFilePath = null;
 		String contributionUri = null;
 		String compsiteUri = null;
@@ -50,7 +50,7 @@ public class ConfServiceImpl implements ConfService {
 		}
 		
 		
-		rcs.update("10.0.2.15", port, compIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+		rcs.update(targetCompIP, port, compIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 	}
 
 }
