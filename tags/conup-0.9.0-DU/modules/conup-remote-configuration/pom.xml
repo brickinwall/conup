@@ -103,10 +103,7 @@
 
 								<delete dir="target/module" />
 								<property name="module.dir" value="modules/${module.path}/" />
-
-								<!-- <copy file="src/main/resources/module/main/module.xml" tofile="${env.TUSCANY_HOME}/${module.dir}/module.xml" /> -->
-								<copy file="target/${project.artifactId}-${project.version}.jar" todir="${env.TUSCANY_HOME}/${module.dir}" />
-
+									<copy file="target/${project.artifactId}-${project.version}.jar" tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
 								<echo>Module ${module.name} has been created in the	TUSCANY_HOME/modules directory.</echo>
 							</target>
 						</configuration>
