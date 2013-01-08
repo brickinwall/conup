@@ -161,7 +161,7 @@ public class XMLUtil {
 				String path = map.get(key);
 				String[] paths = path.split(":");
 				for(String str : paths){
-					if(str.contains("tuscany")){
+					if(str.contains("conup")){
 						disPath = str;
 						break;
 					}
@@ -172,7 +172,7 @@ public class XMLUtil {
 				String path = map.get(key);
 				String[] paths = path.split(";");
 				for(String str : paths){
-					if(str.contains("tuscany")){
+					if(str.contains("conup")){
 						disPath = str;
 						break;
 					}
