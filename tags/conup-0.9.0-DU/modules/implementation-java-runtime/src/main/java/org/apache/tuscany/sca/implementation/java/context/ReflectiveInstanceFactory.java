@@ -41,8 +41,11 @@ public class ReflectiveInstanceFactory<T> implements InstanceFactory<T> {
     //modified for conup
     private Constructor<T> ctr;
     private final ObjectFactory<?>[] ctrArgs;
-    private final Injector<T>[] injectors;
-    private final EventInvoker<T> initInvoker;
+//    change by rgc
+//    private final Injector<T>[] injectors;
+    private Injector<T>[] injectors;
+
+	private final EventInvoker<T> initInvoker;
     private final EventInvoker<T> destroyInvoker;
 	private final Injector<T>[] callbackInjectors;
 
@@ -119,5 +122,12 @@ public class ReflectiveInstanceFactory<T> implements InstanceFactory<T> {
 		this.ctr = ctr;
 	}
     
-    
+	public Injector<T>[] getInjectors() {
+		return injectors;
+	}
+
+	public void setInjectors(Injector<T>[] injectors) {
+		this.injectors = injectors;
+	}
+
 }

@@ -3,6 +3,7 @@ package cn.edu.nju.moon.conup.ext.update;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.apache.tuscany.sca.impl.DeployedComposite;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
 import org.apache.tuscany.sca.implementation.java.impl.JavaImplementationImpl;
+import org.apache.tuscany.sca.implementation.java.injection.FieldInjector;
+import org.apache.tuscany.sca.implementation.java.injection.Injector;
+import org.apache.tuscany.sca.implementation.java.injection.MethodInjector;
 import org.apache.tuscany.sca.implementation.java.invocation.JavaComponentContextProvider;
 import org.apache.tuscany.sca.implementation.java.invocation.JavaImplementationProvider;
 import org.apache.tuscany.sca.provider.ImplementationProvider;
@@ -148,6 +152,27 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 //			}
 			javaImpl.setJavaClass(compClass);
 			instanceFactory.setCtr(compClass.getConstructor());
+			Injector[] injectors = instanceFactory.getInjectors();
+			for(Injector injector : injectors){
+				if(injector instanceof MethodInjector){
+					MethodInjector methodInjector = (MethodInjector) injector;
+					Method oldMethod = methodInjector.getMethod();
+					Method newMethod = compClass.getMethod(oldMethod.getName(), oldMethod.getParameterTypes());
+					methodInjector.setMethod(newMethod);
+				} else if(injector instanceof FieldInjector){
+					FieldInjector fieldInjector = (FieldInjector) injector;
+					Field oldField = fieldInjector.getField();
+					Field newField;
+					try {
+						newField = compClass.getField(oldField.getName());
+						fieldInjector.setField(newField);
+					} catch (NoSuchFieldException e) {
+						e.printStackTrace();
+					}
+				} else{
+					
+				}
+			}
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {

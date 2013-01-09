@@ -214,7 +214,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			if(TxLifecycleManager.getRootTx(rootTxId)  != null)
 				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(rootTxId));
 		}
-		LOGGER.info(completeAction);
+		if(completeAction != null){
+			LOGGER.info(completeAction);
+		}
 		
 		//when a root tx ends, remove it from TxLifecycleManager
 		if(TxLifecycleManager.getRootTx(rootTxId) != null){
@@ -259,7 +261,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			if(TxLifecycleManager.getRootTx(rootTxId)  != null)
 				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(rootTxId));
 		}
-		LOGGER.info(completeAction);
+		if(completeAction != null){
+			LOGGER.info(completeAction);
+		}
 		
 		//when a root tx ends, remove it from TxLifecycleManager
 //		if(TxLifecycleManager.getRootTx(rootTxId) != null){

@@ -33,8 +33,11 @@ import org.apache.tuscany.sca.core.factory.ObjectFactory;
  * @version $Rev: 986676 $ $Date: 2010-08-18 14:52:28 +0100 (Wed, 18 Aug 2010) $
  */
 public class MethodInjector<T> implements Injector<T> {
-    private final Method method;
-    private final ObjectFactory<?> objectFactory;
+	// modified for conup
+	// private final Method method;
+	private Method method;
+
+	private final ObjectFactory<?> objectFactory;
 
     public MethodInjector(Method aMethod, ObjectFactory<?> objectFactory) {
         assert aMethod != null;
@@ -78,6 +81,13 @@ public class MethodInjector<T> implements Injector<T> {
 	public void injectNull(T instance) throws ObjectCreationException {
 		inject(instance, null);		
 	}
+	
+	public Method getMethod() {
+		return method;
+	}
 
+	public void setMethod(Method method) {
+		this.method = method;
+	}
 	
 }
