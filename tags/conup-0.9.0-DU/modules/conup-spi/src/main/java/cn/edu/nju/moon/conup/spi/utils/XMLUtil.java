@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -98,7 +99,8 @@ public class XMLUtil {
 	}
 
 	public Set<String> getChildren(String compIdentifier) {
-		Set<String> childrenComps = new HashSet<String>();
+//		Set<String> childrenComps = new HashSet<String>();
+		Set<String> childrenComps = new ConcurrentSkipListSet<String>();
 		try {
 			Element staticDeps = root.getChild("staticDeps");
 			List compList = staticDeps.getChildren("component");
