@@ -447,8 +447,8 @@ public class CompLifecycleManager {
 			updateCtx.setAlgorithmOldRootTxs(depMgr.getAlgorithmOldVersionRootTxs());
 			updateCtx.setBufferOldRootTxs(TxLifecycleManager.copyOfOldRootTxs(compIdentifier));
 			
-			LOGGER.info("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-			LOGGER.info("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
+			LOGGER.fine("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
+			LOGGER.fine("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 			
 //			System.out.println("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
 //			System.out.println("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
