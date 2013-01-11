@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-communication-api</artifactId>
-	<version>0.9.0-DU</version>
+	<version>0.9.1-DU-SNAPSHOT</version>
 	<name>conup-communication-api</name>
 	<description>conup-communication-api</description>
 
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-communication</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
@@ -38,13 +38,13 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-domain-node</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-tuscany-extension</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
