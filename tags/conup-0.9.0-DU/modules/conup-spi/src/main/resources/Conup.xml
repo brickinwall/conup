@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<conup>
+	<configuration>
+		<algorithm>CONSISTENCY_ALGORITHM</algorithm>
+		<freenessStrategy>CONCURRENT_VERSION_FOR_FREENESS</freenessStrategy>
+		<!-- 
+			TRANQUILLITY_ALGORITHM
+			CONSISTENCY_ALGORITHM 
+			QUIESCENCE_ALGORITHM
+			
+			CONCURRENT_VERSION_FOR_FREENESS 
+			BLOCKING_FOR_FREENESS
+			WAITING_FOR_FREENESS
+		-->
+	</configuration>
+
+	<staticDeps>
+		<component name="PortalComponent">
+			<child>AuthComponent</child>
+			<child>ProcComponent</child>
+		</component>
+	
+		<component name="ProcComponent">
+			<parent>PortalComponent</parent>
+			<child>AuthComponent</child>
+			<child>DBComponent</child>
+		</component>
+		
+		<component name="AuthComponent">
+			<parent>PortalComponent</parent>
+			<parent>ProcComponent</parent>
+		</component>
+		
+		<component name="DBComponent">
+			<parent>ProcComponent</parent>
+		</component>
+	</staticDeps>
+
+</conup>
+
