@@ -30,6 +30,7 @@
     <name>Apache Tuscany SCA Implementation Modules</name>
 
     <modules>
+	<module>core</module>
         <module>domain-node</module>
         <module>implementation-java-runtime</module>   
 	<module>core-databinding</module>        
