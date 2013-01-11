@@ -16,6 +16,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
+
 /**
  * @author rgc
  * @version Nov 29, 2012 7:25:53 PM
@@ -46,7 +48,11 @@ public class XMLUtil {
 		} catch (JDOMException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(disPath == "" || disPath == null){
+				throw new ConupEnvException("TUSCANY_HOME environment is not set!");
+			} else{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -159,28 +165,33 @@ public class XMLUtil {
 		Iterator<String> itr = set.iterator();
 		while (itr.hasNext()) {
 			String key = (String) itr.next();
-			if(key.equals("PATH") && OS.contains("Linux")){
+			if(key.equals("TUSCANY_HOME")){
 				String path = map.get(key);
-				String[] paths = path.split(":");
-				for(String str : paths){
-					if(str.contains("conup")){
-						disPath = str;
-						break;
-					}
-				}
+				disPath = path + "/bin";
 				break;
 			}
-			if(key.equals("Path") && OS.contains("Windows")){
-				String path = map.get(key);
-				String[] paths = path.split(";");
-				for(String str : paths){
-					if(str.contains("conup")){
-						disPath = str;
-						break;
-					}
-				}
-				break;
-			}
+//			if(key.equals("PATH") && OS.contains("Linux")){
+//				String path = map.get(key);
+//				String[] paths = path.split(":");
+//				for(String str : paths){
+//					if(str.contains("conup")){
+//						disPath = str;
+//						break;
+//					}
+//				}
+//				break;
+//			}
+//			if(key.equals("Path") && OS.contains("Windows")){
+//				String path = map.get(key);
+//				String[] paths = path.split(";");
+//				for(String str : paths){
+//					if(str.contains("conup")){
+//						disPath = str;
+//						break;
+//					}
+//				}
+//				break;
+//			}
 		}
 		return disPath;
 	}

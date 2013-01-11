@@ -81,16 +81,11 @@ public class NodeManager{
 				Algorithm algorithm;
 				algorithm = new AlgorithmFactory().createAlgorithm(compObj.getAlgorithmConf());
 				if(algorithm == null){
-					throw new NullPointerException("NullPointerException in NodeManager");
+					throw new NullPointerException("alogrithm should not be null after createAlgorithm(...) in NodeManager");
 				}
 				depMgr.setAlgorithm(algorithm);
 				
-//				FreenessStrategy strategy;
-//				strategy = new AlgorithmFactory().createFreenessStrategy(compObj.getFreenessConf());
-//				depMgr.setFreenessStrategy(strategy);
 			}
-			
-			//TODO read conf.xml, set compStatus
 			
 		}
 		return depMgrs.get(compObj);

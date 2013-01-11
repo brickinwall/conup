@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.core.factory.ObjectCreationException;
 import org.apache.tuscany.sca.core.factory.ObjectFactory;
@@ -35,11 +36,12 @@ import org.apache.tuscany.sca.core.factory.ObjectFactory;
 public class MethodInjector<T> implements Injector<T> {
 	// modified for conup
 	// private final Method method;
+	// private final ObjectFactory<?> objectFactory;
 	private Method method;
 
-	private final ObjectFactory<?> objectFactory;
+	private ObjectFactory<?> objectFactory;
 
-    public MethodInjector(Method aMethod, ObjectFactory<?> objectFactory) {
+	public MethodInjector(Method aMethod, ObjectFactory<?> objectFactory) {
         assert aMethod != null;
         assert objectFactory != null;
         this.method = aMethod;
@@ -88,6 +90,14 @@ public class MethodInjector<T> implements Injector<T> {
 
 	public void setMethod(Method method) {
 		this.method = method;
+	}
+	
+	public ObjectFactory<?> getObjectFactory() {
+		return objectFactory;
+	}
+
+	public void setObjectFactory(ObjectFactory<?> objectFactory) {
+		this.objectFactory = objectFactory;
 	}
 	
 }

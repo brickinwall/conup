@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Composite;
+import org.apache.tuscany.sca.core.factory.ObjectFactory;
+import org.apache.tuscany.sca.core.invocation.WireObjectFactory;
 import org.apache.tuscany.sca.impl.DeployedComposite;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
@@ -150,15 +152,37 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 //			} catch (InvocationTargetException e) {
 //				e.printStackTrace();
 //			}
+			
 			javaImpl.setJavaClass(compClass);
+//			compClass.getf
+			
+//			Method[] methods = compClass.getMethods();
+//			for(Method m : methods){
+//				System.out.println("method:" + m);
+//			}
 			instanceFactory.setCtr(compClass.getConstructor());
 			Injector[] injectors = instanceFactory.getInjectors();
 			for(Injector injector : injectors){
 				if(injector instanceof MethodInjector){
 					MethodInjector methodInjector = (MethodInjector) injector;
 					Method oldMethod = methodInjector.getMethod();
-					Method newMethod = compClass.getMethod(oldMethod.getName(), oldMethod.getParameterTypes());
-					methodInjector.setMethod(newMethod);
+					
+					Method[] methods = compClass.getMethods();
+					Method newMethod = null;
+					for(Method m : methods){
+						if(m.getName().equals(oldMethod.getName())){
+							newMethod = m;
+							break;
+						}
+					}
+					if(newMethod != null){
+						ObjectFactory objFactory = methodInjector.getObjectFactory();
+						if(objFactory instanceof WireObjectFactory){
+							WireObjectFactory wireObjFactory = (WireObjectFactory)objFactory;
+							wireObjFactory.setInterfaze(newMethod.getParameterTypes()[0]);
+						}
+						methodInjector.setMethod(newMethod);
+					}
 				} else if(injector instanceof FieldInjector){
 					FieldInjector fieldInjector = (FieldInjector) injector;
 					Field oldField = fieldInjector.getField();
