@@ -188,7 +188,14 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 					Field oldField = fieldInjector.getField();
 					Field newField;
 					try {
-						newField = compClass.getField(oldField.getName());
+						newField = compClass.getDeclaredField(oldField.getName());
+						// field may be private, need privilege access
+						newField.setAccessible(true);
+						ObjectFactory objFactory = fieldInjector.getObjectFactory();
+						if(objFactory instanceof WireObjectFactory){
+							WireObjectFactory wireObjFactory = (WireObjectFactory)objFactory;
+							wireObjFactory.setInterfaze(newField.getType());
+						}
 						fieldInjector.setField(newField);
 					} catch (NoSuchFieldException e) {
 						e.printStackTrace();
