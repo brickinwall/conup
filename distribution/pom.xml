@@ -12,7 +12,7 @@
 	<version>0.9.1-DU-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Conup distributions</name>
-
+<!--
 	<build>
 		<plugins>
 			<plugin>
@@ -33,5 +33,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
+-->
 </project>
