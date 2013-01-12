@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-core</artifactId>
-            <version>2.0</version>
+            <version>0.9.0-DU</version>
             <scope>compile</scope>
         </dependency>
         
