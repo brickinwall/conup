@@ -34,9 +34,10 @@ import org.apache.tuscany.sca.core.factory.ObjectFactory;
 public class FieldInjector<T> implements Injector<T> {
 //	  modified for conup
 //    private final Field field;
+//	  private final ObjectFactory<?> objectFactory;
 	private Field field;
 
-	private final ObjectFactory<?> objectFactory;
+	private ObjectFactory<?> objectFactory;
 
     /**
      * Create an injector and have it use the given <code>ObjectFactory</code> to inject a value on the instance using
@@ -89,6 +90,14 @@ public class FieldInjector<T> implements Injector<T> {
 
 	public void setField(Field field) {
 		this.field = field;
+	}
+
+	public ObjectFactory getObjectFactory() {
+		return objectFactory;
+	}
+	
+	public void setObjectFactory(ObjectFactory<?> objectFactory) {
+		this.objectFactory = objectFactory;
 	}
 
 }
