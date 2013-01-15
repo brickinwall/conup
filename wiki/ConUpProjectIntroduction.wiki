@@ -12,7 +12,29 @@ Please refer to the following papers for the problem and solutions of dynamic co
   * [http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=4359466 Tranquility]
   * [http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=60317 Quiescence]
 
-= Getting Started =
+= Overall Architecture =
 
+[https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/1.jpg]
+We have extended Tuscany from four points, you can figure out from the aboving figure.
+  * Transaction Management
+Here, Transaction Management includes: the creation of tx id, the lifecycle management of transaction
+  * Local future/past arc management
+  * Interceptor for ack/notify
+  * Component Lifecycle Management
 
-= Sample applications =
+= Overall Conup-Serivce module design =
+In order to make our conup-service module be reusable, we design it as the following figure. 
+[https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/2.jpg]
+Any application server implement our spi in its own implmentation, it can use our conup service to make dynamic update.
+
+= More specific Conup-Serivce module design =
+[https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/3.jpg]
+
+=== Tuscany extension ===
+  * TransactionManager inculdes: TxLifeCycleManager and TxDepMonitor
+    i. TxLifeCycleManager is in charge of the creation of transaction id.
+    ii. TxDepMonitor is used to response to the notification of the inserted code, and take respect action.
+
+  * CompLifeCycleManager is in charge of the lifecycle management of the component(here we extend tuscany component lifecycle to accomdate to the update)
+
+=== Conup SPI ===
