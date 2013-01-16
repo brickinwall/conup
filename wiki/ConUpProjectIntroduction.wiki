@@ -18,14 +18,14 @@ Please refer to the following papers for the problem and solutions of dynamic co
 We have extended Tuscany from four points, you can figure out from the aboving figure.
   * Transaction Management
 Here, Transaction Management includes: the creation of tx id, the lifecycle management of transaction
-  * Local future/past arc management
+  * Local future/past dep management
   * Interceptor for ack/notify
   * Component Lifecycle Management
 
 = Overall Conup-Serivce module design =
 In order to make our conup-service module be reusable, we design it as the following figure. 
 [https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/2.jpg]
-Any application server implement our spi in its own implmentation, it can use our conup service to make dynamic update.
+Any application server implements our spi in its own implmentation, it can use our conup service to make dynamic update.
 
 = More specific Conup-Serivce module design =
 [https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/3.jpg]
@@ -38,3 +38,16 @@ Any application server implement our spi in its own implmentation, it can use ou
   * CompLifeCycleManager is in charge of the lifecycle management of the component(here we extend tuscany component lifecycle to accomdate to the update)
 
 === Conup SPI ===
+Conup spi module is used to make our conup-service more reusable, any application server implements our spi in its own implmentation, it can use our conup service to make dynamic update.
+
+=== Conup core ===
+  * DynamicDependenceManager: manage the local future/past deps
+  * ValidityKeepingAlgorithm: includes three algorithms(Version Consistency, Quiescence, Tranquillity)
+  * OndemandSetup: in order to reduce the overhead of manage the runtime deps, we have implemented ondemand setup to setup the dynamic deps only after receiving update request.
+
+=== Communication ===
+  * RemoteManagement
+provides RemoteConfService and ComponentConfigService, RemoteConfService can send update, ondemand. ComponentConfigService can query component names host by the node, component's status, component's freeness strategy etc.
+
+  * PeerToPeer
+Component uses this module to communicate with peer component, current version only implements DepNotifyService and OndemandDynDepSetupService
