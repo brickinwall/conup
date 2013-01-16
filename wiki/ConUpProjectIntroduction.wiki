@@ -31,8 +31,9 @@ Any application server implements our spi in its own implmentation, it can use o
 [https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/3.jpg]
 
 === Tuscany extension ===
-  * TransactionManager inculdes: TxLifeCycleManager and TxDepMonitor
+  * TransactionManager inculdes:TxLifeCycleManager and TxDepMonitor
     i. TxLifeCycleManager is in charge of the creation of transaction id.
+
     ii. TxDepMonitor is used to response to the notification of the inserted code, and take respect action.
 
   * CompLifeCycleManager is in charge of the lifecycle management of the component(here we extend tuscany component lifecycle to accomdate to the update)
