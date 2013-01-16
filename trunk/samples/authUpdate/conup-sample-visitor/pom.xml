@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-sample-visitor</artifactId>
-	<version>0.9.0-DU</version>
+	<version>0.9.1-DU-SNAPSHOT</version>
 	<name>conup-sample-vistor</name>
 	<description>sample-conup-sample-vistor</description>
 	
@@ -59,17 +59,17 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-domain-node</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-implementation-java-runtime</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-remote-configuration</artifactId>
-			<version>0.9.0-DU</version>
+			<version>0.9.1-DU-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
