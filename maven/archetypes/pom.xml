@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.tuscany.sca</groupId>
+        <artifactId>tuscany-sca</artifactId>
+        <version>0.9.1-DU-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <artifactId>conup-archetype</artifactId>
+    <packaging>pom</packaging>
+    <name>conup Maven Archetypes</name>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <modules>
+                <module>conup-quickstart</module>
+            </modules>
+        </profile>
+    </profiles>    
+
+</project>
