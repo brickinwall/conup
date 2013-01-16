@@ -28,7 +28,7 @@
     <artifactId>authUpdate</artifactId>
     <version>0.9.1-DU-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Dynamic update samples</name>
+    <name>Conup update samples</name>
 
     <modules>
         <module>conup-sample-auth</module>
