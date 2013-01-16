@@ -29,7 +29,7 @@
     <artifactId>tuscany-samples</artifactId>
     <version>0.9.1-DU-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Apache Tuscany SCA Samples</name>
+    <name>Conup Samples</name>
 
     <modules>
         <module>authUpdate</module>
