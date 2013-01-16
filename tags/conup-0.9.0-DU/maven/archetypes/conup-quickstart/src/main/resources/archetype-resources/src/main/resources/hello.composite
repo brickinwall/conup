@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+		
+<composite	xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+		xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		targetNamespace="http://conup"
+		name="conup-hello"
+		 >
+        
+	<component name="MyHelloComponent">
+		<implementation.java class="${package}.HelloWorldServiceImpl" />
+		<service name="HelloWorldService"  requires="trace" policySets="traceBindingPolicySet">
+			<tuscany:binding.jsonrpc uri="http://${ip}:8089/MyHelloComponent/HelloWorldService" />
+		</service>
+	</component>
+	
+</composite>
