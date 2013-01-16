@@ -15,6 +15,7 @@ Please refer to the following papers for the problem and solutions of dynamic co
 = Overall Architecture =
 
 [https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/1.jpg]
+
 We have extended Tuscany from four points, you can figure out from the aboving figure.
   * Transaction Management
 Here, Transaction Management includes: the creation of tx id, the lifecycle management of transaction
@@ -25,6 +26,7 @@ Here, Transaction Management includes: the creation of tx id, the lifecycle mana
 = Overall Conup-Serivce module design =
 In order to make our conup-service module be reusable, we design it as the following figure. 
 [https://conup.googlecode.com/svn/wiki/imgs/ConupProjectIntroduction/2.jpg]
+
 Any application server implements our spi in its own implmentation, it can use our conup service to make dynamic update.
 
 = More specific Conup-Serivce module design =
