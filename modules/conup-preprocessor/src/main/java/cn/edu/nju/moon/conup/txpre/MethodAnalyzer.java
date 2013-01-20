@@ -229,7 +229,7 @@ public class MethodAnalyzer {
 		if (isTransaction(mn, conupTx)) {
 			LOGGER.fine("Begin analyze method:" + mn.name);
 			InsnList insns = mn.instructions;
-			int localNum = mn.localVariables.size();
+			int localNum = mn.maxLocals;
 			if (com.size() == 0) {
 				this.transformWhenNoInvocation(cn, insns, localNum);
 			} 
