@@ -127,7 +127,7 @@ public class CommServerManager {
 					// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
 					String[] infos = deployURI.split(":");
 					ip = infos[1].substring(2);
-					port = Integer.parseInt(infos[2].substring(0, 4)) + 10000;
+					port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;
 					break;
 				} else {
 
