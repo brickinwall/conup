@@ -200,7 +200,7 @@ public class TuscanyProgramAnalyzer {
 					FileInputStream input = new FileInputStream(
 							tempFile.getAbsolutePath());
 					ClassReader cr = new ClassReader(input);
-					ClassNode cn = new ClassNode(ASM4);
+					ClassNode cn = new ClassNode();
 					cr.accept(cn, 0);
 					if (whetherToAnalyze(cn, conupTx)) {
 						LOGGER.fine("Need analyze file:" + tempFile.getName());
