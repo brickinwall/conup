@@ -5,10 +5,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+import org.apache.tuscany.sca.assembly.Binding;
 import org.apache.tuscany.sca.assembly.Component;
+import org.apache.tuscany.sca.assembly.ComponentReference;
+import org.apache.tuscany.sca.assembly.ComponentService;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
 import org.apache.tuscany.sca.assembly.Implementation;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentReferenceImpl;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentServiceImpl;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointImpl;
+import org.apache.tuscany.sca.interfacedef.InterfaceContract;
 import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Invoker;
 import org.apache.tuscany.sca.invocation.Message;
@@ -108,11 +116,83 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * */
 	public Message invoke(Message msg) {
 		LOGGER.fine("operation =" + operation.toString());
-		msg = exchangeViaMsgBody(msg);
 		
-		msg = buffer(msg);
+		if(isCallback(msg)){
+			LOGGER.warning(operation.toString() + " is a Callback operation when interceptor phase is " + phase);
+//			if(operation.toString().contains("searchResultsResponse")){
+//				System.out.println();
+//			}
+			return getNext().invoke(msg);
+		}
+		
+		if(phase.equals(Phase.SERVICE_POLICY) || phase.equals(Phase.REFERENCE_POLICY)){
+			msg = exchangeViaMsgBody(msg);
+			msg = buffer(msg);
+		}
 		
 		return getNext().invoke(msg);
+	}
+	
+	private boolean isCallback(Message msg){
+		boolean isCallback = false;
+		Endpoint endpoint = msg.getTo();
+//		System.out.println(phase);
+		if(endpoint instanceof RuntimeEndpointImpl
+			&& phase.equals(Phase.SERVICE_POLICY)
+			&& getComponent() != null
+			&& getComponent().getReferences() != null){
+			RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
+			String targetUri = rtEp.getDeployedURI();
+			
+//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
+//				System.out.println(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//			}
+			
+			for (ComponentReference compRef : getComponent().getReferences()) {
+				RuntimeComponentReferenceImpl rtCompRef = (RuntimeComponentReferenceImpl) compRef;
+				if (rtCompRef.getCallback() == null
+						|| rtCompRef.getCallback().getBindings() == null)
+					continue;
+				for (Binding binding : rtCompRef.getCallback().getBindings()) {
+					if (targetUri.equals(binding.getURI())) {
+						isCallback = true;
+						break;
+					}
+				}
+				if (isCallback) {
+					break;
+				}
+			}
+			
+		} else if(phase.equals(Phase.REFERENCE_POLICY)
+				&& getComponent() != null
+				&& getComponent().getServices() != null){
+			RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
+			String targetUri = rtEp.getDeployedURI();
+			
+//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
+//				System.out.println(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//			}
+			
+			for (ComponentService compService : getComponent().getServices()) {
+				RuntimeComponentServiceImpl rtCompService = (RuntimeComponentServiceImpl) compService;
+				if (compService.getCallback() == null
+						|| compService.getCallback().getBindings() == null) {
+					continue;
+				}
+				for (Binding binding : compService.getCallback().getBindings()) {
+					if (targetUri.equals(binding.getURI())) {
+						isCallback = true;
+						break;
+					}
+				}
+				if (isCallback) {
+					break;
+				}
+			}
+			
+		}
+		return isCallback;
 	}
 
 	private Message buffer(Message msg) {
