@@ -16,7 +16,6 @@ import org.apache.tuscany.sca.assembly.Implementation;
 import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentReferenceImpl;
 import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentServiceImpl;
 import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointImpl;
-import org.apache.tuscany.sca.interfacedef.InterfaceContract;
 import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Invoker;
 import org.apache.tuscany.sca.invocation.Message;
@@ -33,7 +32,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 
 public class TracePolicyInterceptor implements PhasedInterceptor {
