@@ -64,7 +64,7 @@
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-core</artifactId>
 			<version>0.9.0-DU</version>
-			<scope>test</scope>
+			<!-- <scope>test</scope> -->
 		</dependency>
 	</dependencies>
 
