@@ -62,7 +62,7 @@ public class TuscanyProgramAnalyzer {
 	public boolean addTxLifecycleManager(ClassNode cn) {
 		for (FieldNode fn : (List<FieldNode>) cn.fields) {
 			if (fieldName.equals(fn.name)) {
-				LOGGER.warning("There has already a _txLifecycleMgr in the "
+				LOGGER.info("There has already a _txLifecycleMgr in the "
 						+ cn.name);
 				return false;
 			}
@@ -114,7 +114,7 @@ public class TuscanyProgramAnalyzer {
 				methodtransform.methodTransform(cn, mn, conupTx);
 			}
 		} else {
-			LOGGER.warning("The insert didn't work because the injection of _txLifecycleMgr fails!");
+			LOGGER.info("The insert didn't work because the injection of _txLifecycleMgr fails!");
 		}
 
 	}
