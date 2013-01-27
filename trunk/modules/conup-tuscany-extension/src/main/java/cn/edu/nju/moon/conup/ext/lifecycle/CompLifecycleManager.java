@@ -16,6 +16,7 @@ import org.apache.tuscany.sca.runtime.ActivationException;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
+import cn.edu.nju.moon.conup.ext.utils.PerformanceRecorder;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyOperationType;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
@@ -197,6 +198,7 @@ public class CompLifecycleManager {
 		
 		nodeMgr = NodeManager.getInstance();
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+		PerformanceRecorder.getInstance(compIdentifier).updateReceived(System.nanoTime());
 		
 		synchronized (this) {
 			//If a dynamic update has received, return.
@@ -351,6 +353,9 @@ public class CompLifecycleManager {
 //		}
 		
 		depMgr.dynamicUpdateIsDone();
+		
+		PerformanceRecorder.getInstance(compIdentifier).updateIsDone(System.nanoTime());
+		
 		
 		return true;
 	}
