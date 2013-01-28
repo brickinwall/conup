@@ -37,5 +37,11 @@ public class CompCommAddress {
 	public void setPort(int port) {
 		this.port = port;
 	}
+
+	@Override
+	public String toString() {
+		return "componentIdentifier:" + componentIdentifier
+				+ " ip:" + ip + " port:" + port;
+	}
 	
 }
