@@ -1,10 +1,14 @@
 package cn.edu.nju.conup.comm.api.manager;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.tuscany.sca.assembly.ComponentReference;
 import org.apache.tuscany.sca.assembly.Endpoint;
+import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointReferenceImpl;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.runtime.DomainRegistry;
 
@@ -148,7 +152,13 @@ public class CommServerManager {
 		String ip = null;
 		int port = 0;
 		for (Endpoint ep : endpoints) {
-			if (ep.getComponent().getName().equals(hostComponentIdentifier)) {
+			List<String> compRefName = new ArrayList<String>();
+			for(ComponentReference ref : ep.getComponent().getReferences()){
+				compRefName.add(ref.getName());
+			}
+			String epServiceName = ep.getService().getName();
+			if (ep.getComponent().getName().equals(hostComponentIdentifier) 
+				&& !compRefName.contains(epServiceName)) {
 				String deployURI = ep.getDeployedURI();
 				if (deployURI.startsWith("http://")) {
 					// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
