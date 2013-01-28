@@ -216,7 +216,21 @@ public class MethodAnalyzer {
 		}
 		return multiSrcNode;
 	}
-
+	/**
+	 * find the localvariablenode according to its name
+	 * @param mn
+	 * @param name
+	 * @return
+	 */
+	public LocalVariableNode findVariableLabel(MethodNode mn,String name){
+		for(LocalVariableNode lvn : ((List<LocalVariableNode>) mn.localVariables)){
+			if(lvn.name.equals(name)){
+				return lvn;
+			}
+		}
+		return (LocalVariableNode)mn.localVariables.get(0);
+	}
+  
 	/**
 	 * Insert all the trigger information and DDA
 	 * 
@@ -225,13 +239,16 @@ public class MethodAnalyzer {
 	 * @param conupTx
 	 *            the transaction or method name to be analyze
 	 */
-	public void methodTransform(ClassNode cn, MethodNode mn, String conupTx) {
+	public void methodTransform(ClassNode cn, MethodNode mn, String conupTx) {		
 		if (isTransaction(mn, conupTx)) {
 			LOGGER.fine("Begin analyze method:" + mn.name);
 			InsnList insns = mn.instructions;
 			int localNum = mn.maxLocals;
-			if (com.size() == 0) {
-				this.transformWhenNoInvocation(cn, insns, localNum);
+			LocalVariableNode selfNode = this.findVariableLabel(mn, "this");
+			LabelNode start = selfNode.start;
+			LabelNode last = selfNode.end;
+			if (com.size() == 0) {				
+				start = this.transformWhenNoInvocation(cn, insns, localNum);
 			} 
 			else {
 				stateMachine.setStart(0);
@@ -260,7 +277,7 @@ public class MethodAnalyzer {
 				// insert annotation
 				// Iterator<AnnotationNode> iter =
 				// mn.visibleAnnotations.iterator();
-				insertStartInf(cn, insns, localNum);
+				start = insertStartInf(cn, insns, localNum);
 				// insert first request service before the method invokation
 				if (runinf.size() > 0) {
 					for (AbstractInsnNode firstRS : runinf) {
@@ -453,7 +470,8 @@ public class MethodAnalyzer {
 				}
 				// insert end event
 				if (endinf.size() > 0) {
-					for (AbstractInsnNode end : endinf) {
+					System.out.println("asasda");
+					for (AbstractInsnNode end : endinf) {						
 						InsnList trig = new InsnList();
 						trig.add(new VarInsnNode(ALOAD, localNum));
 						// trig.add(new LdcInsnNode(statesDDA));
@@ -468,10 +486,20 @@ public class MethodAnalyzer {
 								INVOKEVIRTUAL,
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 								"trigger", "(Ljava/lang/String;)V"));
+						int op = end.getOpcode();
+						if(op == RETURN){
+							System.out.println("return");
+							insns.insertBefore(end, trig);
+							
+						}
+						else{						
 						AbstractInsnNode ilPre = end.getPrevious();
-						int op = ilPre.getOpcode();
+						while(ilPre instanceof LineNumberNode ||ilPre instanceof LabelNode){
+							ilPre = ilPre.getPrevious();
+						}
 
 						// get the parameters of the return
+						op = ilPre.getOpcode();
 						while ((op >= ACONST_NULL && op <= LDC)
 								|| (op <= ALOAD && op >= ILOAD)
 								|| (op <= IALOAD && op >= SALOAD)
@@ -481,21 +509,20 @@ public class MethodAnalyzer {
 							op = ilPre.getOpcode();
 						}
 						insns.insert(ilPre, trig);
-					}
+					}}
 				}
-			}
-
-			LabelNode last = ((LocalVariableNode) mn.localVariables.get(0)).end;
-			LabelNode start = ((LocalVariableNode) mn.localVariables.get(0)).start;
+			}			
 			mn.localVariables.add(new LocalVariableNode("transactionID",
 					"Ljava/lang/String;", null, start, last, localNum));
 			mn.maxLocals = mn.maxLocals + 1;
 		}
 
 	}
-	public void transformWhenNoInvocation(ClassNode cn, InsnList insns, int localNum){
+	public LabelNode transformWhenNoInvocation(ClassNode cn, InsnList insns, int localNum){
 		// insert transaction id
 		InsnList trigstart = new InsnList();
+		LabelNode startLabel = new LabelNode();
+		trigstart.add(startLabel);
 		trigstart.add(new VarInsnNode(ALOAD, 0));
 		trigstart
 				.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr, TxlcMgrDesc));
@@ -519,7 +546,7 @@ public class MethodAnalyzer {
 		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL,
 				"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 				"trigger", "(Ljava/lang/String;)V"));
-		insns.insert(insns.getFirst(), trigstart);
+		insns.insertBefore(insns.getFirst(), trigstart);
 		Iterator<AbstractInsnNode> i = insns.iterator();
 		while(i.hasNext()){
 			AbstractInsnNode node = i.next();
@@ -538,9 +565,15 @@ public class MethodAnalyzer {
 						INVOKEVIRTUAL,
 						"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 						"trigger", "(Ljava/lang/String;)V"));
-				AbstractInsnNode ilPre = node.getPrevious();
+				if(node.getOpcode() == RETURN){
+					insns.insertBefore(node, trig);
+				}
+				else{
+				AbstractInsnNode ilPre = node.getPrevious();				
+				while(ilPre instanceof LineNumberNode ||ilPre instanceof LabelNode){
+					ilPre = ilPre.getPrevious();
+				}
 				int op = ilPre.getOpcode();
-
 				// get the parameters of the return
 				while ((op >= ACONST_NULL && op <= LDC)
 						|| (op <= ALOAD && op >= ILOAD)
@@ -551,8 +584,10 @@ public class MethodAnalyzer {
 					op = ilPre.getOpcode();
 				}
 				insns.insert(ilPre, trig);
-			}
+				}
+			}			
 		}
+		return startLabel;
 	}
 	/**
 	 * 
@@ -560,9 +595,11 @@ public class MethodAnalyzer {
 	 * @param insns
 	 * @param localNum
 	 */
-	public void insertStartInf(ClassNode cn, InsnList insns, int localNum) {
+	public LabelNode insertStartInf(ClassNode cn, InsnList insns, int localNum) {
 		// insert transaction id
 		InsnList trigstart = new InsnList();
+		LabelNode startLabel = new LabelNode();
+		trigstart.add(startLabel);
 		trigstart.add(new VarInsnNode(ALOAD, 0));
 		trigstart.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr,
 				TxlcMgrDesc));
@@ -588,11 +625,12 @@ public class MethodAnalyzer {
 						INVOKEVIRTUAL,
 						"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 						"trigger", "(Ljava/lang/String;)V"));
-		insns.insert(insns.getFirst(), trigstart);
+		insns.insertBefore(insns.getFirst(), trigstart);
+		return startLabel;
 	}
 
 	/**
-	 * insert branch event while change the branch's dest label
+	 * insert branch event while change the branch's dst label
 	 * 
 	 * @param insns
 	 * @param jumpE
@@ -620,10 +658,9 @@ public class MethodAnalyzer {
 					INVOKEVIRTUAL,
 					"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 					"trigger", "(Ljava/lang/String;)V"));
-			insns.insert(sourceLabel, trig);
-		} else {
-			LabelNode dstNext = new LabelNode();
-			trig.add(new JumpInsnNode(GOTO, dstNext));
+			insns.insertBefore(sourceLabel, trig);
+		} else {		
+			trig.add(new JumpInsnNode(GOTO, sourceLabel));
 			trig.add(nextOne);
 			trig.add(new VarInsnNode(ALOAD, localNum));
 			// trig.add(new LdcInsnNode(statesDDA));
@@ -637,12 +674,47 @@ public class MethodAnalyzer {
 			trig.add(new MethodInsnNode(
 					INVOKEVIRTUAL,
 					"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-					"trigger", "(Ljava/lang/String;)V"));
-			trig.add(dstNext);
-			insns.insert(sourceLabel, trig);
+					"trigger", "(Ljava/lang/String;)V"));			
+			insns.insertBefore(sourceLabel, trig);
 		}
 		return nextOne;
 	}
+//	public LabelNode changeJumpLabel(InsnList insns, String jumpE,
+//			int localNum, LabelNode sourceLabel) {
+//		InsnList trig = new InsnList();
+//		LabelNode nextOne = new LabelNode();
+//		if (sourceLabel.getPrevious().getOpcode() == GOTO) {
+//			trig.add(nextOne);
+//			trig.add(new VarInsnNode(ALOAD, localNum));			
+//			trig.add(new MethodInsnNode(
+//					INVOKESTATIC,
+//					"org/apache/geronimo/samples/daytrader/dacapo/LDDM",
+//					"getInstance",
+//					"(Ljava/lang/String;)Lorg/apache/geronimo/samples/daytrader/dacapo/LDDM;"));
+//			trig.add(new LdcInsnNode(jumpE));
+//			trig.add(new MethodInsnNode(
+//					INVOKEVIRTUAL,
+//					"org/apache/geronimo/samples/daytrader/dacapo/LDDM",
+//					"trigger", "(Ljava/lang/String;)V"));
+//			insns.insertBefore(sourceLabel, trig);
+//		} else {			
+//			trig.add(new JumpInsnNode(GOTO, sourceLabel));
+//			trig.add(nextOne);
+//			trig.add(new VarInsnNode(ALOAD, localNum));
+//			trig.add(new MethodInsnNode(
+//					INVOKESTATIC,
+//					"org/apache/geronimo/samples/daytrader/dacapo/LDDM",
+//					"getInstance",
+//					"(Ljava/lang/String;)Lorg/apache/geronimo/samples/daytrader/dacapo/LDDM;"));
+//			trig.add(new LdcInsnNode(jumpE));
+//			trig.add(new MethodInsnNode(
+//					INVOKEVIRTUAL,
+//					"org/apache/geronimo/samples/daytrader/dacapo/LDDM",
+//					"trigger", "(Ljava/lang/String;)V"));		
+//			insns.insertBefore(sourceLabel, trig);
+//		}
+//		return nextOne;
+//	}
 
 	/**
 	 * Whether the method has the specified annotation
@@ -754,12 +826,11 @@ public class MethodAnalyzer {
 
 		if (isAnalyze[src] == 0) {
 			AbstractInsnNode an = insns.get(src);
-			if ((an.getOpcode() >= IRETURN && an.getOpcode() <= RETURN)
-					|| an.getOpcode() == ATHROW) {
+			if ((an.getOpcode() >= IRETURN && an.getOpcode() <= RETURN)) {
 				stateMachine.addState(src);
 				isAnalyze[src] = 1;
 				stateMachine.addEvent(new Event(last_state, src, "end"));
-				endinf.add(an);
+				endinf.add(an);				
 				end.add(src);
 			} else {
 				if (controlflow.getFlow(src).getDst().size() == 1) {
