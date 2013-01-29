@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -331,19 +332,21 @@ public class TuscanyProgramAnalyzer {
 	public static void main(String args[]) {
 		try {			
 			TuscanyProgramAnalyzer analyse = new TuscanyProgramAnalyzer();			
-//			String projectPath = "/home/nju/PortalServiceImpl.class";	
-//			String projectPath = "/home/nju/localsvn/conup-sample-hello-auth/target/classes/cn/edu/nju/moon/conup/sample/auth/services/AuthServiceImpl.class";
-			String dbPath = "/home/nju/localsvn/conup-sample-db/target/classes/cn/edu/nju/moon/conup/sample/db/services/DBServiceImpl.class";
-			String authPath = "/home/nju/localsvn/conup-sample-auth/target/classes/cn/edu/nju/moon/conup/sample/auth/services/AuthServiceImpl.class";
-			String procPath = "/home/nju/localsvn/conup-sample-proc/target/classes/cn/edu/nju/moon/conup/sample/proc/services/ProcServiceImpl.class";
-			String portalPath = "/home/nju/localsvn/conup-sample-portal/target/classes/cn/edu/nju/moon/conup/sample/portal/services/PortalServiceImpl.class";
 			
-			analyse.analyzeApplication(dbPath,"");
-			analyse.analyzeApplication(authPath,"");
-			analyse.analyzeApplication(procPath,"");
-			analyse.analyzeApplication(portalPath,"");
-//			String portalPath = "/home/PortalServiceImpl.class";			
-//			analyse.analyzeApplication(portalPath,"");
+			List<String> targetProjs = new ArrayList<String>();
+			targetProjs.add("fullapp-bespoketrip");
+			targetProjs.add("fullapp-coordination");
+			targetProjs.add("fullapp-currency");
+			targetProjs.add("fullapp-packagedtrip");
+			targetProjs.add("fullapp-shoppingcart");
+			targetProjs.add("payment-java");
+			
+			String baseDir = "/home/stone/travelSample/conup-travel-sample/";
+			for(String projLoc : targetProjs){
+				projLoc = baseDir + projLoc + "/target/classes";
+				analyse.analyzeApplication(projLoc, "");
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
