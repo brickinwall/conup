@@ -64,10 +64,7 @@ public class LaunchPortal {
 	}
 	
 	private static void accessServices(Node node) throws InterruptedException {
-			int threadNum = 1;
-			testUpdate();
-			
-			Thread.sleep(3000);
+			int threadNum = 100;
 			
 			Random random;
 			random = new Random(System.currentTimeMillis());
@@ -95,11 +92,11 @@ public class LaunchPortal {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
-				String baseDir = "/home/rgc/Documents/src/googlecode5/tag/distribution/conup-0.9.0-DU/samples/update";
+				String baseDir = "/home/nju/deploy/sample/update";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("114.212.83.140", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 			}
 		});

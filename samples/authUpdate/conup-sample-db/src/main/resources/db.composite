@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 		
 	<!-- requires="trace" policySets="tracePolicySet" policySets="traceImplPolicySet traceBindingPolicySet"
-		114.212.83.140
+		10.0.2.15
 	-->
 		
 <composite	xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
@@ -14,7 +14,7 @@
 	<component name="DBComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.sample.db.services.DBServiceImpl" />
 		<service name="DBService"  requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://114.212.83.140:8081/DBComponent/DBService" />
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8081/DBComponent/DBService" />
 		</service>
 	</component>
 	
