@@ -7,19 +7,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
-import org.oasisopen.sca.annotation.Property;
 import org.oasisopen.sca.annotation.Service;
 
 @Service({ TokenService.class, VerificationService.class })
 public class AuthServiceImpl implements TokenService, VerificationService {
 	Logger logger = Logger.getLogger(AuthServiceImpl.class.getName());
-//	@Property
-	String version = "version.2";
-	
-//	@Property
-//	public void setVersion(String version){
-//		this.version = version;
-//	}
+	String version = "version.1";
 	
 	@ConupTransaction
 	public String getToken(String exeProc, String cred) {
@@ -96,7 +89,7 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 //				String contributionUri = "conup-sample-auth";
 //				String compsiteUri = "auth.composite";
-//				rcs.update("114.212.83.140", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 //				
 //			}
 //		});
@@ -109,7 +102,7 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
 //		String targetIdentifier = "AuthComponent";
 //		int port = 18082;
-//		rcs.ondemand("114.212.83.140", port, targetIdentifier, "TRANQUILLITY");
+//		rcs.ondemand("10.0.2.15", port, targetIdentifier, "TRANQUILLITY");
 //		//TRANQUILLITY
 //		//CONSISTENCY
 //	}
