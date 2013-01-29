@@ -15,7 +15,7 @@ public class ConfServiceImpl implements ConfService {
 		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 		String targetIdentifier = "AuthComponent";
 		int port = 18082;
-		rcs.ondemand("114.212.83.140", port, targetIdentifier, "CONSISTENCY");
+		rcs.ondemand("10.0.2.15", port, targetIdentifier, "CONSISTENCY");
 	}
 	@Override
 	public void update(String compIdentifier, String baseDir) {
@@ -50,7 +50,7 @@ public class ConfServiceImpl implements ConfService {
 		}
 		
 		
-		rcs.update("114.212.83.140", port, compIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+		rcs.update("10.0.2.15", port, compIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 	}
 
 }
