@@ -10,13 +10,13 @@
 	<component name="PortalComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.sample.portal.services.PortalServiceImpl"/>
 		<service name="PortalService" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/PortalService" />
+			<tuscany:binding.jsonrpc uri="http://114.212.83.140:8084/PortalComponent/PortalService" />
 		</service>
 		<reference name="tokenService" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/TokenService" />
+			<tuscany:binding.jsonrpc uri="http://114.212.83.140:8082/AuthComponent/TokenService" />
 		</reference>
 		<reference name="procService" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8083/ProcComponent/ProcService" />
+			<tuscany:binding.jsonrpc uri="http://114.212.83.140:8083/ProcComponent/ProcService" />
 		</reference>
 		
 	</component>

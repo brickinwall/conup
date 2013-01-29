@@ -16,7 +16,7 @@
 	<component name="ConfigComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.sample.configuration.client.ConfServiceImpl" />
 		<service name="ConfService" >
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8090/ConfigComponent/ConfService" />
+			<tuscany:binding.jsonrpc uri="http://114.212.83.140:8090/ConfigComponent/ConfService" />
 		</service>
 		
 	</component>
