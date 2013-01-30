@@ -103,6 +103,7 @@ public class CustomerRegistryImpl implements CustomerRegistry {
 
     @ConupTransaction
     public Customer getCustomer(String id) throws CustomerNotFoundException {
+    	System.out.println("CustomerRegistryImpl.getCustomer(...), id: " + id);
         Customer customer = customers.get(id);
 
         if (customer == null) {
@@ -116,7 +117,11 @@ public class CustomerRegistryImpl implements CustomerRegistry {
     public boolean updateCustomer(Customer customer) {
         Customer current = null;
         try {
-            current = getCustomer(customer.getId());
+//            current = getCustomer(customer.getId());
+        	current = customers.get(customer.getId());
+        	if(current == null){
+        		throw new CustomerNotFoundException("Customer " + customer.getId() + " not found");
+        	}
         } catch (Exception ex) {
             return false;
         }

@@ -57,9 +57,11 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
 
     @ConupTransaction
     public void removeTrip(String cartId, TripItem trip) {
-    	cartStore.addTrip(cartId, trip);
+//    	cartStore.addTrip(cartId, trip);
+    	cartStore.removeTrip(cartId, trip);
     }
 
+    @ConupTransaction
     public TripItem[] getTrips(String cartId) {
     	return cartStore.getTrips(cartId);
     }
@@ -73,7 +75,8 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
         // get the total for all the trips
         float amount = (float)0.0;
 
-        TripItem[] trips = getTrips(cartId);
+//        TripItem[] trips = getTrips(cartId);
+        TripItem[] trips = cartStore.getTrips(cartId);
 
         for (TripItem trip : trips) {
             if (trip.getType().equals(TripItem.TRIP)) {
@@ -84,7 +87,7 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
                 }
             }
         }
-        System.out.println("total amount:" + amount);
+        System.out.println("[ShoppingCart.checkout] total amount:" + amount);
         // Take the payment from the customer
         payment.makePaymentMember(customerId, amount);
 
