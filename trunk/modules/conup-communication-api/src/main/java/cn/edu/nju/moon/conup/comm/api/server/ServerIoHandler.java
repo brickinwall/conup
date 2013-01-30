@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
+import cn.edu.nju.moon.conup.communication.model.CommType;
 import cn.edu.nju.moon.conup.communication.model.RequestObject;
 import cn.edu.nju.moon.conup.communication.model.ResponseObject;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -22,16 +23,24 @@ public class ServerIoHandler extends IoHandlerAdapter{
 	
 	public void exceptionCaught(IoSession session, Throwable cause)
 			throws Exception {
-		LOGGER.warning(cause.getMessage());
+		LOGGER.warning("ServerSide:" + cause.getMessage());
 		session.close(true);
 	}
 
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		RequestObject reqObj = (RequestObject) message;
-//		LOGGER.warning(reqObj.toString());
-//		System.out.println("--------------------------" + reqObj.toString() + "----------------------------");
 		ResponseObject reponseObj = process(reqObj);
-		session.write(reponseObj);
+		boolean replyFlag = check(reqObj.getCommType());
+		if(replyFlag)
+			session.write(reponseObj);
+	}
+
+	private boolean check(CommType commType) {
+		if(commType.equals(CommType.SYN)){
+			return true;
+		} else{
+			return false;
+		}
 	}
 
 	private ResponseObject process(RequestObject reqObj) {
