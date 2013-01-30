@@ -12,6 +12,8 @@ import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactor
 import org.apache.mina.filter.logging.LogLevel;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+
+import cn.edu.nju.moon.conup.communication.model.CommType;
 import cn.edu.nju.moon.conup.communication.model.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 /**
@@ -36,6 +38,7 @@ public class AsynCommClient {
 		reqObj.setProtocol(proctocol);
 		reqObj.setPayload(payload);
 		reqObj.setMsgType(msgType);
+		reqObj.setCommType(CommType.ASYN);
 		
 		IoConnector connector = new NioSocketConnector(); 
 		connector.setConnectTimeoutMillis(10000);
@@ -52,12 +55,14 @@ public class AsynCommClient {
 			@Override
 			public void messageReceived(IoSession session, Object message) throws Exception {
 				// add callback to tell the result
+				session.close(true);
 			}
 			@Override
 			public void exceptionCaught(IoSession session, Throwable cause)
 					throws Exception {
-				LOGGER.warning(cause.getMessage());
+				LOGGER.warning("AsynCommClient:" + cause.getMessage());
 				session.close(true);
+//				session.close(false);
 			}
 		});
 		

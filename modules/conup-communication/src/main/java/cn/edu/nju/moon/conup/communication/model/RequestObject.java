@@ -17,6 +17,15 @@ public class RequestObject implements Serializable {
 	private String protocol;
 	private MsgType msgType;
 	private String payload;
+	private CommType commType;
+
+	public CommType getCommType() {
+		return commType;
+	}
+
+	public void setCommType(CommType commType) {
+		this.commType = commType;
+	}
 
 	public MsgType getMsgType() {
 		return msgType;
