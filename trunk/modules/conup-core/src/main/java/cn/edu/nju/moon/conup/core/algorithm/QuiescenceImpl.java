@@ -65,11 +65,28 @@ public class QuiescenceImpl implements Algorithm {
 		case VALID:
 			doValid(txContext);
 			break;
+		case Free:
+			doFree(txContext);
+			break;
 		default:
 //			doValid(txContext);
 			throw new RuntimeException("Quiescence algorithm cannot execute a transaction while component status is " + compStatus);
 		}
 
+	}
+
+	private void doFree(TransactionContext txContext) {
+		initDynamicDepMgr(txContext.getHostComponent());
+		Object updatingMonitor = depMgr.getUpdatingSyncMonitor();
+		synchronized(updatingMonitor){
+			try {
+				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
+					updatingMonitor.wait();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -177,7 +194,7 @@ public class QuiescenceImpl implements Algorithm {
 				for(String subComp : targetRef){
 					String payload = QuiescencePayloadCreator.createRootTxEndPayload(hostComp, subComp, rootTx, QuiescenceOperationType.NOTIFY_ROOT_TX_END);
 					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-					depNotifyService.synPost(hostComp, subComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+					depNotifyService.synPost(hostComp, subComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 				}
 				// check passive when a root tx is end
 				LOGGER.fine("root tx " + rootTx + " end, checkPassiveAndAck...");
@@ -321,7 +338,7 @@ public class QuiescenceImpl implements Algorithm {
 	 * @param targetComp
 	 */
 	private void ackPassivate(String hostComp, String targetComp) {
-		LOGGER.fine(hostComp + " ackPassivate to " + targetComp);
+		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, QuiescenceOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
