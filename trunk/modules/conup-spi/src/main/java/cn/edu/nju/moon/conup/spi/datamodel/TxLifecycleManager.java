@@ -101,7 +101,9 @@ public class TxLifecycleManager {
 			currentTx = txID;
 			txContextInCache.setCurrentTx(currentTx);
 		} else{
-			LOGGER.warning("Error: dirty data in InterceptroCache.");
+			LOGGER.warning("Error: dirty data in InterceptroCache, " +
+					"because [rootTx, parentTx, currentTx, hostComp] = " + rootTx + ", " +
+					parentTx + ", " + currentTx + ", " + hostComponent);
 		}
 		
 		/**
