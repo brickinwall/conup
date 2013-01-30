@@ -34,7 +34,7 @@ public class PerformanceRecorder {
 	
 	public void updateIsDone(long endTime){
 		this.endTime = endTime;
-		System.out.println("update takes: " + (endTime - startTime) / 1000000.0);
+		System.out.println("update has taken time: " + (endTime - startTime) / 1000000.0 + " ms");
 	}
 	
 	public void updateReceived(long startTime){
