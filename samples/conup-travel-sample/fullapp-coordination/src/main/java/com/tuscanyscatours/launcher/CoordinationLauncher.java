@@ -76,12 +76,12 @@ public class CoordinationLauncher {
 			@Override
 			public void run() {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-				String targetIdentifier1 = "CurrencyConverter";
-				int port1 = 22300;
+				String targetIdentifier1 = "Bank";
+				int port1 = 22313;
 				String baseDir1 = "/home/rgc";
-				String classFilePath1 = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
-				String contributionUri1 = "fullapp-currency";
-				String compsiteUri1 = "fullapp-currency.composite";
+				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
+				String contributionUri1 = "fullapp-bank";
+				String compsiteUri1 = "bank.composite";
 				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
