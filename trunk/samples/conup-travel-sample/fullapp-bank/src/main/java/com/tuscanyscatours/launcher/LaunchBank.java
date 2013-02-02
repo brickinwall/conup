@@ -39,7 +39,7 @@ public class LaunchBank {
         depRecorder = DepRecorder.getInstance();
         
         //access
-        updateBank(node);
+//        updateBank(node);
 	}
 	
 	private static void updateBank(Node node) throws Exception {
@@ -67,9 +67,9 @@ public class LaunchBank {
 				int port1 = 22313;
 				String baseDir1 = "/home/rgc";
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
-				String contributionUri1 = "payment-java";
-				String compsiteUri1 = "payment.composite";
-				rcs.update("114.212.83.140", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				String contributionUri1 = "fullapp-bank";
+				String compsiteUri1 = "bank.composite";
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
