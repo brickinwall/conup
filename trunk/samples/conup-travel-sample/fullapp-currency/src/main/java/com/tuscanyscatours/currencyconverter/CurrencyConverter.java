@@ -26,8 +26,6 @@ import org.oasisopen.sca.annotation.Remotable;
 @Remotable
 public interface CurrencyConverter {
 
-    double getExchangeRate(String fromCurrencyCode, String toCurrencyCode);
-
     double convert(String fromCurrencyCode, String toCurrencyCode, double amount);
 
 }
