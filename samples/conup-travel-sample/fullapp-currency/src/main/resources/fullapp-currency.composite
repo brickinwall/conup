@@ -28,6 +28,10 @@
 		<service name="CurrencyConverter" requires="trace" policySets="traceBindingPolicySet">
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12300/CurrencyConverter/CurrencyConverter" />
 		</service>
+		<reference name="bank" requires="trace" policySets="traceBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/Bank/Bank" />
+        </reference>
+		
     </component> 
     
 </composite>
