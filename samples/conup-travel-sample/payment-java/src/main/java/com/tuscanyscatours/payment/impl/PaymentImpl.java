@@ -28,7 +28,7 @@ import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 
-import com.tuscanyscatours.currencyconverter.CurrencyConverter;
+import com.tuscanyscatours.bank.Bank;
 import com.tuscanyscatours.customer.Customer;
 import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
@@ -57,9 +57,7 @@ public class PaymentImpl implements Payment {
     protected float transactionFee = 0.01f;
     
     @Reference
-    protected CurrencyConverter currencyConverter;
-
-//    private TxLifecycleManager _txLifecycleMgr;
+    protected Bank bank;
     
     @ConupTransaction
     public String makePaymentMember(String customerId, float amount) {
@@ -70,9 +68,7 @@ public class PaymentImpl implements Payment {
 //            		                                    emailGateway,
 //            		                                    customer.getEmail());
 //            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
-            System.out.println("before currencyConverter.convert(...)");
-            System.out.println("currencyConverter.convert(\"USD\", \"GBP\", amount);" + currencyConverter.convert("USD", "GBP", amount));
-            System.out.println("after currencyConverter.convert(...)");
+            System.out.println("GetExchangeRate(\"GBP\", \"USD\"):" + bank.getExchangeRate("GBP", "USD"));
 //            return status;
             return "ok";
         } catch (CustomerNotFoundException ex) {

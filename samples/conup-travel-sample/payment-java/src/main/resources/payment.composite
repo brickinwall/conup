@@ -39,8 +39,8 @@
         <reference name="emailGateway" requires="trace" policySets="traceBindingPolicySet">
         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12312/EmailGateway/EmailGateway" />
         </reference>
-        <reference name="currencyConverter" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12300/CurrencyConverter/CurrencyConverter" />
+        <reference name="bank" requires="trace" policySets="traceBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/Bank/Bank" />
         </reference>
         <property name="transactionFee">0.02</property>
     </component>

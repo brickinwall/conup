@@ -7,7 +7,6 @@ import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import com.tuscanyscatours.currencyconverter.CurrencyConverter;
 import com.tuscanyscatours.payment.Payment;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
@@ -36,17 +35,14 @@ public class LaunchPayment {
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf("Payment", "oldVersion");
-//        nodeMgr.getDynamicDepManager("Payment").ondemandSetupIsDone();
         CompLifecycleManager.getInstance("Payment").setNode(node);
         CommServerManager.getInstance().start("Payment");
         
         nodeMgr.loadConupConf("CustomerRegistry", "oldVersion");
-//      nodeMgr.getDynamicDepManager("CustomerRegistry").ondemandSetupIsDone();
         CompLifecycleManager.getInstance("CustomerRegistry").setNode(node);
         CommServerManager.getInstance().start("CustomerRegistry");
       
         nodeMgr.loadConupConf("EmailGateway", "oldVersion");
-//      nodeMgr.getDynamicDepManager("EmailGateway").ondemandSetupIsDone();
         CompLifecycleManager.getInstance("EmailGateway").setNode(node);
         CommServerManager.getInstance().start("EmailGateway");
         
