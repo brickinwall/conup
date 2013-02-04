@@ -27,6 +27,7 @@ public class BankImpl implements Bank {
     @ConupTransaction
 	@Override
 	public double getExchangeRate(String fromCurrencyCode, String toCurrencyCode) {
+    	System.out.println("Old BankImpl,GBP--->USD:2");
 		return rates[currencyIndex.get(fromCurrencyCode).intValue()][currencyIndex.get(toCurrencyCode).intValue()];
 	}
 
