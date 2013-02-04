@@ -1,5 +1,9 @@
 package com.tuscanyscatours.launcher;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Random;
+
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
@@ -60,14 +64,26 @@ public class CoordinationLauncher {
 	}
 	
 	public static void accessServices(Node node) throws Exception{
-	
-			for(int i = 0; i < 20; i++){
-				new CoordinationVisitorThread(node).start();
-				Thread.sleep(200);
-				if(i == 15){
-					testUpdate();
-				}
+		FileWriter fw;
+		String resultFileName = "expResult.csv"; // "expResult.expResultNoUpdate"
+		int totalExecution = 400;
+		Random random = new Random(System.nanoTime());
+		fw = new FileWriter(resultFileName);
+		fw.write("#Quiescence:Blocking, Execution time(unit:ms)\n");
+		fw.close();
+		for (int i = 0; i < totalExecution; i++) {
+			new CoordinationVisitorThread(node, resultFileName, i + 1,
+					totalExecution).start();
+			Thread.sleep((long) expRandom(random, (float) 1 / 2000));
+			if (i == 200) {
+				testUpdate();
 			}
+		}
+	}
+	
+	private static float expRandom(Random random, float lambda) {
+		float randomFloat = (float) (-Math.log(1-random.nextFloat()) / lambda);
+		return randomFloat;
 	}
 	
 	private static void testUpdate() {
@@ -89,4 +105,41 @@ public class CoordinationLauncher {
 		thread.start();
 	}
 
+	private static void testUpdateShoppingCart() {
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				String targetIdentifier1 = "ShoppingCart";
+				int port1 = 22307;
+				String baseDir1 = "/home/rgc";
+				String classFilePath1 = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
+				String contributionUri1 = "fullapp-shoppingcart";
+				String compsiteUri1 = "fullapp-shoppingcart.composite";
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+			}
+		});
+		
+		thread.start();
+	}
+	
+	private static void testUpdateCar() {
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				String targetIdentifier1 = "CarPartner";
+				int port1 = 22303;
+				String baseDir1 = "/home/rgc";
+				String classFilePath1 = "com.tuscanyscatours.car.impl.CarImpl";
+				String contributionUri1 = "fullapp-bespoketrip";
+				String compsiteUri1 = "fullapp-bespoketrip.composite";
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+			}
+		});
+		
+		thread.start();
+	}
 }
