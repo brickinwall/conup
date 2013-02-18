@@ -110,7 +110,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 //					str += "\t" + oldRoot;
 ////					System.out.print("\t" + oldRoot);
 //				}
-//				System.out.println(str);
+//				LOGGER.fine(str);
 
 			}
 		}
@@ -139,8 +139,8 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 //				Field newFiled = compLcMgr.getUpdateCtx().getNewVerClass().getDeclaredField("version");
 //				newFiled.setAccessible(true);
 //				String newVersion = newFiled.get(compLcMgr.getUpdateCtx().getNewVerClass().getConstructor(null).newInstance()).toString();
-//				System.out.println("old version class: " + compLcMgr.getUpdateCtx().getOldVerClass().hashCode() + "version : " + oldVersion);
-//				System.out.println("new version class: " + compLcMgr.getUpdateCtx().getNewVerClass().hashCode() + "version : " + newVersion);
+//				LOGGER.fine("old version class: " + compLcMgr.getUpdateCtx().getOldVerClass().hashCode() + "version : " + oldVersion);
+//				LOGGER.fine("new version class: " + compLcMgr.getUpdateCtx().getNewVerClass().hashCode() + "version : " + newVersion);
 //			} catch (NoSuchFieldException e) {
 //				e.printStackTrace();
 //			} catch (IllegalArgumentException e) {
@@ -158,7 +158,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 			
 //			Method[] methods = compClass.getMethods();
 //			for(Method m : methods){
-//				System.out.println("method:" + m);
+//				LOGGER.fine("method:" + m);
 //			}
 			instanceFactory.setCtr(compClass.getConstructor());
 			Injector[] injectors = instanceFactory.getInjectors();
@@ -242,7 +242,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 			DynamicUpdateClassLoader cl = new DynamicUpdateClassLoader(baseDir, classNames);
 			c = cl.loadClass(classNames[0]);
 			LOGGER.info("load class: " + c);
-//			System.out.println("c: " + c);
+//			LOGGER.fine("c: " + c);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

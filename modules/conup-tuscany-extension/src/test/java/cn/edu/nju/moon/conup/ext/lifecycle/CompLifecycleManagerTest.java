@@ -1,18 +1,22 @@
 package cn.edu.nju.moon.conup.ext.lifecycle;
 
-import static org.junit.Assert.*;
-import org.apache.tuscany.sca.Node;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
-import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Composite;
+import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
-import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.impl.DeployedComposite;
+import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
 import org.junit.After;
@@ -36,7 +40,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
  * @author rgc
  */
 public class CompLifecycleManagerTest {
-
+	private static Logger LOGGER = Logger.getLogger(CompLifecycleManagerTest.class.getName());
 	CompLifecycleManager clm = null;
 	Node node = null;
 
@@ -77,7 +81,7 @@ public class CompLifecycleManagerTest {
 //		TuscanyRuntime runtime2 = TuscanyRuntime.newInstance();
 //		Node node2 = runtime.createNode(domainURI);
 //		contribution = node2.getContribution("sample-helloworld");
-//		System.out.println(node2.getStartedCompositeURIs());
+//		LOGGER.fine(node2.getStartedCompositeURIs());
 //		assertNotNull(contribution);
 		
 //		clm.uninstall(null, "helloworld");
@@ -96,17 +100,17 @@ public class CompLifecycleManagerTest {
 		
 		Node node = clm.getNode();
 		for(Endpoint ep : ((NodeImpl)node).getDomainRegistry().getEndpoints()){
-			System.out.println("\t" + ep + ":" );
-			System.out.println("\t\t" + "component=" + ep.getComponent());
-			System.out.println("\t\t" + "service=" + ep.getService());
-			System.out.println("\t\t" + "isRemote=" + ep.isRemote());
-			System.out.println("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
-			System.out.println("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
-			System.out.println("\t\t" + "policySets=" + ep.getPolicySets());
-			System.out.println("\t\t" + "binding=" + ep.getBinding());
-			System.out.println("\t\t" + "deployedUri=" + ep.getDeployedURI());
+			LOGGER.fine("\t" + ep + ":" );
+			LOGGER.fine("\t\t" + "component=" + ep.getComponent());
+			LOGGER.fine("\t\t" + "service=" + ep.getService());
+			LOGGER.fine("\t\t" + "isRemote=" + ep.isRemote());
+			LOGGER.fine("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
+			LOGGER.fine("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
+			LOGGER.fine("\t\t" + "policySets=" + ep.getPolicySets());
+			LOGGER.fine("\t\t" + "binding=" + ep.getBinding());
+			LOGGER.fine("\t\t" + "deployedUri=" + ep.getDeployedURI());
 		}
-		System.out.println("<-----stop print endpoint in install...");
+		LOGGER.fine("<-----stop print endpoint in install...");
 		clm.uninstall("sample-helloworld");
 		clm.uninstall("conup-sample-hello-auth");
 		node.stop();
@@ -119,15 +123,15 @@ public class CompLifecycleManagerTest {
 		
 		Node node = clm.getNode();
 		for(Endpoint ep : ((NodeImpl)node).getDomainRegistry().getEndpoints()){
-			System.out.println("\t" + ep + ":" );
-			System.out.println("\t\t" + "component=" + ep.getComponent());
-			System.out.println("\t\t" + "service=" + ep.getService());
-			System.out.println("\t\t" + "isRemote=" + ep.isRemote());
-			System.out.println("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
-			System.out.println("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
-			System.out.println("\t\t" + "policySets=" + ep.getPolicySets());
-			System.out.println("\t\t" + "binding=" + ep.getBinding());
-			System.out.println("\t\t" + "deployedUri=" + ep.getDeployedURI());
+			LOGGER.fine("\t" + ep + ":" );
+			LOGGER.fine("\t\t" + "component=" + ep.getComponent());
+			LOGGER.fine("\t\t" + "service=" + ep.getService());
+			LOGGER.fine("\t\t" + "isRemote=" + ep.isRemote());
+			LOGGER.fine("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
+			LOGGER.fine("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
+			LOGGER.fine("\t\t" + "policySets=" + ep.getPolicySets());
+			LOGGER.fine("\t\t" + "binding=" + ep.getBinding());
+			LOGGER.fine("\t\t" + "deployedUri=" + ep.getDeployedURI());
 		}
 		assertTrue(clm.stop(contributionURI));
 		node.stop();
@@ -205,7 +209,7 @@ public class CompLifecycleManagerTest {
 //			authInstance = (TokenService)(updateCtx.getOldVerClass().newInstance());
 //			assertEquals(BufferTestConvention.OLD_VERSION_HELLO_AUTH_TOKEN_RESULT, authInstance.getToken("nju,cs"));
 //			authInstance = (TokenService)(updateCtx.getNewVerClass().newInstance());
-//			System.out.println(authInstance.getToken("nju,cs"));
+//			LOGGER.fine(authInstance.getToken("nju,cs"));
 //			try {
 //				Thread.sleep(2000);
 //			} catch (InterruptedException e) {

@@ -340,8 +340,9 @@ public class TuscanyProgramAnalyzer {
 			targetProjs.add("fullapp-packagedtrip");
 			targetProjs.add("fullapp-shoppingcart");
 			targetProjs.add("payment-java");
+			//targetProjs.add("fullapp-bank");
 			
-			String baseDir = "/home/stone/travelSample/conup-travel-sample/";
+			String baseDir = "/home/valerio/workspace/conUp/tuscany-sca/samples/conup-travel-sample/";
 			for(String projLoc : targetProjs){
 				projLoc = baseDir + projLoc + "/target/classes";
 				analyse.analyzeApplication(projLoc, "");

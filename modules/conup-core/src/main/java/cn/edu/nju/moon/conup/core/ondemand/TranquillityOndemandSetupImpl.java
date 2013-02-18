@@ -167,18 +167,18 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		// print ConfirmOndemandStatus
-		System.out.println("ConfirmOndemandStatus:");
+		LOGGER.fine("ConfirmOndemandStatus:");
 		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
-			System.out.println("\t" + entry.getKey() + ": " + entry.getValue());
+			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		if (isConfirmedAll) {
 			if (ondemandHelper.getDynamicDepManager().isValid()) {
-				System.out.println("Confirmed all, and component status is valid");
+				LOGGER.fine("Confirmed all, and component status is valid");
 				return true;
 			}
-			System.out.println("Confirmed from all parent components in reqOndemandSetup(...)");
-			System.out.println("trying to change mode to valid");
+			LOGGER.fine("Confirmed from all parent components in reqOndemandSetup(...)");
+			LOGGER.fine("trying to change mode to valid");
 			
 			Printer printer = new Printer();
 			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeInDeps(), "in");
@@ -201,7 +201,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	private void sendConfirmOndemandSetup(String currentComp,
 			String requestSrcComp) {
-		System.out.println("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
+		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -276,18 +276,18 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 			// if current transaction is not a root transaction
 			if (!rootTx.equals(curTx)) {
-//				System.out.println("current tx is " + curTx + ",and root is " + rootTx);
+//				LOGGER.fine("current tx is " + curTx + ",and root is " + rootTx);
 				LOGGER.fine("current tx is " + curTx + ",and root is " + rootTx);
 				continue;
 			}
 
 			// if current is root
-//			System.out.println(curTx + " is a root tx");
+//			LOGGER.fine(curTx + " is a root tx");
 			LOGGER.fine(curTx + " is a root tx");
 
 			
 			fDeps = getFDeps(curComp, rootTx);
-			System.out.println("fDeps:");
+			LOGGER.fine("fDeps:");
 			for (Dependence dep : fDeps) {
 				dep.setType(VersionConsistencyImpl.FUTURE_DEP);
 				dep.setRootTx(rootTx);
@@ -330,7 +330,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			}
 
 			pDeps = getPDeps(curComp, rootTx);
-			System.out.println("pArcs:");
+			LOGGER.fine("pArcs:");
 			for (Dependence dep : pDeps) {
 				dep.setType(VersionConsistencyImpl.PAST_DEP);
 				dep.setRootTx(rootTx);
@@ -418,16 +418,16 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	
 			// if current transaction is not a root transaction
 			if (!rootTx.equals(curTx)) {
-				System.out.println("current tx is " + curTx + ",and root is "
+				LOGGER.fine("current tx is " + curTx + ",and root is "
 						+ rootTx);
 				continue;
 			}
 	
 			// if current is root
-			System.out.println(curTx + " is a root tx");
+			LOGGER.fine(curTx + " is a root tx");
 	
 			fDeps = getFDeps(curComp, rootTx);
-			System.out.println("fDeps:");
+			LOGGER.fine("fDeps:");
 			for (Dependence dep : fDeps) {
 				dep.setType(VersionConsistencyImpl.FUTURE_DEP);
 				dep.setRootTx(rootTx);
@@ -446,7 +446,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			}
 	
 			pDeps = getPDeps(curComp, rootTx);
-			System.out.println("pArcs:");
+			LOGGER.fine("pArcs:");
 			for (Dependence dep : pDeps) {
 				dep.setType(VersionConsistencyImpl.PAST_DEP);
 				dep.setRootTx(rootTx);
@@ -491,7 +491,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		// print ConfirmOndemandStatus
 		LOGGER.fine("ConfirmOndemandStatus:");
 		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
-			System.out.println("\t" + entry.getKey() + ": " + entry.getValue());
+			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		// isConfirmedAll?
@@ -519,7 +519,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
-		System.out.println("notifyFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 
@@ -538,7 +538,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
-		System.out.println("notifyPastOndemand(Arc arc) with " + dep.toString());
+		LOGGER.fine("notifyPastOndemand(Arc arc) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 
@@ -552,9 +552,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 	private boolean sendReqOndemandSetup(Set<String> parentComps,
 			String hostComp) {
-		System.out.println("sendReqOndemandSetup(...) to parent components:");
+		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
 		for (String component : parentComps)
-			System.out.println("\t" + component);
+			LOGGER.fine("\t" + component);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -638,9 +638,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}// END FOR
 
 		// FOR TEST
-		System.out.println("In getFDeps(...), size=" + result.size());
+		LOGGER.fine("In getFDeps(...), size=" + result.size());
 		for (Dependence dep : result) {
-			System.out.println("\t" + dep.toString());
+			LOGGER.fine("\t" + dep.toString());
 		}
 
 		return result;
@@ -699,9 +699,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 		// FOR TEST
 
-		System.out.println("In getPArcs(...), size=" + result.size());
+		LOGGER.fine("In getPArcs(...), size=" + result.size());
 		for (Dependence dep : result) {
-			System.out.println("\t" + dep.toString());
+			LOGGER.fine("\t" + dep.toString());
 		}
 
 		return result;

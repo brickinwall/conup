@@ -616,10 +616,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		//print OndemandRequestStatus
 		String ondemandRequestStatusStr = "OndemandRequestStatus:";
-//		System.out.println("OndemandRequestStatus:");
+//		LOGGER.fine("OndemandRequestStatus:");
 		for(Entry<String, Boolean> entry : OndemandRequestStatus.entrySet()){
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
-//			System.out.println("\t" + entry.getKey() + ": " + entry.getValue());
+//			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 		LOGGER.fine(ondemandRequestStatusStr);
 
@@ -637,9 +637,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine("Received reqOndemandSetup(...) from " + requestSrcComp);
 			LOGGER.fine("Received all reqOndemandSetup(...)");
 			LOGGER.fine("trying to change mode to ondemand");
-//			System.out.println("Received reqOndemandSetup(...) from " + requestSrcComp);
-//			System.out.println("Received all reqOndemandSetup(...)");
-//			System.out.println("trying to change mode to ondemand");
+//			LOGGER.fine("Received reqOndemandSetup(...) from " + requestSrcComp);
+//			LOGGER.fine("Received all reqOndemandSetup(...)");
+//			LOGGER.fine("trying to change mode to ondemand");
 			
 			//change current componentStatus to 'ondemand'
 			ondemandHelper.getDynamicDepManager().setCompStatus(CompStatus.ONDEMAND);
@@ -650,7 +650,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			synchronized (ondemandSyncMonitor) {
 				if(ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.ONDEMAND)){
 					LOGGER.fine("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
-//					System.out.println("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
+//					LOGGER.fine("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
 					onDemandSetUp();
 				}
 			}
@@ -664,21 +664,21 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			String confirmOndemandStatusStr = "";
 			for(Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()){
 				confirmOndemandStatusStr += "\t" + entry.getKey() + ": " + entry.getValue();
-//				System.out.println("\t" + entry.getKey() + ": " + entry.getValue());
+//				LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 			}
 			LOGGER.fine(confirmOndemandStatusStr);
 			
 			if(isConfirmedAll){
 				if(ondemandHelper.getDynamicDepManager().isValid()){
 					LOGGER.fine("Confirmed all, and component status is valid");
-//					System.out.println("Confirmed all, and component status is valid");
+//					LOGGER.fine("Confirmed all, and component status is valid");
 					return;
 				}
 				LOGGER.fine("Confirmed from all parent components in receivedReqOndemandSetup(...)");
 				LOGGER.fine("trying to change mode to valid");
 				
-//				System.out.println("Confirmed from all parent components in receivedReqOndemandSetup(...)");
-//				System.out.println("trying to change mode to valid");
+//				LOGGER.fine("Confirmed from all parent components in receivedReqOndemandSetup(...)");
+//				LOGGER.fine("trying to change mode to valid");
 				
 				//change current componentStatus to 'valid'
 				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
@@ -693,12 +693,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			Set<String> parentComps, String hostComp){
 		
 		// FOR TEST
-		System.out.println("current compStatus=ondemand, before send req ondemand to parent component.");
+		LOGGER.fine("current compStatus=ondemand, before send req ondemand to parent component.");
 		
 		String str = "sendReqOndemandSetup(...) to parent components:";
-//		System.out.println("sendReqOndemandSetup(...) to parent components:");
+//		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
 		for(String component : parentComps){
-//			System.out.println("\t" + component);
+//			LOGGER.fine("\t" + component);
 			str += "\n\t" + component;
 		}
 		LOGGER.fine(str);
@@ -731,10 +731,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		String str = "sendConfirmOndemandSetup(...) to sub components:";
-//		System.out.println("sendConfirmOndemandSetup(...) to sub components:");
+//		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:");
 		for(String component : targetRef){
 			str += "\n\t" + component;
-//			System.out.println("\t" + component);
+//			LOGGER.fine("\t" + component);
 		}
 		LOGGER.fine(str);
 		
@@ -800,14 +800,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}//END FOR
 		
 		//FOR TEST
-//		System.out.println("In getFDeps(...), size=" + result.size());
+//		LOGGER.fine("In getFDeps(...), size=" + result.size());
 		StringBuffer strBuffer = new StringBuffer();
 		for(Dependence dep : result){
 			strBuffer.append("\n" + dep.toString());
-//			System.out.println("\t" + dep.toString());
+//			LOGGER.fine("\t" + dep.toString());
 		}
 		LOGGER.fine("In getFDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		System.out.println("In getFDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
+//		LOGGER.fine("In getFDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -849,14 +849,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		//FOR TEST
 		
-//		System.out.println("In getPArcs(...), size=" + result.size());
+//		LOGGER.fine("In getPArcs(...), size=" + result.size());
 		
 		StringBuffer strBuffer = new StringBuffer();
 		for(Dependence dep : result){
 			strBuffer.append("\n" + dep.toString());
 		}
 		LOGGER.fine("In getPDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		System.out.println("In getPDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
+//		LOGGER.fine("In getPDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -915,7 +915,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			strBuffer.append("\n" + dep.toString());
 		}
 		LOGGER.fine("In getSDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		System.out.println("In getSDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
+//		LOGGER.fine("In getSDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -947,7 +947,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}// END WHILE
 		
 		LOGGER.fine("getHostSubTransaction(" + rootTx + ")=" + subTx);
-//		System.out.println("getHostSubTransaction(" + rootTx + ")=" + subTx);
+//		LOGGER.fine("getHostSubTransaction(" + rootTx + ")=" + subTx);
 		return subTx;
 	}
 	

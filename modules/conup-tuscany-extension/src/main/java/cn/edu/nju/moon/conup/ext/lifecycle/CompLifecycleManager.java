@@ -16,10 +16,10 @@ import org.apache.tuscany.sca.runtime.ActivationException;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
-import cn.edu.nju.moon.conup.ext.utils.PerformanceRecorder;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyOperationType;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
+import cn.edu.nju.moon.conup.ext.utils.experiments.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
@@ -225,9 +225,9 @@ public class CompLifecycleManager {
 //		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 //		synchronized (ondemandSyncMonitor) {
 //			try {
-//				System.out.println("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
+//				LOGGER.fine("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
 //				if (depMgr.isOndemandSetupRequired()) {
-//					System.out.println("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
+//					LOGGER.fine("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
 //					ondemandSyncMonitor.wait();
 //				}
 //			} catch (InterruptedException e) {
@@ -275,7 +275,7 @@ public class CompLifecycleManager {
 					dynamicDepMgr.achievedFree();
 //				} else{
 //					try {
-//						System.out.println("try to  free, try to update------------------CompLifecycleManager");
+//						LOGGER.fine("try to  free, try to update------------------CompLifecycleManager");
 //						validToFreeSyncMonitor.wait();
 //					} catch (InterruptedException e) {
 //						e.printStackTrace();
@@ -338,7 +338,7 @@ public class CompLifecycleManager {
 		updator = UpdateFactory.createCompUpdator(compObj.getImplType());
 		
 		LOGGER.info("**** HaveSetToNewVersion");
-//		System.out.println("clean up for updator is done!");
+//		LOGGER.fine("clean up for updator is done!");
 		LOGGER.info("clean up for updator is done!");
 		
 		//FOR TEST
@@ -348,7 +348,7 @@ public class CompLifecycleManager {
 //		for (Dependence dep : allInDeps) {
 //			inDepsStr += "\n" + dep.toString();
 //		}
-//		System.out.println("in CompLcMgr, when cleanupUpdate is done:" + inDepsStr);
+//		LOGGER.fine("in CompLcMgr, when cleanupUpdate is done:" + inDepsStr);
 		
 //		}
 		
@@ -455,8 +455,8 @@ public class CompLifecycleManager {
 			LOGGER.fine("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
 			LOGGER.fine("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 			
-//			System.out.println("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-//			System.out.println("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
+//			LOGGER.fine("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
+//			LOGGER.fine("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 		}
 		return true;
 	}
@@ -478,8 +478,8 @@ public class CompLifecycleManager {
 		LOGGER.fine("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
 		LOGGER.fine("reinitOldRootTxs.getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 		
-//		System.out.println("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-//		System.out.println("reinitOldRootTxs.getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
+//		LOGGER.fine("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
+//		LOGGER.fine("reinitOldRootTxs.getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 		return true;
 	}
 	

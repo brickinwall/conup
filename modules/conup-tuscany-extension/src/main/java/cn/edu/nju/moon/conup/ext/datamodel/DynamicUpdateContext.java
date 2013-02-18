@@ -29,13 +29,13 @@ public class DynamicUpdateContext {
 	
 	public void removeAlgorithmOldRootTx(String oldRootTx){
 		LOGGER.fine("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
-//		System.out.println("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
+//		LOGGER.fine("in DynaUpdateCtx.removeAlgorithmOldRootTx(), rm " + oldRootTx);
 		algorithmOldRootTxs.remove(oldRootTx);
 	}
 	
 	public void removeBufferOldRootTx(String oldRootTx){
 		LOGGER.fine("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
-//		System.out.println("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
+//		LOGGER.fine("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
 		bufferOldRootTxs.remove(oldRootTx);
 	}
 

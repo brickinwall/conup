@@ -80,9 +80,10 @@ public class TranquillityImpl implements Algorithm {
 //		case UPDATED:
 //			doValid(txContext, dynamicDepMgr);
 //			break;
-		default:
-			System.out.println("----------compStatus-------->" + compStatus);
-			System.out.println("default process...");
+		default:			
+			
+			LOGGER.fine("----------compStatus-------->" + compStatus);
+			LOGGER.fine("default process...");
 		}
 		
 	}

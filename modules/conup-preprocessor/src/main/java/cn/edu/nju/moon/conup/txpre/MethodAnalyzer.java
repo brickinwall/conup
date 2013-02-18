@@ -135,7 +135,7 @@ public class MethodAnalyzer {
 
 	public void printIsAnalyzed(int n) {
 		for (int i = 0; i < n; i++) {
-//			System.out.println(i + ": " + isAnalyze[i]);
+//			LOGGER.fine(i + ": " + isAnalyze[i]);
 		}
 	}
 
@@ -167,7 +167,7 @@ public class MethodAnalyzer {
 	public String getServiceName(String desc) {
 		String[] fields = desc.split(File.separator);
 		String serviceName = fields[fields.length - 1];
-		// System.out.println(desc + " Servic Name is " + serviceName);
+		// LOGGER.fine(desc + " Servic Name is " + serviceName);
 		return serviceName;
 	}
 
@@ -194,7 +194,7 @@ public class MethodAnalyzer {
 
 	public void printArray(int[] srcNum, int n) {
 		for (int i = 0; i < n; i++) {
-			System.out.println(i + ":" + srcNum[i]);
+			LOGGER.fine(i + ":" + srcNum[i]);
 		}
 	}
 
@@ -362,7 +362,7 @@ public class MethodAnalyzer {
 												insns, jumpE, localNum,
 												(LabelNode) i1dst);
 										((JumpInsnNode) src).label = nextOne;
-										// System.out.println("--------------"
+										// LOGGER.fine("--------------"
 										// + nextOne + "replaced"
 										// + ((JumpInsnNode) src).label);
 									} else {
@@ -470,7 +470,7 @@ public class MethodAnalyzer {
 				}
 				// insert end event
 				if (endinf.size() > 0) {
-					System.out.println("asasda");
+					LOGGER.fine("asasda");
 					for (AbstractInsnNode end : endinf) {						
 						InsnList trig = new InsnList();
 						trig.add(new VarInsnNode(ALOAD, localNum));
@@ -488,7 +488,7 @@ public class MethodAnalyzer {
 								"trigger", "(Ljava/lang/String;)V"));
 						int op = end.getOpcode();
 						if(op == RETURN){
-							System.out.println("return");
+							LOGGER.fine("return");
 							insns.insertBefore(end, trig);
 							
 						}
@@ -529,12 +529,12 @@ public class MethodAnalyzer {
 		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc.substring(
 				1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
-		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		// LOGGER.fine("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode("_E"));
-		// System.out.println("----------------------StatesDDA"+statesDDA);
+		// LOGGER.fine("----------------------StatesDDA"+statesDDA);
 		trigstart.add(new LdcInsnNode("_E"));
 		trigstart
 				.add(new MethodInsnNode(
@@ -606,12 +606,12 @@ public class MethodAnalyzer {
 		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc
 				.substring(1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
-		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		// LOGGER.fine("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode(statesDDA));
-		// System.out.println("----------------------StatesDDA"+statesDDA);
+		// LOGGER.fine("----------------------StatesDDA"+statesDDA);
 		trigstart.add(new LdcInsnNode(nextsDDA));
 		trigstart
 				.add(new MethodInsnNode(
@@ -750,15 +750,15 @@ public class MethodAnalyzer {
 				Iterator<AnnotationNode> fi = fn.visibleAnnotations.iterator();
 				while (fi.hasNext()) {
 					AnnotationNode fa = fi.next();
-					// System.out.println(fa.values);
+					// LOGGER.fine(fa.values);
 					if (fa.desc.contains("AEjb") || fa.desc.contains("Ejb")) {
 						// String ejb =
 						// fa.values.get(1).toString().split("/")[0];
 						String ejb = fn.desc.substring(1, fn.desc.length() - 1);
 						;
-						// System.out.println(ejb+"-"+fn.name);
+						// LOGGER.fine(ejb+"-"+fn.name);
 						ejball.put(ejb, (String) fn.name);
-						// System.out.println(ejb+"-"+fn.value);
+						// LOGGER.fine(ejb+"-"+fn.value);
 					}
 				}
 			}
@@ -779,7 +779,7 @@ public class MethodAnalyzer {
 			@Override
 			protected void newControlFlowEdge(int src, int dst) {
 				controlflow.addFlow(src, dst);
-//				System.out.println(src+"->"+dst);
+//				LOGGER.fine(src+"->"+dst);
 				if (src > dst) {
 					controlflow.getFlow(src).setIsWhile(true);
 				}
@@ -839,9 +839,9 @@ public class MethodAnalyzer {
 						int next = (Integer) controlflow.getFlow(src).getDst()
 								.get(0);
 						MethodInsnNode method = ((MethodInsnNode) an);
-						// System.out.println(an.toString()+"'owner is "+method.owner);
+						// LOGGER.fine(an.toString()+"'owner is "+method.owner);
 						if (com.contains(method.owner)) {
-							// System.out.println(an.toString()+"-------------owner is "+method.owner);
+							// LOGGER.fine(an.toString()+"-------------owner is "+method.owner);
 							// String serName = getServiceName(method.owner);
 							// String e = "COM." + serName + "." + src;
 							String e = "COM." + method.owner + "." + src;						
@@ -1189,7 +1189,7 @@ public class MethodAnalyzer {
 				State head = getState(headindex);
 				State tail = getState(tailindex);
 				if (equalState(head, tail)) {
-					System.out.println(headindex + "==" + tailindex + "true");
+					LOGGER.fine(headindex + "==" + tailindex + "true");
 					stateMachine.getEvents().remove(event);
 					stateMachine.mergeStates(headindex, tailindex);
 					states.remove(head);

@@ -12,7 +12,7 @@ public class TracePolicyProviderFactory implements PolicyProviderFactory<TracePo
 	
     public TracePolicyProviderFactory(ExtensionPointRegistry registry) {
         super();
-//    	System.out.println("TracePolicyProviderFactory...");
+//    	LOGGER.fine("TracePolicyProviderFactory...");
         this.registry = registry;
     }
 
@@ -21,18 +21,18 @@ public class TracePolicyProviderFactory implements PolicyProviderFactory<TracePo
 	}
 
 	public PolicyProvider createReferencePolicyProvider(EndpointReference endpointReference) {
-//		System.out.println("TracePolicyProviderFactory.createReferencePolicyProvider()");
+//		LOGGER.fine("TracePolicyProviderFactory.createReferencePolicyProvider()");
 		return new TraceReferencePolicyProvider(endpointReference);
 	}
 
 	public PolicyProvider createServicePolicyProvider(Endpoint endpoint) {
-//		System.out.println("TracePolicyProviderFactory.createServicePolicyProvider()");
+//		LOGGER.fine("TracePolicyProviderFactory.createServicePolicyProvider()");
 		return new TraceServicePolicyProvider(endpoint);
 	}
 
 	public PolicyProvider createImplementationPolicyProvider(
 			RuntimeComponent component) {
-//		System.out.println("TracePolicyProviderFactory.createImplementationPolicyProvider()");
+//		LOGGER.fine("TracePolicyProviderFactory.createImplementationPolicyProvider()");
 		return new TraceImplementationPolicyProvider(component);
 	}
 

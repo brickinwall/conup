@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 
 public class DynamicUpdateClassLoader extends ClassLoader {
 	private String baseDir; 
     private Set<String> dynaclazns; 
+    private Logger LOGGER = Logger.getLogger(DynamicUpdateClassLoader.class.getName());
 
     public DynamicUpdateClassLoader(String baseDir, String[] clazns) throws IOException { 
         super(null);  
@@ -30,7 +34,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
         Class<?> cls = null; 
         StringBuffer sb = new StringBuffer(baseDir); 
         String classname = name.replace('.', File.separatorChar) + ".class";
-//        System.out.println(classname);
+//        LOGGER.fine(classname);
         sb.append(File.separator + classname); 
         File classF = new File(sb.toString()); 
         cls = instantiateClass(name,new FileInputStream(classF),
@@ -52,7 +56,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
         if(!this.dynaclazns.contains(name) && cls == null){
         	
         	try {
-//        		System.out.println("try getClass().getClassLoader().loadClass " + name);
+//        		LOGGER.fine("try getClass().getClassLoader().loadClass " + name);
             	cls = getClass().getClassLoader().loadClass(name);
 			} catch (ClassNotFoundException e) {
 				cls = findClass(name);
@@ -60,7 +64,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
 			}
         }
         if (cls == null) {
-        	System.out.println("cls is null");
+        	LOGGER.fine("cls is null");
 //            cls = findClass(name);
             throw new ClassNotFoundException(name); 
         }
@@ -70,7 +74,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
     } 
 	
 	protected Class<?> findClass(String name) throws ClassNotFoundException{
-//		System.out.println("in method findClass(...): try to find " + name);
+//		LOGGER.fine("in method findClass(...): try to find " + name);
 		
 		Class<?> result = null;
 		

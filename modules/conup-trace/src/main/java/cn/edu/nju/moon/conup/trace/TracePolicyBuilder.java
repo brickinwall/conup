@@ -2,6 +2,7 @@ package cn.edu.nju.moon.conup.trace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -15,9 +16,11 @@ import org.apache.tuscany.sca.policy.PolicyExpression;
 import org.apache.tuscany.sca.policy.PolicySet;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
+import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
+
 
 public class TracePolicyBuilder implements PolicyBuilder<TracePolicy> {
-
+	private static Logger LOGGER = Logger.getLogger(TracePolicyBuilder.class.getName());
 	public QName getPolicyType() {
 		return TracePolicy.TRACE_POLICY_QNAME;
 	}
@@ -27,36 +30,36 @@ public class TracePolicyBuilder implements PolicyBuilder<TracePolicy> {
 	}
 
 	public boolean build(Endpoint endpoint, BuilderContext context) {
-		System.out.println("TracePolicyBuilder.build(...)");
+		LOGGER.fine("TracePolicyBuilder.build(...)");
         List<TracePolicy> polices = getPolicies(endpoint);
-        System.out.println(endpoint + ": " + polices);
+        LOGGER.fine(endpoint + ": " + polices);
         return true;
 	}
 
 	public boolean build(EndpointReference endpointReference,
 			BuilderContext context) {
-		System.out.println("TracePolicyBuilder.build(...)");
+		LOGGER.fine("TracePolicyBuilder.build(...)");
         List<TracePolicy> polices = getPolicies(endpointReference);
-        System.out.println(endpointReference + ": " + polices);
+        LOGGER.fine(endpointReference + ": " + polices);
         return true;
 	}
 
 	public boolean build(Component component, Implementation implementation,
 			BuilderContext context) {
-		System.out.println("TracePolicyBuilder.build(...)");
+		LOGGER.fine("TracePolicyBuilder.build(...)");
         List<TracePolicy> polices = getPolicies(implementation);
-        System.out.println(implementation + ": " + polices);
+        LOGGER.fine(implementation + ": " + polices);
         return true;
 	}
 
 	public boolean build(EndpointReference endpointReference,
 			Endpoint endpoint, BuilderContext context) {
-		System.out.println("TracePolicyBuilder.build(...)");
+		LOGGER.fine("TracePolicyBuilder.build(...)");
 		return true;
 	}
 	
     private List<TracePolicy> getPolicies(PolicySubject subject) {
-    	System.out.println("TracePolicyBuilder.getPolicies(...)");
+    	LOGGER.fine("TracePolicyBuilder.getPolicies(...)");
         List<TracePolicy> polices = new ArrayList<TracePolicy>();
         for (PolicySet ps : subject.getPolicySets()) {
             for (PolicyExpression exp : ps.getPolicies()) {

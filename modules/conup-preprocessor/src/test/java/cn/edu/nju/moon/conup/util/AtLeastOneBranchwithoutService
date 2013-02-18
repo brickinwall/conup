@@ -49,7 +49,7 @@ public class PortalServiceImpl implements PortalService {
 	@Override
 	@ConupTransaction
 	public List<String> execute(String userName, String passwd) {
-		System.out.println("enter execute.......\n\n");
+		LOGGER.fine("enter execute.......\n\n");
 		String cred = userName + "," + passwd;
 		int i = 1;
 		switch (i) {

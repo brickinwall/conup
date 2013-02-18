@@ -1,6 +1,9 @@
 package cn.edu.nju.moon.conup.ext.lifecycle;
 
 
+import java.util.logging.Logger;
+
+import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -13,6 +16,7 @@ import cn.edu.nju.moon.conup.spi.utils.Printer;
  *
  */
 public class AttemptUpdateThread extends Thread {
+	private Logger LOGGER = Logger.getLogger(AttemptUpdateThread.class.getName());
 	private CompLifecycleManager compLcMgr = null;
 	private DynamicDepManager depMgr = null;
 	public AttemptUpdateThread(CompLifecycleManager compLcMgr, DynamicDepManager depMgr){
@@ -34,9 +38,9 @@ public class AttemptUpdateThread extends Thread {
 		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				System.out.println("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
+				LOGGER.fine("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
 				if (depMgr.isOndemandSetupRequired()) {
-					System.out.println("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
+					LOGGER.fine("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
 					ondemandSyncMonitor.wait();
 				}
 			} catch (InterruptedException e) {
@@ -62,7 +66,7 @@ public class AttemptUpdateThread extends Thread {
 					depMgr.achievedFree();
 				} else{
 					try {
-						System.out.println("not ready for update yet, suspend AttemptUpdateThread------------------");
+						LOGGER.fine("not ready for update yet, suspend AttemptUpdateThread------------------");
 						validToFreeSyncMonitor.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
