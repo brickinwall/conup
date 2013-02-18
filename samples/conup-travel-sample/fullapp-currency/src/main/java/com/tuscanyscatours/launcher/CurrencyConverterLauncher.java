@@ -1,14 +1,14 @@
 package com.tuscanyscatours.launcher;
 
-import java.util.ArrayList;
-import java.util.List;
+
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
-
-import com.tuscanyscatours.currencyconverter.CurrencyConverter;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -16,15 +16,20 @@ import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
+import com.tuscanyscatours.currencyconverter.CurrencyConverter;
+
 /**
  *	@author JiangWang<jiang.wang88@gmail.com>
  *
  */
 public class CurrencyConverterLauncher {
+	private static 	Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	public static void main(String[] args) throws Exception{
+	
+		LOGGER.setLevel(Level.OFF);
 		
-		System.out.println("Starting CurrencyConverter node...");
+		LOGGER.fine("Starting CurrencyConverter node...");
 		String domainURI = "uri:default";
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		Node node = runtime.createNode(domainURI);
@@ -32,7 +37,7 @@ public class CurrencyConverterLauncher {
 				.getContributionLocation(CurrencyConverterLauncher.class);
 		node.installContribution(contributionURL);
 		node.startComposite("fullapp-currency", "fullapp-currency.composite");
-		System.out.println("fullapp-currency.composite is ready!");
+		LOGGER.fine("fullapp-currency.composite is ready!");
 		
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
@@ -51,14 +56,14 @@ public class CurrencyConverterLauncher {
 	
 	public static void accessServices(Node node){
 		try {
-			System.out.println("\nTry to update currency component");
+			LOGGER.fine("\nTry to update currency component");
 //			testUpdate();
 			
 			System.out
 					.println("\nTry to access CurrencyConverter#service-binding(CurrencyConverter/CurrencyConverter):");
 			CurrencyConverter currency = node.getService(CurrencyConverter.class,
 					"CurrencyConverter#service-binding(CurrencyConverter/CurrencyConverter)");
-			System.out.println("\t" + "CurrencyConverter.convert(\"USD\", \"EUR\", 100)=" + currency.convert("USD", "EUR", 100));
+			LOGGER.fine("\t" + "CurrencyConverter.convert(\"USD\", \"EUR\", 100)=" + currency.convert("USD", "EUR", 100));
 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

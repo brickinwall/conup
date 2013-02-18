@@ -19,20 +19,24 @@
 
 package com.tuscanyscatours.emailgateway.impl;
 
+import java.util.logging.Logger;
+
 import org.oasisopen.sca.annotation.Service;
 
+import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
 import com.tuscanyscatours.emailgateway.EmailGateway;
 
 @Service(EmailGateway.class)
 public class EmailGatewayImpl implements EmailGateway {
+	private Logger LOGGER = Logger.getLogger(EmailGatewayImpl.class.getName());
 	@ConupTransaction
     public boolean sendEmail(String sender, String recipient, String subject, String body) {
-        System.out.println("From: " + sender);
-        System.out.println("To: " + recipient);
-        System.out.println("Subject: " + subject);
-        System.out.println(body);
+        LOGGER.fine("From: " + sender);
+        LOGGER.fine("To: " + recipient);
+        LOGGER.fine("Subject: " + subject);
+        LOGGER.fine(body);
         return true;
     }
 

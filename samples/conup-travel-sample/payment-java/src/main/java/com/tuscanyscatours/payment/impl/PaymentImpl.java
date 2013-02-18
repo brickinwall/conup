@@ -19,6 +19,8 @@
 
 package com.tuscanyscatours.payment.impl;
 
+import java.util.logging.Logger;
+
 import org.oasisopen.sca.ServiceReference;
 import org.oasisopen.sca.annotation.Property;
 import org.oasisopen.sca.annotation.Reference;
@@ -27,8 +29,9 @@ import org.oasisopen.sca.annotation.Service;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
-import com.tuscanyscatours.bank.Bank;
+import com.tuscanyscatours.currencyconverter.CurrencyConverter;
 import com.tuscanyscatours.customer.Customer;
 import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
@@ -42,7 +45,8 @@ import com.tuscanyscatours.payment.creditcard.CreditCardPayment;
  */
 @Service(Payment.class)
 public class PaymentImpl implements Payment {
-
+	
+	private static Logger LOGGER = Logger.getLogger(Payment.class.getName());
     @Reference
     protected CustomerRegistry customerRegistry;
 
@@ -57,7 +61,9 @@ public class PaymentImpl implements Payment {
     protected float transactionFee = 0.01f;
     
     @Reference
-    protected Bank bank;
+    protected CurrencyConverter currencyConverter;
+
+//    private TxLifecycleManager _txLifecycleMgr;
     
     @ConupTransaction
     public String makePaymentMember(String customerId, float amount) {
@@ -68,7 +74,9 @@ public class PaymentImpl implements Payment {
 //            		                                    emailGateway,
 //            		                                    customer.getEmail());
 //            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
-            System.out.println("GetExchangeRate(\"GBP\", \"USD\"):" + bank.getExchangeRate("GBP", "USD"));
+            LOGGER.fine("before currencyConverter.convert(...)");
+            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + currencyConverter.convert("USD", "GBP", amount));
+            LOGGER.fine("after currencyConverter.convert(...)");
 //            return status;
             return "ok";
         } catch (CustomerNotFoundException ex) {
@@ -83,8 +91,8 @@ public class PaymentImpl implements Payment {
     }
     
     public String checkSecurity(String securityPrompt) {        
-        System.out.println("Extra securiy - " + securityPrompt);
-        System.out.println("password = abcxyz");
+        LOGGER.fine("Extra securiy - " + securityPrompt);
+        LOGGER.fine("password = abcxyz");
         return "abcxyz";
     }
 

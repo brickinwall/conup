@@ -1,5 +1,7 @@
 package com.tuscanyscatours.coordination.impl;
 
+import java.util.logging.Logger;
+
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
@@ -13,6 +15,7 @@ import com.tuscanyscatours.tripbooking.TripBooking;
 
 @Service(Coordination.class)
 public class CoordinationImpl implements Coordination {
+	private static Logger LOGGER = Logger.getLogger(CoordinationImpl.class.getName());
 	@Reference
 	protected TravelCatalogSearch travelCatalogSearch;
 	
@@ -27,11 +30,11 @@ public class CoordinationImpl implements Coordination {
 	
 	@Override
 	public void coordinate() {
-		System.out.println("\nTry to access TravelCatalog#service-binding(TravelCatalogSearch/TravelCatalogSearch):");
+		LOGGER.fine("\nTry to access TravelCatalog#service-binding(TravelCatalogSearch/TravelCatalogSearch):");
 		
 		TripLeg tripLeg = new TripLeg("a0001", "LGW", "FLR", "06/12/09", "06/12/09", "2");
 		TripItem[] tripSearchResults = travelCatalogSearch.search(tripLeg);
-		System.out.println("\t" + "travelCatalogSearch.searchSynch(tripLeg)=" + tripSearchResults);
+		LOGGER.fine("\t" + "travelCatalogSearch.searchSynch(tripLeg)=" + tripSearchResults);
 		
 		String cartId = cartInitialize.newCart();
 		
@@ -43,9 +46,9 @@ public class CoordinationImpl implements Coordination {
 		}
 
 		TripItem[] tripItems = cartInitialize.getTrips(cartId);
-		System.out.println("All trips in shoppingcart:");
+		LOGGER.fine("All trips in shoppingcart:");
 		for (TripItem tripItem : tripItems) {
-			System.out.println(tripItem);
+			LOGGER.fine(tripItem.toString());
 		}
 		
 		cartCheckout.checkout(cartId, "c-0");
