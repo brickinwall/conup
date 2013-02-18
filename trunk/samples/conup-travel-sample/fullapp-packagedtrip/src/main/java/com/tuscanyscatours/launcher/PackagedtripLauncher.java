@@ -1,5 +1,8 @@
 package com.tuscanyscatours.launcher;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
@@ -15,9 +18,12 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class PackagedtripLauncher {
-
+	private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	public static void main(String[] args) throws Exception{
-		System.out.println("Starting packagedtrip node...");
+		
+		LOGGER.setLevel(Level.OFF);
+		
+		LOGGER.fine("Starting packagedtrip node...");
 		String domainURI = "uri:default";
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		Node node = runtime.createNode(domainURI);
@@ -27,7 +33,7 @@ public class PackagedtripLauncher {
 
 		node.startComposite("fullapp-packagedtrip",
 				"fullapp-packagedtrip.composite");
-		System.out.println("fullapp-packagedtrip.composite is ready!");
+		LOGGER.fine("fullapp-packagedtrip.composite is ready!");
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
@@ -51,7 +57,7 @@ public class PackagedtripLauncher {
 				.println("\nTry to access TripPartner#service-binding(Search/Search):");
 			Search carSearch = node.getService(Search.class,
 					"TripPartner#service-binding(Search/Search)");
-			System.out.println("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
+			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

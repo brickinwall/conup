@@ -1,16 +1,11 @@
 package com.tuscanyscatours.launcher;
 
-import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
-
-import com.tuscanyscatours.common.TripItem;
-import com.tuscanyscatours.shoppingcart.CartCheckout;
-import com.tuscanyscatours.shoppingcart.CartInitialize;
-import com.tuscanyscatours.shoppingcart.CartUpdates;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -18,11 +13,16 @@ import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
-public class LaunchShoppingCart {
+import com.tuscanyscatours.common.TripItem;
+import com.tuscanyscatours.shoppingcart.CartCheckout;
+import com.tuscanyscatours.shoppingcart.CartInitialize;
+import com.tuscanyscatours.shoppingcart.CartUpdates;
 
+public class LaunchShoppingCart {
+	private static Logger LOGGER = Logger.getLogger(LaunchShoppingCart.class.getName());
 	public static void main(String[] args) throws Exception {
 
-		System.out.println("Starting ShoppingCart node...");
+		LOGGER.fine("Starting ShoppingCart node...");
 		String domainURI = "uri:default";
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		Node node = runtime.createNode(domainURI);
@@ -32,7 +32,7 @@ public class LaunchShoppingCart {
 
 		node.startComposite("fullapp-shoppingcart",
 				"fullapp-shoppingcart.composite");
-		System.out.println("fullapp-shoppingcart.composite is ready!");
+		LOGGER.fine("fullapp-shoppingcart.composite is ready!");
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
@@ -60,12 +60,12 @@ public class LaunchShoppingCart {
 //			testUpdate();
 //			Thread.sleep(2000);
 			
-			System.out.println("\nTry to access ShoppingCart#service-binding(CartInitialize/CartInitialize):");
+			LOGGER.fine("\nTry to access ShoppingCart#service-binding(CartInitialize/CartInitialize):");
 			CartInitialize cartInitialize = node
 					.getService(CartInitialize.class,
 							"ShoppingCart#service-binding(CartInitialize/CartInitialize)");
 			String cartId = cartInitialize.newCart();
-			System.out.println("create a new cartId: " + cartId);
+			LOGGER.fine("create a new cartId: " + cartId);
 			
 			CartUpdates cartUpdate = node.getService(CartUpdates.class, "ShoppingCart#service-binding(CartUpdates/CartUpdates)");
 			TripItem trip = new TripItem("", "", TripItem.CAR, "FS1DEC06", "Florence and Siena pre-packaged tour", "LGW - FLR", "06/12/09", "13/12/09", 450, "EUR", "http://localhost:8085/tbd");
@@ -76,20 +76,14 @@ public class LaunchShoppingCart {
 			cartUpdate.addTrip(cartId, trip2);
 
 			TripItem[] tripItems = cartInitialize.getTrips(cartId);
-			System.out.println(tripItems.length);
-			System.out.println(tripItems[0]);
-			System.out.println(tripItems[1]);
+			
 			
 			CartCheckout cartCheckout = node.getService(CartCheckout.class, "ShoppingCart#service-binding(CartCheckout/CartCheckout)");
 			cartCheckout.checkout(cartId, "c-0");
 //			String cartId2 = cartInitialize.newCart();
-//			System.out.println("create a new cartId: " + cartId2);
-//			System.out.println(cartInitialize.proxyEqual(cartId, cartId2));
-			
+
 //			
 //			TripItem[] allAddedTripItems = cartInitialize.getTrips(cartId);
-//			System.out.println(allAddedTripItems.length);
-//			System.out.println(allAddedTripItems[0]);
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

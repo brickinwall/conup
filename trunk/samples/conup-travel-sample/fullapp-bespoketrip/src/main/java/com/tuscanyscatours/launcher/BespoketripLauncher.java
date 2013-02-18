@@ -1,5 +1,8 @@
 package com.tuscanyscatours.launcher;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
@@ -15,9 +18,13 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class BespoketripLauncher {
-
-	public static void main(String[] args) throws Exception{
-		System.out.println("Starting bespoketrip node...");
+	private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	
+	public static void main(String[] args) throws Exception{		
+		
+		LOGGER.setLevel(Level.OFF);
+		
+		LOGGER.fine("Starting bespoketrip node...");
 		String domainURI = "uri:default";
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		Node node = runtime.createNode(domainURI);
@@ -27,7 +34,7 @@ public class BespoketripLauncher {
 
 		node.startComposite("fullapp-bespoketrip",
 				"fullapp-bespoketrip.composite");
-		System.out.println("fullapp-bespoketrip.composite is ready!");
+		LOGGER.fine("fullapp-bespoketrip.composite is ready!");
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
@@ -56,23 +63,23 @@ public class BespoketripLauncher {
 	
 	public static void accessServices(Node node){
 		try {
-//			System.out.println("\nTry to update currency component");
+//			LOGGER.fine("\nTry to update currency component");
 //			testUpdate();
 			
 			TripLeg tripLeg = new TripLeg("", "", "FLR", "06/12/09", "06/12/09", "2");
-			System.out.println("\nTry to access CarPartner#service-binding(Search/Search):");
+			LOGGER.fine("\nTry to access CarPartner#service-binding(Search/Search):");
 			Search carSearch = node.getService(Search.class, "CarPartner#service-binding(Search/Search)");
-			System.out.println("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
+			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 //			System.out
 //				.println("\nTry to access CarPartner#service-binding(Search/searchws):");
 //			carSearch = node.getService(Search.class,
 //					"CarPartner#service-binding(Search/searchws)");
-//			System.out.println("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
+//			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 
-			System.out.println("\nTry to access HotelPartner#service-binding(Search/Search):");
+			LOGGER.fine("\nTry to access HotelPartner#service-binding(Search/Search):");
             TripLeg flightTrip = new TripLeg("", "LGW", "FLR", "06/12/09", "06/12/09", "1");
 			Search hotelSearch = node.getService(Search.class, "HotelPartner#service-binding(Search/Search)");
-			System.out.println("\t" + "hotelSearch.searchSynch(tripLeg)=" + hotelSearch.searchSynch(flightTrip));
+			LOGGER.fine("\t" + "hotelSearch.searchSynch(tripLeg)=" + hotelSearch.searchSynch(flightTrip));
 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

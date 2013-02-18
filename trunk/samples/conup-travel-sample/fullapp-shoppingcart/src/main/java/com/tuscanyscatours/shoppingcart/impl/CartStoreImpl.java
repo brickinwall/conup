@@ -51,12 +51,12 @@ public class CartStoreImpl implements CartStore {
 
 //    @Init
 //    public void initCart() {
-//        System.out.println("CartStore init for id: " + cartId);
+//        LOGGER.fine("CartStore init for id: " + cartId);
 //    }
 //
 //    @Destroy
 //    public void destroyCart() {
-//        System.out.println("CartStore destroy for id: " + cartId);
+//        LOGGER.fine("CartStore destroy for id: " + cartId);
 //    }
 
     @ConupTransaction

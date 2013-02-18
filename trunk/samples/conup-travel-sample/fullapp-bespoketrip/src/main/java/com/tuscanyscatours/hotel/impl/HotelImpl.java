@@ -20,6 +20,7 @@ package com.tuscanyscatours.hotel.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.oasisopen.sca.annotation.Callback;
 import org.oasisopen.sca.annotation.Init;
@@ -41,6 +42,7 @@ import com.tuscanyscatours.hotel.HotelManagement;
  */
 @Service( {Search.class, Book.class, HotelManagement.class})
 public class HotelImpl implements Search, Book, HotelManagement {
+	private static Logger LOGGER = Logger.getLogger(HotelImpl.class.getName());
 
     private List<HotelInfo> hotels = new ArrayList<HotelInfo>();
 
@@ -86,6 +88,6 @@ public class HotelImpl implements Search, Book, HotelManagement {
 
     public void addHotelInfo(HotelInfo hotelInfo) {
         hotels.add(hotelInfo);
-        System.out.println("Added hotel info - " + hotelInfo.getName());
+        LOGGER.fine("Added hotel info - " + hotelInfo.getName());
     }
 }
