@@ -23,11 +23,11 @@ public class PortalVisitorThread extends Thread {
 			// boolean updateResult =
 			// domainComponentUpdateService.onDemandRequest(targetComponent,
 			// freenessSetup);
-			// System.out.println("updateResult" + updateResult);
+			// LOGGER.fine("updateResult" + updateResult);
 
 			PortalService portalService = node.getService(PortalService.class, "PortalComponent#service-binding(PortalService/PortalService)");
 			portalService.execute("", "nju", "cs");
-//			System.out.println("\t" + "" + portalService.execute("", "nju", "cs"));
+//			LOGGER.fine("\t" + "" + portalService.execute("", "nju", "cs"));
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

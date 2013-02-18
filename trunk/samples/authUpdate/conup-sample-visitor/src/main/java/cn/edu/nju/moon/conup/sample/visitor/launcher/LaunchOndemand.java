@@ -14,7 +14,7 @@
 //public class LaunchOndemand {
 //	private static Node node;
 //	public static void main(String[] args) throws Exception {
-//		System.out.println("Starting conup-sample-visitor node ....");
+//		LOGGER.fine("Starting conup-sample-visitor node ....");
 //		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchOndemand.class);
 //		
 //        //domain uri
@@ -25,15 +25,15 @@
 //        node.installContribution(contributionURL);
 //        node.startComposite("conup-sample-visitor", "ondemand.composite");
 //        
-//        System.out.println("ondemand.composite ready for big business !!!");
+//        LOGGER.fine("ondemand.composite ready for big business !!!");
 //        
 //        //access
 //        ondemand(node);
 //        
 //        System.in.read();
-//        System.out.println("Stopping ...");
+//        LOGGER.fine("Stopping ...");
 //        node.stop();
-//        System.out.println();
+//        LOGGER.fine();
 //    }
 //	
 //	private static void ondemand(Node node){

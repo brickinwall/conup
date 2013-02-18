@@ -1,26 +1,22 @@
 package cn.edu.nju.moon.conup.sample.portal.launcher;
 
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
+import java.util.logging.Logger;
 
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
-import org.apache.tuscany.sca.Node;
-import org.oasisopen.sca.NoSuchServiceException;
-
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
-import cn.edu.nju.moon.conup.sample.portal.services.PortalService;
-import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class LaunchPortal {
+	private static Logger LOGGER = Logger.getLogger(LaunchPortal.class.getName());
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting conup-sample-portal node ....");
+		LOGGER.fine("Starting conup-sample-portal node ....");
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchPortal.class);
 		
         //domain uri
@@ -33,7 +29,7 @@ public class LaunchPortal {
         
         //add current business node to container
         
-        System.out.println("portal.composite ready for big business !!!");
+        LOGGER.fine("portal.composite ready for big business !!!");
         
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
@@ -58,9 +54,9 @@ public class LaunchPortal {
 //        depRecorder.printRecorder();
         
         System.in.read();
-        System.out.println("Stopping ...");
+        LOGGER.fine("Stopping ...");
         node.stop();
-        System.out.println();
+        
 	}
 	
 	private static void accessServices(Node node) throws InterruptedException {
@@ -69,7 +65,7 @@ public class LaunchPortal {
 			Random random;
 			random = new Random(System.currentTimeMillis());
 			for(int i=0; i<threadNum; i++){
-				System.out.println("Try to access PortalComponent#service-binding(PortalService/PortalService)");
+				LOGGER.fine("Try to access PortalComponent#service-binding(PortalService/PortalService)");
 				new PortalVisitorThread(node).start();
 	//			testUpdate();
 				if(i == 25){
