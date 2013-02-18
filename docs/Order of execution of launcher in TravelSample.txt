@@ -1,0 +1,7 @@
+Order of execution of launchers in Travel-Sample
+fullapp-currency
+fullapp-bespoketrip
+fullapp-packagedtrip
+payment-java
+fullapp-shoppingcart
+fullapp-coordination
