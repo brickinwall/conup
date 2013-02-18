@@ -10,7 +10,7 @@ import cn.edu.nju.moon.conup.sample.portal.services.PortalService;
 public class PortalVisitor extends Thread {
 
 	private Node node = null;
-	Logger logger = Logger.getLogger(VisitorServiceImpl.class.getName());
+	private static Logger LOGGER = Logger.getLogger(VisitorServiceImpl.class.getName());
 
 	public PortalVisitor(Node node) {
 		this.node = node;
@@ -30,7 +30,7 @@ public class PortalVisitor extends Thread {
 		// logger.info("\t" + "" + portalService.execute("nju", "cs"));
 		// sleep(1000);
 		// }
-		System.out.println(portalService.execute("", "nju", "cs"));
+		LOGGER.fine(portalService.execute("", "nju", "cs"));
 	}// END RUN()
 
 }

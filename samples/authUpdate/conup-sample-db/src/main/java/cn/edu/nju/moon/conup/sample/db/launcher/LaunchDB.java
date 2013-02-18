@@ -2,10 +2,11 @@ package cn.edu.nju.moon.conup.sample.db.launcher;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
-import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
@@ -17,6 +18,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 public class LaunchDB {
+	private static Logger LOGGER = Logger.getLogger(LaunchDB.class.getName());
 	/**
 	 * distributed.
 	 * 
@@ -24,7 +26,7 @@ public class LaunchDB {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting conup-sample-db node ....");
+		LOGGER.fine("Starting conup-sample-db node ....");
 		String contributionURL = ContributionLocationHelper
 				.getContributionLocation(LaunchDB.class);
 
@@ -38,14 +40,14 @@ public class LaunchDB {
 
 		// add current business node to container
 
-		System.out.println("db.composite ready for big business !!!");
+		LOGGER.fine("db.composite ready for big business !!!");
 
 		// initiate NodeManager
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("DBComponent", "oldVersion");
 		// ComponentObject compObj = nodeMgr.getComponentObject("DBComponent");
-		// System.out.println(compObj.getStaticDeps() + "\n" +
+		// LOGGER.fine(compObj.getStaticDeps() + "\n" +
 		// compObj.getStaticInDeps() + "\n" + compObj.getAlgorithmConf());
 
 		CompLifecycleManager.getInstance("DBComponent").setNode(node);
@@ -60,9 +62,9 @@ public class LaunchDB {
 //		 accessServices(node);
 
 		System.in.read();
-		System.out.println("Stopping ...");
+		LOGGER.fine("Stopping ...");
 		node.stop();
-		System.out.println();
+		
 	}
 
 	private static void accessServices(Node node) {
@@ -72,7 +74,7 @@ public class LaunchDB {
 					.println("\nTry to access DBComponent#service-binding(DBService/DBService):");
 			DBService db = node.getService(DBService.class,
 					"DBComponent#service-binding(DBService/DBService)");
-			System.out.println("\t" + "" + db.dbOperation("emptyExeProc"));
+			LOGGER.fine("\t" + "" + db.dbOperation("emptyExeProc"));
 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
@@ -91,17 +93,17 @@ public class LaunchDB {
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 		ondemandHelper.ondemandSetup();
 		Set<Dependence> outDeps = depMgr.getRuntimeDeps();
-		System.out.println("OutDepRegistry:");
+		LOGGER.fine("OutDepRegistry:");
 		for (Iterator iterator = outDeps.iterator(); iterator.hasNext();) {
 			Dependence dependence = (Dependence) iterator.next();
-			System.out.println(dependence);
+			LOGGER.fine(dependence.toString());
 		}
 
-		System.out.println("InDepRegistry:");
+		LOGGER.fine("InDepRegistry:");
 		Set<Dependence> inDeps = depMgr.getRuntimeInDeps();
 		for (Iterator iterator = inDeps.iterator(); iterator.hasNext();) {
 			Dependence dependence = (Dependence) iterator.next();
-			System.out.println(dependence);
+			LOGGER.fine(dependence.toString());
 		}
 	}
 

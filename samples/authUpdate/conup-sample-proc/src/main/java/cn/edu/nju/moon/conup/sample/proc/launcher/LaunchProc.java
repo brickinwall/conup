@@ -1,9 +1,11 @@
 package cn.edu.nju.moon.conup.sample.proc.launcher;
 
 
+import java.util.logging.Logger;
+
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
-import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
@@ -14,13 +16,14 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 public class LaunchProc {
+	private static Logger LOGGER = Logger.getLogger(LaunchProc.class.getName());
 	/**
 	 * distributed.
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting conup-sample-proc node ....");
+		LOGGER.fine("Starting conup-sample-proc node ....");
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchProc.class);
 		
         //domain uri
@@ -33,7 +36,7 @@ public class LaunchProc {
         
         //add current business node to container
         
-        System.out.println("proc.composite ready for big business !!!");
+        LOGGER.fine("proc.composite ready for big business !!!");
 
         //initiate NodeManager
         NodeManager nodeMgr;
@@ -52,44 +55,44 @@ public class LaunchProc {
 //        accessServices(node);
         
         System.in.read();
-        System.out.println("Stopping ...");
+        LOGGER.fine("Stopping ...");
         node.stop();
-        System.out.println();
+        
     }
 	
 	private static void accessServices(Node node) throws InterruptedException {
 		try {
-//				System.out.println("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
+//				LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
 //				ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
-//				System.out.println("\t" + "" + pi.process("nju,cs,pass", ""));
+//				LOGGER.fine("\t" + "" + pi.process("nju,cs,pass", ""));
 			
 		while(true){
-			System.out.println("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
+			LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
 			ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
-			System.out.println("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
+			LOGGER.fine("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
 			Thread.sleep(50);
 		}
 		
 //			int threadNum = 100;
 //			for(int i=0; i<threadNum; i++){
-//				System.out.println("Try to access ProcComponent#service-binding(ProcService/ProcService)");
+//				LOGGER.fine("Try to access ProcComponent#service-binding(ProcService/ProcService)");
 //				new ProcVisitorThread(node).start();
 ////				Thread.sleep(2000);
 //			}
 			
 //			
-//			System.out.println("\nTry to access TokenComponent#service-binding(TokenService/TokenService):");
+//			LOGGER.fine("\nTry to access TokenComponent#service-binding(TokenService/TokenService):");
 //			TokenService ts = node.getService(TokenService.class, "TokenComponent#service-binding(TokenService/TokenService)");
 //			String token = ts.getToken("nju,cs");
-//			System.out.println("\t" + "" + token);
+//			LOGGER.fine("\t" + "" + token);
 //			
-//			System.out.println("\nTry to access VerificationComponent#service-binding(VerificationService/VerificationService):");
+//			LOGGER.fine("\nTry to access VerificationComponent#service-binding(VerificationService/VerificationService):");
 //			VerificationService vs = node.getService(VerificationService.class, "VerificationComponent#service-binding(VerificationService/VerificationService)");
-//			System.out.println("\t" + "" + vs.verify(token));
+//			LOGGER.fine("\t" + "" + vs.verify(token));
 			
-//			System.out.println("\nTry to access DBComponent#service-binding(DBService/DBService):");
+//			LOGGER.fine("\nTry to access DBComponent#service-binding(DBService/DBService):");
 //			DBService db = node.getService(DBService.class, "DBComponent#service-binding(DBService/DBService)");
-//			System.out.println("\t" + "" + db.dbOperation());
+//			LOGGER.fine("\t" + "" + db.dbOperation());
 			
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

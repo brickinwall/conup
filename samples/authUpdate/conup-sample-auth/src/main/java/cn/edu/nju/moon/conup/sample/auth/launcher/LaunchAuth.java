@@ -1,10 +1,11 @@
 package cn.edu.nju.moon.conup.sample.auth.launcher;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
-import org.apache.tuscany.sca.Node;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -13,8 +14,10 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 
 public class LaunchAuth {
+	private static Logger LOGGER = Logger.getLogger(LaunchAuth.class.getName());
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting conup-sample-auth node ....");
+		
+		LOGGER.fine("Starting conup-sample-auth node ....");
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchAuth.class);
 		
         //domain uri
@@ -27,7 +30,7 @@ public class LaunchAuth {
         
         //add current business node to container
         
-        System.out.println("auth.composite ready for big business !!!");
+        LOGGER.fine("auth.composite ready for big business !!!");
         
         //initiate NodeManager
         NodeManager nodeMgr;
@@ -43,9 +46,9 @@ public class LaunchAuth {
 //        accessServices(node);
         
         System.in.read();
-        System.out.println("Stopping ...");
+        LOGGER.fine("Stopping ...");
         node.stop();
-        System.out.println();
+        
     }
 	
 	private static void accessServices(Node node) throws InterruptedException {
@@ -53,7 +56,7 @@ public class LaunchAuth {
 		int threadNum = 100;
 		Random random = new Random(System.currentTimeMillis());
 		for(int i=0; i<threadNum; i++){
-			System.out.println("Try to access AuthComponent#service-binding(TokenService/TokenService)");
+			LOGGER.fine("Try to access AuthComponent#service-binding(TokenService/TokenService)");
 			new AuthVisitorThread(node).start();
 			
 			if(i == 25 || i == 75){

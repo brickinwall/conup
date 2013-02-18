@@ -9,7 +9,7 @@
 //public class LaunchUpdate {
 //	private static Node node;
 //	public static void main(String[] args) throws Exception {
-//		System.out.println("Starting conup-sample-visitor node ....");
+//		LOGGER.fine("Starting conup-sample-visitor node ....");
 //		String contributionURL = ContributionLocationHelper.getContributionLocation(LaunchUpdate.class);
 //		
 //        //domain uri
@@ -20,15 +20,15 @@
 //        node.installContribution(contributionURL);
 //        node.startComposite("conup-sample-visitor", "update.composite");
 //        
-//        System.out.println("update.composite ready for big business !!!");
+//        LOGGER.fine("update.composite ready for big business !!!");
 //        
 //        //update
 //        update(node);
 //        
 //        System.in.read();
-//        System.out.println("Stopping ...");
+//        LOGGER.fine("Stopping ...");
 //        node.stop();
-//        System.out.println();
+//        LOGGER.fine();
 //    }
 //	
 //	private static void update(Node node){

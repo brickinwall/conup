@@ -1,6 +1,8 @@
 package cn.edu.nju.moon.conup.sample.visitor.launcher;
 
 
+import java.util.logging.Logger;
+
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
@@ -10,8 +12,9 @@ import cn.edu.nju.moon.conup.sample.visitor.services.VisitorService;
 
 public class LauncherVisitor {
 	public static Node node;
+	private static Logger LOGGER = Logger.getLogger(LauncherVisitor.class.getName());
 	public static void main(String[] args) throws Exception {
-		System.out.println("Starting conup-sample-visitor node ....");
+		LOGGER.fine("Starting conup-sample-visitor node ....");
 		String contributionURL = ContributionLocationHelper.getContributionLocation(LauncherVisitor.class);
 		
         //domain uri
@@ -22,15 +25,15 @@ public class LauncherVisitor {
         node.installContribution(contributionURL);
         node.startComposite("conup-sample-visitor", "visitor.composite");
         
-        System.out.println("visitor.composite ready for big business !!!");
+        LOGGER.fine("visitor.composite ready for big business !!!");
         
         //access
         visit(node);
         
         System.in.read();
-        System.out.println("Stopping ...");
+        LOGGER.fine("Stopping ...");
         node.stop();
-        System.out.println();
+        
 		
     }
 	

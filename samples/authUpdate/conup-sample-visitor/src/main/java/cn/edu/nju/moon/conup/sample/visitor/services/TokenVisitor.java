@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.sample.visitor.services;
 
+import java.util.logging.Logger;
+
 import cn.edu.nju.moon.conup.sample.portal.services.TokenService;
 
 /**
@@ -7,6 +9,7 @@ import cn.edu.nju.moon.conup.sample.portal.services.TokenService;
  * @version Dec 20, 2012 8:34:27 PM
  */
 public class TokenVisitor extends Thread {
+	private static Logger LOGGER = Logger.getLogger(TokenVisitor.class.getName());
 
 	private TokenService tokenService = null;
 	
@@ -20,6 +23,6 @@ public class TokenVisitor extends Thread {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println(tokenService.getToken("", "nju,cs"));
+		LOGGER.fine(tokenService.getToken("", "nju,cs"));
 	}
 }
