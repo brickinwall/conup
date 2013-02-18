@@ -30,11 +30,11 @@ public class XMLUtil {
 	public XMLUtil() {
 		//development version
 //		String xmlUtilLocation = XMLUtil.class.getResource("").toString();
-////		System.out.println("xmlUtilLocation:" + xmlUtilLocation);
+////		LOGGER.fine("xmlUtilLocation:" + xmlUtilLocation);
 //		int beginIndex = xmlUtilLocation.indexOf(":") + 1;
 //		int endIndex = xmlUtilLocation.indexOf("cn/edu/nju/moon/conup/spi/utils/");
 //		String conupXmlPath = xmlUtilLocation.substring(beginIndex, endIndex) + "Conup.xml";
-////		System.out.println("conupXmlPath:" + conupXmlPath);
+////		LOGGER.fine("conupXmlPath:" + conupXmlPath);
 		
 		//distribution version
 		String disPath = getDistributionEnvPath();

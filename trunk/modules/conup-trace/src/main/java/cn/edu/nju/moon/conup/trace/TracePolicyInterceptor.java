@@ -118,7 +118,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		if(isCallback(msg)){
 			LOGGER.warning(operation.toString() + " is a Callback operation when interceptor phase is " + phase);
 //			if(operation.toString().contains("searchResultsResponse")){
-//				System.out.println();
+//				LOGGER.fine();
 //			}
 			return getNext().invoke(msg);
 		}
@@ -134,7 +134,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	private boolean isCallback(Message msg){
 		boolean isCallback = false;
 		Endpoint endpoint = msg.getTo();
-//		System.out.println(phase);
+//		LOGGER.fine(phase);
 		if(endpoint instanceof RuntimeEndpointImpl
 			&& phase.equals(Phase.SERVICE_POLICY)
 			&& getComponent() != null
@@ -143,7 +143,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			String targetUri = rtEp.getDeployedURI();
 			
 //			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
-//				System.out.println(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
 //			}
 			
 			for (ComponentReference compRef : getComponent().getReferences()) {
@@ -169,7 +169,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			String targetUri = rtEp.getDeployedURI();
 			
 //			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
-//				System.out.println(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
 //			}
 			
 			for (ComponentService compService : getComponent().getServices()) {
@@ -208,7 +208,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			threadID = getThreadID();
 			TransactionContext txCtx = cache.getTxCtx(threadID);
 			
-//			System.out.println("\n\n\n ThreadID=" + getThreadID() + ", in buffer, compStatus=" + depMgr.getCompStatus() + " \n\n\n");
+//			LOGGER.fine("\n\n\n ThreadID=" + getThreadID() + ", in buffer, compStatus=" + depMgr.getCompStatus() + " \n\n\n");
 
 			if (depMgr.isNormal()) {
 				TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
@@ -242,7 +242,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
 			synchronized (waitingRemoteCompUpdateDoneMonitor) {
 				if (clMgr.getUpdateCtx() == null || clMgr.getUpdateCtx().isLoaded() == false) {
-//					System.out.println("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
+//					LOGGER.fine("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
 					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), compIdentifier, txCtx, false)){
 						try {
 							waitingRemoteCompUpdateDoneMonitor.wait();
@@ -269,7 +269,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //						printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
 					}
 					if (!freeness.isReadyForUpdate(hostComp)) {
-//						System.out.println("ThreadID=" + getThreadID()
+//						LOGGER.fine("ThreadID=" + getThreadID()
 //								+ "compStatus=" + depMgr.getCompStatus()
 //								+ ", in buffer, try to be free via "
 //								+ freeness.getFreenessType());
@@ -336,25 +336,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		msg.setBody((Object [])copyOfMsgBody.toArray());
 	}
 
-	@Deprecated
-	private Message exchangeViaMsgHeader(Message msg){
-		if (phase.equals(Phase.SERVICE_POLICY)) {
-			System.out.println("\n\n\nservice interceptor: ");
-			System.out.println(msg.getHeaders().get("conup"));
-		} else if(phase.equals(Phase.REFERENCE_POLICY)){
-			System.out.println("\n\n\nreference interceptor: ");
-			System.out.println(msg.getHeaders());
-			msg.getHeaders().put("conup", "testing");
-		} else if(phase.equals(Phase.SERVICE_INTERFACE)){
-			System.out.println("\n\n\n " + Phase.SERVICE_INTERFACE);
-			System.out.println(msg.getHeaders());
-		} else if(phase.equals(Phase.IMPLEMENTATION_POLICY)){
-			System.out.println("\n\n\n " + Phase.IMPLEMENTATION_POLICY);
-			System.out.println(msg.getHeaders());
-		} 
-		
-		return msg;
-	}
+
 	
 	/**
 	 * This method is supposed to exchange root/parent transaction id via
@@ -510,9 +492,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		int index = raw.indexOf(TracePolicyInterceptor.ROOT_PARENT_IDENTIFIER);
 		int head = raw.substring(index).indexOf("[")+1;
-//		System.out.println(raw.substring(0, head));
+//		LOGGER.fine(raw.substring(0, head));
 		int tail = raw.substring(index).indexOf("]");
-//		System.out.println(raw.substring(head, tail));
+//		LOGGER.fine(raw.substring(head, tail));
 		return raw.substring(head, tail);
 	}
 	

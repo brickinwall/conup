@@ -85,7 +85,7 @@ public class ControlFlow {
 			for (int i = 0; i < d.size(); i++) {
 //				System.out.print(d.get(i) + ",");
 			}
-//			System.out.println();
+//			LOGGER.fine();
 		}
 
 	}

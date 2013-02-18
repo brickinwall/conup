@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Logger;
 
 /**
  * As to a Dependence, we care about four properties:
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  *
  */
 public class DepRecorder {
+	private static Logger LOGGER = Logger.getLogger(DepRecorder.class.getName());
 	private static DepRecorder depRecorder = new DepRecorder();
 	/** 
 	 * key: source_component#target_component#rootTx 
@@ -77,7 +79,7 @@ public class DepRecorder {
 		iterator = deps.entrySet().iterator();
 		while(iterator.hasNext()){
 			Entry<String, List<String>> entry = iterator.next();
-			System.out.println(entry.getKey() + ": " + entry.getValue());
+			LOGGER.fine(entry.getKey() + ": " + entry.getValue());
 		}
 	}
 

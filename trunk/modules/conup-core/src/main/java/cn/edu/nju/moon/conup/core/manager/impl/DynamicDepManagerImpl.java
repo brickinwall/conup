@@ -217,7 +217,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		
 		compStatus = CompStatus.VALID;
 		synchronized (ondemandSyncMonitor) {
-			System.out.println("--------------ondemand setup is done, now notify all...------\n\n");
+			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
 			ondemandSyncMonitor.notifyAll();
 			
 			String inDepsStr = "In Dynamic dep manager, ondemandSetupIsDone(), print Dep infos:\n";
@@ -243,7 +243,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		exeRecorder.updateIsDone();
 		synchronized (updatingSyncMonitor) {
 			compStatus = CompStatus.VALID;
-			System.out.println("-----------dynamic update is done, now nitify all...\n\n");
+			LOGGER.fine("-----------dynamic update is done, now nitify all...\n\n");
 			updatingSyncMonitor.notifyAll();
 		}
 		algorithm.updateIsDone(compObj.getIdentifier());
@@ -265,7 +265,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		
 		synchronized (validToFreeSyncMonitor) {
 			compStatus = CompStatus.Free;
-			System.out.println("-----------component has achieved free,now nitify all...\n\n");
+			LOGGER.fine("-----------component has achieved free,now nitify all...\n\n");
 			validToFreeSyncMonitor.notifyAll();
 		}
 	}

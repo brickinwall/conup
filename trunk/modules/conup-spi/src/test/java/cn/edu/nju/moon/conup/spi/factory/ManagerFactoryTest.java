@@ -75,8 +75,8 @@ public class ManagerFactoryTest {
 //		
 //		ManagerFactory mgrFactory = new ManagerFactory();
 //		DynamicDepManager depMgr = mgrFactory.createDynamicDepManager();
-//		System.out.println("depMgr:" + depMgr);
-//		System.out.println("depMgr.getCompObject():" + depMgr.getCompObject());
+//		LOGGER.fine("depMgr:" + depMgr);
+//		LOGGER.fine("depMgr.getCompObject():" + depMgr.getCompObject());
 //	}
 
 }

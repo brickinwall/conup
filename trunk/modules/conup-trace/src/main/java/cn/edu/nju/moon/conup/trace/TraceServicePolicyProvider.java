@@ -27,15 +27,15 @@ public class TraceServicePolicyProvider extends BasePolicyProvider<TracePolicy> 
 //    			List<PolicyExpression> policyExtensions = ps.getPolicies();
 //    			for(PolicyExpression pe : policyExtensions)
 //    				System.out.print("PolicyExtensions:" + pe + "  ");
-//    			System.out.println();
+//    			LOGGER.fine();
 //    		}
     		subject.getPolicySets().addAll(policySets);
     	}
     		
     	
-//    	System.out.println("TraceServicePolicyProvider related policysets:");
+//    	LOGGER.fine("TraceServicePolicyProvider related policysets:");
 //    	for(PolicySet ps : subject.getPolicySets())
-//    		System.out.println("\t" + ps);
+//    		LOGGER.fine("\t" + ps);
     	
     	List<TracePolicy> policies = findPolicies();
     	return new TracePolicyInterceptor(subject, getContext(), operation, policies, Phase.SERVICE_POLICY);

@@ -14,6 +14,7 @@ import cn.edu.nju.moon.conup.util.GeneratePortalService;
 import cn.edu.nju.moon.conup.util.TxWithSwitch;
 
 public class TuscanyProgramAnalyzerTest {
+	
 	TuscanyProgramAnalyzer tuscanyProgramAnalyzer = null;
 	ClassNode cn = null;
 	ClassNode txWithSwitchCn = null;
@@ -90,10 +91,10 @@ public class TuscanyProgramAnalyzerTest {
 //				tuscanyProgramAnalyzer.showClassSource("/home/PortalServiceImpl.class");
 //			} catch (Exception e) {
 //				e.printStackTrace();
-//				System.out.println(e);
+//				LOGGER.fine(e);
 //			}
 //		} else {
-//			System.out.println("Need not to analyze!");
+//			LOGGER.fine("Need not to analyze!");
 //		}
 //	}
 	@Test
@@ -114,7 +115,7 @@ public class TuscanyProgramAnalyzerTest {
 				tuscanyProgramAnalyzer.showClassSource("src/test/resources/PortalServiceImpl.class");
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println(e);
+				
 			}
 		} else {
 			System.out.println("Need not to analyze!");

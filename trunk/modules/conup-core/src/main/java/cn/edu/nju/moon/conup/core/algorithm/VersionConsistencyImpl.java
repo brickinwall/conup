@@ -59,7 +59,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		assert compStatus != null;
 		
 //		if(txContext.getEventType().equals(TxEventType.TransactionStart)){
-//			System.out.println("TxEventType.TransactionStart, rootTx:" + txContext.getRootTx() + ",currentTx:" + txContext.getCurrentTx());
+//			LOGGER.fine("TxEventType.TransactionStart, rootTx:" + txContext.getRootTx() + ",currentTx:" + txContext.getCurrentTx());
 //		}
 		
 		switch (compStatus) {
@@ -80,8 +80,8 @@ public class VersionConsistencyImpl implements Algorithm {
 //			doValid(txContext, dynamicDepMgr);
 //			break;
 		default:
-			System.out.println("----------compStatus-------->" + compStatus);
-			System.out.println("default process...");
+			LOGGER.fine("----------compStatus-------->" + compStatus);
+			LOGGER.fine("default process...");
 		}
 		
 	}
@@ -186,7 +186,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //				Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 //				synchronized (ondemandSyncMonitor) {
 //					if(depMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
-//System.out.println("wait when ondemand: suspend send ConsistencyOperationType.ACK_SUBTX_INIT");
+//LOGGER.fine("wait when ondemand: suspend send ConsistencyOperationType.ACK_SUBTX_INIT");
 //						try {
 //							ondemandSyncMonitor.wait();
 //						} catch (InterruptedException e) {
@@ -205,7 +205,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //				Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 //				synchronized (ondemandSyncMonitor) {
 //					if(depMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
-//System.out.println("wait when ondemand: suspend send ConsistencyOperationType.NOTIFY_SUBTX_END");
+//LOGGER.fine("wait when ondemand: suspend send ConsistencyOperationType.NOTIFY_SUBTX_END");
 //						try {
 //							ondemandSyncMonitor.wait();
 //						} catch (InterruptedException e) {
@@ -352,7 +352,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //				Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
 //				synchronized (ondemandSyncMonitor) {
 //					if(dynamicDepMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
-//System.out.println("wait when ondemand:ConsistencyOperationType.ACK_SUBTX_INIT");
+//LOGGER.fine("wait when ondemand:ConsistencyOperationType.ACK_SUBTX_INIT");
 //						try {
 //							ondemandSyncMonitor.wait();
 //						} catch (InterruptedException e) {
@@ -414,7 +414,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //				synchronized (ondemandSyncMonitor) {
 //					if(dynamicDepMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
 //						try {
-//System.out.println("wait when ondemand:ConsistencyOperationType.NOTIFY_SUBTX_END");
+//LOGGER.fine("wait when ondemand:ConsistencyOperationType.NOTIFY_SUBTX_END");
 //							ondemandSyncMonitor.wait();
 //						} catch (InterruptedException e) {
 //							e.printStackTrace();
@@ -484,7 +484,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		synchronized (ondemandSyncMonitor) {
 			try {
 				if (dynamicDepMgr.isOndemandSetting()) {
-					System.out.println("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
+					LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
 					ondemandSyncMonitor.wait();
 				}
 			} catch (InterruptedException e) {
@@ -536,9 +536,9 @@ public class VersionConsistencyImpl implements Algorithm {
 			depNotifyService.synPost(targetComp, str, ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
-//		System.out.println("accept future create msg,print inDepRegistry:");
+//		LOGGER.fine("accept future create msg,print inDepRegistry:");
 //		for(Dependence temp : inDepRegistry.getDependences()){
-//			System.out.println(temp);
+//			LOGGER.fine(temp);
 //		}
 		return true;
 	}
@@ -616,7 +616,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 //			if(dynamicDepMgr.isOndemandSetting()){
-//System.out.println("wait when ondemand:doNotifySubTxEnd(...)");
+//LOGGER.fine("wait when ondemand:doNotifySubTxEnd(...)");
 //				try {
 //					ondemandSyncMonitor.wait();
 //				} catch (InterruptedException e) {
@@ -881,8 +881,8 @@ public class VersionConsistencyImpl implements Algorithm {
 							continue;
 						}
 					} catch (Exception e) {
-						System.out.println("scope=" + scope);
-						System.out.println("scope.getSubComponents()=" + scope.getSubComponents(dep.getSrcCompObjIdentifier()));
+						LOGGER.fine("scope=" + scope);
+						LOGGER.fine("scope.getSubComponents()=" + scope.getSubComponents(dep.getSrcCompObjIdentifier()));
 						e.printStackTrace();
 					}
 					
@@ -997,8 +997,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		LOGGER.fine("oldRootTx:" + outDepsStr);
 		
 		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
-//		System.out.println("in consisitency algorithm(allInDeps):" + allInDeps);
-//		System.out.println("in consisitency algorithm(oldrootTxs):" + oldRootTx);
+//		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
+//		LOGGER.fine("in consisitency algorithm(oldrootTxs):" + oldRootTx);
 		return oldRootTx;
 	}
 

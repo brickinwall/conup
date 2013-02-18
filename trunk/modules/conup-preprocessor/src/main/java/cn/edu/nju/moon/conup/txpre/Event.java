@@ -79,7 +79,7 @@ public class Event {
 	public String getPort() {
 		if (event.contains("COM")) {
 //			String comAndMethod = event.split("\\.")[1];
-//			System.out.println(event.split("\\.")[1]);
+//			LOGGER.fine(event.split("\\.")[1]);
 			return event.split("\\.")[1];
 //			return comAndMethod.split(":")[0];
 			
