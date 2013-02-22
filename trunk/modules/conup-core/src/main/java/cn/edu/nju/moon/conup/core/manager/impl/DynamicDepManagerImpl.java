@@ -241,13 +241,25 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		ExecutionRecorder exeRecorder;
 		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
 		exeRecorder.updateIsDone();
+//		synchronized (updatingSyncMonitor) {
+//			compStatus = CompStatus.VALID;
+//			System.out.println("-----------dynamic update is done, now notify all...\n\n");
+//			updatingSyncMonitor.notifyAll();
+//		}
+//		algorithm.updateIsDone(compObj.getIdentifier());
+//		isUpdateRequestReceived = false;
+		
 		synchronized (updatingSyncMonitor) {
-			compStatus = CompStatus.VALID;
-			LOGGER.fine("-----------dynamic update is done, now nitify all...\n\n");
+			synchronized (ondemandSyncMonitor) {
+				isUpdateRequestReceived = false;
+			}
+			algorithm.updateIsDone(compObj.getIdentifier());
+			
+			//before changing to NORMAL, compStatus is supposed to be UPDATING.
+			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
+			compStatus = CompStatus.NORMAL;
 			updatingSyncMonitor.notifyAll();
 		}
-		algorithm.updateIsDone(compObj.getIdentifier());
-		isUpdateRequestReceived = false;
 		
 	}
 	
@@ -303,8 +315,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public void remoteDynamicUpdateIsDone() {
 		synchronized (waitingRemoteCompUpdateDoneMonitor) {
-			compStatus = CompStatus.VALID;
-			waitingRemoteCompUpdateDoneMonitor.notifyAll();
+//			compStatus = CompStatus.VALID;
+			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.VALID)){
+				LOGGER.warning("CompStatus is supposed to be NORMAL or VALID, but it's " + compStatus);
+			}
+			if(compStatus.equals(CompStatus.VALID)){
+				compStatus = CompStatus.NORMAL;
+				System.out.println("remote update is done, CompStatus: " + compStatus + ", now notify all");
+				waitingRemoteCompUpdateDoneMonitor.notifyAll();
+			}
 		}
 	}
 
