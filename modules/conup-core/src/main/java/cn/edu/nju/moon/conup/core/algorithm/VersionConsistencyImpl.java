@@ -45,6 +45,15 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	public static Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
 	
+	/**
+	 * When dynamic update is done, the CompStatus of a component should be changed to NORMAL.
+	 * Before that, however, there are many dynamic dependences which should be removed.
+	 * Map<String, Map<String, Boolean>> takes the hostComponent as the key, 
+	 * and the inner Map<String, Boolean> takes the parent-components as the key.
+	 */
+	public static Map<String, Map<String, Boolean>> isCleanUpForUpdateSent = new ConcurrentHashMap<String, Map<String, Boolean>>();
+//	public static Map<String, Integer> isCleanUpForUpdateDone = new ConcurrentHashMap<String, Integer>();
+	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
 	
 	@Override
@@ -94,17 +103,26 @@ public class VersionConsistencyImpl implements Algorithm {
 
 		boolean manageDepResult = false;
 		String[] payloadInfos = payload.split(",");
-		String srcComp = payloadInfos[0].split(":")[1];
-		String targetComp = payloadInfos[1].split(":")[1];
-		String rootTx = payloadInfos[2].split(":")[1];
-		String operationTypeInfo = payloadInfos[3].split(":")[1];
-		ConsistencyOperationType operationType = null;
+//		String srcComp = payloadInfos[0].split(":")[1];
+//		String targetComp = payloadInfos[1].split(":")[1];
+//		String rootTx = payloadInfos[2].split(":")[1];
+//		String operationTypeInfo = payloadInfos[3].split(":")[1];
+//		ConsistencyOperationType operationType = null;
+//		
+//		if(operationTypeInfo != null){
+//			operationType = Enum.valueOf(ConsistencyOperationType.class, operationTypeInfo);
+//		}
+		
+		ConsistencyOndemandPayloadResolver plResolver;
+		plResolver = new ConsistencyOndemandPayloadResolver(payload);
+		String srcComp = plResolver.getParameter(ConsistencyPayload.SRC_COMPONENT);
+		String targetComp = plResolver.getParameter(ConsistencyPayload.TARGET_COMPONENT);
+		String rootTx = plResolver.getParameter(ConsistencyPayload.ROOT_TX);
+		ConsistencyOperationType operationType = plResolver.getOperation();
+		
 		
 		DynamicDepManager ddm = nodeMgr.getDynamicDepManager(targetComp);
 		
-		if(operationTypeInfo != null){
-			operationType = Enum.valueOf(ConsistencyOperationType.class, operationTypeInfo);
-		}
 		assert operationType != null;
 		
 		switch(operationType){
@@ -172,6 +190,9 @@ public class VersionConsistencyImpl implements Algorithm {
 			manageDepResult = doNormalRootTxEnd(resolver.getParameter(ConsistencyPayload.SRC_COMPONENT),
 					resolver.getParameter(ConsistencyPayload.TARGET_COMPONENT),
 					resolver.getParameter(ConsistencyPayload.ROOT_TX));
+			break;
+		case NOTIFY_REMOTE_UPDATE_DONE:
+			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp);
 			break;
 		}
 		return manageDepResult;
@@ -718,6 +739,50 @@ public class VersionConsistencyImpl implements Algorithm {
 		return result; 
 	}
 	
+	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
+		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		
+		//notify parent components that remote dynamic update is done
+		Scope scope = depMgr.getScope();
+		Set<String> parentComps;
+//		Set<String> subComps;
+		if(scope != null){
+			parentComps = scope.getParentComponents(hostComp);
+//			subComps = scope.getSubComponents(hostComp);
+		}
+		else{
+			parentComps = depMgr.getCompObject().getStaticInDeps();
+//			subComps = depMgr.getCompObject().getStaticDeps();
+		}
+		Map<String, Boolean> isSentToParent = isCleanUpForUpdateSent.get(hostComp);
+		if(isSentToParent == null){
+			isSentToParent = new ConcurrentHashMap<String, Boolean>();
+			isCleanUpForUpdateSent.put(hostComp, isSentToParent);
+		}
+		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+		for(String comp : parentComps){
+			if(isSentToParent.get(comp) == null){
+				isSentToParent.put(comp, false);
+			}
+			if(isSentToParent.get(comp)==false){
+				String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
+				depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+				isSentToParent.put(comp, true);
+			}
+		}
+		
+		//clear local deps
+		depMgr.getRuntimeDeps().clear();
+		depMgr.getRuntimeInDeps().clear();
+		depMgr.setScope(null);
+		
+		depMgr.remoteDynamicUpdateIsDone();
+		
+		return true;
+	}
+	
 	/**
 	 * try to remove future dep when receive ACK_SUB_INIT
 	 * @param dynamicDepMgr
@@ -1055,7 +1120,33 @@ public class VersionConsistencyImpl implements Algorithm {
 
 	@Override
 	public boolean updateIsDone(String hostComp) {
+		//clear local status maintained for update
 		isSetupDone.clear();
+
+		//notify parent components that dynamic update is done
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(hostComp);
+		
+		//notify parent components that remote dynamic update is done
+		Scope scope = depMgr.getScope();
+		Set<String> parentComps;
+		if (scope != null) {
+			parentComps = scope.getParentComponents(hostComp);
+		} else {
+			parentComps = depMgr.getCompObject().getStaticInDeps();
+		}
+		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+		for(String comp : parentComps){
+			System.out.println("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
+			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+		}
+		
+		//clear local deps
+		depMgr.getRuntimeDeps().clear();
+		depMgr.getRuntimeInDeps().clear();
+		depMgr.setScope(null);
+		
 		return true;
 	}
 
