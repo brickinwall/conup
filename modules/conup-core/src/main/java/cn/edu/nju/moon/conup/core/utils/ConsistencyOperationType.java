@@ -30,4 +30,7 @@ public enum ConsistencyOperationType {
 	ACK_PAST_ONDEMAND,
 	ACK_SUB_FUTURE_ONDEMAND,
 	ACK_SUB_PAST_ONDEMAND,
+	
+	/** notify that a remote update is done */
+	NOTIFY_REMOTE_UPDATE_DONE,
 }

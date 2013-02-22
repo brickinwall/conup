@@ -79,4 +79,14 @@ public class ConsistencyPayloadCreator {
 				
 	}
 	
+	public static String createRemoteUpdateIsDonePayload(String srcComp, String targetComp, ConsistencyOperationType opType){
+		String result = null;
+		
+		result = ConsistencyPayload.SRC_COMPONENT + ":" + srcComp + "," +
+				ConsistencyPayload.TARGET_COMPONENT + ":" + targetComp + "," +
+				ConsistencyPayload.OPERATION_TYPE + ":" + opType + "," ;
+		
+		return result;
+	}
+	
 }
