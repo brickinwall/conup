@@ -6,13 +6,16 @@ import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
+import cn.edu.nju.moon.conup.core.ondemand.OndemandSetupHelperImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
 /**
@@ -216,8 +219,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		exeRecorder.ondemandIsDone();
 		
 		compStatus = CompStatus.VALID;
+		OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+		ondemandSetupHelper.resetIsOndemandRqstRcvd();
 		synchronized (ondemandSyncMonitor) {
 			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
+			ondemandSetupHelper.onDemandIsDone();
 			ondemandSyncMonitor.notifyAll();
 			
 			String inDepsStr = "In Dynamic dep manager, ondemandSetupIsDone(), print Dep infos:\n";
@@ -321,7 +327,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			}
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.NORMAL;
-				System.out.println("remote update is done, CompStatus: " + compStatus + ", now notify all");
+				LOGGER.info("remote update is done, CompStatus: " + compStatus + ", now notify all");
+//				System.out.println("remote update is done, CompStatus: " + compStatus + ", now notify all");
 				waitingRemoteCompUpdateDoneMonitor.notifyAll();
 			}
 		}

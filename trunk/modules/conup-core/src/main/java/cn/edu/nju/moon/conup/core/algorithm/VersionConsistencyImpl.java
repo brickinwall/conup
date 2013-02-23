@@ -51,7 +51,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * Map<String, Map<String, Boolean>> takes the hostComponent as the key, 
 	 * and the inner Map<String, Boolean> takes the parent-components as the key.
 	 */
-	public static Map<String, Map<String, Boolean>> isCleanUpForUpdateSent = new ConcurrentHashMap<String, Map<String, Boolean>>();
+//	public static Map<String, Map<String, Boolean>> isCleanUpForUpdateSent = new ConcurrentHashMap<String, Map<String, Boolean>>();
 //	public static Map<String, Integer> isCleanUpForUpdateDone = new ConcurrentHashMap<String, Integer>();
 	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
@@ -102,7 +102,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		Printer printer = new Printer();
 
 		boolean manageDepResult = false;
-		String[] payloadInfos = payload.split(",");
+//		String[] payloadInfos = payload.split(",");
 //		String srcComp = payloadInfos[0].split(":")[1];
 //		String targetComp = payloadInfos[1].split(":")[1];
 //		String rootTx = payloadInfos[2].split(":")[1];
@@ -149,8 +149,10 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			
-			String parentTxID = payloadInfos[4].split(":")[1];
-			String subTxID = payloadInfos[5].split(":")[1];
+//			String parentTxID = payloadInfos[4].split(":")[1];
+//			String subTxID = payloadInfos[5].split(":")[1];
+			String parentTxID = plResolver.getParameter(ConsistencyPayload.PARENT_TX);
+			String subTxID = plResolver.getParameter(ConsistencyPayload.SUB_TX);
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
@@ -162,8 +164,10 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			
-			String subTxEndParentTxID = payloadInfos[4].split(":")[1];
-			String subTxEndSubTxID = payloadInfos[5].split(":")[1];
+//			String subTxEndParentTxID = payloadInfos[4].split(":")[1];
+//			String subTxEndSubTxID = payloadInfos[5].split(":")[1];
+			String subTxEndParentTxID = plResolver.getParameter(ConsistencyPayload.PARENT_TX);
+			String subTxEndSubTxID = plResolver.getParameter(ConsistencyPayload.SUB_TX);
 			manageDepResult = doNotifySubTxEnd(srcComp, targetComp, rootTx, subTxEndParentTxID, subTxEndSubTxID);
 			
 //			LOGGER.info("after process NOTIFY_SUBTX_END:");
@@ -756,21 +760,21 @@ public class VersionConsistencyImpl implements Algorithm {
 			parentComps = depMgr.getCompObject().getStaticInDeps();
 //			subComps = depMgr.getCompObject().getStaticDeps();
 		}
-		Map<String, Boolean> isSentToParent = isCleanUpForUpdateSent.get(hostComp);
-		if(isSentToParent == null){
-			isSentToParent = new ConcurrentHashMap<String, Boolean>();
-			isCleanUpForUpdateSent.put(hostComp, isSentToParent);
-		}
+//		Map<String, Boolean> isSentToParent = isCleanUpForUpdateSent.get(hostComp);
+//		if(isSentToParent == null){
+//			isSentToParent = new ConcurrentHashMap<String, Boolean>();
+//			isCleanUpForUpdateSent.put(hostComp, isSentToParent);
+//		}
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
-			if(isSentToParent.get(comp) == null){
-				isSentToParent.put(comp, false);
-			}
-			if(isSentToParent.get(comp)==false){
+//			if(isSentToParent.get(comp) == null){
+//				isSentToParent.put(comp, false);
+//			}
+//			if(isSentToParent.get(comp)==false){
 				String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 				depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-				isSentToParent.put(comp, true);
-			}
+//				isSentToParent.put(comp, true);
+//			}
 		}
 		
 		//clear local deps
@@ -1137,7 +1141,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		}
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
-			System.out.println("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
+			LOGGER.info("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
 			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}

@@ -95,8 +95,17 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 		return isOndemandRqstRcvd;
 	}
 	
+	@Override
+	public void resetIsOndemandRqstRcvd(){
+		isOndemandRqstRcvd = false;
+	}
+	
 	public boolean isOndemandDone(){
 		return ondemandSetup.isOndemandDone();
+	}
+	
+	public void onDemandIsDone(){
+		ondemandSetup.onDemandIsDone();
 	}
 	
 }

@@ -40,4 +40,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 	}
 
+	@Override
+	public void onDemandIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

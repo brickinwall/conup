@@ -60,4 +60,16 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 		return false;
 	}
 
+	@Override
+	public void resetIsOndemandRqstRcvd() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDemandIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -45,4 +45,6 @@ public interface OndemandSetup {
 	 */
 	public void setOndemandHelper(OndemandSetupHelper ondemandHelper);
 	
+	public void onDemandIsDone();
+	
 }

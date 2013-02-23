@@ -17,6 +17,8 @@ import cn.edu.nju.moon.conup.comm.api.peer.services.impl.DepNotifyServiceImpl;
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
+import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
+import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
 import cn.edu.nju.moon.conup.core.utils.TranquillityOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.TranquillityOperationType;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayload;
@@ -95,21 +97,28 @@ public class TranquillityImpl implements Algorithm {
 		Printer printer = new Printer();
 		
 		boolean manageDepResult = false;
-		String[] payloadInfos = payload.split(",");
-		String srcComp = payloadInfos[0].split(":")[1];
-		String targetComp = payloadInfos[1].split(":")[1];
-		String rootTx = payloadInfos[2].split(":")[1];
-		String operationTypeInfo = payloadInfos[3].split(":")[1];
-		TranquillityOperationType eventType = null;
+		
+		TranquillityOndemandPayloadResolver payloadResolver = new TranquillityOndemandPayloadResolver(payload);
+		String srcComp = payloadResolver.getParameter(TranquillityPayload.SRC_COMPONENT);
+		String targetComp = payloadResolver.getParameter(TranquillityPayload.TARGET_COMPONENT);
+		String rootTx = payloadResolver.getParameter(TranquillityPayload.ROOT_TX);
+		TranquillityOperationType operationTypeInfo = payloadResolver.getOperation();
+		
+//		String[] payloadInfos = payload.split(",");
+//		String srcComp = payloadInfos[0].split(":")[1];
+//		String targetComp = payloadInfos[1].split(":")[1];
+//		String rootTx = payloadInfos[2].split(":")[1];
+//		String operationTypeInfo = payloadInfos[3].split(":")[1];
+//		TranquillityOperationType eventType = null;
 		
 		DynamicDepManager ddm = nodeMgr.getDynamicDepManager(targetComp);
 		
-		if(operationTypeInfo != null){
-			eventType = Enum.valueOf(TranquillityOperationType.class, operationTypeInfo);
-		}
-		assert eventType != null;
+//		if(operationTypeInfo != null){
+//			eventType = Enum.valueOf(TranquillityOperationType.class, operationTypeInfo);
+//		}
+		assert operationTypeInfo != null;
 		
-		switch(eventType){
+		switch(operationTypeInfo){
 		case NOTIFY_FUTURE_CREATE:
 //			LOGGER.info("before process NOTIFY_FUTURE_CREATE:");
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
@@ -137,8 +146,10 @@ public class TranquillityImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			
-			String parentTxID = payloadInfos[4].split(":")[1];
-			String subTxID = payloadInfos[5].split(":")[1];
+//			String parentTxID = payloadInfos[4].split(":")[1];
+//			String subTxID = payloadInfos[5].split(":")[1];
+			String parentTxID = payloadResolver.getParameter(TranquillityPayload.PARENT_TX);
+			String subTxID = payloadResolver.getParameter(TranquillityPayload.SUB_TX);
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
@@ -150,8 +161,10 @@ public class TranquillityImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			
-			String subTxEndParentTxID = payloadInfos[4].split(":")[1];
-			String subTxEndSubTxID = payloadInfos[5].split(":")[1];
+//			String subTxEndParentTxID = payloadInfos[4].split(":")[1];
+//			String subTxEndSubTxID = payloadInfos[5].split(":")[1];
+			String subTxEndParentTxID = payloadResolver.getParameter(TranquillityPayload.PARENT_TX);
+			String subTxEndSubTxID = payloadResolver.getParameter(TranquillityPayload.SUB_TX);
 			manageDepResult = doNotifySubTxEnd(srcComp, targetComp, rootTx, subTxEndParentTxID, subTxEndSubTxID);
 			
 //			LOGGER.info("after process NOTIFY_SUBTX_END:");
@@ -178,6 +191,9 @@ public class TranquillityImpl implements Algorithm {
 			manageDepResult = doNormalRootTxEnd(resolver.getParameter(TranquillityPayload.SRC_COMPONENT),
 					resolver.getParameter(TranquillityPayload.TARGET_COMPONENT),
 					resolver.getParameter(TranquillityPayload.ROOT_TX));
+			break;
+		case NOTIFY_REMOTE_UPDATE_DONE:
+			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp);
 			break;
 		}
 		return manageDepResult;
@@ -693,6 +709,29 @@ public class TranquillityImpl implements Algorithm {
 	}
 	
 	/**
+	 * receive NOTIFY_REMOTE_UPDATE_DONE
+	 * change component status from valid --> normal
+	 * because in tranquillity we only consider one depth layer, do not need to send to parent any more.
+	 * @param srComp
+	 * @param hostComp
+	 * @return
+	 */
+	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
+		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		
+		//clear local deps
+		depMgr.getRuntimeDeps().clear();
+		depMgr.getRuntimeInDeps().clear();
+		depMgr.setScope(null);
+		
+		depMgr.remoteDynamicUpdateIsDone();
+		
+		return true;
+	}
+	
+	/**
 	 * try to remove future dep when receive ACK_SUB_INIT
 	 * @param dynamicDepMgr
 	 * @param currentComp
@@ -882,8 +921,36 @@ public class TranquillityImpl implements Algorithm {
 
 	@Override
 	public boolean updateIsDone(String hostComp) {
-		
+		// clear local status maintained for update
 		isSetupDone.clear();
+
+		// notify parent components that dynamic update is done
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager
+				.getDynamicDepManager(hostComp);
+
+		// notify parent components that remote dynamic update is done
+		Scope scope = depMgr.getScope();
+		Set<String> parentComps;
+		if (scope != null) {
+			parentComps = scope.getParentComponents(hostComp);
+		} else {
+			parentComps = depMgr.getCompObject().getStaticInDeps();
+		}
+		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+		for (String comp : parentComps) {
+			LOGGER.info("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
+			String payload = TranquillityPayloadCreator
+					.createRemoteUpdateIsDonePayload(hostComp, comp,
+							TranquillityOperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY,
+					MsgType.DEPENDENCE_MSG, payload);
+		}
+
+		// clear local deps
+		depMgr.getRuntimeDeps().clear();
+		depMgr.getRuntimeInDeps().clear();
+		depMgr.setScope(null);
 		return true;
 	}
 

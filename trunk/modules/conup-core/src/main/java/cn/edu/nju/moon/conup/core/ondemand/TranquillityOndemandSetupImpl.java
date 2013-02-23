@@ -738,4 +738,10 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		return scope;
 	}
 
+	@Override
+	public void onDemandIsDone() {
+		OndemandRequestStatus.clear();
+		ConfirmOndemandStatus.clear();
+	}
+
 }
