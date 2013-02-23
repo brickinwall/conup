@@ -36,4 +36,10 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	public boolean isOndemandDone() {
 		return true;
 	}
+
+	@Override
+	public void onDemandIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
 }

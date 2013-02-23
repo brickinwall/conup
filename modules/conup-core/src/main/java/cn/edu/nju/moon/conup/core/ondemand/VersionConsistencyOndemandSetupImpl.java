@@ -131,7 +131,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			String requestSrcComp) {
 		//suspend all the threads that is initiated
 		
-		LOGGER.fine("**** in reqOndemandSetup(...):"+
+		LOGGER.info("**** in reqOndemandSetup(...):"+
 			"\t" + "currentComponent=" + currentComp +
 			"\t" + "requestSourceComponent=" + requestSrcComp);
 		
@@ -170,13 +170,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		for(String component : targetRef){
 			targetRefs += "\n\t" + component;
 		}
-		LOGGER.fine("**** " + hostComp + "'s targetRef:"
+		LOGGER.info("**** " + hostComp + "'s targetRef:"
 				+ targetRefs);
 		String tmpParentComps = new String();
 		for(String component : parentComps){
 			tmpParentComps += "\n\t" + component;
 		}
-		LOGGER.fine("**** " + hostComp + "'s parents:"
+		LOGGER.info("**** " + hostComp + "'s parents:"
 				+ tmpParentComps);
 		
 		//wait for other reqOndemandSetup(...)
@@ -187,9 +187,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	
 	public boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
-		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
+		LOGGER.info("**** " + "confirmOndemandSetup(...) from " + parentComp);
 		if(ondemandHelper.getDynamicDepManager().isValid()){
-			LOGGER.fine("**** component status is valid, and return");
+			LOGGER.info("**** component status is valid, and return");
 			return true;
 		}
 		
@@ -197,14 +197,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		if (ConfirmOndemandStatus.containsKey(parentComp))
 			ConfirmOndemandStatus.put(parentComp, true);
 		else
-			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
+			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
 		String confirmOndemandStatusStr = "ConfirmOndemandStatus:";
 		for(Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()){
 			confirmOndemandStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
-		LOGGER.fine(confirmOndemandStatusStr);
+		LOGGER.info(confirmOndemandStatusStr);
 		
 		//isConfirmedAll?
 		boolean isConfirmedAll = true;
@@ -213,7 +213,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		if(isConfirmedAll){
 			//change current componentStatus to 'valid'
-			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp + 
+			LOGGER.info("confirmOndemandSetup(...) from " + parentComp + 
 					", and confirmed All, trying to change mode to valid");
 			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
 			//send confirmOndemandSetup(...)
@@ -545,7 +545,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	public boolean notifySubPastOndemand(Dependence dep) {
-		LOGGER.fine("notifySubPastOndemand(Arc arc) with " + dep.toString());
+		LOGGER.info("notifySubPastOndemand(Arc arc) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -621,7 +621,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 //			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
-		LOGGER.fine(ondemandRequestStatusStr);
+		LOGGER.info(ondemandRequestStatusStr);
 
 		/*
 		 * To judge whether current component has received reqOndemandSetup(...)
@@ -666,11 +666,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				confirmOndemandStatusStr += "\t" + entry.getKey() + ": " + entry.getValue();
 //				LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 			}
-			LOGGER.fine(confirmOndemandStatusStr);
+			LOGGER.info(confirmOndemandStatusStr);
 			
 			if(isConfirmedAll){
 				if(ondemandHelper.getDynamicDepManager().isValid()){
-					LOGGER.fine("Confirmed all, and component status is valid");
+					LOGGER.info("Confirmed all, and component status is valid");
 //					LOGGER.fine("Confirmed all, and component status is valid");
 					return;
 				}
@@ -701,7 +701,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 //			LOGGER.fine("\t" + component);
 			str += "\n\t" + component;
 		}
-		LOGGER.fine(str);
+		LOGGER.info(str);
 		
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -736,7 +736,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			str += "\n\t" + component;
 //			LOGGER.fine("\t" + component);
 		}
-		LOGGER.fine(str);
+		LOGGER.info(str);
 		
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -991,6 +991,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		scope.setTarget(targetComps);
 		
 		return scope;
+	}
+
+	@Override
+	public void onDemandIsDone() {
+		OndemandRequestStatus.clear();
+		ConfirmOndemandStatus.clear();
 	}
 	
 }

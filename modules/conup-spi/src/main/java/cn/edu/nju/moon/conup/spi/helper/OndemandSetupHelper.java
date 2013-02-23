@@ -57,4 +57,14 @@ public interface OndemandSetupHelper {
 	 * @return whether ondemnad setup is done
 	 */
 	public boolean isOndemandDone();
+	
+	/**
+	 * reset isOndemandRqstRcvd to false
+	 */
+	public void resetIsOndemandRqstRcvd();
+	
+	/**
+	 * do cleanup works when ondemand is done
+	 */
+	public void onDemandIsDone();
 }
