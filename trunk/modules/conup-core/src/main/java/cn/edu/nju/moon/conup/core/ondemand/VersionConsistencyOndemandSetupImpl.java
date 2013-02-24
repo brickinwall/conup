@@ -1032,8 +1032,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 	@Override
 	public void onDemandIsDone() {
-		OndemandRequestStatus.clear();
-		ConfirmOndemandStatus.clear();
+		String hostComp = ondemandHelper.getCompObject().getIdentifier();
+		OndemandRequestStatus.remove(hostComp);
+		ConfirmOndemandStatus.remove(hostComp);
+//		OndemandRequestStatus.clear();
+//		ConfirmOndemandStatus.clear();
 	}
 	
 }
