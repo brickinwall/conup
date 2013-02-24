@@ -36,8 +36,18 @@ import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	private final static Logger LOGGER = Logger.getLogger(TranquillityOndemandSetupImpl.class.getName());
 
-	public static Map<String, Boolean> OndemandRequestStatus = new HashMap<String, Boolean>();
-	public static Map<String, Boolean> ConfirmOndemandStatus = new HashMap<String, Boolean>();
+	/**
+	 * outer map's key is hostCompName
+	 * inner map's key is subComponentName
+	 */
+	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new HashMap<String, Map<String, Boolean>>();
+	/**
+	 * outer map's key is hostCompName
+	 * inner map's key is parentComponentName
+	 */
+	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
+//	public static Map<String, Boolean> OndemandRequestStatus = new HashMap<String, Boolean>();
+//	public static Map<String, Boolean> ConfirmOndemandStatus = new HashMap<String, Boolean>();
 
 	public static Logger getLogger() {
 		return LOGGER;
@@ -142,12 +152,19 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			}
 
 			// init ConfirmOndemandStatus
+			Map<String, Boolean> confirmStatus = new HashMap<String, Boolean>();
+			ConfirmOndemandStatus.put(currentComp, confirmStatus);
 			for (String component : parentComps) {
-				if (!ConfirmOndemandStatus.containsKey(component))
-					ConfirmOndemandStatus.put(component, false);
+				if( !confirmStatus.containsKey(component)){
+					confirmStatus.put(component, false);
+				}
+//				if (!ConfirmOndemandStatus.containsKey(component))
+//					ConfirmOndemandStatus.put(component, false);
 			}
 			sendReqOndemandSetup(parentComps, currentComp);
 
+		} else{	//current component is not the target component
+			ConfirmOndemandStatus.put(currentComp, new HashMap<String, Boolean>());
 		}
 
 		//onDemandSetUp
@@ -161,28 +178,29 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 //		onDemandSetUp(currentComp, requestSrcComp);
 
 		// isConfirmedAll?
+		Map<String, Boolean> confirmStatus = ConfirmOndemandStatus.get(currentComp);
 		boolean isConfirmedAll = true;
-		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
+		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 			isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 		}
 
 		// print ConfirmOndemandStatus
-		LOGGER.fine("ConfirmOndemandStatus:");
-		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
-			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
+		LOGGER.info("ConfirmOndemandStatus:");
+		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
+			LOGGER.info("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		if (isConfirmedAll) {
 			if (ondemandHelper.getDynamicDepManager().isValid()) {
-				LOGGER.fine("Confirmed all, and component status is valid");
+				LOGGER.info("Confirmed all, and component status is valid");
 				return true;
 			}
-			LOGGER.fine("Confirmed from all parent components in reqOndemandSetup(...)");
-			LOGGER.fine("trying to change mode to valid");
+			LOGGER.info("Confirmed from all parent components in reqOndemandSetup(...)");
+			LOGGER.info("trying to change mode to valid");
 			
-			Printer printer = new Printer();
-			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeInDeps(), "in");
-			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeDeps(), "out");
+//			Printer printer = new Printer();
+//			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeInDeps(), "in");
+//			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeDeps(), "out");
 			
 			// change current componentStatus to 'valid'
 			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
@@ -201,7 +219,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	private void sendConfirmOndemandSetup(String currentComp,
 			String requestSrcComp) {
-		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
+		LOGGER.info("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -483,20 +501,26 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		// update current component's ConfirmOndemandStatus
-		if (ConfirmOndemandStatus.containsKey(parentComp))
-			ConfirmOndemandStatus.put(parentComp, true);
+		Map<String, Boolean> confirmStatus = ConfirmOndemandStatus.get(currentComp);
+		if (confirmStatus.containsKey(parentComp))
+			confirmStatus.put(parentComp, true);
 		else
 			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
+		
+//		if (ConfirmOndemandStatus.containsKey(parentComp))
+//			ConfirmOndemandStatus.put(parentComp, true);
+//		else
+//			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
 
 		// print ConfirmOndemandStatus
-		LOGGER.fine("ConfirmOndemandStatus:");
-		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
-			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
+		LOGGER.info("ConfirmOndemandStatus:");
+		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
+			LOGGER.info("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		// isConfirmedAll?
 		boolean isConfirmedAll = true;
-		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
+		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 			isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 		}
 		if (isConfirmedAll) {
@@ -552,9 +576,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 	private boolean sendReqOndemandSetup(Set<String> parentComps,
 			String hostComp) {
-		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
+		LOGGER.info("sendReqOndemandSetup(...) to parent components:");
 		for (String component : parentComps)
-			LOGGER.fine("\t" + component);
+			LOGGER.info("\t" + component);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -740,8 +764,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 	@Override
 	public void onDemandIsDone() {
-		OndemandRequestStatus.clear();
-		ConfirmOndemandStatus.clear();
+		String hostComp = ondemandHelper.getCompObject().getIdentifier();
+		OndemandRequestStatus.remove(hostComp);
+		ConfirmOndemandStatus.remove(hostComp);
+//		OndemandRequestStatus.clear();
+//		ConfirmOndemandStatus.clear();
 	}
 
 }

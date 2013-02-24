@@ -222,7 +222,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 		ondemandSetupHelper.resetIsOndemandRqstRcvd();
 		synchronized (ondemandSyncMonitor) {
-			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
+			LOGGER.info("--------------ondemand setup is done, now notify all...------\n\n");
 			ondemandSetupHelper.onDemandIsDone();
 			ondemandSyncMonitor.notifyAll();
 			
