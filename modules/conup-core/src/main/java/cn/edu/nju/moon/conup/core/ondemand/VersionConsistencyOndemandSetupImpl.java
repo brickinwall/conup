@@ -40,8 +40,16 @@ import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private final static Logger LOGGER = Logger.getLogger(VersionConsistencyOndemandSetupImpl.class.getName());
 	
-	public static Map<String, Boolean> OndemandRequestStatus = new HashMap<String, Boolean>();
-	public static Map<String, Boolean> ConfirmOndemandStatus = new HashMap<String, Boolean>();
+	/**
+	 * outer map's key is hostCompName
+	 * inner map's key is subComponentName
+	 */
+	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new HashMap<String, Map<String, Boolean>>();
+	/**
+	 * outer map's key is hostCompName
+	 * inner map's key is parentComponentName
+	 */
+	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -154,15 +162,31 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		parentComps = ondemandHelper.getDynamicDepManager().getStaticInDeps();
 		
 		//init OndemandRequestStatus
+		Map<String, Boolean> reqStatus = new HashMap<String, Boolean>();
+		OndemandRequestStatus.put(currentComp, reqStatus);
 		for(String subComponent : targetRef){
-			if(!OndemandRequestStatus.containsKey(subComponent))
-				OndemandRequestStatus.put(subComponent, false);
+			if(!reqStatus.containsKey(subComponent)){
+//				if(OndemandRequestStatus.get(currentComp) == null){
+//					reqStatus.put(subComponent, false);
+//				} else{
+				reqStatus.put(subComponent, false);
+//				}
+			}
+//				OndemandRequestStatus.put(subComponent, false);
 		}
 		
 		//init ConfirmOndemandStatus
+		Map<String, Boolean> confirmStatus = new HashMap<String, Boolean>();
+		ConfirmOndemandStatus.put(currentComp, confirmStatus);
 		for(String component : parentComps){
-			if(!ConfirmOndemandStatus.containsKey(component))
-				ConfirmOndemandStatus.put(component, false);
+			if(!confirmStatus.containsKey(component)){
+//				if(ConfirmOndemandStatus.get(currentComp) == null){
+//					confirmStatus.put(component, false);
+//				} else{
+				confirmStatus.put(component, false);
+//				}
+			}
+//				ConfirmOndemandStatus.put(component, false);
 		}
 		
 		//FOR TEST
@@ -194,21 +218,28 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		
 		// update current component's ConfirmOndemandStatus
-		if (ConfirmOndemandStatus.containsKey(parentComp))
-			ConfirmOndemandStatus.put(parentComp, true);
+		Map<String, Boolean> confirmStatus = ConfirmOndemandStatus.get(currentComp);
+		assert confirmStatus != null;
+		
+		if(confirmStatus.containsKey(parentComp))
+			confirmStatus.put(parentComp, true);
 		else
 			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
+//		if (ConfirmOndemandStatus.containsKey(parentComp))
+//			ConfirmOndemandStatus.put(parentComp, true);
+//		else
+//			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
 		String confirmOndemandStatusStr = "ConfirmOndemandStatus:";
-		for(Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()){
+		for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
 			confirmOndemandStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
 		LOGGER.info(confirmOndemandStatusStr);
 		
 		//isConfirmedAll?
 		boolean isConfirmedAll = true;
-		for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
+		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 			isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 		}
 		if(isConfirmedAll){
@@ -608,16 +639,21 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private void receivedReqOndemandSetup(
 			String requestSrcComp, String currentComp, Set<String> parentComponents){
 		// update current component's OndemandRequestStatus
-		if (OndemandRequestStatus.containsKey(requestSrcComp))
-			OndemandRequestStatus.put(requestSrcComp, true);
-		else{
+		Map<String, Boolean> reqStatus = OndemandRequestStatus.get(currentComp);
+		if(reqStatus.containsKey(requestSrcComp))
+			reqStatus.put(requestSrcComp, true);
+		else
 			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
-		}
+//		if (OndemandRequestStatus.containsKey(requestSrcComp))
+//			OndemandRequestStatus.put(requestSrcComp, true);
+//		else{
+//			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
+//		}
 		
 		//print OndemandRequestStatus
 		String ondemandRequestStatusStr = "OndemandRequestStatus:";
 //		LOGGER.fine("OndemandRequestStatus:");
-		for(Entry<String, Boolean> entry : OndemandRequestStatus.entrySet()){
+		for(Entry<String, Boolean> entry : reqStatus.entrySet()){
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 //			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
@@ -628,7 +664,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		 * from every in-scope outgoing static edge
 		 */
 		boolean isReceivedAll = true;
-		for (Entry<String, Boolean> entry : OndemandRequestStatus.entrySet()) {
+		for (Entry<String, Boolean> entry : reqStatus.entrySet()) {
 			isReceivedAll = isReceivedAll && (Boolean) entry.getValue();
 		}
 
@@ -656,13 +692,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			}
 			//isConfirmedAll?
 			boolean isConfirmedAll = true;
-			for (Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()) {
+			Map<String, Boolean> confirmStatus = ConfirmOndemandStatus.get(currentComp);
+			for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 				isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 			}
 			
 			//print ConfirmOndemandStatus
 			String confirmOndemandStatusStr = "";
-			for(Entry<String, Boolean> entry : ConfirmOndemandStatus.entrySet()){
+			for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
 				confirmOndemandStatusStr += "\t" + entry.getKey() + ": " + entry.getValue();
 //				LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 			}
