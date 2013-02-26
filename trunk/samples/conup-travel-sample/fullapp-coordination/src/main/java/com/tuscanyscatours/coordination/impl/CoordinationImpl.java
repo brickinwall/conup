@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
+import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
+
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.coordination.Coordination;
@@ -29,6 +31,7 @@ public class CoordinationImpl implements Coordination {
 	protected CartCheckout cartCheckout;
 	
 	@Override
+	@ConupTransaction
 	public void coordinate() {
 		LOGGER.fine("\nTry to access TravelCatalog#service-binding(TravelCatalogSearch/TravelCatalogSearch):");
 		
