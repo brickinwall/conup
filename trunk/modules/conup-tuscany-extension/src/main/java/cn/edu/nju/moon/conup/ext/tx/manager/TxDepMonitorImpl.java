@@ -19,6 +19,7 @@ import org.apache.tuscany.sca.runtime.DomainRegistry;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
@@ -66,6 +67,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		// when be notified that a tx ends, remove it from TX_IDS.
 		if(et.equals(TxEventType.TransactionEnd)){
 			TX_IDS.remove(txContext.getHostComponent());
+			
+			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
+			interceptorCache.removeTxCtx(getThreadID());
 			
 			CompLifecycleManager compLcMgr;
 			compLcMgr = CompLifecycleManager.getInstance(txContext.getHostComponent());
@@ -198,7 +202,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
 				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
 
-				LOGGER.fine("removeAlgorithmOldRootTx txID:" + rootTxId);
+				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
 				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)
 						&& compLcMgr.isDynamicUpdateRqstRCVD()) {
@@ -245,7 +249,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
 				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
 
-				LOGGER.info("removeAlgorithmOldRootTx txID:" + rootTxId);
+				LOGGER.info("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
 				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)
 						&& compLcMgr.isDynamicUpdateRqstRCVD()) {
@@ -271,6 +275,11 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //		}
 		TxLifecycleManager.removeRootTx(parentTxId, rootTxId);
 		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+	}
+	
+	/** return current thread ID. */
+	private String getThreadID(){
+		return new Integer(Thread.currentThread().hashCode()).toString();
 	}
 	
 }
