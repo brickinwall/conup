@@ -1,5 +1,11 @@
 package com.tuscanyscatours.launcher;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -63,34 +69,108 @@ public class CoordinationLauncher {
 	}
 	
 	public static void accessServices(Node node) throws Exception{
-	
-			for(int i = 0; i < 20; i++){
-				new CoordinationVisitorThread(node).start();
-				Thread.sleep(200);
-				if(i == 15){
-					testUpdate();
-				}
-			}
-			Experiment.getInstance().close();
-	}
-	
-	private static void testUpdate() {
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-				String targetIdentifier1 = "CurrencyConverter";
-				int port1 = 22300;
-				String baseDir1 = "/home/valerio/workspace/conUp/tuscany-sca/updated-components";
-				String classFilePath1 = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
-				String contributionUri1 = "fullapp-currency";
-				String compsiteUri1 = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
-			}
-		});
+		int accessTimes = 40;		//total request
+		int rqstInterval = 200;
+		String targetComp = "CurrencyConverter";	//target component for update
+		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
 		
-		thread.start();
+		System.out.println("Pls input the command, or input 'help' for help");
+		Scanner scanner = new Scanner(System.in);
+		while(scanner.hasNextLine()){
+			String [] input = scanner.nextLine().split(" ");
+			COMMANDS command = Enum.valueOf(COMMANDS.class, input[0].trim());
+			
+			switch (command) {
+			case access:
+				if( input.length == 3 ){
+					rqstInterval = new Integer(input[1].trim());
+					accessTimes = new Integer(input[2].trim());
+				} else{
+					System.out.println("Illegal parameters for 'access'");
+					break;
+				}
+				
+//				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
+				for (int i = 0; i < accessTimes; i++) {
+					new CoordinationVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+				}
+				break;
+			case update:
+				String toVer = null;
+				if( input.length == 3){
+					targetComp = input[1].trim();
+					toVer = input[2].trim();
+//					System.out.println("update " + targetComp + " " + toVer);
+					TravelCompUpdate.update(targetComp, toVer);
+				} else{
+					System.out.println("Illegal parameters for 'update'");
+					break;
+				}
+				break;
+			case updateAt:
+				if(input.length<=4 || input.length%2==1){
+					System.out.println("Illegal parameters for 'updateAt'");
+					break;
+				}
+				
+				targetComp = input[1].trim();
+				rqstInterval = new Integer(input[2].trim());
+				accessTimes = new Integer(input[3].trim());
+				
+				for(int i=4; i<input.length; i+=2){
+					int point = new Integer(input[i].trim());
+					if(point < accessTimes)
+						updatePoints.put(point, input[i+1]);
+				}
+				
+				for (int i = 0; i < accessTimes; i++) {
+					new CoordinationVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+					if(updatePoints.get(i) != null){
+//						System.out.println("update " + targetComp + " at " + i);
+						TravelCompUpdate.update(targetComp, updatePoints.get(i));
+					}
+				}
+				break;
+			case help:
+				System.out.println();
+				System.out.println("access specified times without executing update, e.g., ");
+				System.out.println("	[usage] access 400 50");
+				System.out.println("	[behavior] access the component 50 times, and the thread sleep 400ms before sending each request");
+				System.out.println("update specified component without accessing it. e.g., ");
+				System.out.println("	[usage] update CurrencyConverter VER_ONE");
+				System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
+				System.out.println("update a component while requests ongoing, e.g., ");
+				System.out.println("	[usage] updateAt CurrencyConverter 400 50 15 VER_ONE 35 VER_TWO");
+				System.out.println("	[behavior] access 50 times, and the thread sleep 400ms before sending each request. " +
+						" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
+				System.out.println("'help' shows supported commands.");
+				System.out.println();
+				break;
+			default:
+				System.out.println("Unsupported command. input 'help' for help.");
+				break;
+			}
+			
+		}//WHILE
+		
+		
+//		int num = 0;
+//		for(int i = 0; i < num; i++){
+//			new CoordinationVisitorThread(node).start();
+//			Thread.sleep(400);
+//			if(i == 15){
+//				TravelCompUpdate.updateCurrencyToVerOne();
+//				Thread.sleep(1000);
+//			}
+			
+//			if(i == 35){
+//				TravelCompUpdate.updateCurrencyToVerTwo();
+//				Thread.sleep(1000);
+//			}
+//			Experiment.getInstance().close();
+//		}
 	}
-
+	
 }
