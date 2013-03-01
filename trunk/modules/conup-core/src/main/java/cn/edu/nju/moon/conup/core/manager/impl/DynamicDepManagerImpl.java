@@ -34,7 +34,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	/** dependences to other components */
 	private DependenceRegistry outDepRegistry = new DependenceRegistry();
 	/** transactions hosted by current component */
-	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
+//	private TransactionRegistry txRegistry = TransactionRegistry.getInstance();
+	private TransactionRegistry txRegistry = new TransactionRegistry();
 	/** used to identify whether received update request */
 	private boolean isUpdateRequestReceived = false;
 	
