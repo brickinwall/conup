@@ -9,7 +9,7 @@
 	<description>sample-conup-sample-portal</description>
 	
 	<properties>
-		<module.name>portal</module.name>
+		<module.name>auth-update/portal</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
