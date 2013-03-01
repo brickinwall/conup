@@ -152,8 +152,13 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			}
 
 			// init ConfirmOndemandStatus
-			Map<String, Boolean> confirmStatus = new HashMap<String, Boolean>();
-			ConfirmOndemandStatus.put(currentComp, confirmStatus);
+			Map<String, Boolean> confirmStatus;
+			if(ConfirmOndemandStatus.containsKey(currentComp)){
+				confirmStatus = ConfirmOndemandStatus.get(currentComp);
+			} else{
+				confirmStatus = new HashMap<String, Boolean>();
+				ConfirmOndemandStatus.put(currentComp, confirmStatus);
+			}
 			for (String component : parentComps) {
 				if( !confirmStatus.containsKey(component)){
 					confirmStatus.put(component, false);

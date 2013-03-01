@@ -162,8 +162,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		parentComps = ondemandHelper.getDynamicDepManager().getStaticInDeps();
 		
 		//init OndemandRequestStatus
-		Map<String, Boolean> reqStatus = new HashMap<String, Boolean>();
-		OndemandRequestStatus.put(currentComp, reqStatus);
+		Map<String, Boolean> reqStatus;
+		if(OndemandRequestStatus.containsKey(currentComp)){
+			reqStatus = OndemandRequestStatus.get(currentComp);
+		} else{
+			reqStatus = new HashMap<String, Boolean>();
+			OndemandRequestStatus.put(currentComp, reqStatus);
+		}
 		for(String subComponent : targetRef){
 			if(!reqStatus.containsKey(subComponent)){
 //				if(OndemandRequestStatus.get(currentComp) == null){
@@ -176,8 +181,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		
 		//init ConfirmOndemandStatus
-		Map<String, Boolean> confirmStatus = new HashMap<String, Boolean>();
-		ConfirmOndemandStatus.put(currentComp, confirmStatus);
+		Map<String, Boolean> confirmStatus;
+		if(ConfirmOndemandStatus.containsKey(currentComp)){
+			confirmStatus = ConfirmOndemandStatus.get(currentComp);
+		} else{
+			confirmStatus = new HashMap<String, Boolean>();
+			ConfirmOndemandStatus.put(currentComp, confirmStatus);
+		}
 		for(String component : parentComps){
 			if(!confirmStatus.containsKey(component)){
 //				if(ConfirmOndemandStatus.get(currentComp) == null){
