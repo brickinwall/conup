@@ -93,8 +93,10 @@ public class TxLifecycleManager {
 			txContextInCache.setHostComponent(hostComponent);
 			txContextInCache.setRootComponent(rootComponent);
 			txContextInCache.setParentComponent(parentComponent);
+//		} else if(rootTx!=null && parentTx!=null 
+//				&& currentTx==null && hostComponent!=null){
 		} else if(rootTx!=null && parentTx!=null 
-				&& currentTx==null && hostComponent!=null){
+				&& hostComponent!=null){
 			assert(rootTx!=null && parentTx!=null && currentTx==null && hostComponent!=null);
 			//current transaction is a sub-transaction
 			//update interceptor cache dependency
@@ -154,6 +156,10 @@ public class TxLifecycleManager {
 	 */
 	public static void addRootTx(String parentTxId, String rootTxId){
 		synchronized (OLD_ROOT_TXS) {
+			//FOR TEST
+			if(parentTxId == null && rootTxId != null){
+				Logger.getLogger(TxLifecycleManager.class.getName()).warning("parentTx:" + parentTxId + ", rootTx: " + rootTxId);
+			}
 			if(rootTxId != null)
 				OLD_ROOT_TXS.put(parentTxId, rootTxId);
 //				OLD_ROOT_TXS.add(rootTxId);
