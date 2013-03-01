@@ -66,7 +66,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TX_IDS.
 		if(et.equals(TxEventType.TransactionEnd)){
-			TX_IDS.remove(txContext.getHostComponent());
+//			TX_IDS.remove(txContext.getHostComponent());
+			TX_IDS.remove(curTxID);
 			
 			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
 			interceptorCache.removeTxCtx(getThreadID());
@@ -227,7 +228,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			rootTxId = TxLifecycleManager.getRootTx(rootTxId);
 		}
 		TxLifecycleManager.removeRootTx(rootTxId);
-		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+		LOGGER.info("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
 	@Override
