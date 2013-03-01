@@ -7,7 +7,7 @@
 	<description>conup-remote-configuration</description>
 
 	<properties>
-		<module.name>conup-remote-configuration</module.name>
+		<module.name>auth-update/conup-remote-configuration</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

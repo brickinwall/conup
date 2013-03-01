@@ -7,7 +7,7 @@
 	<description>sample-conup-sample-vistor</description>
 	
 	<properties>
-		<module.name>visitor</module.name>
+		<module.name>auth-update/visitor</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	

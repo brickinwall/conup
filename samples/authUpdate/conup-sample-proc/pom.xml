@@ -9,7 +9,7 @@
 	<description>sample-conup-sample-proc</description>
 
 	<properties>
-		<module.name>proc</module.name>
+		<module.name>auth-update/proc</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	

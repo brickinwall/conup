@@ -9,7 +9,7 @@
 	<description>sample-conup-sample-auth</description>
 
 	<properties>
-		<module.name>auth</module.name>
+		<module.name>auth-update/auth</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

@@ -9,7 +9,7 @@
 	<name>conup-sample-configuration-client</name>
 	
 	<properties>
-		<module.name>config</module.name>
+		<module.name>auth-update/config</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
