@@ -8,17 +8,20 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
 
 public class TransactionRegistry  {
-	private static TransactionRegistry transactionRegistry = new TransactionRegistry();
+//	private static TransactionRegistry transactionRegistry = new TransactionRegistry();
 	/** take tx_id as key*/
 	private Map<String, TransactionContext> txContexts;
 	
-	private TransactionRegistry(){
+//	private TransactionRegistry(){
+//		txContexts = new ConcurrentHashMap<String, TransactionContext>();
+//	}
+	public TransactionRegistry(){
 		txContexts = new ConcurrentHashMap<String, TransactionContext>();
 	}
 	
-	public static TransactionRegistry getInstance(){
-		return transactionRegistry;
-	}
+//	public static TransactionRegistry getInstance(){
+//		return transactionRegistry;
+//	}
 	
 	public TransactionContext getTransactionContext(String transactionID) {
 		return txContexts.get(transactionID);

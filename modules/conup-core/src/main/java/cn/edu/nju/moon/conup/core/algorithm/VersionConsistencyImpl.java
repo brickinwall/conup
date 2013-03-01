@@ -834,7 +834,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		
 		if(!inFutureFlag){
-			TransactionContext txContext = TransactionRegistry.getInstance().getTransactionContext(currentTxID);
+//			TransactionContext txContext = TransactionRegistry.getInstance().getTransactionContext(currentTxID);
+			TransactionContext txContext = dynamicDepMgr.getTxs().get(currentTxID);
 			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
 			
 			for(Dependence dep : outFutureOneRoot){
