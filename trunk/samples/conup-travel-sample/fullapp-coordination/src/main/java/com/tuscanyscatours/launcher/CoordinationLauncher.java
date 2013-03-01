@@ -1,30 +1,16 @@
 package com.tuscanyscatours.launcher;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
-import org.oasisopen.sca.NoSuchServiceException;
-
-import com.tuscanyscatours.common.Search;
-import com.tuscanyscatours.common.TripItem;
-import com.tuscanyscatours.common.TripLeg;
-import com.tuscanyscatours.coordination.Coordination;
-import com.tuscanyscatours.shoppingcart.CartInitialize;
-import com.tuscanyscatours.travelcatalog.TravelCatalogSearch;
-import com.tuscanyscatours.tripbooking.TripBooking;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
@@ -78,7 +64,13 @@ public class CoordinationLauncher {
 		Scanner scanner = new Scanner(System.in);
 		while(scanner.hasNextLine()){
 			String [] input = scanner.nextLine().split(" ");
-			COMMANDS command = Enum.valueOf(COMMANDS.class, input[0].trim());
+			COMMANDS command = null;
+			try{
+				command = Enum.valueOf(COMMANDS.class, input[0].trim());
+			} catch(Exception e){
+				System.out.println("Unsupported command. input 'help' for help.");
+				continue;
+			}
 			
 			switch (command) {
 			case access:
