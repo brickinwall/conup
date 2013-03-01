@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
-
 public class DynamicUpdateClassLoader extends ClassLoader {
 	private String baseDir; 
     private Set<String> dynaclazns; 

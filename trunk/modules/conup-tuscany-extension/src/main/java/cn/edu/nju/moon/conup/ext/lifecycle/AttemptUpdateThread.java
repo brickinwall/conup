@@ -3,7 +3,6 @@ package cn.edu.nju.moon.conup.ext.lifecycle;
 
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
