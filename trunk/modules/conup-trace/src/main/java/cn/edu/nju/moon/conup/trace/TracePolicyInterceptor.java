@@ -220,7 +220,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			synchronized (syncMonitor) {
 				try {
 					if (depMgr.isOndemandSetting()) {
-						LOGGER.warning("ThreadID=" + getThreadID() + "----------------syncMonitor.wait();buffer------------");
+						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
 						syncMonitor.wait();
 					}
 				} catch (InterruptedException e) {
@@ -286,7 +286,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						depMgr.achievedFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
 							TxLifecycleManager.removeRootTx(txCtx.getParentTx(), txCtx.getRootTx());
 							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
@@ -399,7 +399,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			// check interceptor cache
 			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
 			threadID = getThreadID();
-			TransactionContext txContext = cache.getTxCtx(hostComponent);
+			TransactionContext txContext = cache.getTxCtx(threadID);
 			if(txContext == null){
 				// generate and init TransactionDependency
 				txContext = new TransactionContext();
