@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
@@ -61,17 +63,19 @@ import org.apache.tuscany.sca.runtime.RuntimeComponent;
 import org.apache.tuscany.sca.runtime.Version;
 import org.apache.tuscany.sca.shell.jline.JLine;
 
+import com.tuscanyscatours.CoordinationVisitorThread;
+import com.tuscanyscatours.TravelCompUpdate;
+
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.apppre.TuscanyProgramAnalyzer;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
-
 
 /**
  * A little SCA command shell.
  */
 public class Shell {
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Shell.class.getName());
     private boolean useJline;
     final List<String> history = new ArrayList<String>();
@@ -89,7 +93,9 @@ public class Shell {
         boolean requirePreprocessor = true;
 //        boolean requireContainer = true;
         String domainURI = "uri:default";
-        String compositeFileName = null;
+        
+        @SuppressWarnings("unused")
+		String compositeFileName = null;
         NodeManager nodeMgr = NodeManager.getInstance();
         
         boolean showHelp = false;
@@ -121,7 +127,7 @@ public class Shell {
 			shell = new Shell(domainURI, useJline);
 			if (showHelp || contribution == null) {
 				shell.help(null);
-			}
+			}	// END IF
 			if (contribution != null) {
 				// added for conup
 				File file = new File(contribution);
@@ -131,51 +137,148 @@ public class Shell {
 				if(absContributionPath.contains("conup-sample-visitor") || absContributionPath.contains("conup-sample-configuration-client"))
 					requirePreprocessor = false;
 				// preprocess
-//				if (!absContributionPath.contains("conup-sample-visitor")) {
-					if (requirePreprocessor) {
-						TuscanyProgramAnalyzer analyzer;
-						analyzer = new TuscanyProgramAnalyzer();
-						analyzer.analyzeApplication(absContributionPath,
-								absContributionPath);
-						System.out.println("Preprocessing is done...");
-					} else {
-						System.out.println("Skipped preprocessing...");
-					}
+				if (requirePreprocessor) {	
+					TuscanyProgramAnalyzer analyzer;
+					analyzer = new TuscanyProgramAnalyzer();	
+					analyzer.analyzeApplication(absContributionPath,	
+							absContributionPath);
+					System.out.println("Preprocessing is done...");	
+				} else {
+					System.out.println("Skipped preprocessing...");
+				}
 
-					System.out.println();
-					System.out.println("install " + contribution + " -start");
-					String curi = shell.getNode().installContribution(contribution);
-					shell.getNode().startDeployables(curi);
+				System.out.println();
+				System.out.println("install " + contribution + " -start");
+				String curi = shell.getNode().installContribution(contribution);
+				shell.getNode().startDeployables(curi);
 
-					Node node = shell.getNode();
-					Map<String, DeployedComposite> startedComposites = ((NodeImpl)node).getStartedComposites();
-					Iterator<Entry<String, DeployedComposite>> iterator = startedComposites.entrySet().iterator();
-					while(iterator.hasNext()){
-						Entry<String, DeployedComposite> entry = iterator.next();
-						String uri = entry.getKey();
-						DeployedComposite deployComposite = entry.getValue();
-						if(uri.contains(curi)){
-							Composite composite = deployComposite.getBuiltComposite();
-							List<Component> components = composite.getComponents();
-							for(Component comp : components){
-								RuntimeComponent runtimeComponent = (RuntimeComponent)comp;
-								String componentName = runtimeComponent.getName();
-								nodeMgr.loadConupConf(componentName, "Version");
-								CompLifecycleManager.getInstance(componentName).setNode(node);
-							    CommServerManager.getInstance().start(componentName);
-							}
+				Node node = shell.getNode();
+				Map<String, DeployedComposite> startedComposites = ((NodeImpl)node).getStartedComposites();
+				Iterator<Entry<String, DeployedComposite>> iterator = startedComposites.entrySet().iterator();
+				while(iterator.hasNext()){
+					Entry<String, DeployedComposite> entry = iterator.next();
+					String uri = entry.getKey();
+					DeployedComposite deployComposite = entry.getValue();
+					if(uri.contains(curi)){
+						Composite composite = deployComposite.getBuiltComposite();
+						List<Component> components = composite.getComponents();
+						for(Component comp : components){
+							RuntimeComponent runtimeComponent = (RuntimeComponent)comp;
+							String componentName = runtimeComponent.getName();
+							nodeMgr.loadConupConf(componentName, "Version");
+							CompLifecycleManager.getInstance(componentName).setNode(node);
+						    CommServerManager.getInstance().start(componentName);
 						}
 					}
+				}
 					
-					 //launch DepRecorder
-			        DepRecorder depRecorder;
-			        depRecorder = DepRecorder.getInstance();
-					
-//				}// END IF
-			}
-		}
+				 //launch DepRecorder
+//			     DepRecorder depRecorder;
+//			     depRecorder = DepRecorder.getInstance();
+				if(absContributionPath.contains("coordination")){
+					accessServices(node);
+				}
+			}	// END IF
+		}	// END ELSE
         shell.run();
     }
+    
+    private static void accessServices(Node node) throws Exception{
+		int accessTimes = 40;		//total request
+		int rqstInterval = 200;
+		String targetComp = "CurrencyConverter";	//target component for update
+		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
+		
+		System.out.println("Pls input the command, or input 'help' for help");
+		@SuppressWarnings("resource")
+		Scanner scanner = new Scanner(System.in);
+		while(scanner.hasNextLine()){
+			String [] input = scanner.nextLine().split(" ");
+			COMMANDS command = null;
+			try{
+				command = Enum.valueOf(COMMANDS.class, input[0].trim());
+			} catch(Exception e){
+				System.out.println("Unsupported command. input 'help' for help.");
+				continue;
+			}
+			
+			switch (command) {
+			case access:
+				if( input.length == 3 ){
+					rqstInterval = new Integer(input[1].trim());
+					accessTimes = new Integer(input[2].trim());
+				} else{
+					System.out.println("Illegal parameters for 'access'");
+					break;
+				}
+				
+//				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
+				for (int i = 0; i < accessTimes; i++) {
+					new CoordinationVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+				}
+				break;
+			case update:
+				String toVer = null;
+				if( input.length == 3){
+					targetComp = input[1].trim();
+					toVer = input[2].trim();
+//					System.out.println("update " + targetComp + " " + toVer);
+					TravelCompUpdate.update(targetComp, toVer);
+				} else{
+					System.out.println("Illegal parameters for 'update'");
+					break;
+				}
+				break;
+			case updateAt:
+				if(input.length<=4 || input.length%2==1){
+					System.out.println("Illegal parameters for 'updateAt'");
+					break;
+				}
+				
+				targetComp = input[1].trim();
+				rqstInterval = new Integer(input[2].trim());
+				accessTimes = new Integer(input[3].trim());
+				
+				for(int i=4; i<input.length; i+=2){
+					int point = new Integer(input[i].trim());
+					if(point < accessTimes)
+						updatePoints.put(point, input[i+1]);
+				}
+				
+				for (int i = 0; i < accessTimes; i++) {
+					new CoordinationVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+					if(updatePoints.get(i) != null){
+//						System.out.println("update " + targetComp + " at " + i);
+						TravelCompUpdate.update(targetComp, updatePoints.get(i));
+					}
+				}
+				break;
+			case help:
+				System.out.println();
+				System.out.println("access specified times without executing update, e.g., ");
+				System.out.println("	[usage] access 400 50");
+				System.out.println("	[behavior] access the component 50 times, and the thread sleep 400ms before sending each request");
+				System.out.println("update specified component without accessing it. e.g., ");
+				System.out.println("	[usage] update CurrencyConverter VER_ONE");
+				System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
+				System.out.println("update a component while requests ongoing, e.g., ");
+				System.out.println("	[usage] updateAt CurrencyConverter 400 50 15 VER_ONE 35 VER_TWO");
+				System.out.println("	[behavior] access 50 times, and the thread sleep 400ms before sending each request. " +
+						" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
+				System.out.println("'help' shows supported commands.");
+				System.out.println();
+				break;
+			case exit:
+				return;
+			default:
+				System.out.println("Unsupported command. input 'help' for help.");
+				break;
+			}
+			
+		}//WHILE
+	}
 
     //added for conup
     public String getCurrentDomain() {
