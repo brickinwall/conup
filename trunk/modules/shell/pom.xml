@@ -62,6 +62,11 @@
         	<artifactId>conup-communication-api</artifactId>
         	<version>0.9.1-DU-SNAPSHOT</version>
         </dependency>
+        <dependency>
+        	<groupId>cn.edu.nju.moon</groupId>
+        	<artifactId>conup-remote-configuration</artifactId>
+        	<version>0.9.1-DU-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     
     <build>
