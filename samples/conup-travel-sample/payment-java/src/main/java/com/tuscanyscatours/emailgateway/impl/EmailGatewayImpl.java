@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
 import com.tuscanyscatours.emailgateway.EmailGateway;

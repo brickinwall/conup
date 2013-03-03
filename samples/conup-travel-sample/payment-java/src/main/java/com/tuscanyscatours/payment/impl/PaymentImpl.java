@@ -75,7 +75,8 @@ public class PaymentImpl implements Payment {
 //            		                                    customer.getEmail());
 //            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
             LOGGER.fine("before currencyConverter.convert(...)");
-            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + currencyConverter.convert("USD", "GBP", amount));
+            double result = currencyConverter.convert("USD", "GBP", amount);
+            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + result);
             LOGGER.fine("after currencyConverter.convert(...)");
 //            return status;
             return "ok";

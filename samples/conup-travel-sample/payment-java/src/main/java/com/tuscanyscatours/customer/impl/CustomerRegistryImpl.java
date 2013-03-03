@@ -23,11 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.oasisopen.sca.annotation.Destroy;
-import org.oasisopen.sca.annotation.EagerInit;
-import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Requires;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
@@ -44,41 +39,43 @@ import com.tuscanyscatours.payment.creditcard.PayerType;
  * An in-memory customer registry implementation
  */
 @Service(CustomerRegistry.class)
-@Scope("COMPOSITE")
-@EagerInit
+//@Scope("COMPOSITE")
+//@EagerInit
 //TODO adapting to Tuscany 2
 //@Requires("{http://docs.oasis-open.org/ns/opencsa/sca/200912}managedTransaction.global")
 public class CustomerRegistryImpl implements CustomerRegistry {
     private volatile static int idGenerator = 0;
-    private Map<String, Customer> customers = new HashMap<String, Customer>();
-
-    @Init
-    public void init() {
-        // Load the customers
-        ObjectFactory factory = new ObjectFactory();
-        CreditCardDetailsType cc = factory.createCreditCardDetailsType();
-        PayerType john = factory.createPayerType();
-        john.setName("John Smith");
-        cc.setCardOwner(john);
-        cc.setCreditCardNumber("1111-2222-3333-4444");
-        cc.setCreditCardType(CreditCardTypeType.VISA);
-        cc.setCVV2("1234");
-        cc.setExpMonth(1);
-        cc.setExpYear(2014);
-        Customer customer = new Customer();
-        customer.setId("c-" + idGenerator++);
-        customer.setName("John Smith");
-        customer.setEmail("john@xyz.com");
-        customer.setCreditCard(cc);
-        customers.put(customer.getId(), customer);
-        
-//        createCustomer("John Smith", "john@xyz.com", cc);
+    private static Map<String, Customer> customers = new HashMap<String, Customer>();
+    
+    static{
+    	ObjectFactory factory = new ObjectFactory();
+    	CreditCardDetailsType cc = factory.createCreditCardDetailsType();
+    	PayerType john = factory.createPayerType();
+    	john.setName("John Smith");
+    	cc.setCardOwner(john);
+    	cc.setCreditCardNumber("1111-2222-3333-4444");
+    	cc.setCreditCardType(CreditCardTypeType.VISA);
+    	cc.setCVV2("1234");
+    	cc.setExpMonth(1);
+    	cc.setExpYear(2014);
+    	Customer customer = new Customer();
+    	customer.setId("c-" + idGenerator++);
+    	customer.setName("John Smith");
+    	customer.setEmail("john@xyz.com");
+    	customer.setCreditCard(cc);
+    	customers.put(customer.getId(), customer);
     }
 
-    @Destroy
-    public void destroy() {
-        // Save the customers
-    }
+//    @Init
+//    public void init() {
+//        // Load the customers
+////        createCustomer("John Smith", "john@xyz.com", cc);
+//    }
+
+//    @Destroy
+//    public void destroy() {
+//        // Save the customers
+//    }
 
     @ConupTransaction
     public Customer createCustomer(String name, String email, CreditCardDetailsType creditCard) {
@@ -116,7 +113,7 @@ public class CustomerRegistryImpl implements CustomerRegistry {
     public boolean updateCustomer(Customer customer) {
         Customer current = null;
         try {
-            current = getCustomer(customer.getId());
+            current =  customers.get(customer.getId()); 
         } catch (Exception ex) {
             return false;
         }
