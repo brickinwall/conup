@@ -127,27 +127,27 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		switch(operationType){
 		case NOTIFY_FUTURE_CREATE:
-//			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_CREATE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_CREATE:");
+			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_CREATE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_CREATE:");
 			
 			manageDepResult = doNotifyFutureCreate(srcComp, targetComp, rootTx);
 			
-//			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_CREATE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_CREATE:");
+			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_CREATE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_CREATE:");
 			break;
 		case NOTIFY_FUTURE_REMOVE:
-//			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
 			
 			manageDepResult = doNotifyFutureRemove(srcComp, targetComp, rootTx);
 			
-//			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", before process ACK_SUBTX_INIT");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", before process ACK_SUBTX_INIT");
 			
 //			String parentTxID = payloadInfos[4].split(":")[1];
 //			String subTxID = payloadInfos[5].split(":")[1];
@@ -156,13 +156,13 @@ public class VersionConsistencyImpl implements Algorithm {
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
 			break;
 		case NOTIFY_SUBTX_END:
 //			LOGGER.info("before process NOTIFY_SUBTX_END:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", before process NOTIFY_SUBTX_END");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", before process NOTIFY_SUBTX_END");
 			
 //			String subTxEndParentTxID = payloadInfos[4].split(":")[1];
 //			String subTxEndSubTxID = payloadInfos[5].split(":")[1];
@@ -171,22 +171,28 @@ public class VersionConsistencyImpl implements Algorithm {
 			manageDepResult = doNotifySubTxEnd(srcComp, targetComp, rootTx, subTxEndParentTxID, subTxEndSubTxID);
 			
 //			LOGGER.info("after process NOTIFY_SUBTX_END:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", after process NOTIFY_SUBTX_END");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", after process NOTIFY_SUBTX_END");
 			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
 			
 			manageDepResult = doNotifyPastCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
 			break;
 		case NOTIFY_PAST_REMOVE:
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_REMOVE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_REMOVE:");
+			
 			manageDepResult = doNotifyPastRemove(srcComp, targetComp, rootTx);
+			
+			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_REMOVE:");
+			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_REMOVE:");
 			break;
 		case NORMAL_ROOT_TX_END:
 			ConsistencyOndemandPayloadResolver resolver;
@@ -468,15 +474,22 @@ public class VersionConsistencyImpl implements Algorithm {
 		} else {
 			// up receiving FirstRequestService
 			// if current tx is root tx, we need to start set up
-			if(rootTx == null){
-				throw new NullPointerException("rootTx");
+			Scope scope = dynamicDepMgr.getScope();
+			Set<String> targetRef = new HashSet<String>();
+			if(scope != null){
+				targetRef.addAll(scope.getSubComponents(hostComponent));
+			} else{
+				targetRef.addAll(dynamicDepMgr.getStaticDeps());
 			}
+			assert rootTx != null;
 			if(rootTx.equals(currentTx) && (isSetupDone.get(rootTx) == null || !isSetupDone.get(rootTx))){
 				Set<String> fDeps = txContext.getFutureComponents();
 				Iterator<String> depIterator = fDeps.iterator();
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				while(depIterator.hasNext()){
 					String targetComp = depIterator.next();
+					if(!targetRef.contains(targetComp))
+						continue;
 					Dependence dep = new Dependence(FUTURE_DEP, currentTx, hostComponent, targetComp, null, null);
 					outDepRegistry.addDependence(dep);
 					String payload = ConsistencyPayloadCreator.createPayload(hostComponent, targetComp, currentTx, ConsistencyOperationType.NOTIFY_FUTURE_CREATE);
@@ -751,30 +764,16 @@ public class VersionConsistencyImpl implements Algorithm {
 		//notify parent components that remote dynamic update is done
 		Scope scope = depMgr.getScope();
 		Set<String> parentComps;
-//		Set<String> subComps;
 		if(scope != null){
 			parentComps = scope.getParentComponents(hostComp);
-//			subComps = scope.getSubComponents(hostComp);
 		}
 		else{
 			parentComps = depMgr.getCompObject().getStaticInDeps();
-//			subComps = depMgr.getCompObject().getStaticDeps();
 		}
-//		Map<String, Boolean> isSentToParent = isCleanUpForUpdateSent.get(hostComp);
-//		if(isSentToParent == null){
-//			isSentToParent = new ConcurrentHashMap<String, Boolean>();
-//			isCleanUpForUpdateSent.put(hostComp, isSentToParent);
-//		}
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
-//			if(isSentToParent.get(comp) == null){
-//				isSentToParent.put(comp, false);
-//			}
-//			if(isSentToParent.get(comp)==false){
-				String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-				depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-//				isSentToParent.put(comp, true);
-//			}
+			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		//clear local deps
@@ -1097,6 +1096,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 			}
 			if( pastFlag&&futureFlag ){
+				LOGGER.fine(deps.toString());
 				freeFlag = false;
 				break;
 			}

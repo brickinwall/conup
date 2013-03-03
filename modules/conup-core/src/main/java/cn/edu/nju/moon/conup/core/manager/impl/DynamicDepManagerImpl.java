@@ -116,7 +116,9 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean isReadyForUpdate() {
-		return compStatus.equals(CompStatus.VALID) && algorithm.isReadyForUpdate(compObj.getIdentifier());
+		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
+		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compStatus.equals(CompStatus.VALID));
+		return compStatus.equals(CompStatus.VALID) && algReadyForUpdate;
 	}
 
 	@Override
@@ -227,17 +229,17 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			ondemandSetupHelper.onDemandIsDone();
 			ondemandSyncMonitor.notifyAll();
 			
-			String inDepsStr = "In Dynamic dep manager, ondemandSetupIsDone(), print Dep infos:\n";
+			String inDepsStr = "";
 			for (Dependence dep : inDepRegistry.getDependences()) {
 				inDepsStr += "\n" + dep.toString();
 			}
-			LOGGER.fine("inDepsStr:" + inDepsStr);
+			LOGGER.info("inDepsStr:" + inDepsStr);
 			String outDepsStr = "";
 
 			for (Dependence dep : outDepRegistry.getDependences()) {
 				outDepsStr += "\n" + dep.toString();
 			}
-			LOGGER.fine("outDepsStr:" + outDepsStr);
+			LOGGER.info("outDepsStr:" + outDepsStr);
 			
 		}
 	}
