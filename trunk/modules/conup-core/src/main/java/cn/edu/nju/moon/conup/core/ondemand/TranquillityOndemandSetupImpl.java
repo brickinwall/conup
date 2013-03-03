@@ -282,7 +282,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 				LOGGER.warning("Invalid data found while onDemandSetUp");
 				continue;
 			}
-			if(txCtx.getEventType().equals(TxEventType.TransactionEnd)){
+			// for the ended non-root txs, no need to create the lfe, lpe
+			if(!rootTx.equals(curTx) && txCtx.getEventType().equals(TxEventType.TransactionEnd)){
 				continue;
 			}
 
@@ -312,6 +313,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			fDeps = getFDeps(curComp, rootTx);
 			LOGGER.fine("fDeps:");
 			for (Dependence dep : fDeps) {
+				if(!scope.getSubComponents(curComp).contains(dep.getTargetCompObjIdentifer())){
+					continue;
+				}
 				dep.setType(VersionConsistencyImpl.FUTURE_DEP);
 				dep.setRootTx(rootTx);
 				
@@ -355,6 +359,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			pDeps = getPDeps(curComp, rootTx);
 			LOGGER.fine("pArcs:");
 			for (Dependence dep : pDeps) {
+				if(!scope.getSubComponents(curComp).contains(dep.getTargetCompObjIdentifer())){
+					continue;
+				}
 				dep.setType(VersionConsistencyImpl.PAST_DEP);
 				dep.setRootTx(rootTx);
 				if (!rtOutDeps.contains(dep)
