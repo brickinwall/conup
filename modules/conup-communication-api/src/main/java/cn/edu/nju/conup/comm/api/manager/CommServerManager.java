@@ -142,6 +142,12 @@ public class CommServerManager {
 		return cci;
 	}
 	
+	/**
+	 * when start component's communication server
+	 * we need to get its ip and port to start it, then this method will be invoked.
+	 * @param hostComponentIdentifier
+	 * @return
+	 */
 	public CompCommAddress getInfos(String hostComponentIdentifier) {
 		CompLifecycleManager compLifecycleMgr = CompLifecycleManager.getInstance(hostComponentIdentifier);
 		
@@ -153,6 +159,7 @@ public class CommServerManager {
 		int port = 0;
 		for (Endpoint ep : endpoints) {
 			List<String> compRefName = new ArrayList<String>();
+			//TODO confused by the following codes.
 			for(ComponentReference ref : ep.getComponent().getReferences()){
 				compRefName.add(ref.getName());
 			}
