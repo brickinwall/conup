@@ -27,7 +27,7 @@ public class TravelCompUpdate {
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
 				String contributionUri1 = "fullapp-bank";
 				String compsiteUri1 = "bank.composite";
-				rcs.update("192.168.137.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -47,7 +47,7 @@ public class TravelCompUpdate {
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
 				String contributionUri1 = "fullapp-bank";
 				String compsiteUri1 = "bank.composite";
-				rcs.update("192.168.137.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -67,7 +67,7 @@ public class TravelCompUpdate {
 				String classFilePath1 = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
 				String contributionUri1 = "fullapp-shoppingcart";
 				String compsiteUri1 = "fullapp-shoppingcart.composite";
-				rcs.update("192.168.137.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -86,7 +86,7 @@ public class TravelCompUpdate {
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("192.168.137.135", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 			}
 		});
@@ -106,7 +106,7 @@ public class TravelCompUpdate {
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("192.168.137.135", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 			}
 		});
