@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -18,7 +20,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
  */
 public class TxLifecycleManager {
 	
-	private Logger LOGGER = Logger.getLogger(TxLifecycleManager.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(TxLifecycleManager.class.getName());
 	/**
 	 * TX_IDS takes transactionID and TransactionContext as key and value respectively.
 	 */
@@ -38,10 +40,10 @@ public class TxLifecycleManager {
 	 */
 //	private static Set<String> OLD_ROOT_TXS = new ConcurrentSkipListSet<>();
 	/**
-	 * key: parent tx
-	 * value: root tx
+	 * key compIdentifier
+	 * key: parent tx, value: root tx
 	 */
-	private static Map<String, String>	OLD_ROOT_TXS = new ConcurrentHashMap<String, String>();
+	private static Map<String, Map<String, String>>	OLD_ROOT_TXS = new ConcurrentHashMap<String, Map<String, String>>();
 	
 	/**
 	 * create transaction id
@@ -97,7 +99,7 @@ public class TxLifecycleManager {
 //				&& currentTx==null && hostComponent!=null){
 		} else if(rootTx!=null && parentTx!=null 
 				&& hostComponent!=null){
-			assert(rootTx!=null && parentTx!=null && currentTx==null && hostComponent!=null);
+			assert(rootTx!=null && parentTx!=null && hostComponent!=null);
 			//current transaction is a sub-transaction
 			//update interceptor cache dependency
 			currentTx = txID;
@@ -154,22 +156,32 @@ public class TxLifecycleManager {
 	 * when a business request with root/parent txs accepted, TxLifecycleManager should 
 	 * get notified. 
 	 */
-	public static void addRootTx(String parentTxId, String rootTxId){
+	public static void addRootTx(String hostComp, String parentTxId, String rootTxId){
 		synchronized (OLD_ROOT_TXS) {
-			//FOR TEST
-			if(parentTxId == null && rootTxId != null){
-				Logger.getLogger(TxLifecycleManager.class.getName()).warning("parentTx:" + parentTxId + ", rootTx: " + rootTxId);
+			assert hostComp != null;
+			if(rootTxId != null){
+				if(OLD_ROOT_TXS.get(hostComp) != null)
+					OLD_ROOT_TXS.get(hostComp).put(parentTxId, rootTxId);
+				else{
+					Map<String, String> txInfo = new ConcurrentHashMap<String, String>();
+					txInfo.put(parentTxId, rootTxId);
+					OLD_ROOT_TXS.put(hostComp, txInfo);
+				}
+//				OLD_ROOT_TXS.put(parentTxId, rootTxId);
 			}
-			if(rootTxId != null)
-				OLD_ROOT_TXS.put(parentTxId, rootTxId);
 //				OLD_ROOT_TXS.add(rootTxId);
 			
 		}
 	}
 	
-	public static String getRootTx(String parentTxId){
+	public static String getRootTx(String hostComp, String parentTxId){
 		synchronized (OLD_ROOT_TXS) {
-			return OLD_ROOT_TXS.get(parentTxId);
+			assert hostComp != null && parentTxId != null;
+			if(OLD_ROOT_TXS.get(hostComp) != null)
+				return OLD_ROOT_TXS.get(hostComp).get(parentTxId);
+			else
+				return null;
+//			return OLD_ROOT_TXS.get(parentTxId);
 		}
 	}
 	
@@ -179,10 +191,13 @@ public class TxLifecycleManager {
 	 * remove all the txs whose root is marked with given rootTx or parentTx
 	 * @param rootTx
 	 */
-	public static void removeRootTx(String rootTx){
+	public static void removeRootTx(String hostComp, String rootTx){
 		synchronized (OLD_ROOT_TXS) {
+			assert hostComp != null;
 			Iterator<Entry<String, String>> iterator;
-			iterator = OLD_ROOT_TXS.entrySet().iterator();
+			if(OLD_ROOT_TXS.get(hostComp) == null)
+				return;
+			iterator = OLD_ROOT_TXS.get(hostComp).entrySet().iterator();
 			while(iterator.hasNext()){
 				Entry<String, String> entry;
 				entry = iterator.next();
@@ -197,9 +212,12 @@ public class TxLifecycleManager {
 	 * @param parentTx
 	 * @param rootTx
 	 */
-	public static void removeRootTx(String parentTx, String rootTx){
+	public static void removeRootTx(String hostComp, String parentTx, String rootTx){
 		synchronized (OLD_ROOT_TXS) {
-			OLD_ROOT_TXS.remove(parentTx);
+			assert hostComp != null;
+			if(OLD_ROOT_TXS.get(hostComp) == null)
+				return;
+			OLD_ROOT_TXS.get(hostComp).remove(parentTx);
 		}
 	}
 	
@@ -211,7 +229,7 @@ public class TxLifecycleManager {
 			DynamicDepManager depMgr;
 			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
 //			LOGGER.fine("\nOLD_ROOT_TXS,size:" + OLD_ROOT_TXS.size() + " before convertToAlgorithmRoots:" + OLD_ROOT_TXS);
-			Set<String> result = depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS);
+			Set<String> result = depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
 //			LOGGER.fine("\ncopyOfOldRootTxs,size:" + result.size() + " after convertToAlgorithmRoots:" + result);
 			return result;
 		}
