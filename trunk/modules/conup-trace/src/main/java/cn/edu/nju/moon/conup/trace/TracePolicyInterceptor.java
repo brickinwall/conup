@@ -195,15 +195,14 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 
 	private Message buffer(Message msg) {
 		if (phase.equals(Phase.SERVICE_POLICY)) {
-			String compIdentifier = getComponent().getName();
+			String hostComp;
+			hostComp = getComponent().getName();
 			NodeManager nodeMgr = NodeManager.getInstance();
 			DynamicDepManager depMgr = nodeMgr
-					.getDynamicDepManager(compIdentifier);
+					.getDynamicDepManager(hostComp);
 			CompLifecycleManager clMgr;
-			clMgr = CompLifecycleManager.getInstance(compIdentifier);
-			String hostComp;
+			clMgr = CompLifecycleManager.getInstance(hostComp);
 			String threadID;
-			hostComp = getComponent().getName();
 			InterceptorCache cache = InterceptorCache.getInstance(hostComp);
 			threadID = getThreadID();
 			TransactionContext txCtx = cache.getTxCtx(threadID);
@@ -211,7 +210,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //			LOGGER.fine("\n\n\n ThreadID=" + getThreadID() + ", in buffer, compStatus=" + depMgr.getCompStatus() + " \n\n\n");
 
 			if (depMgr.isNormal()) {
-				TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
+				TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 				return msg;
 			}
 
@@ -230,27 +229,22 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			
 			String freenessConf = depMgr.getCompObject().getFreenessConf();
 			FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
-			if(freeness == null){
-				throw new NullPointerException("NullPointerException because freeness == null");
-			}
-			if(txCtx == null){
-//				getNext().invoke(msg);
-				throw new NullPointerException("NullPointerException because txCtx == null");
-			}
-
+			assert freeness!= null;
+			assert txCtx != null;
+			
 			// haven't received update request yet
 			Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
 			synchronized (waitingRemoteCompUpdateDoneMonitor) {
 				if (clMgr.getUpdateCtx() == null || clMgr.getUpdateCtx().isLoaded() == false) {
 //					LOGGER.fine("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
-					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), compIdentifier, txCtx, false)){
+					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)){
 						try {
 							waitingRemoteCompUpdateDoneMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
-					TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
+					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 					return msg;
 				}
 			}
@@ -261,7 +255,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				if(depMgr.getCompStatus().equals(CompStatus.VALID)
 					&& clMgr.getUpdateCtx() != null && clMgr.getUpdateCtx().isLoaded() ){
 					// add root tx to
-					TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
+					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 					// calculate old version root txs
 					if (!clMgr.getUpdateCtx().isOldRootTxsInitiated()) {
 						clMgr.initOldRootTxs();
@@ -288,7 +282,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
 						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
-							TxLifecycleManager.removeRootTx(txCtx.getParentTx(), txCtx.getRootTx());
+							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
 //							clMgr.getUpdateCtx().removeBufferOldRootTx(txCtx.getParentTx(), txCtx.getRootTx());
 							validToFreeSyncMonitor.wait();
@@ -320,7 +314,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				}
 			}
 			
-			TxLifecycleManager.addRootTx(txCtx.getParentTx(), txCtx.getRootTx());
+			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 		}// END IF(SERVICE_POLICY)
 		return msg;
 	}
