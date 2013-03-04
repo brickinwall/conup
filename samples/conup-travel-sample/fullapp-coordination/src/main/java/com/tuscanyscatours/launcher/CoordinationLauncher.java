@@ -60,7 +60,8 @@ public class CoordinationLauncher {
 		String targetComp = "CurrencyConverter";	//target component for update
 		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
 		
-		System.out.println("Pls input the command, or input 'help' for help");
+//		System.out.println("Pls input the command, or input 'help' for help");
+		printHelp();
 		Scanner scanner = new Scanner(System.in);
 		while(scanner.hasNextLine()){
 			String [] input = scanner.nextLine().split(" ");
@@ -126,20 +127,10 @@ public class CoordinationLauncher {
 				}
 				break;
 			case help:
-				System.out.println();
-				System.out.println("access specified times without executing update, e.g., ");
-				System.out.println("	[usage] access 400 50");
-				System.out.println("	[behavior] access the component 50 times, and the thread sleep 400ms before sending each request");
-				System.out.println("update specified component without accessing it. e.g., ");
-				System.out.println("	[usage] update CurrencyConverter VER_ONE");
-				System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
-				System.out.println("update a component while requests ongoing, e.g., ");
-				System.out.println("	[usage] updateAt CurrencyConverter 400 50 15 VER_ONE 35 VER_TWO");
-				System.out.println("	[behavior] access 50 times, and the thread sleep 400ms before sending each request. " +
-						" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
-				System.out.println("'help' shows supported commands.");
-				System.out.println();
+				printHelp();
 				break;
+			case exit:
+				return;
 			default:
 				System.out.println("Unsupported command. input 'help' for help.");
 				break;
@@ -163,6 +154,26 @@ public class CoordinationLauncher {
 //			}
 //			Experiment.getInstance().close();
 //		}
+	}
+	
+	private static void printHelp(){
+		System.out.println();
+		System.out.println("access specified times without executing update, e.g., ");
+		System.out.println("	[usage] access 200 50");
+		System.out.println("	[behavior] access the component 50 times, and the thread sleep 200ms before sending each request");
+		System.out.println("update specified component without accessing it. e.g., ");
+		System.out.println("	[usage] update CurrencyConverter VER_ONE");
+		System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
+		System.out.println("update a component while requests ongoing, e.g., ");
+		System.out.println("	[usage] updateAt CurrencyConverter 200 50 35 VER_ONE");
+		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
+				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 35th request");
+		
+		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
+		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
+				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
+		System.out.println("'help' shows supported commands.");
+		System.out.println();
 	}
 	
 }

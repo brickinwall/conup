@@ -1,4 +1,4 @@
-package com.tuscanyscatours.launcher;
+package cn.edu.nju.moon.conup.sample.portal.launcher;
 
 /**
  * 
@@ -14,6 +14,8 @@ public enum COMMANDS {
 	updateAt,
 	/** help of the commands */
 	help,
+	/** ondemand */
+	ondemand,
 	/** exit */
 	exit;
 }

@@ -1,6 +1,9 @@
 package cn.edu.nju.moon.conup.sample.portal.launcher;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -59,65 +62,132 @@ public class LaunchPortal {
         
 	}
 	
-	private static void accessServices(Node node) throws InterruptedException {
-			int threadNum = 100;
-			
-			Random random;
-			random = new Random(System.currentTimeMillis());
-			for(int i=0; i<threadNum; i++){
-				LOGGER.fine("Try to access PortalComponent#service-binding(PortalService/PortalService)");
-				new PortalVisitorThread(node).start();
-	//			testUpdate();
-				if(i == 25){
-					testUpdate();
-				}
-//				if(i == 75){
-//					Thread.sleep(2000);
-//					testUpdateToOldVersion();
-//				}
-				Thread.sleep(Math.abs(random.nextInt())%10 * 60);
-	//			Thread.sleep(200);
-			}
-		}
-
-	private static void testUpdate() {
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-				String targetIdentifier = "AuthComponent";
-				int port = 18082;
-				String baseDir = "/home/nju/deploy/sample/update";
-				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
-				String contributionUri = "conup-sample-auth";
-				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-				
-			}
-		});
+	
+	public static void accessServices(Node node) throws Exception{
+		int accessTimes = 40;		//total request
+		int rqstInterval = 200;
+		String targetComp = "AuthComponent";	//target component for update
+		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
 		
-		thread.start();
+//		System.out.println("Pls input the command, or input 'help' for help");
+		printHelp();
+		Scanner scanner = new Scanner(System.in);
+		while(scanner.hasNextLine()){
+			String [] input = scanner.nextLine().split(" ");
+			COMMANDS command = null;
+			try{
+				command = Enum.valueOf(COMMANDS.class, input[0].trim());
+			} catch(Exception e){
+				System.out.println("Unsupported command. input 'help' for help.");
+				continue;
+			}
+			
+			switch (command) {
+			case access:
+				if( input.length == 3 ){
+					rqstInterval = new Integer(input[1].trim());
+					accessTimes = new Integer(input[2].trim());
+				} else{
+					System.out.println("Illegal parameters for 'access'");
+					break;
+				}
+				
+//				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
+				for (int i = 0; i < accessTimes; i++) {
+					new PortalVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+				}
+				break;
+			case update:
+				String toVer = null;
+				if( input.length == 3){
+					targetComp = input[1].trim();
+					toVer = input[2].trim();
+//					System.out.println("update " + targetComp + " " + toVer);
+					AuthCompUpdate.update(targetComp, toVer);
+				} else{
+					System.out.println("Illegal parameters for 'update'");
+					break;
+				}
+				break;
+			case updateAt:
+				if(input.length<=4 || input.length%2==1){
+					System.out.println("Illegal parameters for 'updateAt'");
+					break;
+				}
+				
+				targetComp = input[1].trim();
+				rqstInterval = new Integer(input[2].trim());
+				accessTimes = new Integer(input[3].trim());
+				
+				for(int i=4; i<input.length; i+=2){
+					int point = new Integer(input[i].trim());
+					if(point < accessTimes)
+						updatePoints.put(point, input[i+1]);
+				}
+				
+				for (int i = 0; i < accessTimes; i++) {
+					new PortalVisitorThread(node).start();
+					Thread.sleep(rqstInterval);
+					if(updatePoints.get(i) != null){
+//						System.out.println("update " + targetComp + " at " + i);
+						AuthCompUpdate.update(targetComp, updatePoints.get(i));
+					}
+				}
+				break;
+			case help:
+				printHelp();
+				break;
+			case exit:
+				return;
+			default:
+				System.out.println("Unsupported command. input 'help' for help.");
+				break;
+			}
+			
+		}//WHILE
+		
 	}
 	
-	private static void testUpdateToOldVersion() {
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-				String targetIdentifier = "AuthComponent";
-				int port = 18082;
-				String baseDir = "/home/nju/deploy/sample/update/old";
-				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
-				String contributionUri = "conup-sample-auth";
-				String compsiteUri = "auth.composite";
-				rcs.update("114.212.85.6", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-				
-			}
-		});
+	private static void printHelp(){
+		System.out.println();
+		System.out.println("access specified times without executing update, e.g., ");
+		System.out.println("	[usage] access 200 50");
+		System.out.println("	[behavior] access the component 50 times, and the thread sleep 200ms before sending each request");
+		System.out.println("update specified component without accessing it. e.g., ");
+		System.out.println("	[usage] update AuthComponent VER_ONE");
+		System.out.println("	[behavior] update component 'AuthComponent' to VER_ONE");
+		System.out.println("update a component while requests ongoing, e.g., ");
+		System.out.println("	[usage] updateAt AuthComponent 200 50 35 VER_ONE");
+		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
+				" Meanwhile, update component 'AuthComponent' to VER_ONE at 35th request");
 		
-		thread.start();
+		System.out.println("	[usage] updateAt AuthComponent 200 70 25 VER_ONE 65 VER_TWO");
+		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
+				" Meanwhile, update component 'AuthComponent' to VER_ONE at 15th request and to VER_TWO at 35th request");
+		System.out.println("'help' shows supported commands.");
+		System.out.println();
 	}
+	
+//	private static void accessServices(Node node) throws InterruptedException {
+//			int threadNum = 70;
+//			
+//			Random random;
+//			random = new Random(System.currentTimeMillis());
+//			for(int i=0; i<threadNum; i++){
+//				LOGGER.fine("Try to access PortalComponent#service-binding(PortalService/PortalService)");
+//				new PortalVisitorThread(node).start();
+//	//			testUpdate();
+//				if(i == 30){
+//					testUpdateVersion2();
+//				}
+//				if(i == 60){
+//					testUpdateVersion3();
+//				}
+//				Thread.sleep(Math.abs(random.nextInt())%10 * 60);
+//	//			Thread.sleep(200);
+//			}
+//		}
+
 	
 }
