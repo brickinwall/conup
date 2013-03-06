@@ -233,13 +233,13 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			for (Dependence dep : inDepRegistry.getDependences()) {
 				inDepsStr += "\n" + dep.toString();
 			}
-			LOGGER.info("inDepsStr:" + inDepsStr);
+			LOGGER.fine("inDepsStr:" + inDepsStr);
 			String outDepsStr = "";
 
 			for (Dependence dep : outDepRegistry.getDependences()) {
 				outDepsStr += "\n" + dep.toString();
 			}
-			LOGGER.info("outDepsStr:" + outDepsStr);
+			LOGGER.fine("outDepsStr:" + outDepsStr);
 			
 		}
 	}

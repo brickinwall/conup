@@ -219,7 +219,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			synchronized (syncMonitor) {
 				try {
 					if (depMgr.isOndemandSetting()) {
-						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
+						LOGGER.fine("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
 						syncMonitor.wait();
 					}
 				} catch (InterruptedException e) {
@@ -280,7 +280,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						depMgr.achievedFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
 							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
