@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -95,6 +96,7 @@ public class TxLifecycleManager {
 			txContextInCache.setHostComponent(hostComponent);
 			txContextInCache.setRootComponent(rootComponent);
 			txContextInCache.setParentComponent(parentComponent);
+			LOGGER.fine("created root tx id:" + rootTx);
 //		} else if(rootTx!=null && parentTx!=null 
 //				&& currentTx==null && hostComponent!=null){
 		} else if(rootTx!=null && parentTx!=null 
@@ -229,16 +231,12 @@ public class TxLifecycleManager {
 			DynamicDepManager depMgr;
 			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
 //			LOGGER.fine("\nOLD_ROOT_TXS,size:" + OLD_ROOT_TXS.size() + " before convertToAlgorithmRoots:" + OLD_ROOT_TXS);
-			Set<String> result = depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
+			if(OLD_ROOT_TXS.get(hostComp) != null)
+				return depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
+			else
+				return new HashSet<String>();
 //			LOGGER.fine("\ncopyOfOldRootTxs,size:" + result.size() + " after convertToAlgorithmRoots:" + result);
-			return result;
 		}
-////		Set<String> copy = new HashSet<String>();
-//		synchronized (OLD_ROOT_TXS) {
-//			copy.addAll(OLD_ROOT_TXS);
-//			copy.putAll(OLD_ROOT_TXS);
-//		}
-//		return copy;
 	}
 	
 }
