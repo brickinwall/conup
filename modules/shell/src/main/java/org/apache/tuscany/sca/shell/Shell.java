@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
@@ -63,12 +62,15 @@ import org.apache.tuscany.sca.runtime.RuntimeComponent;
 import org.apache.tuscany.sca.runtime.Version;
 import org.apache.tuscany.sca.shell.jline.JLine;
 
-import com.tuscanyscatours.CoordinationVisitorThread;
-import com.tuscanyscatours.TravelCompUpdate;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.apppre.TuscanyProgramAnalyzer;
+import cn.edu.nju.moon.conup.experiments.utils.ConupExpCommands;
+import cn.edu.nju.moon.conup.experiments.utils.CoordinationVisitorThread;
+import cn.edu.nju.moon.conup.experiments.utils.TravelCompUpdate;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
+import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
@@ -184,98 +186,70 @@ public class Shell {
     }
     
     private static void accessServices(Node node) throws Exception{
-		int accessTimes = 40;		//total request
-		int rqstInterval = 200;
-		String targetComp = "CurrencyConverter";	//target component for update
-		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
-		
-		System.out.println("Pls input the command, or input 'help' for help");
+		printHelp();
 		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(System.in);
 		while(scanner.hasNextLine()){
 			String [] input = scanner.nextLine().split(" ");
-			COMMANDS command = null;
+			ConupExpCommands command = null;
 			try{
-				command = Enum.valueOf(COMMANDS.class, input[0].trim());
+				command = Enum.valueOf(ConupExpCommands.class, input[0].trim());
 			} catch(Exception e){
 				System.out.println("Unsupported command. input 'help' for help.");
 				continue;
 			}
 			
 			switch (command) {
-			case access:
-				if( input.length == 3 ){
-					rqstInterval = new Integer(input[1].trim());
-					accessTimes = new Integer(input[2].trim());
+			case timelinessExp1:
+				if( input.length == 1 ){
+					doTimelinessExp1(node);
 				} else{
-					System.out.println("Illegal parameters for 'access'");
-					break;
-				}
-				
-//				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
-				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node).start();
-					Thread.sleep(rqstInterval);
-				}
-				break;
-			case update:
-				String toVer = null;
-				if( input.length == 3){
-					targetComp = input[1].trim();
-					toVer = input[2].trim();
-//					System.out.println("update " + targetComp + " " + toVer);
-					TravelCompUpdate.update(targetComp, toVer);
-				} else{
-					System.out.println("Illegal parameters for 'update'");
+					System.out.println("wrong number parameters for 'timelinessExp1'");
 					break;
 				}
 				break;
-			case updateAt:
-				if(input.length<=4 || input.length%2==1){
-					System.out.println("Illegal parameters for 'updateAt'");
-					break;
-				}
-				
-				targetComp = input[1].trim();
-				rqstInterval = new Integer(input[2].trim());
-				accessTimes = new Integer(input[3].trim());
-				
-				for(int i=4; i<input.length; i+=2){
-					int point = new Integer(input[i].trim());
-					if(point < accessTimes)
-						updatePoints.put(point, input[i+1]);
-				}
-				
-				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node).start();
-					Thread.sleep(rqstInterval);
-					if(updatePoints.get(i) != null){
-//						System.out.println("update " + targetComp + " at " + i);
-						TravelCompUpdate.update(targetComp, updatePoints.get(i));
-					}
-				}
-				break;
+//			case update:
+//				String toVer = null;
+//				if( input.length == 3){
+//					targetComp = input[1].trim();
+//					toVer = input[2].trim();
+////					System.out.println("update " + targetComp + " " + toVer);
+//					TravelCompUpdate.update(targetComp, toVer);
+//				} else{
+//					System.out.println("Illegal parameters for 'update'");
+//					break;
+//				}
+//				break;
+//			case updateAt:
+//				if(input.length<=4 || input.length%2==1){
+//					System.out.println("Illegal parameters for 'updateAt'");
+//					break;
+//				}
+//				
+//				targetComp = input[1].trim();
+//				rqstInterval = new Integer(input[2].trim());
+//				accessTimes = new Integer(input[3].trim());
+//				
+//				for(int i=4; i<input.length; i+=2){
+//					int point = new Integer(input[i].trim());
+//					if(point < accessTimes)
+//						updatePoints.put(point, input[i+1]);
+//				}
+//				
+//				for (int i = 0; i < accessTimes; i++) {
+//					new CoordinationVisitorThread(node).start();
+//					Thread.sleep(rqstInterval);
+//					if(updatePoints.get(i) != null){
+////						System.out.println("update " + targetComp + " at " + i);
+//						TravelCompUpdate.update(targetComp, updatePoints.get(i));
+//					}
+//				}
+//				break;
 			case help:
-				System.out.println();
-				System.out.println("access specified times without executing update, e.g., ");
-				System.out.println("	[usage] access 200 50");
-				System.out.println("	[behavior] access the component 50 times, and the thread sleep 200ms before sending each request");
-				System.out.println("update specified component without accessing it. e.g., ");
-				System.out.println("	[usage] update CurrencyConverter VER_ONE");
-				System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
-				System.out.println("update a component while requests ongoing, e.g., ");
-				System.out.println("	[usage] updateAt CurrencyConverter 200 50 35 VER_ONE");
-				System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
-						" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 35th request");
-				
-				System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
-				System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
-						" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
-				System.out.println("'help' shows supported commands.");
-				System.out.println();
+				printHelp();
 				break;
-			case exit:
-				return;
+//			case exit:
+//				return;
 			default:
 				System.out.println("Unsupported command. input 'help' for help.");
 				break;
@@ -283,6 +257,47 @@ public class Shell {
 			
 		}//WHILE
 	}
+    
+    private static void doTimelinessExp1(Node node) throws InterruptedException {
+    	ExpXMLUtil xmlUtil = new ExpXMLUtil();
+    	ExpSetting expSetting = xmlUtil.getExpSetting();
+    	
+    	// the interval between each request thread
+    	int rqstInterval = 200;
+
+    	int indepRun = expSetting.getIndepRun();
+    	int nThreads = expSetting.getnThreads();
+    	// launching the update threadId
+    	int threadId = expSetting.getThreadId();
+    	String targetComp = expSetting.getTargetComp();
+    	String ipAddress = expSetting.getIpAddress();
+    	String baseDir = expSetting.getBaseDir();
+    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
+    	
+    	for(int i = 0; i < indepRun; i++){
+			for (int j = 0; j < nThreads; j++) {
+				Thread.sleep(rqstInterval);
+				new CoordinationVisitorThread(node).start();
+				if(j == threadId)
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+			}
+    		Thread.sleep(10000);
+    	}
+	}
+
+	private static void printHelp(){
+    	System.out.println();
+		System.out.println("1. Timeliness_Exp_1");
+		System.out.println("	[usage] timelinessExp1");
+		System.out.println("	[behavior] do independent run 200 times, and with nThreads 10, and update threadId is 5 for each time");
+		System.out.println("2. Timeliness_Exp_2");
+		System.out.println("3. Disruption_Exp_3");
+		System.out.println("4. Disruption_Exp_4");
+		System.out.println("5. Framework_Exp_5");
+		
+		System.out.println("'help' shows supported commands.");
+		System.out.println();
+    }
 
     //added for conup
     public String getCurrentDomain() {

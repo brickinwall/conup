@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
+import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 
 public class Experiment {
 	private Logger LOGGER = Logger.getLogger(Experiment.class.getName());
@@ -16,11 +16,21 @@ public class Experiment {
 	private static PrintWriter out = null;
 	
 	private Experiment() {
+		ExpXMLUtil xmlUtil = new ExpXMLUtil();
+		String tuscanyHomeLocation = xmlUtil.getTuscanyHome();
+		ExpSetting expSetting = xmlUtil.getExpSetting();
+		int nThreads = expSetting.getnThreads();
+		int threadId = expSetting.getThreadId();
+		String expType = expSetting.getType();
+		String targetComp = expSetting.getTargetComp();
+		
+		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
+		fileName = expType + "_{" + nThreads + "}_" + threadId + "_" + targetComp + ".csv";
+		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath+fileName);
 			out = new PrintWriter(new FileWriter(file,true),true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
