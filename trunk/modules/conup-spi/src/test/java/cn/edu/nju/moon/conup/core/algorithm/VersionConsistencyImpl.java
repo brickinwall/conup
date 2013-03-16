@@ -84,4 +84,10 @@ public class VersionConsistencyImpl implements Algorithm {
 		return false;
 	}
 
+	@Override
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

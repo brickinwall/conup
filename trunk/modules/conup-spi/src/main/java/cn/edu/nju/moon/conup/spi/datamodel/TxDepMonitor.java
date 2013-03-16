@@ -38,9 +38,41 @@ public interface TxDepMonitor {
 	 */
 	public TxDepMonitor newInstance();
 	
-	public boolean notifySubTxStart(String subComp, String curComp, String rootTx,
+	/**
+	 * the host component started a sub-transaction on a remote component
+	 * @param subComp
+	 * @param curComp
+	 * @param rootTx
+	 * @param parentTx
+	 * @param subTx
+	 * @return
+	 */
+	public boolean startRemoteSubTx(String subComp, String curComp, String rootTx,
 			String parentTx, String subTx);
 	
-	public boolean notifySubTxEnd(String subComp, String curComp, String rootTx,
+	/**
+	 * a sub-transaction just ended and returned from a remote component 
+	 * @param subComp
+	 * @param curComp
+	 * @param rootTx
+	 * @param parentTx
+	 * @param subTx
+	 * @return
+	 */
+	public boolean endRemoteSubTx(String subComp, String curComp, String rootTx,
 			String parentTx, String subTx);
+	
+	/**
+	 * the host component is going to init a sub-transaction for another component.
+	 * However, the sub-transaction has not truely been started.
+	 * 
+	 * @param hostComp
+	 * @param rootTx
+	 * @param rootComp
+	 * @param parentTx
+	 * @param parentComp
+	 * @return
+	 */
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp);
+	
 }

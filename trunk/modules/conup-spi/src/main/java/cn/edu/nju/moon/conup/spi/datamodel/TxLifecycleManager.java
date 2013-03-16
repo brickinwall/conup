@@ -130,10 +130,10 @@ public class TxLifecycleManager {
 	 * create a temporary transaction id
 	 * @return
 	 */
-	public String createTmpTxId(){
+	public String createFakeTxId(){
 		UUID uuid = UUID.randomUUID();
 		String txID = uuid.toString();
-		return "TMP_TX_ID" + txID;
+		return "FAKE_TX_ID" + txID;
 	}
 	
 	/**
