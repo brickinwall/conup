@@ -14,6 +14,7 @@ import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyOperationType;
@@ -211,6 +212,7 @@ public class CompLifecycleManager {
 			
 			//initiate updator
 			updator.initUpdator(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier);
+			depMgr.setTxDepMonitor(new TxDepMonitorImpl());
 			depMgr.updateIsReceived();
 		}
 		

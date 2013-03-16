@@ -36,8 +36,8 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
  *
  */
 public class TxDepMonitorImpl implements TxDepMonitor {
-	
 	private Logger LOGGER = Logger.getLogger(TxDepMonitorImpl.class.getName());
+	
 	/**
 	 * 
 	 * @param TxEventType 
@@ -63,14 +63,19 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(txContext.getHostComponent());
 		
+		//save a TxDepMonitor into DynamicDepManager
+		if(dynamicDepMgr.getTxDepMonitor() == null){
+			dynamicDepMgr.setTxDepMonitor(this);
+		}
+		
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TX_IDS.
 		if(et.equals(TxEventType.TransactionEnd)){
 //			TX_IDS.remove(txContext.getHostComponent());
 			TX_IDS.remove(curTxID);
 			
-			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
-			interceptorCache.removeTxCtx(getThreadID());
+//			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
+//			interceptorCache.removeTxCtx(getThreadID());
 			
 			CompLifecycleManager compLcMgr;
 			compLcMgr = CompLifecycleManager.getInstance(txContext.getHostComponent());
@@ -164,7 +169,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		return comps;
 	}
 
-	private String convertServiceToComp(String service, String hostComp){
+	public String convertServiceToComp(String service, String hostComp){
 		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
 		Node node = compLifeCycleMgr.getNode();
 		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
@@ -228,7 +233,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
 		}
 		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
-		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+		LOGGER.info("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
 	@Override
@@ -275,12 +280,37 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //			rootTxId = TxLifecycleManager.getRootTx(rootTxId);
 //		}
 		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);
-		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+		LOGGER.info("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
 	/** return current thread ID. */
 	private String getThreadID(){
 		return new Integer(Thread.currentThread().hashCode()).toString();
+	}
+
+	@Override
+	public TxDepMonitor newInstance() {
+		return new TxDepMonitorImpl();
+	}
+
+	@Override
+	public boolean notifySubTxStart(String subComp, String curComp,
+			String rootTx, String parentTx, String subTx) {
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+		
+		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, 
+				subComp, curComp, rootTx, parentTx, subTx);
+	}
+
+	@Override
+	public boolean notifySubTxEnd(String subComp, String curComp,
+			String rootTx, String parentTx, String subTx) {
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+		
+		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
+				subComp, curComp, rootTx, parentTx, subTx);
 	}
 	
 }
