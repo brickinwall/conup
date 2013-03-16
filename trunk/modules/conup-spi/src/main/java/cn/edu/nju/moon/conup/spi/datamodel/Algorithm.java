@@ -92,4 +92,15 @@ public interface Algorithm {
 	
 	public String getAlgorithmRoot(String parentTx, String rootTx);
 	
+	/**
+	 * when a sub transaction started or ended, parent component should get notified.
+	 * @param subTxStatus the status of sub transaction, which can only be TxEventType.TransactionStart or TxEventType.TransactionEnd
+	 * @param subComp host component of the sub transaction
+	 * @param curComp current component
+	 * @param rootTx 
+	 * @param parentTx the parent transaction of the sub transaction, i.e., current transaction
+	 * @param subTx 
+	 * @return
+	 */
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 }
