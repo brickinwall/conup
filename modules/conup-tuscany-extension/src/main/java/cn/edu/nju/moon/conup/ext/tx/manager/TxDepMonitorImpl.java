@@ -294,7 +294,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	}
 
 	@Override
-	public boolean notifySubTxStart(String subComp, String curComp,
+	public boolean startRemoteSubTx(String subComp, String curComp,
 			String rootTx, String parentTx, String subTx) {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
@@ -304,13 +304,21 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	}
 
 	@Override
-	public boolean notifySubTxEnd(String subComp, String curComp,
+	public boolean endRemoteSubTx(String subComp, String curComp,
 			String rootTx, String parentTx, String subTx) {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
 		
 		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
 				subComp, curComp, rootTx, parentTx, subTx);
+	}
+
+	@Override
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		
+		return depMgr.initLocalSubTx(hostComp, rootTx, rootComp, parentTx, parentComp);
 	}
 	
 }
