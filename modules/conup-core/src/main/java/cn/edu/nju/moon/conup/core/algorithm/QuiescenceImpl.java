@@ -538,4 +538,10 @@ public class QuiescenceImpl implements Algorithm {
 		}
 	}
 
+	@Override
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

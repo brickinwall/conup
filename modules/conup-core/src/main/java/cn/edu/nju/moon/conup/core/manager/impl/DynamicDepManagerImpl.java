@@ -377,5 +377,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
 		this.txDepMonitor = txDepMonitor;
 	}
+
+	@Override
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+		return algorithm.initLocalSubTx(hostComp, rootTx, rootComp, parentTx, parentComp);
+	}
 	
 }
