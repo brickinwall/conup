@@ -31,4 +31,16 @@ public interface TxDepMonitor {
 	 * @param rootTxId
 	 */
 	public void rootTxEnd(String hostComp, String parentTxId, String rootTxId);
+	
+	/**
+	 * 
+	 * @return a new instance of TxDepMonitor
+	 */
+	public TxDepMonitor newInstance();
+	
+	public boolean notifySubTxStart(String subComp, String curComp, String rootTx,
+			String parentTx, String subTx);
+	
+	public boolean notifySubTxEnd(String subComp, String curComp, String rootTx,
+			String parentTx, String subTx);
 }

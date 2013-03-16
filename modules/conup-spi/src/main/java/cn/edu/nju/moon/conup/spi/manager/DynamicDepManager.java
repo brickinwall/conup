@@ -9,6 +9,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 /**
  * For managing/maintaining transactions and dependences
@@ -253,5 +255,27 @@ public interface DynamicDepManager {
 	 * @return
 	 */
 	public String getAlgorithmRoot(String parentTx, String rootTx);
+	
+	/**
+	 * @param subTxStatus sub tx status, i.e., TransactionStart and TransactionEnd
+	 * @param subComp
+	 * @param curComp
+	 * @param rootTx
+	 * @param parentTx
+	 * @param subTx
+	 * @return
+	 */
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
+	
+	/**
+	 * @return TxDepMonitor
+	 */
+	public TxDepMonitor getTxDepMonitor();
+
+	/**
+	 * save a TxDepMonitor instance to DynamicDepManager
+	 * @param txDepMonitor
+	 */
+	public void setTxDepMonitor(TxDepMonitor txDepMonitor);
 	
 }
