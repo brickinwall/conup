@@ -103,4 +103,16 @@ public interface Algorithm {
 	 * @return
 	 */
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
+
+	/**
+	 * the host component is going to init a sub-transaction for another component.
+	 * However, the sub-transaction has not truely been started.
+	 * 
+	 * @param hostComp
+	 * @param rootTx
+	 * @param rootComp
+	 * @param parentTx
+	 * @param parentComp
+	 */
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp);
 }
