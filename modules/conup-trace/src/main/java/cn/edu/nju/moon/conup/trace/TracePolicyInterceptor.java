@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -33,9 +34,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 
 public class TracePolicyInterceptor implements PhasedInterceptor {
@@ -101,7 +105,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		LOGGER.fine("operation =" + operation.toString());
 		
 		if(isCallback(msg)){
-			LOGGER.info(operation.toString() + " is a Callback operation when interceptor phase is " + phase);
+			LOGGER.fine(operation.toString() + " is a Callback operation when interceptor phase is " + phase);
 			return getNext().invoke(msg);
 		}
 		
@@ -171,7 +175,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				LOGGER.warning("Error: message body cannot be null in a service body");
 			}
 			
-			LOGGER.info("trace SERVICE_POLICY : " + transactionTag);
+			LOGGER.fine("trace SERVICE_POLICY : " + transactionTag);
 			
 			//get root, parent and current transaction id
 			if(transactionTag != null){
@@ -191,6 +195,16 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						: subInfo.split(":")[0];
 				subComp = subInfo.split(":")[1].equals("null") ? null
 						: subInfo.split(":")[1];
+			}
+			
+			if(rootTx!=null && rootComponent!=null){
+				msg.getHeaders().put(ROOT_TX, rootTx);
+				msg.getHeaders().put(ROOT_COMP, rootComponent);
+			}
+			
+			if(parentTx!=null && parentComponent!=null){
+				msg.getHeaders().put(PARENT_TX, parentTx);
+				msg.getHeaders().put(PARENT_COMP, parentComponent);
 			}
 			
 			if(subTx != null && subComp != null){
@@ -252,13 +266,13 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				parentComponent = hostComponent;
 				
 				TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-				subTx = new TxLifecycleManager().createTmpTxId();
+				subTx = new TxLifecycleManager().createFakeTxId();
 				subComp = txDepMonitor.convertServiceToComp(getTargetServiceName(), hostComponent);
 				
 				assert subComp != null;
 				
 				//TODO
-				txDepMonitor.notifySubTxStart(subComp, hostComponent, rootTx, parentTx, subTx);
+				txDepMonitor.startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
 			}//else(dependency != null)
 			
 			//generate transaction tag(identifier)
@@ -273,7 +287,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			msgBody.add(buffer.toString());
 			msg.setBody((Object [])msgBody.toArray());
 			
-			LOGGER.info("trace REFERENCE_POLICY : " + newRootParent);
+			LOGGER.fine("trace REFERENCE_POLICY : " + newRootParent);
 		}//else if(reference.policy)
 		
 		if(phase.equals(Phase.REFERENCE_POLICY)
@@ -310,10 +324,19 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			threadID = getThreadID();
 			TransactionContext txCtx = cache.getTxCtx(threadID);
 			
-//			LOGGER.fine("\n\n\n ThreadID=" + getThreadID() + ", in buffer, compStatus=" + depMgr.getCompStatus() + " \n\n\n");
-
+			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
 			if (depMgr.isNormal()) {
 				TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+				if(txCtx.getRootTx() != null){
+					assert txCtx.getParentTx() != null;
+					assert txCtx.getParentComponent() != null;
+					assert msg.getHeaders().get(SUB_TX) != null;
+					storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+							txCtx.getRootTx(), txCtx.getRootComponent(), 
+							txCtx.getParentTx(), txCtx.getParentComponent());
+					txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+							txCtx.getParentTx(), txCtx.getParentComponent());
+				}
 				return msg;
 			}
 
@@ -322,7 +345,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			synchronized (syncMonitor) {
 				try {
 					if (depMgr.isOndemandSetting()) {
-						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
+						LOGGER.fine("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
 						syncMonitor.wait();
 					}
 				} catch (InterruptedException e) {
@@ -348,6 +371,16 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						}
 					}
 					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+					if(txCtx.getRootTx() != null){
+						assert txCtx.getParentTx() != null;
+						assert txCtx.getParentComponent() != null;
+						assert msg.getHeaders().get(SUB_TX) != null;
+						storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+								txCtx.getRootTx(), txCtx.getRootComponent(), 
+								txCtx.getParentTx(), txCtx.getParentComponent());
+						txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+								txCtx.getParentTx(), txCtx.getParentComponent());
+					}
 					return msg;
 				}
 			}
@@ -383,11 +416,10 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						depMgr.achievedFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
 							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
-//							clMgr.getUpdateCtx().removeBufferOldRootTx(txCtx.getParentTx(), txCtx.getRootTx());
 							validToFreeSyncMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -407,17 +439,27 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					clMgr.cleanupUpdate();
 				}
 				
-				if (depMgr.isInterceptRequired()) {
-					LOGGER.warning("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------updatingSyncMonitor.wait();buffer------------");
-					try {
-						updatingSyncMonitor.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+//				if (depMgr.isInterceptRequired()) {
+//					LOGGER.warning("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------updatingSyncMonitor.wait();buffer------------");
+//					try {
+//						updatingSyncMonitor.wait();
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
 			}
 			
 			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+			if(txCtx.getRootTx() != null){
+				assert txCtx.getParentTx() != null;
+				assert txCtx.getParentComponent() != null;
+				assert msg.getHeaders().get(SUB_TX) != null;
+				storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+						txCtx.getRootTx(), txCtx.getRootComponent(), 
+						txCtx.getParentTx(), txCtx.getParentComponent());
+				txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+						txCtx.getParentTx(), txCtx.getParentComponent());
+			}
 		}// END IF(SERVICE_POLICY)
 		return msg;
 	}
@@ -478,6 +520,16 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert hostComp.equals(subComp);
 				assert hostComp.equals(txCtx.getHostComponent());
 				
+				NodeManager nodeMgr = NodeManager.getInstance();
+				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+				Printer printer = new Printer();
+				LOGGER.fine("TxS before removeFakeSubTx:");
+				printer.printTxs(LOGGER, depMgr.getTxs());
+				removeFakeSubTx(hostComp, subTx);
+				LOGGER.fine("TxS after removeFakeSubTx:");
+				printer.printTxs(LOGGER, depMgr.getTxs());
+				
+				
 				//generate info required to be attatched to the response msg body
 				StringBuffer endedSubTxTag = new StringBuffer();
 				endedSubTxTag.append(ENDED_SUB_TX_TAG);
@@ -502,7 +554,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					msg.setBody(msg.getBody().toString() + endedSubTxTag);
 				}
 				
-				LOGGER.info("attach SERVICE_POLICY: " + endedSubTxTag);
+				LOGGER.fine("attach SERVICE_POLICY: " + endedSubTxTag);
 			} else if(phase.equals(Phase.REFERENCE_POLICY)){
 				String subTx = null;
 				String subComp = null;
@@ -527,7 +579,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					return msg;
 				}
 				
-				LOGGER.info("attach REFERENCE_POLICY: " + endedSubTxTag);
+				LOGGER.fine("attach REFERENCE_POLICY: " + endedSubTxTag);
 				
 				Map<String, String> endedSubTxProperty = parseEndedSubTxTag(endedSubTxTag);
 				
@@ -545,18 +597,48 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert hostComp.equals(getComponent().getName());
 				
 				if( !subComp.equals(hostComp)){
-//					NodeManager nodeMgr = NodeManager.getInstance();
-//					DynamicDepManager depMgr = nodeMgr
-//							.getDynamicDepManager(hostComp);
-//					depMgr.subTxEnd(subComp, hostComp, rootTx, currentTx, subTx);
+					
+					NodeManager nodeMgr = NodeManager.getInstance();
+					DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+					Printer printer = new Printer();
+					LOGGER.fine("TxS before endRemoteSubTx:");
+					printer.printTxs(LOGGER, depMgr.getTxs());
+					
 					TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-					txDepMonitor.notifySubTxEnd(subComp, hostComp, rootTx, currentTx, subTx);
+					txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+					
+					LOGGER.fine("TxS after endRemoteSubTx:");
+					printer.printTxs(LOGGER, depMgr.getTxs());
 				}
 				
 			}
 			
 			return msg;
 		}
+	
+	private void storeFakeSubTx(DynamicDepManager depMgr, String fakeSubTx, String hostComp, 
+			String rootTx, String rootComp, String parentTx, String parentComp){
+		TransactionContext txCtx;
+		
+		txCtx = new TransactionContext();
+		txCtx.setCurrentTx(fakeSubTx);
+		txCtx.setHostComponent(hostComp);
+		txCtx.setEventType(TxEventType.TransactionStart);
+		txCtx.setFutureComponents(new HashSet<String>());
+		txCtx.setPastComponents(new HashSet<String>());
+		txCtx.setParentComponent(parentComp);
+		txCtx.setParentTx(parentTx);
+		txCtx.setRootTx(rootTx);
+		txCtx.setRootComponent(rootComp);
+		
+		depMgr.getTxs().put(fakeSubTx, txCtx);
+	}
+	
+	private void removeFakeSubTx(String hostComp, String fakeSubTx){
+		NodeManager nodeMgr = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+		depMgr.getTxs().remove(fakeSubTx);
+	}
 
 	private Map<String, String> parseEndedSubTxTag(String endedSubTxTag) {
 		// TODO Auto-generated method stub
