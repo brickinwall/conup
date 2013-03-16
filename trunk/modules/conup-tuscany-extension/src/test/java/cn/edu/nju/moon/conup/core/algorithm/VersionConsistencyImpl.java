@@ -6,6 +6,7 @@ import java.util.Set;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -74,6 +75,13 @@ public class VersionConsistencyImpl implements Algorithm {
 	public String getAlgorithmRoot(String parentTx, String rootTx) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
+			String parentTx, String subTx) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
