@@ -133,12 +133,13 @@ public class QuiescenceImpl implements Algorithm {
 			result = doNotifyRemoteUpdateDone(srcComp, hostComp);
 			break;
 		case NOTIFY_ROOT_TX_END:
-			initDynamicDepMgr(hostComp);
+			LOGGER.info("deprecated notification: NOTIFY_ROOT_TX_END");
+//			initDynamicDepMgr(hostComp);
 //			LOGGER.fine("before process NOTIFY_ROOT_TX_END:");
 //			printer.printTxs(depMgr.getTxs());
 			
-			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
-			result = doNotifyRootTxEnd(srcComp, hostComp, rootTx);
+//			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
+//			result = doNotifyRootTxEnd(srcComp, hostComp, rootTx);
 			
 //			LOGGER.fine("after process NOTIFY_ROOT_TX_END:");
 //			printer.printTxs(depMgr.getTxs());
@@ -522,6 +523,19 @@ public class QuiescenceImpl implements Algorithm {
 	@Override
 	public String getAlgorithmRoot(String parentTx, String rootTx) {
 		return rootTx;
+	}
+
+	@Override
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
+			String parentTx, String subTx) {
+		if(subTxStatus.equals(TxEventType.TransactionStart))
+			return doAckSubtxInit(subComp, curComp, rootTx, parentTx, subTx);
+		else if(subTxStatus.equals(TxEventType.TransactionEnd))
+			return doNotifySubTxEnd(subComp, curComp, rootTx, parentTx, subTx);
+		else{
+			LOGGER.warning("unexpected sub transaction status: " + subTxStatus + " for rootTx " + rootTx);
+			return false;
+		}
 	}
 
 }

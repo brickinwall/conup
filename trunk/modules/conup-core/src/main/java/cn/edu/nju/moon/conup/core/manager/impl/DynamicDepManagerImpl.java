@@ -13,6 +13,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -49,6 +51,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	 * 
 	 */
 	private Object waitingRemoteCompUpdateDoneMonitor = new Object();
+	
+	private TxDepMonitor txDepMonitor = null;
 
 	public DynamicDepManagerImpl() {
 	}
@@ -259,13 +263,14 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		isUpdateRequestReceived = false;
 		
 		synchronized (updatingSyncMonitor) {
-			synchronized (ondemandSyncMonitor) {
-				isUpdateRequestReceived = false;
-			}
-			algorithm.updateIsDone(compObj.getIdentifier());
+//			synchronized (ondemandSyncMonitor) {
+//				isUpdateRequestReceived = false;
+//			}
 			
+			algorithm.updateIsDone(compObj.getIdentifier());
 			//before changing to NORMAL, compStatus is supposed to be UPDATING.
 			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
+			isUpdateRequestReceived = false;
 			compStatus = CompStatus.NORMAL;
 			updatingSyncMonitor.notifyAll();
 		}
@@ -274,6 +279,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	@Override
 	public void updating(){
+		LOGGER.info("Executing dynamic update for component '" + compObj.getIdentifier() + "'");
 		compStatus = CompStatus.UPDATING;
 	}
 	
@@ -286,7 +292,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		
 		synchronized (validToFreeSyncMonitor) {
 			compStatus = CompStatus.Free;
-			LOGGER.fine("-----------component has achieved free,now nitify all...\n\n");
+			LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
 			validToFreeSyncMonitor.notifyAll();
 		}
 	}
@@ -339,6 +345,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean updateIsReceived() {
+		LOGGER.info("Received dynamic update request.");
 		isUpdateRequestReceived = true;
 		algorithm.start(compObj.getIdentifier());
 		return true;
@@ -352,6 +359,23 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public String getAlgorithmRoot(String parentTx, String rootTx) {
 		return algorithm.getAlgorithmRoot(parentTx, rootTx);
+	}
+
+	@Override
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
+			String parentTx, String subTx) {
+		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
+	}
+	
+	public TxDepMonitor getTxDepMonitor() {
+//		return txDepMonitor;
+		if(txDepMonitor == null)
+			return null;
+		return txDepMonitor.newInstance();
+	}
+
+	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
+		this.txDepMonitor = txDepMonitor;
 	}
 	
 }
