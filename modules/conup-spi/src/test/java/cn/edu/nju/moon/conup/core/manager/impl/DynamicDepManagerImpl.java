@@ -15,7 +15,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * @author JiangWang<jiang.wang88@gmail.com>
  *
  */
-public class DynamicDepManagerImpl implements DynamicDepManager {
+public abstract class DynamicDepManagerImpl implements DynamicDepManager {
 
 	private ComponentObject compObj;
 	
