@@ -225,10 +225,16 @@ public class VersionConsistencyImpl implements Algorithm {
 			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				if( depMgr.isNormal()){
-//					depMgr.getTxs().remove(rootTx);
+					Printer printer = new Printer();
+					LOGGER.fine("TxS before notified TransactionEnd:");
+					printer.printTxs(LOGGER, depMgr.getTxs());
+					
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
 					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
-					LOGGER.info("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
+					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
+					
+					LOGGER.fine("TxS after notified TransactionEnd:");
+					printer.printTxs(LOGGER, depMgr.getTxs());
 					
 					return;
 				} else{
@@ -1158,6 +1164,34 @@ public class VersionConsistencyImpl implements Algorithm {
 			LOGGER.warning("unexpected sub transaction status: " + subTxStatus + " for rootTx " + rootTx);
 			return false;
 		}
+	}
+
+	@Override
+	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		
+		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
+		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
+		
+		if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
+			Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
+			if(!rtInDeps.contains(lfe)){
+				rtInDeps.add(lfe);
+			}
+			if (!rtOutDeps.contains(lfe)) {
+				rtOutDeps.add(lfe);
+			}
+			
+			Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
+			if(!rtInDeps.contains(lpe)){
+				rtInDeps.add(lpe);
+			}
+			if (!rtOutDeps.contains(lpe)) {
+				rtOutDeps.add(lpe);
+			}
+		}
+		return true;
 	}
 	
 }
