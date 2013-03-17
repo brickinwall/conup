@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -140,7 +141,16 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
                             : null;
 
                     if (returnType == null) {
-                        msg.setBody(null);
+                    	JsonNode rawResult = jsonResponse.get("result");
+                    	if(rawResult != null){
+                    		ObjectMapper mapper = createObjectMapper(String.class);
+                    		List<Object> msgBody = new ArrayList<Object>();
+                    		Object contextBody = mapper.readValue(rawResult, String.class);
+                        	msgBody.add(contextBody);
+                        	msg.setBody((Object [])msgBody.toArray());
+                    	} else{
+                    		msg.setBody(null);
+                    	}
                         return msg;
                     }
 
@@ -156,10 +166,40 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
 
                     ObjectMapper mapper = createObjectMapper(returnClass);
                     String json = mapper.writeValueAsString(rawResult);
-
+                    boolean arrayFlag = false;
+                    if(json.startsWith("[["))
+                    	arrayFlag = true;
+                    
+                    String conupContext = null;
+                    if(json.contains("ENDED_SUB_TX_TAG")){
+                    	String[] jsonElements = json.split(",");
+                    	json = "";
+                    	for(int i = 0; i < jsonElements.length; i++){
+                    		if(jsonElements[i].contains("ENDED_SUB_TX_TAG")){
+                    			conupContext = jsonElements[i];
+                    			continue;
+                    		}
+                    		json = json + jsonElements[i] + ",";
+                    	}
+                    	if(arrayFlag)
+                    		json = json.substring(1, json.length()-2) + "]";
+                    	else
+                    		json = json.substring(1, json.length()-1);
+                    }
+                    
                     Object body = mapper.readValue(json, TypeFactory.type(genericReturnType));
 
-                    msg.setBody(body);
+//                    JsonNode conupContext = jsonResponse.get("context"); 
+                    if(conupContext != null){
+                    	List<Object> msgBody = new ArrayList<Object>();
+                    	msgBody.add(body);
+                    	String contextJson = mapper.writeValueAsString(conupContext);
+                    	Object contextBody = mapper.readValue(contextJson, String.class);
+                    	msgBody.add(contextBody);
+                    	msg.setBody((Object [])msgBody.toArray());
+                    } else{
+                    	msg.setBody(body);
+                    }
                 } else {
                     msg.setBody(entityResponse);
                 }

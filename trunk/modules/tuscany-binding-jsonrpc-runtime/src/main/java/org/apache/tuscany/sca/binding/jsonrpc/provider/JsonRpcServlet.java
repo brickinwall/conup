@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
@@ -51,6 +52,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.TextNode;
 import org.oasisopen.sca.ServiceRuntimeException;
 
 public class JsonRpcServlet extends HttpServlet {
@@ -289,10 +291,19 @@ public class JsonRpcServlet extends HttpServlet {
             } else {
                 if (jsonOperation.getOutputType().getLogical().size() == 0) {
                     // void operation (json-rpc notification)
-                    JsonRpc10Response response =
-                        new JsonRpc10Response(request.getId(), JsonNodeFactory.instance.nullNode());
-                    return response;
-
+                	// modify for conup
+                	if(responseMessage.getBody() != null){
+//                		result = responseMessage.getBody();
+                		List<Object> msgBodyOriginal = Arrays.asList((Object [])responseMessage.getBody());
+                		TextNode textNode = new TextNode((String) msgBodyOriginal.get(0));
+                		JsonRpc10Response response =
+                				new JsonRpc10Response(request.getId(), (JsonNode)textNode);
+                		return response;
+                	} else{
+                		JsonRpc10Response response =
+                				new JsonRpc10Response(request.getId(), JsonNodeFactory.instance.nullNode());
+                		return response;
+                	}
                 } else {
                     // regular operation returning some value
                     result = responseMessage.getBody();
