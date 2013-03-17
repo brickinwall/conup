@@ -345,7 +345,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			synchronized (syncMonitor) {
 				try {
 					if (depMgr.isOndemandSetting()) {
-						LOGGER.fine("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
+						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
 						syncMonitor.wait();
 					}
 				} catch (InterruptedException e) {
@@ -416,7 +416,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						depMgr.achievedFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
 							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
@@ -434,7 +434,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
 			synchronized (updatingSyncMonitor) {
 				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
-					LOGGER.warning("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + ", in buffer updatingSyncMonitor, is Free for update now, try to execute update...");
+					LOGGER.info("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + ", in buffer updatingSyncMonitor, is Free for update now, try to execute update...");
 					clMgr.executeUpdate();
 					clMgr.cleanupUpdate();
 				}
@@ -523,11 +523,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				NodeManager nodeMgr = NodeManager.getInstance();
 				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
 				Printer printer = new Printer();
-				LOGGER.fine("TxS before removeFakeSubTx:");
-				printer.printTxs(LOGGER, depMgr.getTxs());
+//				LOGGER.fine("TxS before removeFakeSubTx:");
+//				printer.printTxs(LOGGER, depMgr.getTxs());
 				removeFakeSubTx(hostComp, subTx);
-				LOGGER.fine("TxS after removeFakeSubTx:");
-				printer.printTxs(LOGGER, depMgr.getTxs());
+//				LOGGER.fine("TxS after removeFakeSubTx:");
+//				printer.printTxs(LOGGER, depMgr.getTxs());
 				
 				
 				//generate info required to be attatched to the response msg body
@@ -621,6 +621,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		TransactionContext txCtx;
 		
 		txCtx = new TransactionContext();
+		txCtx.setFakeTx(true);
 		txCtx.setCurrentTx(fakeSubTx);
 		txCtx.setHostComponent(hostComp);
 		txCtx.setEventType(TxEventType.TransactionStart);
@@ -632,6 +633,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		txCtx.setRootComponent(rootComp);
 		
 		depMgr.getTxs().put(fakeSubTx, txCtx);
+//		depMgr.getFakeTxs().put(fakeSubTx, txCtx);
 	}
 	
 	private void removeFakeSubTx(String hostComp, String fakeSubTx){
