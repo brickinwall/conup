@@ -78,18 +78,19 @@ public class DynamicUpdateContext {
 	}
 	
 	public boolean isOldRootTxsEquals(){
-		boolean isEquals = false;
-		LOGGER.fine("algorithmOldRootTxs.size()=" + algorithmOldRootTxs.size() + 
-				", bufferOldRootTxs.size()=" + bufferOldRootTxs.size());
-		LOGGER.fine("algorithmOldRootTxs: " + algorithmOldRootTxs);
-		LOGGER.fine("bufferOldRootTxs: " + bufferOldRootTxs);
-		if(algorithmOldRootTxs.containsAll(bufferOldRootTxs)
-				&& bufferOldRootTxs.containsAll(algorithmOldRootTxs)){
-			isEquals = true;
-		} else if(algorithmOldRootTxs.size() != bufferOldRootTxs.size()){
-			isEquals = false;
-		}
-		return isEquals;
+		return true;
+//		boolean isEquals = false;
+//		LOGGER.info("algorithmOldRootTxs.size()=" + algorithmOldRootTxs.size() + 
+//				", bufferOldRootTxs.size()=" + bufferOldRootTxs.size());
+//		LOGGER.info("algorithmOldRootTxs: " + algorithmOldRootTxs);
+//		LOGGER.info("bufferOldRootTxs: " + bufferOldRootTxs);
+//		if(algorithmOldRootTxs.containsAll(bufferOldRootTxs)
+//				&& bufferOldRootTxs.containsAll(algorithmOldRootTxs)){
+//			isEquals = true;
+//		} else if(algorithmOldRootTxs.size() != bufferOldRootTxs.size()){
+//			isEquals = false;
+//		}
+//		return isEquals;
 	}
 	
 }
