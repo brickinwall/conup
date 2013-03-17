@@ -19,6 +19,7 @@ public enum ConsistencyOperationType {
 	NOTIFY_SUBTX_END,
 	NOTIFY_PAST_CREATE,
 	NOTIFY_PAST_REMOVE,
+	NOTIFY_START_REMOTE_SUB_TX,	//
 	//ondemand event type
 	REQ_ONDEMAND_SETUP,
 	CONFIRM_ONDEMAND_SETUP,
