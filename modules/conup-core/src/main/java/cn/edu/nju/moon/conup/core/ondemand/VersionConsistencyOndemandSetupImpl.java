@@ -280,6 +280,38 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		else
 			targetRef.addAll(scope.getSubComponents(curComp));
 		
+//		//create concentric circles for fake sub txs
+//		Iterator<Entry<String, TransactionContext>> fakeTxIterator = 
+//				depMgr.getFakeTxs().entrySet().iterator();
+//		while(fakeTxIterator.hasNext()){
+//			TransactionContext txContext = 
+//					(TransactionContext)fakeTxIterator.next().getValue();
+//			String rootTx = txContext.getRootTx();
+//			assert(txContext.getHostComponent().equals(curComp));
+//			String curTx = txContext.getCurrentTx();
+//			
+//			//in this case, it means current entry in interceptorCache is invalid
+//			if(rootTx == null || curComp == null){
+//				LOGGER.warning("Invalid data found while onDemandSetUp");
+//				continue;
+//			}
+//			
+//			// for the ended non-root txs, no need to create the lfe, lpe
+//			if(!rootTx.equals(curTx) && txContext.getEventType().equals(TxEventType.TransactionEnd)){
+//				continue;
+//			}
+//			
+//			Dependence lfe = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
+//					rootTx, curComp, curComp, null, null);
+//			Dependence lpe = new Dependence(VersionConsistencyImpl.PAST_DEP, 
+//					rootTx, curComp, curComp, null, null);
+//			
+//			rtInDeps.add(lfe);
+//			rtInDeps.add(lpe);
+//			rtOutDeps.add(lfe);
+//			rtOutDeps.add(lpe);
+//		}
+		
 		Iterator<Entry<String, TransactionContext>> iterator = 
 				txs.entrySet().iterator();
 		while(iterator.hasNext()){
@@ -315,6 +347,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine("current tx is " + curTx + ",and root is " + rootTx);
 				continue;
 			}
+			
+			if(txContext.isFakeTx())
+				continue;
 			
 			//if current is root 
 			LOGGER.fine("curTx + is a root tx");
@@ -436,7 +471,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
-		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -487,7 +522,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
-		LOGGER.fine("notifyPastOndemand(Arc arc) with " + dep.toString());
+		LOGGER.info("notifyPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -537,7 +572,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifySubFutureOndemand(Dependence dep) {
-		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -603,7 +638,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	public boolean notifySubPastOndemand(Dependence dep) {
-		LOGGER.fine("notifySubPastOndemand(Arc arc) with " + dep.toString());
+		LOGGER.info("notifySubPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -1011,6 +1046,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			entry = txIterator.next();
 			currentTx = entry.getKey();
 			ctx = entry.getValue();
+
+			if(ctx.isFakeTx())
+				continue;
+			
 			assert(ctx.getCurrentTx().equals(currentTx));
 			if (ctx.getRootTx().equals(rootTx) 
 				&& !ctx.getEventType().equals(TxEventType.TransactionEnd)) {
