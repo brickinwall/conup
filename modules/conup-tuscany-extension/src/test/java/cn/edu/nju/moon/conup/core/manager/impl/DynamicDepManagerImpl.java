@@ -271,4 +271,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return false;
 	}
 
+	@Override
+	public Map<String, TransactionContext> getFakeTxs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

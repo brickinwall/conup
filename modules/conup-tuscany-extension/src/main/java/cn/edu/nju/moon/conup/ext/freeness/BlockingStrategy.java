@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.ext.freeness;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
@@ -15,6 +16,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
  *
  */
 public class BlockingStrategy implements FreenessStrategy {
+	private Logger LOGGER = Logger.getLogger(BlockingStrategy.class.getName());
 	/** represent blocking strategy */
 	public final static String BLOCKING = "BLOCKING_FOR_FREENESS";
 	
@@ -57,7 +59,14 @@ public class BlockingStrategy implements FreenessStrategy {
 //		} else{
 //			return true;
 //		}
-		return depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, bufferOldVersionRootTxs, txCtx, isUpdateReqRCVD);
+		boolean isBlock = depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, bufferOldVersionRootTxs, txCtx, isUpdateReqRCVD);
+		
+		if(isBlock){
+			LOGGER.info(txCtx.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs + 
+					"\n buffer: " + bufferOldVersionRootTxs);
+		}
+		
+		return isBlock;
 	}
 
 	@Override
