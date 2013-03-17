@@ -42,8 +42,10 @@ public class TransactionContext {
 	private Set<String> pastComponents;
 	/** components that will be used later. */
 	private Set<String> futureComponents;
-	
-//	private Map<String, SubTransaction> subTxs;
+	/** it's used to identify whether a sub-tx is a fake transaction */
+	private boolean isFakeTx = false;
+
+	//	private Map<String, SubTransaction> subTxs;
 	/** subTx's host components, it takes sub-tx id as the key */
 	private Map<String, String> subTxHostComps;
 	/** subTx's statuses, it takes sub-tx id as the key */
@@ -194,6 +196,14 @@ public class TransactionContext {
 	 */
 	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
 		this.txDepMonitor = txDepMonitor;
+	}
+	
+	public boolean isFakeTx() {
+		return isFakeTx;
+	}
+
+	public void setFakeTx(boolean isFakeTx) {
+		this.isFakeTx = isFakeTx;
 	}
 
 	@Override
