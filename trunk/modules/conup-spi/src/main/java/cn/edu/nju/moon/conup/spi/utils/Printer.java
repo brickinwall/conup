@@ -29,6 +29,16 @@ public class Printer {
 		LOGGER.fine(result);
 	}
 	
+	public void printDeps(Logger LOGGER, Set<Dependence> deps, String type){
+//		LOGGER.info("Deps:" + type);
+		String result = "Deps:" + type + "\n\t";
+		for (Iterator<Dependence> iterator = deps.iterator(); iterator.hasNext();) {
+			Dependence dependence = (Dependence) iterator.next();
+			result += dependence + "\n\t";
+		}
+		LOGGER.info(result);
+	}
+	
 	public void printTxs(Map<String, TransactionContext> txs){
 //		LOGGER.info("Txs:");
 		Iterator<Entry<String, TransactionContext>> txsIterator = txs.entrySet().iterator();
@@ -39,7 +49,7 @@ public class Printer {
 			TransactionContext tc = entry.getValue();
 			result += tc.toString() + "\n\t";
 		}
-		LOGGER.fine(result);
+		LOGGER.info(result);
 	}
 	
 	public void printTxs(Logger LOGGER, Map<String, TransactionContext> txs){
@@ -51,6 +61,6 @@ public class Printer {
 			TransactionContext tc = entry.getValue();
 			result += tc.toString() + "\n\t";
 		}
-		LOGGER.fine(result);
+		LOGGER.info(result);
 	}
 }
