@@ -17,15 +17,14 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.tuscany.sca</groupId>
         <artifactId>tuscany-modules</artifactId>
-        <version>2.0</version>
+        <version>0.9.1-DU-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
     <name>Apache Tuscany SCA JSON-RPC Binding Runtime</name>
 
@@ -165,5 +164,44 @@
 	        <scope>test</scope>
         </dependency>
     </dependencies>
+
+	  <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<inherited>false</inherited>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>build-dist</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<property name="module.dir" value="modules/" />
+
+								<copy file="target/${project.artifactId}-${project.version}.jar" tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
+
+								<echo>Module tuscany-binding-jsonrpc-runtime has been created in the TUSCANY_HOME/modules directory.</echo>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
