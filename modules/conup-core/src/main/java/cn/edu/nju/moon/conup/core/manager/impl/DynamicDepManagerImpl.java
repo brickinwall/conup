@@ -422,8 +422,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
-		return algorithm.initLocalSubTx(hostComp, rootTx, rootComp, parentTx, parentComp);
+	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+		return algorithm.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
 	}
 	
 }
