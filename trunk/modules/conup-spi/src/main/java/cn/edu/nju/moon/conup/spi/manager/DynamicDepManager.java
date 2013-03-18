@@ -290,11 +290,12 @@ public interface DynamicDepManager {
 	 * However, the sub-transaction has not truely been started.
 	 * 
 	 * @param hostComp
+	 * @param fakeSubTx the fake tx id
 	 * @param rootTx
 	 * @param rootComp
 	 * @param parentTx
 	 * @param parentComp
 	 */
-	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp);
+	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
 }

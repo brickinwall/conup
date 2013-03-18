@@ -314,11 +314,11 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	}
 
 	@Override
-	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
+	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
-		return depMgr.initLocalSubTx(hostComp, rootTx, rootComp, parentTx, parentComp);
+		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
 	}
 	
 }

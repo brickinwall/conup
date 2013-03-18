@@ -67,12 +67,13 @@ public interface TxDepMonitor {
 	 * However, the sub-transaction has not truely been started.
 	 * 
 	 * @param hostComp
+	 * @param fakeSubTx the fake tx id
 	 * @param rootTx
 	 * @param rootComp
 	 * @param parentTx
 	 * @param parentComp
 	 * @return
 	 */
-	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp);
+	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
 }

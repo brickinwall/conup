@@ -334,7 +334,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
 							txCtx.getRootTx(), txCtx.getRootComponent(), 
 							txCtx.getParentTx(), txCtx.getParentComponent());
-					txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+					txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
+							txCtx.getRootTx(), txCtx.getRootComponent(),
 							txCtx.getParentTx(), txCtx.getParentComponent());
 				}
 				return msg;
@@ -378,7 +379,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
 								txCtx.getRootTx(), txCtx.getRootComponent(), 
 								txCtx.getParentTx(), txCtx.getParentComponent());
-						txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+						txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
+								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
 					return msg;
@@ -457,7 +459,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
 						txCtx.getRootTx(), txCtx.getRootComponent(), 
 						txCtx.getParentTx(), txCtx.getParentComponent());
-				txDepMonitor.initLocalSubTx(hostComp, txCtx.getRootTx(), txCtx.getRootComponent(),
+				txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
+						txCtx.getRootTx(), txCtx.getRootComponent(),
 						txCtx.getParentTx(), txCtx.getParentComponent());
 			}
 		}// END IF(SERVICE_POLICY)
