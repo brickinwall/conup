@@ -35,6 +35,7 @@
         <module>implementation-java-runtime</module>   
 	<module>core-databinding</module>        
 	<module>shell</module>
+	<module>tuscany-binding-jsonrpc-runtime</module>
        	<module>conup-communication</module>
 	<module>conup-communication-api</module>
 	<module>conup-core</module>
