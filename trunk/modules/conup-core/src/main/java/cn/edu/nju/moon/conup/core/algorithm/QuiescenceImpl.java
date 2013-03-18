@@ -87,6 +87,8 @@ public class QuiescenceImpl implements Algorithm {
 				e.printStackTrace();
 			}
 		}
+		//TODO is here a doNormal() operation required?
+		doNormal(txContext);
 	}
 
 	@Override
@@ -112,16 +114,18 @@ public class QuiescenceImpl implements Algorithm {
 		
 		switch(operationType){
 		case ACK_SUBTX_INIT:
-			parentTx = payloadResolver.getParameter(QuiescencePayload.PARENT_TX);
-			subTx = payloadResolver.getParameter(QuiescencePayload.SUB_TX);
-			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
-			result = doAckSubtxInit(srcComp, hostComp, rootTx, parentTx, subTx);
+			LOGGER.warning("deprecated notification ACK_SUBTX_INIT");
+//			parentTx = payloadResolver.getParameter(QuiescencePayload.PARENT_TX);
+//			subTx = payloadResolver.getParameter(QuiescencePayload.SUB_TX);
+//			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
+//			result = doAckSubtxInit(srcComp, hostComp, rootTx, parentTx, subTx);
 			break;
 		case NOTIFY_SUBTX_END:
-			parentTx = payloadResolver.getParameter(QuiescencePayload.PARENT_TX);
-			subTx = payloadResolver.getParameter(QuiescencePayload.SUB_TX);
-			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
-			result = doNotifySubTxEnd(srcComp, hostComp, rootTx, parentTx, subTx);
+			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
+//			parentTx = payloadResolver.getParameter(QuiescencePayload.PARENT_TX);
+//			subTx = payloadResolver.getParameter(QuiescencePayload.SUB_TX);
+//			rootTx = payloadResolver.getParameter(QuiescencePayload.ROOT_TX);
+//			result = doNotifySubTxEnd(srcComp, hostComp, rootTx, parentTx, subTx);
 			break;
 		case REQ_PASSIVATE:
 			result = doReqPassivate(srcComp, hostComp);
@@ -165,42 +169,41 @@ public class QuiescenceImpl implements Algorithm {
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-				String payload = QuiescencePayloadCreator.createPayload(hostComp, txCtx.getParentComponent(), txCtx.getRootTx(), QuiescenceOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
-				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+//				String payload = QuiescencePayloadCreator.createPayload(hostComp, txCtx.getParentComponent(), txCtx.getRootTx(), QuiescenceOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
+//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+//				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 			}
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
 			
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-				String payload = QuiescencePayloadCreator.createPayload(
-						hostComp, txCtx.getParentComponent(),
-						txCtx.getRootTx(),
-						QuiescenceOperationType.NOTIFY_SUBTX_END,
-						txCtx.getParentTx(), txCtx.getCurrentTx());
-				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+//				String payload = QuiescencePayloadCreator.createPayload(
+//						hostComp, txCtx.getParentComponent(),
+//						txCtx.getRootTx(),
+//						QuiescenceOperationType.NOTIFY_SUBTX_END,
+//						txCtx.getParentTx(), txCtx.getCurrentTx());
+//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+//				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 			} else{
 				Iterator<Entry<String, TransactionContext>> txIterator;
 				txIterator = depMgr.getTxs().entrySet().iterator();
 				while(txIterator.hasNext()){
 					TransactionContext tmpTxCtx;
 					tmpTxCtx = txIterator.next().getValue();
-					if(tmpTxCtx.getRootTx().equals(rootTx)){
+					if(tmpTxCtx.getRootTx().equals(rootTx) && !tmpTxCtx.isFakeTx()){
 						txIterator.remove();
 						txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					}
 				}
 				Set<String> targetRef;
 				targetRef = depMgr.getStaticDeps();
-				for(String subComp : targetRef){
-					String payload = QuiescencePayloadCreator.createRootTxEndPayload(hostComp, subComp, rootTx, QuiescenceOperationType.NOTIFY_ROOT_TX_END);
-					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-					depNotifyService.synPost(hostComp, subComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
-				}
+//				for(String subComp : targetRef){
+//					String payload = QuiescencePayloadCreator.createRootTxEndPayload(hostComp, subComp, rootTx, QuiescenceOperationType.NOTIFY_ROOT_TX_END);
+//					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+//					depNotifyService.synPost(hostComp, subComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+//				}
 				// check passive when a root tx is end
 				LOGGER.fine("root tx " + rootTx + " end, checkPassiveAndAck...");
 				
-//
 				LOGGER.fine("before checkPassiveAndAck:");
 				Printer printer = new Printer();
 				initDynamicDepMgr(hostComp);
@@ -365,7 +368,8 @@ public class QuiescenceImpl implements Algorithm {
 			boolean bePassive = true;
 			while(txsIterator.hasNext()){
 				Entry<String, TransactionContext> entry = txsIterator.next();
-				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd)){
+				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd) 
+					&& !entry.getValue().isFakeTx()){
 					bePassive = false;
 					break;
 				}
@@ -541,7 +545,7 @@ public class QuiescenceImpl implements Algorithm {
 	@Override
 	public boolean initLocalSubTx(String hostComp, String rootTx, String rootComp, String parentTx, String parentComp) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }
