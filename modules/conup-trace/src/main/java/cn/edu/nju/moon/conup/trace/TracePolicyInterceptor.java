@@ -115,18 +115,88 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		
 //		return getNext().invoke(msg);
-//		System.out.println(phase + " " + operation);
-		try{
-			msg = getNext().invoke(msg);
-		} catch(Exception e){
-			System.out.println("Exception caught:");
-			System.out.println("phase: " + phase);
-			System.out.println("operation: " + operation);
-			e.printStackTrace();
-		}
+		msg = getNext().invoke(msg);
 		
-		if(phase.equals(Phase.SERVICE_POLICY) || phase.equals(Phase.REFERENCE_POLICY)){
+		if(phase.equals(Phase.SERVICE_POLICY)){
 			msg = attachEndedTxToResponse(msg);
+		} else if(phase.equals(Phase.REFERENCE_POLICY)){
+//			System.out.println(msg.getBody());
+			String currentTx = null;
+			String hostComp = null;
+			String rootTx = null;
+			String rootComp = null;
+			String parentTx = null;
+			String parentComp = null;
+			String threadID = null;
+			String subTx = null;
+			String subComp = null;
+			
+			List<Object> msgBodyOriginal;
+			if(msg.getBody() == null){
+				Object [] tmp = new Object[1];
+				tmp[0] = (Object)"";
+				msgBodyOriginal = Arrays.asList(tmp);
+			}
+			else{
+				if(msg.getBody().getClass().isArray())
+					msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
+				else
+					msgBodyOriginal = Arrays.asList(msg.getBody());
+			}
+			
+			List<Object> msgBody = new ArrayList<Object>();
+			msgBody.addAll(msgBodyOriginal);
+			String subContextTag = null;
+			for(Object object : msgBody){
+				
+				if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
+					subContextTag = object.toString();
+					msgBody.remove(object);
+					break;
+				}
+			}
+			if(subContextTag == null)
+				return msg;
+			
+			LOGGER.fine("subContextTag:" + subContextTag + ", msgBody:" + msgBody);
+			
+			// Here we need to pay attention, the body in this return message should be only one object, not an array.
+			// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
+			// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
+			if(msgBody.size() != 0)
+				msg.setBody(msgBody.get(0));
+			
+			LOGGER.fine("attach REFERENCE_POLICY: " + subContextTag);
+			
+			Map<String, String> endedSubTxProperty = parseEndedSubTxTag(subContextTag);
+			
+			if(endedSubTxProperty.size() == 0){
+				LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
+			}
+			
+			rootTx = endedSubTxProperty.get(ROOT_TX);
+			rootComp = endedSubTxProperty.get(ROOT_COMP);
+			currentTx = endedSubTxProperty.get(PARENT_TX);
+			hostComp = endedSubTxProperty.get(PARENT_COMP);
+			subTx = endedSubTxProperty.get(SUB_TX);
+			subComp = endedSubTxProperty.get(SUB_COMP);
+			
+			assert hostComp.equals(getComponent().getName());
+			
+			if( !subComp.equals(hostComp)){
+				
+				NodeManager nodeMgr = NodeManager.getInstance();
+				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+				Printer printer = new Printer();
+				LOGGER.fine("TxS before endRemoteSubTx:");
+//				printer.printTxs(LOGGER, depMgr.getTxs());
+				
+				TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
+				txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+				
+				LOGGER.fine("TxS after endRemoteSubTx:");
+//				printer.printTxs(LOGGER, depMgr.getTxs());
+			}
 		}
 		
 		return msg;
@@ -216,6 +286,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			
 			//get host component name
 			hostComponent = getComponent().getName();
+//			if(subComp != null)
+//				assert hostComponent.equals(subComp);
 			
 			// check interceptor cache
 			InterceptorCache cache = InterceptorCache.getInstance(hostComponent);
@@ -432,7 +504,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				}
 			}
 
-//			// if ready for update
+			// if ready for update
 			Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
 			synchronized (updatingSyncMonitor) {
 				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
@@ -478,12 +550,13 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			
 			//locate ROOT_PARENT_IDENTIFIER in message body
 			List<Object> msgBodyOriginal;
+			// return value is void
 			if (msg.getBody() == null) {
-				Object[] tmp = new Object[1];
-				tmp[0] = (Object) "";
-				msgBodyOriginal = Arrays.asList(tmp);
+	//			Object[] tmp = new Object[1];
+	//			tmp[0] = (Object) "";
+	//			msgBodyOriginal = Arrays.asList(tmp);
+				msgBodyOriginal = new ArrayList<Object>();
 			} else{
-	//			msgBodyOriginal = Arrays.asList((Object[]) msg.getBody());
 				msgBodyOriginal = Arrays.asList(msg.getBody());
 			}
 			
@@ -532,32 +605,30 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //				LOGGER.fine("TxS after removeFakeSubTx:");
 //				printer.printTxs(LOGGER, depMgr.getTxs());
 				
-				
 				//generate info required to be attatched to the response msg body
 				StringBuffer endedSubTxTag = new StringBuffer();
 				endedSubTxTag.append(ENDED_SUB_TX_TAG);
 				endedSubTxTag.append("[");
-				endedSubTxTag.append(ROOT_TX + ":" + rootTx + ",");
-				endedSubTxTag.append(ROOT_COMP + ":" + rootComp + ",");
-				endedSubTxTag.append(PARENT_TX + ":" + parentTx + ",");
-				endedSubTxTag.append(PARENT_COMP + ":" + parentComp + ",");
+				endedSubTxTag.append(ROOT_TX + ":" + rootTx + ";");
+				endedSubTxTag.append(ROOT_COMP + ":" + rootComp + ";");
+				endedSubTxTag.append(PARENT_TX + ":" + parentTx + ";");
+				endedSubTxTag.append(PARENT_COMP + ":" + parentComp + ";");
 //				endedSubTxTag.append(SUB_TX + ":" + currentTx + ",");
 //				endedSubTxTag.append(SUB_COMP + ":" + hostComp );
-				endedSubTxTag.append(SUB_TX + ":" + subTx + ",");
+				endedSubTxTag.append(SUB_TX + ":" + subTx + ";");
 				endedSubTxTag.append(SUB_COMP + ":" + subComp );
 				endedSubTxTag.append("]");
 				
 				//reset the msg body
 				msgBody.add(endedSubTxTag.toString());
-//				msg.setBody((Object [])msgBody.toArray());
-				if(msg.getBody() instanceof String){
-					msg.setBody(msg.getBody().toString() + endedSubTxTag);
-				} else{
-					System.out.println("unsupported msg body type in TraceInterceptor");
-					msg.setBody(msg.getBody().toString() + endedSubTxTag);
-				}
+				msg.setBody((Object [])msgBody.toArray());
 				
-				LOGGER.fine("attach SERVICE_POLICY: " + endedSubTxTag);
+				msg.getHeaders().remove(ROOT_TX);
+				msg.getHeaders().remove(ROOT_COMP);
+				msg.getHeaders().remove(PARENT_TX);
+				msg.getHeaders().remove(PARENT_COMP);
+				msg.getHeaders().remove(SUB_TX);
+				msg.getHeaders().remove(SUB_COMP);
 			} else if(phase.equals(Phase.REFERENCE_POLICY)){
 				String subTx = null;
 				String subComp = null;
@@ -571,16 +642,44 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //						break;
 //					}
 //				}
-				String msgBodyStr = msg.getBody().toString();
-				if(msgBodyStr.contains(TracePolicyInterceptor.ENDED_SUB_TX_TAG)){
-					int loc = msgBodyStr.indexOf(TracePolicyInterceptor.ENDED_SUB_TX_TAG);
-					realMsgBody = msgBodyStr.substring(0, loc);
-					endedSubTxTag = msgBodyStr.substring(loc);
-					//TODO
-					msg.setBody(realMsgBody);
-				} else{
-					return msg;
+//				String msgBodyStr = msg.getBody().toString();
+//				if(msgBodyStr.contains(TracePolicyInterceptor.ENDED_SUB_TX_TAG)){
+//					int loc = msgBodyStr.indexOf(TracePolicyInterceptor.ENDED_SUB_TX_TAG);
+//					realMsgBody = msgBodyStr.substring(0, loc);
+//					endedSubTxTag = msgBodyStr.substring(loc);
+//					//TODO
+//					msg.setBody(realMsgBody);
+//				} else{
+//					return msg;
+//				}
+				
+				if(msg.getBody() == null){
+					Object [] tmp = new Object[1];
+					tmp[0] = (Object)"";
+					msgBodyOriginal = Arrays.asList(tmp);
 				}
+				else
+					msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
+				
+				msgBody.addAll(msgBodyOriginal);
+				for(Object object : msgBody){
+					
+					if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
+						endedSubTxTag = object.toString();
+						msgBody.remove(object);
+						break;
+					}
+				}
+				if(endedSubTxTag == null)
+					return msg;
+				LOGGER.fine("subContextTag:" + endedSubTxTag + ", msgBody:" + msgBody);
+				
+				// Here we need to pay attention, the body in this return message should be only one object, not an array.
+				// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
+				// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
+				if(msgBody.size() != 0)
+					msg.setBody(msgBody.get(0));
+				
 				
 				LOGGER.fine("attach REFERENCE_POLICY: " + endedSubTxTag);
 				
@@ -613,12 +712,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					LOGGER.fine("TxS after endRemoteSubTx:");
 					printer.printTxs(LOGGER, depMgr.getTxs());
 				}
-				
 			}
 			
 			return msg;
 		}
-	
+
 	private void storeFakeSubTx(DynamicDepManager depMgr, String fakeSubTx, String hostComp, 
 			String rootTx, String rootComp, String parentTx, String parentComp){
 		TransactionContext txCtx;
@@ -646,10 +744,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	}
 
 	private Map<String, String> parseEndedSubTxTag(String endedSubTxTag) {
-		// TODO Auto-generated method stub
 		String subStrCtx = endedSubTxTag.substring(endedSubTxTag.indexOf("[")+1, endedSubTxTag.indexOf("]"));
 		Map<String, String> result = new HashMap<String, String>();
-		String [] splitted = subStrCtx.split(",");
+		String [] splitted = subStrCtx.split(";");
 		for(String str : splitted){
 			String [] pair = str.split(":");
 			result.put(pair[0], pair[1]);
@@ -671,67 +768,66 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 
 	
 	private boolean isCallback(Message msg){
-			boolean isCallback = false;
-			Endpoint endpoint = msg.getTo();
-	//		LOGGER.fine(phase);
-			if(endpoint instanceof RuntimeEndpointImpl
-				&& phase.equals(Phase.SERVICE_POLICY)
-				&& getComponent() != null
-				&& getComponent().getReferences() != null){
-				RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
-				String targetUri = rtEp.getDeployedURI();
-				
-	//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
-	//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
-	//			}
-				
-				for (ComponentReference compRef : getComponent().getReferences()) {
-					RuntimeComponentReferenceImpl rtCompRef = (RuntimeComponentReferenceImpl) compRef;
-					if (rtCompRef.getCallback() == null
-							|| rtCompRef.getCallback().getBindings() == null)
-						continue;
-					for (Binding binding : rtCompRef.getCallback().getBindings()) {
-						if (targetUri.equals(binding.getURI())) {
-							isCallback = true;
-							break;
-						}
-					}
-					if (isCallback) {
+		boolean isCallback = false;
+		Endpoint endpoint = msg.getTo();
+//		LOGGER.fine(phase);
+		if(endpoint instanceof RuntimeEndpointImpl
+			&& phase.equals(Phase.SERVICE_POLICY)
+			&& getComponent() != null
+			&& getComponent().getReferences() != null){
+			RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
+			String targetUri = rtEp.getDeployedURI();
+			
+//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
+//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//			}
+			
+			for (ComponentReference compRef : getComponent().getReferences()) {
+				RuntimeComponentReferenceImpl rtCompRef = (RuntimeComponentReferenceImpl) compRef;
+				if (rtCompRef.getCallback() == null
+						|| rtCompRef.getCallback().getBindings() == null)
+					continue;
+				for (Binding binding : rtCompRef.getCallback().getBindings()) {
+					if (targetUri.equals(binding.getURI())) {
+						isCallback = true;
 						break;
 					}
 				}
-				
-			} else if(phase.equals(Phase.REFERENCE_POLICY)
-					&& getComponent() != null
-					&& getComponent().getServices() != null){
-				RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
-				String targetUri = rtEp.getDeployedURI();
-				
-	//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
-	//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
-	//			}
-				
-				for (ComponentService compService : getComponent().getServices()) {
-					RuntimeComponentServiceImpl rtCompService = (RuntimeComponentServiceImpl) compService;
-					if (compService.getCallback() == null
-							|| compService.getCallback().getBindings() == null) {
-						continue;
-					}
-					for (Binding binding : compService.getCallback().getBindings()) {
-						if (targetUri.equals(binding.getURI())) {
-							isCallback = true;
-							break;
-						}
-					}
-					if (isCallback) {
-						break;
-					}
+				if (isCallback) {
+					break;
 				}
-				
 			}
-			return isCallback;
+			
+		} else if(phase.equals(Phase.REFERENCE_POLICY)
+				&& getComponent() != null
+				&& getComponent().getServices() != null){
+			RuntimeEndpointImpl rtEp = ((RuntimeEndpointImpl) endpoint);
+			String targetUri = rtEp.getDeployedURI();
+			
+//			if(targetUri.equals("http://114.212.81.182:12305/Car/SearchCallback")){
+//				LOGGER.fine(phase + "  " + "http://114.212.81.182:12305/Car/SearchCallback");
+//			}
+			
+			for (ComponentService compService : getComponent().getServices()) {
+				RuntimeComponentServiceImpl rtCompService = (RuntimeComponentServiceImpl) compService;
+				if (compService.getCallback() == null
+						|| compService.getCallback().getBindings() == null) {
+					continue;
+				}
+				for (Binding binding : compService.getCallback().getBindings()) {
+					if (targetUri.equals(binding.getURI())) {
+						isCallback = true;
+						break;
+					}
+				}
+				if (isCallback) {
+					break;
+				}
+			}
+			
 		}
-
+		return isCallback;
+	}
 	/**
 	 * root and parent transaction id is stored in the format: VcTransactionRootAndParentIdentifier[ROOT_ID,PARENT_ID].
 	 * 
