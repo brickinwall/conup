@@ -30,16 +30,16 @@
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12305/TravelCatalogSearch/TravelCatalogSearch" />
 		</service>
         <reference name="hotelSearch" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/Search" />
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelSearch" />
         </reference>
         <reference name="flightSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/Search" />
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightSearch" />
         </reference> 
         <reference name="carSearch" requires="trace" policySets="traceBindingPolicySet">
-         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/Search"/>
+         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarSearch"/>
         </reference>    
         <reference name="tripSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/Search" />
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripSearch" />
         </reference>
         <reference name="currencyConverter" requires="trace" policySets="traceBindingPolicySet">
        		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12300/CurrencyConverter/CurrencyConverter"/>
@@ -53,16 +53,16 @@
 			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12306/TripBooking/TripBooking" />
 		</service>
         <reference name="hotelBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/Book"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelBook"/>
         </reference>
         <reference name="flightBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/Book"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightBook"/>
         </reference>
         <reference name="carBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/Book"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarBook"/>
         </reference>
         <reference name="tripBook" requires="trace" policySets="traceBindingPolicySet">  
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/Book"/>
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripBook"/>
         </reference>
         <reference name="cartUpdates" requires="trace" policySets="traceBindingPolicySet">
         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartUpdates" />

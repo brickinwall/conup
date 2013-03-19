@@ -8,8 +8,8 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import com.tuscanyscatours.common.Search;
 import com.tuscanyscatours.common.TripLeg;
+import com.tuscanyscatours.trip.impl.TripSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -55,7 +55,7 @@ public class PackagedtripLauncher {
 			TripLeg tripLeg = new TripLeg("", "", "FLR", "06/12/09", "06/12/09", "2");
 			System.out
 				.println("\nTry to access TripPartner#service-binding(Search/Search):");
-			Search carSearch = node.getService(Search.class,
+			TripSearch carSearch = node.getService(TripSearch.class,
 					"TripPartner#service-binding(Search/Search)");
 			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 

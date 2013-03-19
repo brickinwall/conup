@@ -22,26 +22,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.oasisopen.sca.annotation.Callback;
 import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Book;
-import com.tuscanyscatours.common.Search;
-import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
+import com.tuscanyscatours.hotel.HotelBook;
 import com.tuscanyscatours.hotel.HotelInfo;
 import com.tuscanyscatours.hotel.HotelManagement;
+import com.tuscanyscatours.hotel.HotelSearch;
 
 /**
  * An implementation of the Hotel service
  */
-@Service( {Search.class, Book.class, HotelManagement.class})
-public class HotelImpl implements Search, Book, HotelManagement {
+@Service( {HotelSearch.class, HotelBook.class, HotelManagement.class})
+public class HotelImpl implements HotelSearch, HotelBook, HotelManagement {
 	private static Logger LOGGER = Logger.getLogger(HotelImpl.class.getName());
 
     private List<HotelInfo> hotels = new ArrayList<HotelInfo>();
@@ -85,7 +82,8 @@ public class HotelImpl implements Search, Book, HotelManagement {
     public String book(TripItem tripItem) {
         return "hotel1";
     }
-
+    
+    @ConupTransaction
     public void addHotelInfo(HotelInfo hotelInfo) {
         hotels.add(hotelInfo);
         LOGGER.fine("Added hotel info - " + hotelInfo.getName());

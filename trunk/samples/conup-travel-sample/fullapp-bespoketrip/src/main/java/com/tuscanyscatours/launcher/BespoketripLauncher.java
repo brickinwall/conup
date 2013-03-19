@@ -8,8 +8,9 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import com.tuscanyscatours.common.Search;
+import com.tuscanyscatours.car.impl.CarSearch;
 import com.tuscanyscatours.common.TripLeg;
+import com.tuscanyscatours.hotel.HotelSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
@@ -68,7 +69,7 @@ public class BespoketripLauncher {
 			
 			TripLeg tripLeg = new TripLeg("", "", "FLR", "06/12/09", "06/12/09", "2");
 			LOGGER.fine("\nTry to access CarPartner#service-binding(Search/Search):");
-			Search carSearch = node.getService(Search.class, "CarPartner#service-binding(Search/Search)");
+			CarSearch carSearch = node.getService(CarSearch.class, "CarPartner#service-binding(Search/Search)");
 			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 //			System.out
 //				.println("\nTry to access CarPartner#service-binding(Search/searchws):");
@@ -78,7 +79,7 @@ public class BespoketripLauncher {
 
 			LOGGER.fine("\nTry to access HotelPartner#service-binding(Search/Search):");
             TripLeg flightTrip = new TripLeg("", "LGW", "FLR", "06/12/09", "06/12/09", "1");
-			Search hotelSearch = node.getService(Search.class, "HotelPartner#service-binding(Search/Search)");
+            HotelSearch hotelSearch = node.getService(HotelSearch.class, "HotelPartner#service-binding(Search/Search)");
 			LOGGER.fine("\t" + "hotelSearch.searchSynch(tripLeg)=" + hotelSearch.searchSynch(flightTrip));
 
 		} catch (NoSuchServiceException e) {
