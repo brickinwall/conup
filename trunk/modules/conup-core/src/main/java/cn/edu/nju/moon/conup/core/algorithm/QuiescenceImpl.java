@@ -176,6 +176,8 @@ public class QuiescenceImpl implements Algorithm {
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
 			
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
+				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+				depMgr.getTxs().remove(txCtx.getCurrentTx());
 //				String payload = QuiescencePayloadCreator.createPayload(
 //						hostComp, txCtx.getParentComponent(),
 //						txCtx.getRootTx(),
