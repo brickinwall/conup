@@ -304,11 +304,12 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine("current tx is " + curTx + ",and root is " + rootTx);
 				continue;
 			}
+			
+			if(txCtx.isFakeTx())
+				continue;
 
 			// if current is root
-//			LOGGER.fine(curTx + " is a root tx");
 			LOGGER.fine(curTx + " is a root tx");
-
 			
 			fDeps = getFDeps(curComp, rootTx);
 			LOGGER.fine("fDeps:");
