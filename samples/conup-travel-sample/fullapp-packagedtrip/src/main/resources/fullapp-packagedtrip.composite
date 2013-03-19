@@ -24,11 +24,11 @@
 
     <component name="TripPartner">
         <implementation.java class="com.tuscanyscatours.trip.impl.TripImpl"/>
-        <service name="Search" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/Search" />
+        <service name="TripSearch" requires="trace" policySets="traceBindingPolicySet">
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripSearch" />
         </service>
-        <service name="Book" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/Book" />
+        <service name="TripBook" requires="trace" policySets="traceBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripBook" />
         </service>
     </component>
 

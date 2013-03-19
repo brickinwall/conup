@@ -22,25 +22,20 @@ package com.tuscanyscatours.flight.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oasisopen.sca.annotation.Callback;
 import org.oasisopen.sca.annotation.ComponentName;
 import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Book;
-import com.tuscanyscatours.common.Search;
-import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 
 /**
  * An implementation of the Flight service
  */
-@Service( {Search.class, Book.class})
-public class FlightImpl implements Search, Book {
+@Service( {FlightSearch.class, FlightBook.class})
+public class FlightImpl implements FlightSearch, FlightBook {
 
     private List<FlightInfo> flights = new ArrayList<FlightInfo>();
 

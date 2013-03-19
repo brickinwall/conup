@@ -23,9 +23,12 @@ import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Book;
+import com.tuscanyscatours.car.impl.CarBook;
 import com.tuscanyscatours.common.TripItem;
+import com.tuscanyscatours.flight.impl.FlightBook;
+import com.tuscanyscatours.hotel.HotelBook;
 import com.tuscanyscatours.shoppingcart.CartUpdates;
+import com.tuscanyscatours.trip.impl.TripBook;
 import com.tuscanyscatours.tripbooking.TripBooking;
 
 /**
@@ -35,16 +38,16 @@ import com.tuscanyscatours.tripbooking.TripBooking;
 public class TripBookingImpl implements TripBooking {
 
     @Reference
-    protected Book hotelBook;
+    protected HotelBook hotelBook;
 
     @Reference
-    protected Book flightBook;
+    protected FlightBook flightBook;
 
     @Reference
-    protected Book carBook;
+    protected CarBook carBook;
 
     @Reference
-    protected Book tripBook;
+    protected TripBook tripBook;
 
     @Reference
     protected CartUpdates cartUpdates;

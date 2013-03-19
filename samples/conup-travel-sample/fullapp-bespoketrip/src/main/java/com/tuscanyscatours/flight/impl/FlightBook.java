@@ -17,14 +17,13 @@
  * under the License.    
  */
 
-package com.tuscanyscatours.common;
+package com.tuscanyscatours.flight.impl;
 
 import org.oasisopen.sca.annotation.Remotable;
 
+import com.tuscanyscatours.common.TripItem;
+
 @Remotable
-public interface Search {
-    TripItem[] searchSynch(TripLeg tripLeg);
-
-
-    int getPercentComplete();
+public interface FlightBook {
+    String book(TripItem tripItem);
 }

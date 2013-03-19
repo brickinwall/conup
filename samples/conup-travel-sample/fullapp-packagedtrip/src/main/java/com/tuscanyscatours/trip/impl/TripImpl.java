@@ -28,8 +28,6 @@ import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Book;
-import com.tuscanyscatours.common.Search;
 import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
@@ -38,8 +36,8 @@ import com.tuscanyscatours.common.TripLeg;
  * An implementation of the Trip service
  */
 //@Scope("STATELESS")
-@Service( {Search.class, Book.class})
-public class TripImpl implements Search, Book {
+@Service( {TripSearch.class, TripBook.class})
+public class TripImpl implements TripSearch, TripBook {
 
     private List<TripInfo> trips = new ArrayList<TripInfo>();
 

@@ -36,12 +36,15 @@ import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Search;
+import com.tuscanyscatours.car.impl.CarSearch;
 import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.currencyconverter.CurrencyConverter;
+import com.tuscanyscatours.flight.impl.FlightSearch;
+import com.tuscanyscatours.hotel.HotelSearch;
 import com.tuscanyscatours.travelcatalog.TravelCatalogSearch;
+import com.tuscanyscatours.trip.impl.TripSearch;
 
 /**
  * An implementation of the travel catalog service
@@ -50,16 +53,16 @@ import com.tuscanyscatours.travelcatalog.TravelCatalogSearch;
 public class TravelCatalogImpl implements TravelCatalogSearch {
 
     @Reference
-    protected Search hotelSearch;
+    protected HotelSearch hotelSearch;
 
     @Reference
-    protected Search flightSearch;
+    protected FlightSearch flightSearch;
 
     @Reference
-    protected Search carSearch;
+    protected CarSearch carSearch;
 
     @Reference
-    protected Search tripSearch;
+    protected TripSearch tripSearch;
 
     @Property
     public String quoteCurrencyCode = "USD";

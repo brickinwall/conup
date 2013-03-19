@@ -23,24 +23,19 @@ package com.tuscanyscatours.car.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oasisopen.sca.annotation.Callback;
 import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.Book;
-import com.tuscanyscatours.common.Search;
-import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 
 /**
  * An implementation of the Car service
  */
-@Service( {Search.class, Book.class})
-public class CarImpl implements Search, Book {
+@Service( {CarSearch.class, CarBook.class})
+public class CarImpl implements CarSearch, CarBook {
 
     private List<CarInfo> cars = new ArrayList<CarInfo>();
 
