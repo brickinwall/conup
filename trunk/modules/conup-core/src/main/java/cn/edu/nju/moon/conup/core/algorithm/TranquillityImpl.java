@@ -406,6 +406,7 @@ public class TranquillityImpl implements Algorithm {
 			 * if currentTx is not root, need to notify parent sub_tx_end
 			 * else if currentTx is root, start cleanup
 			 */
+			assert scope != null;
 			boolean isTarget = scope.isTarget(hostComponent);
 			if(isTarget){
 //				String payload = TranquillityPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), parentTx, TranquillityOperationType.NOTIFY_SUBTX_END, txContext.getParentTx(), txContext.getCurrentTx());
@@ -1056,7 +1057,7 @@ public class TranquillityImpl implements Algorithm {
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
 		if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
-			Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
+			Dependence lfe = new Dependence(FUTURE_DEP, parentTx, hostComp, hostComp, null, null);
 			if(!rtInDeps.contains(lfe)){
 				rtInDeps.add(lfe);
 			}
@@ -1064,7 +1065,7 @@ public class TranquillityImpl implements Algorithm {
 				rtOutDeps.add(lfe);
 			}
 			
-			Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
+			Dependence lpe = new Dependence(PAST_DEP, parentTx, hostComp, hostComp, null, null);
 			if(!rtInDeps.contains(lpe)){
 				rtInDeps.add(lpe);
 			}
