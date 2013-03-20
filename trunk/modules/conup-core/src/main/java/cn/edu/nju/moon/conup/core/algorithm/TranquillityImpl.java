@@ -937,10 +937,8 @@ public class TranquillityImpl implements Algorithm {
 	}
 	
 	@Override
-	public boolean isBlockRequiredForFree(
-			Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
-			boolean isUpdateReqRCVD) {
+	public boolean isBlockRequiredForFree( Set<String> algorithmOldVersionRootTxs,
+			TransactionContext txContext, boolean isUpdateReqRCVD) {
 		if( !isUpdateReqRCVD ){
 			return false;
 		}

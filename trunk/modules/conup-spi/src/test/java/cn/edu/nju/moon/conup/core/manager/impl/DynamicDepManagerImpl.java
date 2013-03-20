@@ -184,7 +184,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isBlockRequiredForFree(
 			Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
+			TransactionContext txContext,
 			boolean isUpdateReqRCVD) {
 		// TODO Auto-generated method stub
 		return false;

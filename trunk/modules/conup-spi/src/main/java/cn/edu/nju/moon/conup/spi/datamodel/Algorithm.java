@@ -71,8 +71,7 @@ public interface Algorithm {
 	 * @return
 	 */
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
-			boolean isUpdateReqRCVD);
+			TransactionContext txContext, boolean isUpdateReqRCVD);
 	
 	/**
 	 * when dynamic update is done, the concrete algorithm should get notified to execute cleanup

@@ -164,89 +164,83 @@ public class TxLifecycleManager {
 		associateTx.put(threadID, identifier);
 	}
 	
-	/** 
-	 * when a business request with root/parent txs accepted, TxLifecycleManager should 
-	 * get notified. 
-	 */
-	public static void addRootTx(String hostComp, String parentTxId, String rootTxId){
-		synchronized (OLD_ROOT_TXS) {
-			assert hostComp != null;
-			if(rootTxId != null){
-				if(OLD_ROOT_TXS.get(hostComp) != null)
-					OLD_ROOT_TXS.get(hostComp).put(parentTxId, rootTxId);
-				else{
-					Map<String, String> txInfo = new ConcurrentHashMap<String, String>();
-					txInfo.put(parentTxId, rootTxId);
-					OLD_ROOT_TXS.put(hostComp, txInfo);
-				}
-//				OLD_ROOT_TXS.put(parentTxId, rootTxId);
-			}
-//				OLD_ROOT_TXS.add(rootTxId);
-			
-		}
-	}
-	
-	public static String getRootTx(String hostComp, String parentTxId){
-		synchronized (OLD_ROOT_TXS) {
-			assert hostComp != null && parentTxId != null;
-			if(OLD_ROOT_TXS.get(hostComp) != null)
-				return OLD_ROOT_TXS.get(hostComp).get(parentTxId);
-			else
-				return null;
-//			return OLD_ROOT_TXS.get(parentTxId);
-		}
-	}
-	
-	/**
-	 * when a root tx ended on the component, TxLifecycleManager should 
-	 * get notified. 
-	 * remove all the txs whose root is marked with given rootTx or parentTx
-	 * @param rootTx
-	 */
-	public static void removeRootTx(String hostComp, String rootTx){
-		synchronized (OLD_ROOT_TXS) {
-			assert hostComp != null;
-			Iterator<Entry<String, String>> iterator;
-			if(OLD_ROOT_TXS.get(hostComp) == null)
-				return;
-			iterator = OLD_ROOT_TXS.get(hostComp).entrySet().iterator();
-			while(iterator.hasNext()){
-				Entry<String, String> entry;
-				entry = iterator.next();
-				if(entry.getValue().equals(rootTx) || entry.getKey().equals(rootTx))
-					iterator.remove();
-			}
-		}
-	}
-	
-	/**
-	 * Exactly remove a entry from the OLD_ROOT_TXS
-	 * @param parentTx
-	 * @param rootTx
-	 */
-	public static void removeRootTx(String hostComp, String parentTx, String rootTx){
-		synchronized (OLD_ROOT_TXS) {
-			assert hostComp != null;
-			if(OLD_ROOT_TXS.get(hostComp) == null)
-				return;
-			OLD_ROOT_TXS.get(hostComp).remove(parentTx);
-		}
-	}
-	
-	/**
-	 * @return a copy of all the root txs that are running on the component
-	 */
-	public static Set<String>  copyOfOldRootTxs(String hostComp){
-		synchronized (OLD_ROOT_TXS) {
-			DynamicDepManager depMgr;
-			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
-//			LOGGER.fine("\nOLD_ROOT_TXS,size:" + OLD_ROOT_TXS.size() + " before convertToAlgorithmRoots:" + OLD_ROOT_TXS);
-			if(OLD_ROOT_TXS.get(hostComp) != null)
-				return depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
-			else
-				return new HashSet<String>();
-//			LOGGER.fine("\ncopyOfOldRootTxs,size:" + result.size() + " after convertToAlgorithmRoots:" + result);
-		}
-	}
+//	/** 
+//	 * when a business request with root/parent txs accepted, TxLifecycleManager should 
+//	 * get notified. 
+//	 */
+//	public static void addRootTx(String hostComp, String parentTxId, String rootTxId){
+//		synchronized (OLD_ROOT_TXS) {
+//			assert hostComp != null;
+//			if(rootTxId != null){
+//				if(OLD_ROOT_TXS.get(hostComp) != null)
+//					OLD_ROOT_TXS.get(hostComp).put(parentTxId, rootTxId);
+//				else{
+//					Map<String, String> txInfo = new ConcurrentHashMap<String, String>();
+//					txInfo.put(parentTxId, rootTxId);
+//					OLD_ROOT_TXS.put(hostComp, txInfo);
+//				}
+//			}
+//		}
+//	}
+//	
+//	public static String getRootTx(String hostComp, String parentTxId){
+//		synchronized (OLD_ROOT_TXS) {
+//			assert hostComp != null && parentTxId != null;
+//			if(OLD_ROOT_TXS.get(hostComp) != null)
+//				return OLD_ROOT_TXS.get(hostComp).get(parentTxId);
+//			else
+//				return null;
+//		}
+//	}
+//	
+//	/**
+//	 * when a root tx ended on the component, TxLifecycleManager should 
+//	 * get notified. 
+//	 * remove all the txs whose root is marked with given rootTx or parentTx
+//	 * @param rootTx
+//	 */
+//	public static void removeRootTx(String hostComp, String rootTx){
+//		synchronized (OLD_ROOT_TXS) {
+//			assert hostComp != null;
+//			Iterator<Entry<String, String>> iterator;
+//			if(OLD_ROOT_TXS.get(hostComp) == null)
+//				return;
+//			iterator = OLD_ROOT_TXS.get(hostComp).entrySet().iterator();
+//			while(iterator.hasNext()){
+//				Entry<String, String> entry;
+//				entry = iterator.next();
+//				if(entry.getValue().equals(rootTx) || entry.getKey().equals(rootTx))
+//					iterator.remove();
+//			}
+//		}
+//	}
+//	
+//	/**
+//	 * Exactly remove a entry from the OLD_ROOT_TXS
+//	 * @param parentTx
+//	 * @param rootTx
+//	 */
+//	public static void removeRootTx(String hostComp, String parentTx, String rootTx){
+//		synchronized (OLD_ROOT_TXS) {
+//			assert hostComp != null;
+//			if(OLD_ROOT_TXS.get(hostComp) == null)
+//				return;
+//			OLD_ROOT_TXS.get(hostComp).remove(parentTx);
+//		}
+//	}
+//	
+//	/**
+//	 * @return a copy of all the root txs that are running on the component
+//	 */
+//	public static Set<String>  copyOfOldRootTxs(String hostComp){
+//		synchronized (OLD_ROOT_TXS) {
+//			DynamicDepManager depMgr;
+//			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
+//			if(OLD_ROOT_TXS.get(hostComp) != null)
+//				return depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
+//			else
+//				return new HashSet<String>();
+//		}
+//	}
 	
 }

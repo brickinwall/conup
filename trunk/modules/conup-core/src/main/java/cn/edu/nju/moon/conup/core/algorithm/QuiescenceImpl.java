@@ -452,10 +452,8 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean isBlockRequiredForFree(
-			Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
-			boolean isUpdateReqRCVD) {
+	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
+			TransactionContext txContext, boolean isUpdateReqRCVD) {	
 
 		boolean isRootComp = txContext.getHostComponent().equals(
 				txContext.getRootComponent());

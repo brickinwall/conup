@@ -360,9 +360,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
-			boolean isUpdateReqRCVD) {
-		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, bufferOldVersionRootTxs, txContext, isUpdateReqRCVD);
+			TransactionContext txContext, boolean isUpdateReqRCVD) {
+		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, txContext, isUpdateReqRCVD);
 	}
 
 	@Override
