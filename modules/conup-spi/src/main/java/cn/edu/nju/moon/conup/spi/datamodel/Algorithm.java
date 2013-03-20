@@ -84,7 +84,7 @@ public interface Algorithm {
 	 * when necessary, algorithm may need to be notified to execute related initiation.
 	 * @param identifier
 	 */
-	public void start(String identifier);
+	public void initiate(String identifier);
 
 	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs);
 

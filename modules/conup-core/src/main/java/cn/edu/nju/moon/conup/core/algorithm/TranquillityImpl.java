@@ -910,6 +910,8 @@ public class TranquillityImpl implements Algorithm {
 		
 		Scope scope = depMgr.getScope();
 		Set<String> parentComps;
+		
+		assert scope != null;
 		parentComps = scope.getParentComponents(hostComponent);
 		if(parentComps == null || parentComps.size() == 0 ){
 			//remove tx
@@ -990,7 +992,7 @@ public class TranquillityImpl implements Algorithm {
 	}
 
 	@Override
-	public void start(String identifier) {
+	public void initiate(String identifier) {
 		
 	}
 
