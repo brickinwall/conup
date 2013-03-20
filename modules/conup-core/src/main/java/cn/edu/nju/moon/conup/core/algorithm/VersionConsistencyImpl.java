@@ -134,11 +134,12 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
 			break;
 		case NOTIFY_START_REMOTE_SUB_TX:
-			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
-			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
-			doNotifyStartRemoteSubTx(srcComp, targetComp, rootTx);
-			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
-			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
+			LOGGER.warning("deprecated notification NOTIFY_START_REMOTE_SUB_TX");
+//			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
+//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
+//			doNotifyStartRemoteSubTx(srcComp, targetComp, rootTx);
+//			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
+//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
