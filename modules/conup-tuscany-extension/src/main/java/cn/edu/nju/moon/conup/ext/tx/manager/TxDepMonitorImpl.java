@@ -115,7 +115,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		Set<String> tmpFutureServices = new ConcurrentSkipListSet<String>();
 		tmpFutureServices.addAll(fservices);
 		for(String fs : tmpFutureServices){
-			if(!targetCompIdentifier.equals(convertServiceToComp(fs, hostComp))){
+			if(!targetCompIdentifier.equals(convertServiceToComponent(fs, hostComp))){
 				tmpFutureServices.remove(fs);
 			}
 		}
@@ -146,7 +146,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			for(Endpoint ep : endpoints){
 				String URI = ep.getURI();
 				String serviceName = service.substring(service.lastIndexOf(".") + 1);
-				if(URI.contains(serviceName)){
+				if(URI.contains(serviceName + "/" + serviceName)){
 					int index = URI.indexOf("#");
 					comps.add(URI.substring(0, index));
 				}
@@ -169,7 +169,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		return comps;
 	}
 
-	public String convertServiceToComp(String service, String hostComp){
+	public String convertServiceToComponent(String service, String hostComp){
 		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
 		Node node = compLifeCycleMgr.getNode();
 		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
@@ -177,16 +177,22 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		Iterator<Endpoint> endpointsIterator = endpoints.iterator(); 
 		String serviceName = service.substring(service.lastIndexOf(".") + 1);
 		
+		int totalComps = 0;
+		String compName = null;
 		while (endpointsIterator.hasNext()) {
 			Endpoint endpoint = (Endpoint) endpointsIterator.next();
 			String URI = endpoint.getURI();
-			if(URI.contains(serviceName)){
+			if(URI.contains(serviceName + "/" + serviceName)){
 				int index = URI.indexOf("#");
-				return URI.substring(0, index);
+				compName = URI.substring(0, index);
+				totalComps ++;
+//				return URI.substring(0, index);
 			}
 		}
+		assert totalComps==1;
 		
-		return null;
+		return compName;
+		
 	}
 
 	@Override

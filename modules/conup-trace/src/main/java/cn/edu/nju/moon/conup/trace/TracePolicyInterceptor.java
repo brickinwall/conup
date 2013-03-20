@@ -339,7 +339,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				
 				TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
 				subTx = new TxLifecycleManager().createFakeTxId();
-				subComp = txDepMonitor.convertServiceToComp(getTargetServiceName(), hostComponent);
+				subComp = txDepMonitor.convertServiceToComponent(getTargetServiceName(), hostComponent);
 				
 				assert subComp != null;
 				
@@ -596,7 +596,10 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				subComp = msg.getHeaders().get(SUB_COMP).toString();
 				
 				assert subTx != null;
-				assert hostComp.equals(subComp);
+				if( !hostComp.equals(subComp) ){
+					LOGGER.warning("hostComp: " + hostComp + " subComp: " + subComp);
+					assert hostComp.equals(subComp);
+				}
 				assert hostComp.equals(txCtx.getHostComponent());
 				
 				NodeManager nodeMgr = NodeManager.getInstance();
