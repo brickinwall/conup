@@ -78,14 +78,14 @@ public class ExpXMLUtil {
 		Element baseDir = setting.getChild("baseDir");
 		Element type = setting.getChild("type");
 		
-		expSetting.setIndepRun(Integer.parseInt(indepRun.getValue()));
-		expSetting.setnThreads(Integer.parseInt(nThreads.getValue()));
-		expSetting.setThreadId(Integer.parseInt(threadId.getValue()));
-		expSetting.setTargetComp(targetComp.getValue());
-		expSetting.setIpAddress(ipAddress.getValue());
-		expSetting.setRqstInterval(Integer.parseInt(rqstInterval.getValue()));
-		expSetting.setBaseDir(baseDir.getValue());
-		expSetting.setType(type.getValue());
+		expSetting.setIndepRun(Integer.parseInt(indepRun.getValue().trim()));
+		expSetting.setnThreads(Integer.parseInt(nThreads.getValue().trim()));
+		expSetting.setThreadId(Integer.parseInt(threadId.getValue().trim()));
+		expSetting.setTargetComp(targetComp.getValue().trim());
+		expSetting.setIpAddress(ipAddress.getValue().trim());
+		expSetting.setRqstInterval(Integer.parseInt(rqstInterval.getValue().trim()));
+		expSetting.setBaseDir(baseDir.getValue().trim());
+		expSetting.setType(type.getValue().trim());
 		
 		return expSetting;
 	}
@@ -110,13 +110,12 @@ public class ExpXMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
 					List parentList = comp.getChildren("parent");
 					Iterator parentListIter = parentList.iterator();
 					while (parentListIter.hasNext()) {
-						parentComp.add(((Element) parentListIter.next())
-								.getValue());
+						parentComp.add(((Element) parentListIter.next()).getValue().trim());
 					}
 				}
 			}
@@ -135,13 +134,12 @@ public class ExpXMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
 					List childrenList = comp.getChildren("child");
 					Iterator childListIter = childrenList.iterator();
 					while (childListIter.hasNext()) {
-						childrenComps.add(((Element) childListIter.next())
-								.getValue());
+						childrenComps.add(((Element) childListIter.next()).getValue().trim());
 					}
 				}
 			}
@@ -160,7 +158,7 @@ public class ExpXMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				allComps.add(compName);
 			}
 		} catch (Exception e) {
