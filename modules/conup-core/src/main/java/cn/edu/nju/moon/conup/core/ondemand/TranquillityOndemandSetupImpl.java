@@ -62,6 +62,12 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
 		ondemandHelper.getDynamicDepManager().setScope(scope);
+		
+		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+		assert scope != null;
+		assert ddm.getRuntimeInDeps().size() == 0;
+		assert ddm.getRuntimeDeps().size() == 0;
+		
 		return reqOndemandSetup(hostComp, hostComp);
 	}
 
@@ -269,6 +275,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			String curTx = null;
 			if (scope.getParentComponents(hostComp) == null
 					|| scope.getParentComponents(hostComp).size() == 0) {
+				if(txCtx.isFakeTx())
+					continue;
 				rootTx = txCtx.getCurrentTx();
 			} else{
 				rootTx = txCtx.getParentTx();
