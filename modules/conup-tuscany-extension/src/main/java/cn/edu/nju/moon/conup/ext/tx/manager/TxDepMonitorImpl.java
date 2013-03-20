@@ -310,6 +310,21 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		TransactionContext txCtx;
+		
+		txCtx = new TransactionContext();
+		txCtx.setFakeTx(true);
+		txCtx.setCurrentTx(fakeSubTx);
+		txCtx.setHostComponent(hostComp);
+		txCtx.setEventType(TxEventType.TransactionStart);
+		txCtx.setFutureComponents(new HashSet<String>());
+		txCtx.setPastComponents(new HashSet<String>());
+		txCtx.setParentComponent(parentComp);
+		txCtx.setParentTx(parentTx);
+		txCtx.setRootTx(rootTx);
+		txCtx.setRootComponent(rootComp);
+		
+		depMgr.getTxs().put(fakeSubTx, txCtx);
 		
 		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
 	}

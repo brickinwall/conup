@@ -404,9 +404,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					assert txCtx.getParentTx() != null;
 					assert txCtx.getParentComponent() != null;
 					assert msg.getHeaders().get(SUB_TX) != null;
-					storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
-							txCtx.getRootTx(), txCtx.getRootComponent(), 
-							txCtx.getParentTx(), txCtx.getParentComponent());
+//					storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+//							txCtx.getRootTx(), txCtx.getRootComponent(), 
+//							txCtx.getParentTx(), txCtx.getParentComponent());
 					txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
 							txCtx.getRootTx(), txCtx.getRootComponent(),
 							txCtx.getParentTx(), txCtx.getParentComponent());
@@ -450,9 +450,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						assert txCtx.getParentTx() != null;
 						assert txCtx.getParentComponent() != null;
 						assert msg.getHeaders().get(SUB_TX) != null;
-						storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
-								txCtx.getRootTx(), txCtx.getRootComponent(), 
-								txCtx.getParentTx(), txCtx.getParentComponent());
+//						storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+//								txCtx.getRootTx(), txCtx.getRootComponent(), 
+//								txCtx.getParentTx(), txCtx.getParentComponent());
 						txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
@@ -531,9 +531,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert txCtx.getParentTx() != null;
 				assert txCtx.getParentComponent() != null;
 				assert msg.getHeaders().get(SUB_TX) != null;
-				storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
-						txCtx.getRootTx(), txCtx.getRootComponent(), 
-						txCtx.getParentTx(), txCtx.getParentComponent());
+//				storeFakeSubTx(depMgr, msg.getHeaders().get(SUB_TX).toString(), hostComp, 
+//						txCtx.getRootTx(), txCtx.getRootComponent(), 
+//						txCtx.getParentTx(), txCtx.getParentComponent());
 				txDepMonitor.initLocalSubTx(hostComp, msg.getHeaders().get(SUB_TX).toString(), 
 						txCtx.getRootTx(), txCtx.getRootComponent(),
 						txCtx.getParentTx(), txCtx.getParentComponent());
