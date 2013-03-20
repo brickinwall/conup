@@ -192,7 +192,6 @@ public class CompLifecycleManager {
 	 * @param compIdentifier target component's identifier
 	 * @return
 	 */
-	//String baseDir, String classPath,String contributionURI, String compositeURI, String compIdentifier, Scope scope 
 	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
 		NodeManager nodeMgr;
 		DynamicDepManager depMgr;
@@ -222,29 +221,6 @@ public class CompLifecycleManager {
 			ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 			ondemandHelper.ondemandSetup();
 		}
-		
-		//waiting while on-demand setup
-//		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
-//		synchronized (ondemandSyncMonitor) {
-//			try {
-//				LOGGER.fine("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
-//				if (depMgr.isOndemandSetupRequired()) {
-//					LOGGER.fine("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
-//					ondemandSyncMonitor.wait();
-//				}
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		
-		//calculate old version root txs
-//		Set<String> oldRootTxs = depMgr.getOldVersionRootTxs();
-//		updateCtx.setOldVerionRootTxs(oldRootTxs);
-		
-//		attemptToUpdate();
-//		OndemandSetupThread ondemandThread;
-//		ondemandThread = new OndemandSetupThread(compIdentifier);
-//		ondemandThread.start();
 		
 		AttemptUpdateThread attemptUpdaterThread;
 		attemptUpdaterThread = new AttemptUpdateThread(this, depMgr);
