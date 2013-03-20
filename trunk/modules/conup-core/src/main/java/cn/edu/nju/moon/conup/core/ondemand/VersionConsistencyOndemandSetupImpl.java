@@ -64,6 +64,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
 		ondemandHelper.getDynamicDepManager().setScope(scope);
+		
+		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+		assert scope != null;
+		assert ddm.getRuntimeInDeps().size() == 0;
+		assert ddm.getRuntimeDeps().size() == 0;
+		
 		return reqOndemandSetup(hostComp, hostComp);
 	}
 	
