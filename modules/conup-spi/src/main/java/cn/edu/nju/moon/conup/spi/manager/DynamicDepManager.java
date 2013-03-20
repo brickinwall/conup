@@ -209,7 +209,7 @@ public interface DynamicDepManager {
 	 * @param isUpdateReqRCVD is the component received dynamic update request
 	 * @return
 	 */
-	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs, Set<String> bufferOldVersionRootTxs, 
+	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
 			TransactionContext txContext, boolean isUpdateReqRCVD);
 
 	/**

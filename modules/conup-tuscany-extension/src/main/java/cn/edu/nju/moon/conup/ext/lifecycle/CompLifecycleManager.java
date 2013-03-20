@@ -428,13 +428,8 @@ public class CompLifecycleManager {
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		if(!updateCtx.isOldRootTxsInitiated()){
 			updateCtx.setAlgorithmOldRootTxs(depMgr.getAlgorithmOldVersionRootTxs());
-			updateCtx.setBufferOldRootTxs(TxLifecycleManager.copyOfOldRootTxs(compIdentifier));
 			
 			LOGGER.fine("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-			LOGGER.fine("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
-			
-//			LOGGER.fine("getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-//			LOGGER.fine("getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
 		}
 		return true;
 	}
@@ -452,28 +447,24 @@ public class CompLifecycleManager {
 		nodeMgr = NodeManager.getInstance();
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		updateCtx.setAlgorithmOldRootTxs(depMgr.getAlgorithmOldVersionRootTxs());
-		updateCtx.setBufferOldRootTxs(TxLifecycleManager.copyOfOldRootTxs(compIdentifier));
 		LOGGER.fine("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-		LOGGER.fine("reinitOldRootTxs.getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
-		
-//		LOGGER.fine("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
-//		LOGGER.fine("reinitOldRootTxs.getBufferOldRootTxs:" + updateCtx.getBufferOldRootTxs().size() + updateCtx.getBufferOldRootTxs());
+
 		return true;
 	}
 	
-	public boolean removeBufferoldRootTxs(String parentTx, String rootTx){
-		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
-		String compIdentifier;
-		
-		compIdentifier = compObj.getIdentifier();
-		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
-		
-		updateCtx.removeBufferOldRootTx(depMgr.getAlgorithmRoot(parentTx, rootTx));
-		
-		return true;
-	}
+//	public boolean removeBufferoldRootTxs(String parentTx, String rootTx){
+//		NodeManager nodeMgr;
+//		DynamicDepManager depMgr;
+//		String compIdentifier;
+//		
+//		compIdentifier = compObj.getIdentifier();
+//		nodeMgr = NodeManager.getInstance();
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		
+//		updateCtx.removeBufferOldRootTx(depMgr.getAlgorithmRoot(parentTx, rootTx));
+//		
+//		return true;
+//	}
 	
 	public DynamicUpdateContext getUpdateCtx() {
 		return updateCtx;

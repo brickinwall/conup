@@ -43,27 +43,17 @@ public class BlockingStrategy implements FreenessStrategy {
 		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(compIdentifier);
 		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
-		Set<String> bufferOldVersionRootTxs;
 		if( isUpdateReqRCVD ){
 			compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
 			algorithmOldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-			bufferOldVersionRootTxs = compLcMgr.getUpdateCtx().getBufferOldRootTxs();
 		} else{
 			algorithmOldVersionRootTxs = null;
-			bufferOldVersionRootTxs = null;
 		}
 		
-//		if((algorithmOldVersionRootTxs!=null) 
-//				&& (algorithmOldVersionRootTxs.contains(rootTx) || bufferOldVersionRootTxs.contains(rootTx))){
-//			return false;
-//		} else{
-//			return true;
-//		}
-		boolean isBlock = depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, bufferOldVersionRootTxs, txCtx, isUpdateReqRCVD);
+		boolean isBlock = depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, txCtx, isUpdateReqRCVD);
 		
 		if(isBlock){
-			LOGGER.info(txCtx.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs + 
-					"\n buffer: " + bufferOldVersionRootTxs);
+			LOGGER.info(txCtx.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 		}
 		
 		return isBlock;

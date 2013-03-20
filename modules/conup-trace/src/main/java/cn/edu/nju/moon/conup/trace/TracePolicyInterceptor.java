@@ -398,7 +398,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			
 			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
 			if (depMgr.isNormal()) {
-				TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+//				TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 				// the invoked transaction is not a root transaction
 				if(txCtx.getRootTx() != null){
 					assert txCtx.getParentTx() != null;
@@ -444,7 +444,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 							e.printStackTrace();
 						}
 					}
-					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+//					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 					// the invoked transaction is not a root transaction
 					if(txCtx.getRootTx() != null){
 						assert txCtx.getParentTx() != null;
@@ -467,7 +467,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				if(depMgr.getCompStatus().equals(CompStatus.VALID)
 					&& clMgr.getUpdateCtx() != null && clMgr.getUpdateCtx().isLoaded() ){
 					// add root tx to
-					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+//					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 					// calculate old version root txs
 					if (!clMgr.getUpdateCtx().isOldRootTxsInitiated()) {
 						clMgr.initOldRootTxs();
@@ -494,8 +494,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
 						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
-							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
-							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
+//							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+//							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
 							validToFreeSyncMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -525,7 +525,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //				}
 			}
 			
-			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+//			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 			// the invoked transaction is not a root transaction
 			if(txCtx.getRootTx() != null){
 				assert txCtx.getParentTx() != null;

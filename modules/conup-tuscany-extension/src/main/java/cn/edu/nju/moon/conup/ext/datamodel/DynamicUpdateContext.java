@@ -17,10 +17,8 @@ public class DynamicUpdateContext {
 	private Class<?>  newVerClass;
 	/** represents whether is the DynamicUpdateContext loaded */
 	private boolean isLoaded = false;
+//	private Set<String> bufferOldRootTxs = null;
 	/**  root txs that should be responded with old version component */
-//	private Set<String> oldVerionRootTxs = new HashSet<String>();
-//	private Set<String> oldVerionRootTxs = null;
-	private Set<String> bufferOldRootTxs = null;
 	private Set<String> algorithmOldRootTxs = null;
 	
 	public boolean isLoaded() {
@@ -32,10 +30,10 @@ public class DynamicUpdateContext {
 		algorithmOldRootTxs.remove(oldRootTx);
 	}
 	
-	public void removeBufferOldRootTx(String oldRootTx){
-		LOGGER.fine("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
-		bufferOldRootTxs.remove(oldRootTx);
-	}
+//	public void removeBufferOldRootTx(String oldRootTx){
+//		LOGGER.fine("in DynaUpdateCtx.removeBufferOldRootTx(), rm " + oldRootTx);
+//		bufferOldRootTxs.remove(oldRootTx);
+//	}
 
 	public void setLoaded(boolean isLoaded) {
 		this.isLoaded = isLoaded;
@@ -57,13 +55,13 @@ public class DynamicUpdateContext {
 		this.newVerClass = newVerClass;
 	}
 
-	public Set<String> getBufferOldRootTxs() {
-		return bufferOldRootTxs;
-	}
-
-	public void setBufferOldRootTxs(Set<String> bufferOldRootTxs) {
-		this.bufferOldRootTxs = bufferOldRootTxs;
-	}
+//	public Set<String> getBufferOldRootTxs() {
+//		return bufferOldRootTxs;
+//	}
+//
+//	public void setBufferOldRootTxs(Set<String> bufferOldRootTxs) {
+//		this.bufferOldRootTxs = bufferOldRootTxs;
+//	}
 
 	public Set<String> getAlgorithmOldRootTxs() {
 		return algorithmOldRootTxs;
@@ -74,7 +72,8 @@ public class DynamicUpdateContext {
 	}
 	
 	public boolean isOldRootTxsInitiated(){
-		return (bufferOldRootTxs!=null) && (algorithmOldRootTxs!=null);
+//		return (bufferOldRootTxs!=null) && (algorithmOldRootTxs!=null);
+		return algorithmOldRootTxs != null;
 	}
 	
 	public boolean isOldRootTxsEquals(){

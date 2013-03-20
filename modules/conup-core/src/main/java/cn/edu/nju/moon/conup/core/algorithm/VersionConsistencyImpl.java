@@ -1090,25 +1090,19 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean isBlockRequiredForFree(
-			Set<String> algorithmOldVersionRootTxs,
-			Set<String> bufferOldVersionRootTxs, TransactionContext txContext,
-			boolean isUpdateReqRCVD) {
+	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
+			TransactionContext txContext, boolean isUpdateReqRCVD) {
 		if( !isUpdateReqRCVD ){
 			return false;
 		}
 		
 		String rootTx = txContext.getRootTx();
-//		if((algorithmOldVersionRootTxs!=null) 
-//				&& ( !algorithmOldVersionRootTxs.contains(rootTx) && !bufferOldVersionRootTxs.contains(rootTx))){
 		if ((algorithmOldVersionRootTxs != null)
 				&& algorithmOldVersionRootTxs.contains(rootTx) ){
-			LOGGER.info(txContext.getRootTx() + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs + 
-						"\n buffer: " + bufferOldVersionRootTxs);
+			LOGGER.info(txContext.getRootTx() + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return false;
 		} else{
-			LOGGER.info(txContext.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs + 
-					"\n buffer: " + bufferOldVersionRootTxs);
+			LOGGER.info(txContext.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return true;
 		}
 	}

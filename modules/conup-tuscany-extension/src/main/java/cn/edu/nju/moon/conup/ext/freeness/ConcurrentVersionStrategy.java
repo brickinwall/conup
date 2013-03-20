@@ -39,20 +39,15 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 //		Set<String> oldVersionRootTxs = depMgr.getOldVersionRootTxs();
 		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
-		Set<String> bufferOldVersionRootTxs;
 		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-//		oldVersionRootTxs = compLcMgr.getDynamicUpdateContext().getOldVerionRootTxs();
 		algorithmOldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-		bufferOldVersionRootTxs = compLcMgr.getUpdateCtx().getBufferOldRootTxs();
 		synchronized(depMgr.getValidToFreeSyncMonitor()){
 			if((algorithmOldVersionRootTxs!=null) 
-					&& (algorithmOldVersionRootTxs.contains(rootTxID) || bufferOldVersionRootTxs.contains(rootTxID))){
+					&& (algorithmOldVersionRootTxs.contains(rootTxID))){
 				LOGGER.fine(rootTxID + " is dispatched to old version");
-//				fcb.toOldVersionComp(hostComp);
 				return compLcMgr.getUpdateCtx().getOldVerClass();
 			}else{
 				LOGGER.fine(rootTxID + " is dispatched to new version");
-//				fcb.toNewVersionComp(hostComp);
 				return compLcMgr.getUpdateCtx().getNewVerClass();
 			}
 		}

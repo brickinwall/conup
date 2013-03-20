@@ -202,11 +202,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //				&& compLcMgr.isDynamicUpdateRqstRCVD()
 //				&& compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
 			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-//				if(TxLifecycleManager.getRootTx(rootTxId) != null){
-//					rootTxId = TxLifecycleManager.getRootTx(rootTxId);
-//				}
 				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
-				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
 
 				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
@@ -220,19 +216,19 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		ExecutionRecorder exeRecorder;
 		exeRecorder = ExecutionRecorder.getInstance(hostComp);
 		String completeAction = exeRecorder.getCompleteAction(rootTxId);
-		if(completeAction == null || completeAction.equals("null")){
-			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
-				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
-		}
+//		if(completeAction == null || completeAction.equals("null")){
+//			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
+//				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
+//		}
 		if(completeAction != null){
 			LOGGER.info(completeAction);
 		}
-		
-		//when a root tx ends, remove it from TxLifecycleManager
-		if(TxLifecycleManager.getRootTx(hostComp, rootTxId) != null){
-			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
-		}
-		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
+//		
+//		//when a root tx ends, remove it from TxLifecycleManager
+//		if(TxLifecycleManager.getRootTx(hostComp, rootTxId) != null){
+//			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
+//		}
+//		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
 		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
@@ -253,7 +249,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //					rootTxId = TxLifecycleManager.getRootTx(rootTxId);
 //				}
 				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
-				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
+//				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
 
 				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
@@ -267,19 +263,16 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		ExecutionRecorder exeRecorder;
 		exeRecorder = ExecutionRecorder.getInstance(hostComp);
 		String completeAction = exeRecorder.getCompleteAction(rootTxId);
-		if(completeAction == null || completeAction.equals("null")){
-			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
-				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
-		}
+//		if(completeAction == null || completeAction.equals("null")){
+//			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
+//				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
+//		}
 		if(completeAction != null){
 			LOGGER.info(completeAction);
 		}
-		
-		//when a root tx ends, remove it from TxLifecycleManager
-//		if(TxLifecycleManager.getRootTx(rootTxId) != null){
-//			rootTxId = TxLifecycleManager.getRootTx(rootTxId);
-//		}
-		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);
+//		
+//		//when a root tx ends, remove it from TxLifecycleManager
+//		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);
 		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
