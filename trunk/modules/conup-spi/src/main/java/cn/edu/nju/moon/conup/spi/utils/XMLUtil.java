@@ -1,7 +1,6 @@
 package cn.edu.nju.moon.conup.spi.utils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,20 +22,11 @@ import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
  * @version Nov 29, 2012 7:25:53 PM
  */
 public class XMLUtil {
-//	private String conupXmlPath = "/home/rgc/Documents/conup/tags/conup-2.1-DU/distribution/tuscany-sca-2.1-DU/bin/Conup.xml";
 	private String conupXmlPath = "src/main/resources/Conup.xml";
 	Element root = null;
 
 	public XMLUtil() {
-		//development version
-//		String xmlUtilLocation = XMLUtil.class.getResource("").toString();
-////		LOGGER.fine("xmlUtilLocation:" + xmlUtilLocation);
-//		int beginIndex = xmlUtilLocation.indexOf(":") + 1;
-//		int endIndex = xmlUtilLocation.indexOf("cn/edu/nju/moon/conup/spi/utils/");
-//		String conupXmlPath = xmlUtilLocation.substring(beginIndex, endIndex) + "Conup.xml";
-////		LOGGER.fine("conupXmlPath:" + conupXmlPath);
 		
-		//distribution version
 		String disPath = getDistributionEnvPath();
 		if(disPath != null){
 			conupXmlPath = disPath + "/Conup.xml";
@@ -71,13 +61,13 @@ public class XMLUtil {
 	public String getAlgorithmConf() {
 		Element configuration = root.getChild("configuration");
 		Element algorithm = configuration.getChild("algorithm");
-		return algorithm.getValue();
+		return algorithm.getValue().trim();
 	}
 
 	public String getFreenessStrategy() {
 		Element configuration = root.getChild("configuration");
 		Element freenessStrategy = configuration.getChild("freenessStrategy");
-		return freenessStrategy.getValue();
+		return freenessStrategy.getValue().trim();
 	}
 
 	public Set<String> getParents(String compIdentifier) {
@@ -88,13 +78,12 @@ public class XMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
 					List parentList = comp.getChildren("parent");
 					Iterator parentListIter = parentList.iterator();
 					while (parentListIter.hasNext()) {
-						parentComp.add(((Element) parentListIter.next())
-								.getValue());
+						parentComp.add(((Element) parentListIter.next()).getValue().trim());
 					}
 				}
 			}
@@ -113,13 +102,12 @@ public class XMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
 					List childrenList = comp.getChildren("child");
 					Iterator childListIter = childrenList.iterator();
 					while (childListIter.hasNext()) {
-						childrenComps.add(((Element) childListIter.next())
-								.getValue());
+						childrenComps.add(((Element) childListIter.next()).getValue().trim());
 					}
 				}
 			}
@@ -138,7 +126,7 @@ public class XMLUtil {
 			Iterator iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
-				String compName = comp.getAttributeValue("name");
+				String compName = comp.getAttributeValue("name").trim();
 				allComps.add(compName);
 			}
 		} catch (Exception e) {
