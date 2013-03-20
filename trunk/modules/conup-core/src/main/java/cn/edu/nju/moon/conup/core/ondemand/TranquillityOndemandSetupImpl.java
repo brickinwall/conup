@@ -106,6 +106,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 					srcComp, curComp, null, null);
 			notifyPastOndemand(dep);
 		}
+		
+		assert ondemandHelper.getDynamicDepManager().getScope() != null;
+		LOGGER.info("Scope:\n\t" + ondemandHelper.getDynamicDepManager().getScope());
 		return true;
 	}
 
@@ -613,6 +616,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			targetSet.add(hostComp);
 			subSet.add(hostComp);
 			scope.addComponent(parent, parentSet, subSet);
+			
+			parentSet.clear();
+			subSet.clear();
+			parentSet.add(parent);
+			scope.addComponent(hostComp, parentSet, subSet);
 			scope.setTarget(targetSet);
 			payload = TranquillityPayload.OPERATION_TYPE + ":"
 					+ TranquillityOperationType.REQ_ONDEMAND_SETUP + ","

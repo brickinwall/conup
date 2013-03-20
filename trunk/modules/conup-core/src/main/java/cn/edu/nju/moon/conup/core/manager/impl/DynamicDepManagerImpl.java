@@ -389,7 +389,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public boolean updateIsReceived() {
 		LOGGER.info("Received dynamic update request.");
 		isUpdateRequestReceived = true;
-		algorithm.start(compObj.getIdentifier());
+		algorithm.initiate(compObj.getIdentifier());
 		return true;
 	}
 

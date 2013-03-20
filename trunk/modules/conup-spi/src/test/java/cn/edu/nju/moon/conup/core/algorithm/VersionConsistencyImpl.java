@@ -60,7 +60,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	@Override
-	public void start(String identifier) {
+	public void initiate(String identifier) {
 		// TODO Auto-generated method stub
 
 	}

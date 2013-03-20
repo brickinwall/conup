@@ -507,7 +507,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	@Override
-	public void start(String hostComp) {
+	public void initiate(String hostComp) {
 		doReqPassivate(hostComp, hostComp);
 	}
 
