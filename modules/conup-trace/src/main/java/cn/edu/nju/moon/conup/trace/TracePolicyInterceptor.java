@@ -186,8 +186,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			if( !subComp.equals(hostComp)){
 				
 				NodeManager nodeMgr = NodeManager.getInstance();
-				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-				Printer printer = new Printer();
+//				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+//				Printer printer = new Printer();
 				LOGGER.fine("TxS before endRemoteSubTx:");
 //				printer.printTxs(LOGGER, depMgr.getTxs());
 				
@@ -399,6 +399,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
 			if (depMgr.isNormal()) {
 				TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+				// the invoked transaction is not a root transaction
 				if(txCtx.getRootTx() != null){
 					assert txCtx.getParentTx() != null;
 					assert txCtx.getParentComponent() != null;
@@ -444,6 +445,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						}
 					}
 					TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+					// the invoked transaction is not a root transaction
 					if(txCtx.getRootTx() != null){
 						assert txCtx.getParentTx() != null;
 						assert txCtx.getParentComponent() != null;
@@ -524,6 +526,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			}
 			
 			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
+			// the invoked transaction is not a root transaction
 			if(txCtx.getRootTx() != null){
 				assert txCtx.getParentTx() != null;
 				assert txCtx.getParentComponent() != null;

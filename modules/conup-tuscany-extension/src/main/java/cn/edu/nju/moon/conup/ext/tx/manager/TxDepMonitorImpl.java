@@ -233,7 +233,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
 		}
 		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
-		LOGGER.info("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
 	@Override
@@ -280,7 +280,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //			rootTxId = TxLifecycleManager.getRootTx(rootTxId);
 //		}
 		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);
-		LOGGER.info("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
 	/** return current thread ID. */
