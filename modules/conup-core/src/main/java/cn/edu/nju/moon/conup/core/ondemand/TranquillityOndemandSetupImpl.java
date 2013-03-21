@@ -64,6 +64,16 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		ondemandHelper.getDynamicDepManager().setScope(scope);
 		
 		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+		if(ddm.getRuntimeInDeps().size() != 0){
+			ddm.getRuntimeInDeps().clear();
+		}
+		if(ddm.getRuntimeDeps().size() != 0){
+			ddm.getRuntimeDeps().clear();
+		}
+		LOGGER.fine("ondemand()....");
+		Printer printer = new Printer();
+		printer.printTxs(LOGGER, ddm.getTxs());
+		
 		assert scope != null;
 		assert ddm.getRuntimeInDeps().size() == 0;
 		assert ddm.getRuntimeDeps().size() == 0;
