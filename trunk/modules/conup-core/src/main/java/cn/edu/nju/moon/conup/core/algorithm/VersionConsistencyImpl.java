@@ -125,13 +125,13 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_CREATE:");
 			break;
 		case NOTIFY_FUTURE_REMOVE:
-//			printer.printDeps(ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
 			
 			manageDepResult = doNotifyFutureRemove(srcComp, targetComp, rootTx);
 			
-//			printer.printDeps(ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
 			break;
 		case NOTIFY_START_REMOTE_SUB_TX:
 			LOGGER.warning("deprecated notification NOTIFY_START_REMOTE_SUB_TX");
@@ -168,14 +168,14 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
 			
 			manageDepResult = doNotifyPastCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
 			break;
 		case NOTIFY_PAST_REMOVE:
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_REMOVE:");
@@ -518,6 +518,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyFutureCreate(String srcComp, String targetComp, String rootTx) {
+		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -557,7 +558,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyPastRemove(String srcComp, String targetComp, String rootTx) {
-		LOGGER.info("doNotifyPastRemove " + srcComp + "-->" + targetComp + " " + rootTx);
+		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -574,6 +575,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyPastCreate(String srcComp, String targetComp, String rootTx) {
+		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -705,6 +707,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyFutureRemove(String srcComp, String targetComp, String rootTx) {
+		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -761,7 +764,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
 		depMgr.getRuntimeInDeps().clear();
-		depMgr.setScope(null);
+//		depMgr.setScope(null);
 		
 		depMgr.remoteDynamicUpdateIsDone();
 		
@@ -1134,7 +1137,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
 		depMgr.getRuntimeInDeps().clear();
-		depMgr.setScope(null);
+//		depMgr.setScope(null);
 		
 		return true;
 	}
@@ -1200,28 +1203,31 @@ public class VersionConsistencyImpl implements Algorithm {
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
-		if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
-			Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
-			if(!rtInDeps.contains(lfe)){
-				rtInDeps.add(lfe);
+		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+		synchronized (ondemandMonitor) {
+			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
+				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
+				if(!rtInDeps.contains(lfe)){
+					rtInDeps.add(lfe);
+				}
+				if (!rtOutDeps.contains(lfe)) {
+					rtOutDeps.add(lfe);
+				}
+				
+				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
+				if(!rtInDeps.contains(lpe)){
+					rtInDeps.add(lpe);
+				}
+				if (!rtOutDeps.contains(lpe)) {
+					rtOutDeps.add(lpe);
+				}
+				
+				// ACK_SUBTX_INIT
+				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, rootTx, ConsistencyOperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
+				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+				depNotifyService.synPost(hostComp, parentComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+				
 			}
-			if (!rtOutDeps.contains(lfe)) {
-				rtOutDeps.add(lfe);
-			}
-			
-			Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
-			if(!rtInDeps.contains(lpe)){
-				rtInDeps.add(lpe);
-			}
-			if (!rtOutDeps.contains(lpe)) {
-				rtOutDeps.add(lpe);
-			}
-			
-			// ACK_SUBTX_INIT
-			String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, rootTx, ConsistencyOperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
-			DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-			depNotifyService.synPost(hostComp, parentComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-			
 		}
 		
 		return true;

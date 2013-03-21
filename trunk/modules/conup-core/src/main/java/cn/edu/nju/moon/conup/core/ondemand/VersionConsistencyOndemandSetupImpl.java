@@ -28,6 +28,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -292,38 +293,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		else
 			targetRef.addAll(scope.getSubComponents(curComp));
 		
-//		//create concentric circles for fake sub txs
-//		Iterator<Entry<String, TransactionContext>> fakeTxIterator = 
-//				depMgr.getFakeTxs().entrySet().iterator();
-//		while(fakeTxIterator.hasNext()){
-//			TransactionContext txContext = 
-//					(TransactionContext)fakeTxIterator.next().getValue();
-//			String rootTx = txContext.getRootTx();
-//			assert(txContext.getHostComponent().equals(curComp));
-//			String curTx = txContext.getCurrentTx();
-//			
-//			//in this case, it means current entry in interceptorCache is invalid
-//			if(rootTx == null || curComp == null){
-//				LOGGER.warning("Invalid data found while onDemandSetUp");
-//				continue;
-//			}
-//			
-//			// for the ended non-root txs, no need to create the lfe, lpe
-//			if(!rootTx.equals(curTx) && txContext.getEventType().equals(TxEventType.TransactionEnd)){
-//				continue;
-//			}
-//			
-//			Dependence lfe = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-//					rootTx, curComp, curComp, null, null);
-//			Dependence lpe = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-//					rootTx, curComp, curComp, null, null);
-//			
-//			rtInDeps.add(lfe);
-//			rtInDeps.add(lpe);
-//			rtOutDeps.add(lfe);
-//			rtOutDeps.add(lpe);
-//		}
-		
 		Iterator<Entry<String, TransactionContext>> iterator = 
 				txs.entrySet().iterator();
 		while(iterator.hasNext()){
@@ -483,7 +452,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
-		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -534,7 +503,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
-		LOGGER.fine("notifyPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifyPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -584,7 +553,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifySubFutureOndemand(Dependence dep) {
-		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -611,6 +580,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(curComp));
 		
 		fDeps = getFDeps(curComp, subTx);
+		
+		LOGGER.info("fDeps:" + fDeps);
 		for(Dependence ose : fDeps){
 			if( !targetRef.contains(ose.getTargetCompObjIdentifer())){
 				continue;
@@ -631,10 +602,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		
 		sDeps = getSDeps(curComp, subTx);
+		LOGGER.info("sDeps:" + sDeps);
 		for(Dependence ose : sDeps){
 			if( !targetRef.contains(ose.getTargetCompObjIdentifer())){
 				continue;
 			}
+			assert ose.getRootTx() != null;
 			if(!fDeps.contains(ose)){
 				//notify sub future on-demand
 				OndemandDynDepSetupServiceImpl ondemandComm;
@@ -650,7 +623,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	public boolean notifySubPastOndemand(Dependence dep) {
-		LOGGER.fine("notifySubPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.info("notifySubPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -702,6 +675,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			if( !targetRef.contains(ose.getTargetCompObjIdentifer())){
 				continue;
 			}
+			
+			assert ose.getRootTx() != null;
 			if(!pDeps.contains(ose)){
 				//notify sub future on-demand
 				OndemandDynDepSetupServiceImpl ondemandComm;
@@ -895,22 +870,32 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		String rootTx = null;
 		
-		//read transaction dependencies from TransactionRegistry
-		Iterator<Entry<String, TransactionContext>> txIterator;
-		txIterator = txs.entrySet().iterator();
-		TransactionContext ctx;
-		while (txIterator.hasNext()) {
-			ctx = txIterator.next().getValue();
-			if (ctx.getRootTx().equals(txID) 
-				|| ctx.getCurrentTx().equals(txID)) {
-				if(ctx.getFutureComponents() != null
-					|| ctx.getFutureComponents().size()!=0){
-					rootTx = ctx.getRootTx();
-					futureC.addAll(ctx.getFutureComponents());
+		if(txID != null){
+			//read transaction dependencies from TransactionRegistry
+			Iterator<Entry<String, TransactionContext>> txIterator;
+			txIterator = txs.entrySet().iterator();
+			TransactionContext ctx;
+			while (txIterator.hasNext()) {
+				ctx = txIterator.next().getValue();
+				if (ctx.getRootTx().equals(txID) 
+						|| ctx.getCurrentTx().equals(txID)) {
+					if(ctx.getFutureComponents() != null
+							|| ctx.getFutureComponents().size()!=0){
+						rootTx = ctx.getRootTx();
+						futureC.addAll(ctx.getFutureComponents());
 //					break;
+					}
 				}
+			}// END WHILE
+		} else{	// the txID has not started on local component
+			LOGGER.info("no local subTx running...");
+			Scope scope = depMgr.getScope();
+			if(scope == null){
+				futureC.addAll(depMgr.getStaticDeps());
+			} else{
+				futureC.addAll(scope.getSubComponents(curComp));
 			}
-		}// END WHILE
+		}
 		
 		for(String component : futureC){
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
@@ -1045,6 +1030,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
+		
+//		Printer printer = new Printer();
+//		LOGGER.info("Txs before getHostSubTx for rootTx: " + rootTx);
+//		printer.printTxs(LOGGER, txs);
 		
 		String subTx = null;
 		
