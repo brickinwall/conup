@@ -66,6 +66,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		ondemandHelper.getDynamicDepManager().setScope(scope);
 		
 		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+		if(ddm.getRuntimeInDeps().size() != 0){
+			ddm.getRuntimeInDeps().clear();
+		}
+		if(ddm.getRuntimeDeps().size() != 0){
+			ddm.getRuntimeDeps().clear();
+		}
 		assert scope != null;
 		assert ddm.getRuntimeInDeps().size() == 0;
 		assert ddm.getRuntimeDeps().size() == 0;
@@ -477,7 +483,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
-		LOGGER.info("notifyFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -528,7 +534,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
-		LOGGER.info("notifyPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifyPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -578,7 +584,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifySubFutureOndemand(Dependence dep) {
-		LOGGER.info("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -644,7 +650,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	public boolean notifySubPastOndemand(Dependence dep) {
-		LOGGER.info("notifySubPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifySubPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
