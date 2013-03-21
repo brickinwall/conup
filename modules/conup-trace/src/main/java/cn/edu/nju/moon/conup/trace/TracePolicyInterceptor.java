@@ -181,6 +181,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			subTx = endedSubTxProperty.get(SUB_TX);
 			subComp = endedSubTxProperty.get(SUB_COMP);
 			
+			assert hostComp != null;
 			assert hostComp.equals(getComponent().getName());
 			
 			if( !subComp.equals(hostComp)){
@@ -746,7 +747,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	private void removeFakeSubTx(String hostComp, String fakeSubTx){
 		NodeManager nodeMgr = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-		depMgr.getTxs().remove(fakeSubTx);
+		
+		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+		synchronized (ondemandMonitor) {
+			depMgr.getTxs().remove(fakeSubTx);
+		}
 	}
 
 	private Map<String, String> parseEndedSubTxTag(String endedSubTxTag) {
