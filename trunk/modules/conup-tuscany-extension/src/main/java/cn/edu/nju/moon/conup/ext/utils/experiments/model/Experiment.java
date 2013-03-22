@@ -50,18 +50,18 @@ public class Experiment {
 		return experiment;
 	}
 	
-	public void writeDisruptionToFile(int roundId, int curThreadId, String statusWhenStart, String statusWhenEnd, double responseTime){
+	public void writeResponseTimeToFile(int roundId, int curThreadId, String statusWhenStart, String statusWhenEnd, double responseTime){
 		synchronized(experiment){
-			out.write(roundId + "," + nThreads + "," + curThreadId + "," + statusWhenStart + "," + statusWhenEnd + "," + responseTime + "\n");
+			LOGGER.info("I'm writing to disruption.. ");
+			String data = roundId + "," + nThreads + "," + curThreadId + "," + statusWhenStart + "," + statusWhenEnd + "," + responseTime + "\n";
+			out.write(data);
 			out.flush();
-//			out.println(nThreads + "," + curThreadId + "," + statusWhenStart + "," + statusWhenEnd + "," + responseTime);
 		}
 	}
 	
 	public void writeToFile(String data) {
 		synchronized (experiment) {
 			LOGGER.fine("I'm writing: " + data);
-//			out.println(data);			
 			out.write(data);
 			out.flush();
 		}
