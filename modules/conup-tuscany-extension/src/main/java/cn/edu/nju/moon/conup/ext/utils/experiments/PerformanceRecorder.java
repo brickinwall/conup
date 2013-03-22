@@ -35,7 +35,7 @@ public class PerformanceRecorder {
 	
 	public void updateIsDone(long endTime){
 		this.endTime = endTime;
-		String data ="update has taken time: " + (this.endTime - startTime) / 1000000.0 + " ms";
+		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
 		Experiment.getInstance().writeToFile(data);
 	}
 	
