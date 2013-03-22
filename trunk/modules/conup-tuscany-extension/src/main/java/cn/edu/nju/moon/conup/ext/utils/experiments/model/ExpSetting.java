@@ -10,10 +10,19 @@ public class ExpSetting {
 	private int nThreads;
 	private int threadId;
 	private int rqstInterval;
+	private int updateInterval;
 	private String targetComp;
 	private String ipAddress;
 	private String baseDir;
 	private String type;
+
+	public int getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(int updateInterval) {
+		this.updateInterval = updateInterval;
+	}
 
 	public String getType() {
 		return type;
