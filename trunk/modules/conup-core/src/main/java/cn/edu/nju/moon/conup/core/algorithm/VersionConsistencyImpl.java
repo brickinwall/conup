@@ -143,16 +143,16 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", before process ACK_SUBTX_INIT");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", before process ACK_SUBTX_INIT");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", before process ACK_SUBTX_INIT");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", before process ACK_SUBTX_INIT");
 //			
 			String parentTxID = plResolver.getParameter(ConsistencyPayload.PARENT_TX);
 			String subTxID = plResolver.getParameter(ConsistencyPayload.SUB_TX);
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 //			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
 			break;
 		case NOTIFY_SUBTX_END:
 			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
@@ -168,14 +168,14 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
 			
 			manageDepResult = doNotifyPastCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
+			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
 			break;
 		case NOTIFY_PAST_REMOVE:
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_REMOVE:");
@@ -378,9 +378,9 @@ public class VersionConsistencyImpl implements Algorithm {
 				 * current transaction is not root
 				 * notify parent that a new sub-tx start
 				 */
-//				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), rootTx, ConsistencyOperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), rootTx, ConsistencyOperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
+				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 			}
 			
 		} else if (txEventType.equals(TxEventType.DependencesChanged)) {
@@ -811,6 +811,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		if(!inFutureFlag){
 			TransactionContext txContext = dynamicDepMgr.getTxs().get(currentTxID);
+			
 			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
 			
 			for(Dependence dep : outFutureOneRoot){
@@ -832,7 +833,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	
 	/**
-	 * try to remove future dep when receive NOTIFY_FUTURE_REMOVE
+	 * try to remove future dep when receive NOTIFY_FUTURE_REMOVE, NOTIFY_PAST_CREATE
 	 * according the condition to decide whether need to remove the future dep
 	 * @param dynamicDepMgr
 	 * @param currentComp
@@ -1205,8 +1206,10 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
-			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
+//			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
+			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
 				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
+				LOGGER.info(lfe.toString());
 				if(!rtInDeps.contains(lfe)){
 					rtInDeps.add(lfe);
 				}
@@ -1215,6 +1218,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 				
 				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
+				LOGGER.info(lpe.toString());
 				if(!rtInDeps.contains(lpe)){
 					rtInDeps.add(lpe);
 				}
