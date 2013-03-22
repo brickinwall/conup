@@ -118,7 +118,7 @@ public class CoordinationLauncher {
 				}
 				
 				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node).start();
+					new CoordinationVisitorThread(node, 0 , i + 1).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
 //						System.out.println("update " + targetComp + " at " + i);
@@ -159,15 +159,15 @@ public class CoordinationLauncher {
 	private static void printHelp(){
 		System.out.println();
 		System.out.println("access specified times without executing update, e.g., ");
-		System.out.println("	[usage] access 200 50");
-		System.out.println("	[behavior] access the component 50 times, and the thread sleep 200ms before sending each request");
+		System.out.println("	[usage] access 500 50");
+		System.out.println("	[behavior] access the component 50 times, and the thread sleep 500ms before sending each request");
 		System.out.println("update specified component without accessing it. e.g., ");
 		System.out.println("	[usage] update CurrencyConverter VER_ONE");
 		System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
 		System.out.println("update a component while requests ongoing, e.g., ");
-		System.out.println("	[usage] updateAt CurrencyConverter 200 50 35 VER_ONE");
-		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
-				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 35th request");
+		System.out.println("	[usage] updateAt CurrencyConverter 500 50 25 VER_ONE");
+		System.out.println("	[behavior] access 50 times, and the thread sleep 500ms before sending each request. " +
+				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 25th request");
 		
 		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +

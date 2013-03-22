@@ -3,6 +3,7 @@ package cn.edu.nju.moon.conup.ext.utils.experiments;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
 
 /**
@@ -36,7 +37,9 @@ public class PerformanceRecorder {
 	public void updateIsDone(long endTime){
 		this.endTime = endTime;
 		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
-		Experiment.getInstance().writeToFile(data);
+		ExpSetting expSetting = Experiment.getInstance().getExpSetting();
+		if(expSetting.getType().contains("timeliness"))
+			Experiment.getInstance().writeToFile(data);
 	}
 	
 	public void updateReceived(long startTime){
