@@ -355,6 +355,9 @@ public class QuiescenceImpl implements Algorithm {
 	 * @param hostComp
 	 */
 	private void checkPassiveAndAck(String hostComp) {
+		if( !isPassivateRCVD)
+			return;
+		
 		Iterator<Entry<String, Boolean>> iterator = DEPS.entrySet().iterator();
 		boolean allACKRCVD = true;
 		while(iterator.hasNext()){
@@ -431,6 +434,20 @@ public class QuiescenceImpl implements Algorithm {
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
 		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
 		initDynamicDepMgr(hostComp);
+		
+		//notify parent components that remote dynamic update is done
+		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+		for(String comp : DEPS.keySet()){
+			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, QuiescenceOperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			depNotifyService.asynPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+		}
+		
+		// clean up
+		DEPS.clear();
+		REQS.clear();
+		isPassivateRCVD = false;
+		PASSIVATED = false;
+		
 		depMgr.remoteDynamicUpdateIsDone();
 		return true;
 	}
@@ -544,7 +561,6 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
