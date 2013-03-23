@@ -76,4 +76,6 @@ public interface TxDepMonitor {
 	 */
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
+	public boolean endLocalSubTx(String hostComp, String fakeSubTx);
+	
 }

@@ -608,7 +608,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				Printer printer = new Printer();
 //				LOGGER.fine("TxS before removeFakeSubTx:");
 //				printer.printTxs(LOGGER, depMgr.getTxs());
-				removeFakeSubTx(hostComp, subTx);
+//				removeFakeSubTx(hostComp, subTx);
+				depMgr.getTxDepMonitor().endLocalSubTx(hostComp, subTx);
 //				LOGGER.fine("TxS after removeFakeSubTx:");
 //				printer.printTxs(LOGGER, depMgr.getTxs());
 				
@@ -744,15 +745,15 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //		depMgr.getFakeTxs().put(fakeSubTx, txCtx);
 	}
 	
-	private void removeFakeSubTx(String hostComp, String fakeSubTx){
-		NodeManager nodeMgr = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-		
-		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
-		synchronized (ondemandMonitor) {
-			depMgr.getTxs().remove(fakeSubTx);
-		}
-	}
+//	private void removeFakeSubTx(String hostComp, String fakeSubTx){
+//		NodeManager nodeMgr = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+//		
+//		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+//		synchronized (ondemandMonitor) {
+//			depMgr.getTxs().remove(fakeSubTx);
+//		}
+//	}
 
 	private Map<String, String> parseEndedSubTxTag(String endedSubTxTag) {
 		String subStrCtx = endedSubTxTag.substring(endedSubTxTag.indexOf("[")+1, endedSubTxTag.indexOf("]"));
