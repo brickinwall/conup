@@ -12,6 +12,7 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
@@ -138,8 +139,9 @@ public class CoordinationLauncher {
 						updatePoints.put(point, input[i+1]);
 				}
 				
-				CountDownLatch warmCountDown = new CountDownLatch(150);
-				for (int i = 0; i < 150; i++) {
+				
+				CountDownLatch warmCountDown = new CountDownLatch(50);
+				for (int i = 0; i < 50; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					Thread.sleep(rqstInterval);
 				}
@@ -148,11 +150,11 @@ public class CoordinationLauncher {
 				Thread.sleep(3000);
 				
 				DisruptionExp disExp = DisruptionExp.getInstance();
-				for(int round = 0; round < 50; round++){
-					long updateStartTime = System.nanoTime();
+				for(int round = 0; round < 10; round++){
+					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
 					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
 					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, updateCountDown).start();
+						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
 						if(updatePoints.get(i) != null){
 							TravelCompUpdate.update(targetComp, updatePoints.get(i));
 						}
@@ -160,23 +162,17 @@ public class CoordinationLauncher {
 					}
 					updateCountDown.await();
 					
-					long updateEndTime = System.nanoTime();
-					double updateExecTime = (updateEndTime - updateStartTime) / 1000000.0;
 					
 					Thread.sleep(3000);
 
-					long normalStartTime = System.nanoTime();
 					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
 					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, normalCountDown).start();
+						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
 						Thread.sleep(rqstInterval);
 					}
 					normalCountDown.await();
-
-					long normalEndTime = System.nanoTime();
-					double normalExecTime = (normalEndTime - normalStartTime) / 1000000.0;
 					
-					String data = normalExecTime + "," + updateExecTime + "," + (long)(updateExecTime - normalExecTime) + "\n";
+					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
 					disExp.writeToFile(data);
 					
 					Thread.sleep(3000);
