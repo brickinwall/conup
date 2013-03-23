@@ -1,11 +1,11 @@
 package com.tuscanyscatours.launcher;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.CountDown;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
 
@@ -17,13 +17,13 @@ public class CoordinationVisitorThread extends Thread{
 	private Node node;
 	private int threadId;
 	private int roundId;
-	private CountDown countDown;
+	private CountDownLatch countDown;
 	
 	public CoordinationVisitorThread(Node node) {
 		this.node = node;
 	}
 	
-	public CoordinationVisitorThread(Node node, CountDown countDown) {
+	public CoordinationVisitorThread(Node node, CountDownLatch countDown) {
 		this.countDown = countDown;
 		this.node = node;
 	}

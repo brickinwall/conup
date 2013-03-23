@@ -3,6 +3,7 @@ package com.tuscanyscatours.launcher;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -11,7 +12,6 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.CountDown;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
@@ -123,7 +123,6 @@ public class CoordinationLauncher {
 					new CoordinationVisitorThread(node, 0 , i + 1).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
-//						System.out.println("update " + targetComp + " at " + i);
 						TravelCompUpdate.update(targetComp, updatePoints.get(i));
 					}
 				}
@@ -139,51 +138,44 @@ public class CoordinationLauncher {
 						updatePoints.put(point, input[i+1]);
 				}
 				
-				CountDown warmCountDown = new CountDown(150);
+				CountDownLatch warmCountDown = new CountDownLatch(150);
 				for (int i = 0; i < 150; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					Thread.sleep(rqstInterval);
 				}
-				while(true){
-					if(!warmCountDown.hasNext())
-						break;
-				}
+				warmCountDown.await();
 				
 				Thread.sleep(3000);
 				
 				DisruptionExp disExp = DisruptionExp.getInstance();
 				for(int round = 0; round < 50; round++){
+					long updateStartTime = System.nanoTime();
+					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, updateCountDown).start();
+						if(updatePoints.get(i) != null){
+							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+						}
+						Thread.sleep(rqstInterval);
+					}
+					updateCountDown.await();
+					
+					long updateEndTime = System.nanoTime();
+					double updateExecTime = (updateEndTime - updateStartTime) / 1000000.0;
+					
+					Thread.sleep(3000);
+
 					long normalStartTime = System.nanoTime();
-					CountDown normalCountDown = new CountDown(50);
+					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
 					for (int i = 0; i < accessTimes; i++) {
 						new CoordinationVisitorThread(node, normalCountDown).start();
 						Thread.sleep(rqstInterval);
 					}
-					while(true){
-						if(!normalCountDown.hasNext())
-							break;
-					}
+					normalCountDown.await();
+
 					long normalEndTime = System.nanoTime();
 					double normalExecTime = (normalEndTime - normalStartTime) / 1000000.0;
 					
-					Thread.sleep(3000);
-					
-					long updateStartTime = System.nanoTime();
-					CountDown updateCountDown = new CountDown(50);
-					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, updateCountDown).start();
-						Thread.sleep(rqstInterval);
-						if(updatePoints.get(i) != null){
-							TravelCompUpdate.update(targetComp, updatePoints.get(i));
-						}
-					}
-					while(true){
-						if(!updateCountDown.hasNext())
-							break;
-					}
-					
-					long updateEndTime = System.nanoTime();
-					double updateExecTime = (updateEndTime - updateStartTime) / 1000000.0;
 					String data = normalExecTime + "," + updateExecTime + "," + (long)(updateExecTime - normalExecTime) + "\n";
 					disExp.writeToFile(data);
 					
