@@ -11,6 +11,8 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.CountDown;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
@@ -126,6 +128,70 @@ public class CoordinationLauncher {
 					}
 				}
 				break;
+			case disruption:
+				targetComp = input[1].trim();
+				rqstInterval = new Integer(input[2].trim());
+				accessTimes = new Integer(input[3].trim());
+
+				for(int i=4; i<input.length; i+=2){
+					int point = new Integer(input[i].trim());
+					if(point < accessTimes)
+						updatePoints.put(point, input[i+1]);
+				}
+				
+				CountDown warmCountDown = new CountDown(150);
+				for (int i = 0; i < 150; i++) {
+					new CoordinationVisitorThread(node, warmCountDown).start();
+					Thread.sleep(rqstInterval);
+				}
+				while(true){
+					if(!warmCountDown.hasNext())
+						break;
+				}
+				
+				Thread.sleep(3000);
+				
+				DisruptionExp disExp = DisruptionExp.getInstance();
+				for(int round = 0; round < 50; round++){
+					long normalStartTime = System.nanoTime();
+					CountDown normalCountDown = new CountDown(50);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, normalCountDown).start();
+						Thread.sleep(rqstInterval);
+					}
+					while(true){
+						if(!normalCountDown.hasNext())
+							break;
+					}
+					long normalEndTime = System.nanoTime();
+					double normalExecTime = (normalEndTime - normalStartTime) / 1000000.0;
+					
+					Thread.sleep(3000);
+					
+					long updateStartTime = System.nanoTime();
+					CountDown updateCountDown = new CountDown(50);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, updateCountDown).start();
+						Thread.sleep(rqstInterval);
+						if(updatePoints.get(i) != null){
+							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+						}
+					}
+					while(true){
+						if(!updateCountDown.hasNext())
+							break;
+					}
+					
+					long updateEndTime = System.nanoTime();
+					double updateExecTime = (updateEndTime - updateStartTime) / 1000000.0;
+					String data = normalExecTime + "," + updateExecTime + "," + (long)(updateExecTime - normalExecTime) + "\n";
+					disExp.writeToFile(data);
+					
+					Thread.sleep(3000);
+				}
+				
+				disExp.close();
+				
 			case help:
 				printHelp();
 				break;
@@ -168,6 +234,9 @@ public class CoordinationLauncher {
 		System.out.println("	[usage] updateAt CurrencyConverter 500 50 25 VER_ONE");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 500ms before sending each request. " +
 				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 25th request");
+		
+		System.out.println("experiment of disruption ");
+		System.out.println("	[usage] disruption CurrencyConverter 500 50 25 VER_ONE\n\n");
 		
 		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +

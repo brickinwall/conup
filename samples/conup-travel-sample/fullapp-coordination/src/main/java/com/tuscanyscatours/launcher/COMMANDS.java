@@ -14,6 +14,8 @@ public enum COMMANDS {
 	updateAt,
 	/** help of the commands */
 	help,
+	/** calc disruption of different algorithm */
+	disruption,
 	/** exit */
 	exit;
 }

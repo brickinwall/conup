@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.CountDown;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
 
@@ -16,8 +17,14 @@ public class CoordinationVisitorThread extends Thread{
 	private Node node;
 	private int threadId;
 	private int roundId;
+	private CountDown countDown;
 	
 	public CoordinationVisitorThread(Node node) {
+		this.node = node;
+	}
+	
+	public CoordinationVisitorThread(Node node, CountDown countDown) {
+		this.countDown = countDown;
 		this.node = node;
 	}
 	
@@ -34,21 +41,22 @@ public class CoordinationVisitorThread extends Thread{
 
 	public void run() {
 		try {
-			long startTime = System.nanoTime();
+//			long startTime = System.nanoTime();
 			
 			Coordination scaTour = node.getService(Coordination.class, "Coordination#service-binding(Coordination/Coordination)");
 			scaTour.coordinate();
+			countDown.countDown();
 			
-			long endTime = System.nanoTime();
-			double responseTime = (endTime - startTime) / 1000000.0;
-			LOGGER.info("responseTime:" + responseTime);
-			Experiment exp = Experiment.getInstance();
-			ExpSetting expSetting = exp.getExpSetting();
-			if(expSetting.getType().contains("disruption")){
-				String statusWhenStart = "start_status";
-				String statusWhenEnd = "end_status";
-				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
-			}
+//			long endTime = System.nanoTime();
+//			double responseTime = (endTime - startTime) / 1000000.0;
+//			LOGGER.info("responseTime:" + responseTime);
+//			Experiment exp = Experiment.getInstance();
+//			ExpSetting expSetting = exp.getExpSetting();
+//			if(expSetting.getType().contains("disruption")){
+//				String statusWhenStart = "start_status";
+//				String statusWhenEnd = "end_status";
+//				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
+//			}
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}
