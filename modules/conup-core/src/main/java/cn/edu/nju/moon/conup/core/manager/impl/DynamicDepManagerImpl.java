@@ -289,17 +289,17 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (updatingSyncMonitor) {
-//			algorithm.updateIsDone(compObj.getIdentifier());
-//			//before changing to NORMAL, compStatus is supposed to be UPDATING.
-//			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
-//			isUpdateRequestReceived = false;
-//			compStatus = CompStatus.NORMAL;
-//			updatingSyncMonitor.notifyAll();
-			
+			algorithm.updateIsDone(compObj.getIdentifier());
+			//before changing to NORMAL, compStatus is supposed to be UPDATING.
 			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
 			isUpdateRequestReceived = false;
-			compStatus = CompStatus.VALID;
+			compStatus = CompStatus.NORMAL;
 			updatingSyncMonitor.notifyAll();
+			
+//			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
+//			isUpdateRequestReceived = false;
+//			compStatus = CompStatus.VALID;
+//			updatingSyncMonitor.notifyAll();
 		}
 		
 	}
@@ -334,9 +334,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (validToFreeSyncMonitor) {
-			compStatus = CompStatus.Free;
-			LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
-			validToFreeSyncMonitor.notifyAll();
+			if(compStatus.equals(CompStatus.VALID)){
+				compStatus = CompStatus.Free;
+				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
+				validToFreeSyncMonitor.notifyAll();
+			}
 		}
 	}
 

@@ -125,13 +125,13 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_CREATE:");
 			break;
 		case NOTIFY_FUTURE_REMOVE:
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_FUTURE_REMOVE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_FUTURE_REMOVE:");
 			
 			manageDepResult = doNotifyFutureRemove(srcComp, targetComp, rootTx);
 			
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_FUTURE_REMOVE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "----Out----" + "after process NOTIFY_FUTURE_REMOVE:");
 			break;
 		case NOTIFY_START_REMOTE_SUB_TX:
 			LOGGER.warning("deprecated notification NOTIFY_START_REMOTE_SUB_TX");
@@ -143,16 +143,16 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", before process ACK_SUBTX_INIT");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", before process ACK_SUBTX_INIT");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", before process ACK_SUBTX_INIT");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", before process ACK_SUBTX_INIT");
 //			
 			String parentTxID = plResolver.getParameter(ConsistencyPayload.PARENT_TX);
 			String subTxID = plResolver.getParameter(ConsistencyPayload.SUB_TX);
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 //			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
 			break;
 		case NOTIFY_SUBTX_END:
 			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
@@ -168,14 +168,14 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",before process NOTIFY_PAST_CREATE:");
 			
 			manageDepResult = doNotifyPastCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_PAST_CREATE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
-			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_CREATE:");
+//			printer.printDeps(LOGGER, ddm.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_CREATE:");
 			break;
 		case NOTIFY_PAST_REMOVE:
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_REMOVE:");
@@ -518,7 +518,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyFutureCreate(String srcComp, String targetComp, String rootTx) {
-		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
+		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -558,7 +558,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyPastRemove(String srcComp, String targetComp, String rootTx) {
-		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
+		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -575,7 +575,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyPastCreate(String srcComp, String targetComp, String rootTx) {
-		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
+		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
@@ -707,7 +707,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyFutureRemove(String srcComp, String targetComp, String rootTx) {
-		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
+		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		NodeManager nodeManager = NodeManager.getInstance();
 		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
