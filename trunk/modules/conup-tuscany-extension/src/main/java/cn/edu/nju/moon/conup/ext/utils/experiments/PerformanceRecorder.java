@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -36,10 +36,10 @@ public class PerformanceRecorder {
 	
 	public void updateIsDone(long endTime){
 		this.endTime = endTime;
-		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
-		ExpSetting expSetting = Experiment.getInstance().getExpSetting();
+//		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
+		ExpSetting expSetting = TimelinessExp.getInstance().getExpSetting();
 		if(expSetting.getType().contains("timeliness"))
-			Experiment.getInstance().writeToFile(data);
+			TimelinessExp.getInstance().writeToFile(0, (this.endTime - startTime) / 1000000.0);
 	}
 	
 	public void updateReceived(long startTime){
