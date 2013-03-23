@@ -334,5 +334,17 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		
 		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
 	}
+
+	@Override
+	public boolean endLocalSubTx(String hostComp, String fakeSubTx) {
+		NodeManager nodeMgr = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+		
+		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+		synchronized (ondemandMonitor) {
+			depMgr.getTxs().remove(fakeSubTx);
+		}
+		return true;
+	}
 	
 }
