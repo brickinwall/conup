@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
 
@@ -18,6 +19,8 @@ public class CoordinationVisitorThread extends Thread{
 	private int threadId;
 	private int roundId;
 	private CountDownLatch countDown;
+	private ResponseTimeRecorder resTimeRec;
+	private String execType;
 	
 	public CoordinationVisitorThread(Node node) {
 		this.node = node;
@@ -33,6 +36,14 @@ public class CoordinationVisitorThread extends Thread{
 		this.threadId = threadId;
 	}
 	
+	public CoordinationVisitorThread(Node node, CountDownLatch countDown, int threadId, ResponseTimeRecorder resTimeRec, String execType){
+		this.node = node;
+		this.countDown = countDown;
+		this.threadId = threadId;
+		this.resTimeRec = resTimeRec;
+		this.execType = execType;
+	}
+	
 	public CoordinationVisitorThread(Node node,int roundId, int threadId){
 		this.node = node;
 		this.roundId = roundId;
@@ -41,22 +52,23 @@ public class CoordinationVisitorThread extends Thread{
 
 	public void run() {
 		try {
-//			long startTime = System.nanoTime();
+			long startTime = System.nanoTime();
 			
 			Coordination scaTour = node.getService(Coordination.class, "Coordination#service-binding(Coordination/Coordination)");
 			scaTour.coordinate();
 			countDown.countDown();
 			
-//			long endTime = System.nanoTime();
-//			double responseTime = (endTime - startTime) / 1000000.0;
-//			LOGGER.info("responseTime:" + responseTime);
-//			Experiment exp = Experiment.getInstance();
-//			ExpSetting expSetting = exp.getExpSetting();
-//			if(expSetting.getType().contains("disruption")){
-//				String statusWhenStart = "start_status";
-//				String statusWhenEnd = "end_status";
-//				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
-//			}
+			long endTime = System.nanoTime();
+			
+			if( execType == null)
+				return;
+			else if(execType.equals("normal"))
+				resTimeRec.addNormalResponse(threadId, endTime - startTime);
+			else if(execType.equals("update"))
+				resTimeRec.addUpdateResponse(threadId, endTime - startTime);
+			else
+				return;
+			
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}
