@@ -139,9 +139,9 @@ public class CoordinationLauncher {
 						updatePoints.put(point, input[i+1]);
 				}
 				
-				
-				CountDownLatch warmCountDown = new CountDownLatch(50);
-				for (int i = 0; i < 50; i++) {
+				int warmUpTimes = 100;
+				CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
+				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					Thread.sleep(rqstInterval);
 				}
@@ -150,7 +150,24 @@ public class CoordinationLauncher {
 				Thread.sleep(3000);
 				
 				DisruptionExp disExp = DisruptionExp.getInstance();
-				for(int round = 0; round < 10; round++){
+				double normalBaseLine = 0.0;
+				for(int round = 0; round < 50; round++){
+					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+
+					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+						Thread.sleep(rqstInterval);
+					}
+					normalCountDown.await();
+					
+					normalBaseLine += resTimeRec.getTotalNormalResTime();
+					Thread.sleep(2000);
+				}
+				normalBaseLine = normalBaseLine / 50;
+				LOGGER.info("normalBaseLine:" + normalBaseLine);
+				
+				for(int round = 0; round < 50; round++){
 					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
 					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
 					for (int i = 0; i < accessTimes; i++) {
@@ -162,21 +179,39 @@ public class CoordinationLauncher {
 					}
 					updateCountDown.await();
 					
-					
-					Thread.sleep(3000);
-
-					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-						Thread.sleep(rqstInterval);
-					}
-					normalCountDown.await();
-					
-					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
+					String data = normalBaseLine + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - normalBaseLine) + "\n";
 					disExp.writeToFile(data);
 					
-					Thread.sleep(3000);
+					Thread.sleep(2000);
 				}
+				
+//				for(int round = 0; round < 50; round++){
+//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+//					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
+//					for (int i = 0; i < accessTimes; i++) {
+//						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
+//						if(updatePoints.get(i) != null){
+//							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+//						}
+//						Thread.sleep(rqstInterval);
+//					}
+//					updateCountDown.await();
+//					
+//					
+//					Thread.sleep(3000);
+//
+//					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
+//					for (int i = 0; i < accessTimes; i++) {
+//						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+//						Thread.sleep(rqstInterval);
+//					}
+//					normalCountDown.await();
+//					
+//					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
+//					disExp.writeToFile(data);
+//					
+//					Thread.sleep(3000);
+//				}
 				
 				disExp.close();
 				
