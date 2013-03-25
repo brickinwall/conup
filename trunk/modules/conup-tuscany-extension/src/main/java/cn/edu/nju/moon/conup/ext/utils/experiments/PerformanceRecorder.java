@@ -38,8 +38,10 @@ public class PerformanceRecorder {
 		this.endTime = endTime;
 //		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
 		ExpSetting expSetting = TimelinessExp.getInstance().getExpSetting();
-		if(expSetting.getType().contains("timeliness"))
-			TimelinessExp.getInstance().writeToFile(0, (this.endTime - startTime) / 1000000.0);
+		if(expSetting.getType().contains("timeliness")){
+			new TimelinessRecorder().addUpdateCostTime(this.endTime - startTime);
+//			TimelinessExp.getInstance().writeToFile(0, (this.endTime - startTime) / 1000000.0);
+		}
 	}
 	
 	public void updateReceived(long startTime){

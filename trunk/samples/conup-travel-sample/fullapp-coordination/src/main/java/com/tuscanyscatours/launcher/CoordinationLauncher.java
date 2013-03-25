@@ -1,5 +1,7 @@
 package com.tuscanyscatours.launcher;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -13,7 +15,10 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
@@ -87,10 +92,12 @@ public class CoordinationLauncher {
 				}
 				
 //				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
+				CountDownLatch accessCountDown = new CountDownLatch(accessTimes);
 				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node).start();
+					new CoordinationVisitorThread(node, accessCountDown).start();
 					Thread.sleep(rqstInterval);
 				}
+				accessCountDown.await();
 				break;
 			case update:
 				String toVer = null;
@@ -150,22 +157,41 @@ public class CoordinationLauncher {
 				Thread.sleep(3000);
 				
 				DisruptionExp disExp = DisruptionExp.getInstance();
-				double normalBaseLine = 0.0;
-				for(int round = 0; round < 50; round++){
-					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-
-					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-						Thread.sleep(rqstInterval);
-					}
-					normalCountDown.await();
-					
-					normalBaseLine += resTimeRec.getTotalNormalResTime();
-					Thread.sleep(2000);
-				}
-				normalBaseLine = normalBaseLine / 50;
-				LOGGER.info("normalBaseLine:" + normalBaseLine);
+//				double normalBaseLine = 0.0;
+//				int n = 4;
+//				for(int round = 0; round < n; round++){
+//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+//
+//					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
+//					for (int i = 0; i < accessTimes; i++) {
+//						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+//						Thread.sleep(rqstInterval);
+//					}
+//					normalCountDown.await();
+//					
+//					normalBaseLine += resTimeRec.getTotalNormalResTime();
+//					Thread.sleep(2000);
+//				}
+//				normalBaseLine = normalBaseLine / n;
+//				LOGGER.info("normalBaseLine:" + normalBaseLine);
+//				
+//				for(int round = 0; round < 50; round++){
+//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+//					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
+//					for (int i = 0; i < accessTimes; i++) {
+//						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
+//						if(updatePoints.get(i) != null){
+//							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+//						}
+//						Thread.sleep(rqstInterval);
+//					}
+//					updateCountDown.await();
+//					
+//					String data = normalBaseLine + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - normalBaseLine) + "\n";
+//					disExp.writeToFile(data);
+//					
+//					Thread.sleep(2000);
+//				}
 				
 				for(int round = 0; round < 50; round++){
 					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
@@ -179,42 +205,98 @@ public class CoordinationLauncher {
 					}
 					updateCountDown.await();
 					
-					String data = normalBaseLine + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - normalBaseLine) + "\n";
+					
+					Thread.sleep(3000);
+
+					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+						Thread.sleep(rqstInterval);
+					}
+					normalCountDown.await();
+					
+					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
 					disExp.writeToFile(data);
+					
+					Thread.sleep(3000);
+				}
+				
+				disExp.close();
+				break;
+			case timeliness:
+				targetComp = input[1].trim();
+				rqstInterval = new Integer(input[2].trim());
+				accessTimes = new Integer(input[3].trim());
+
+				for(int i=4; i<input.length; i+=2){
+					int point = new Integer(input[i].trim());
+					if(point < accessTimes)
+						updatePoints.put(point, input[i+1]);
+				}
+				
+				warmUpTimes = 100;
+				warmCountDown = new CountDownLatch(warmUpTimes);
+				for (int i = 0; i < warmUpTimes; i++) {
+					new CoordinationVisitorThread(node, warmCountDown).start();
+					Thread.sleep(rqstInterval);
+				}
+				warmCountDown.await();
+				
+				Thread.sleep(3000);
+				
+				TimelinessRecorder timelinessRec = new TimelinessRecorder();
+				for(int round = 0; round < 50; round++){
+					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, updateCountDown, i + 1, timelinessRec).start();
+						if(updatePoints.get(i) != null){
+							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+						}
+						Thread.sleep(rqstInterval);
+					}
+					updateCountDown.await();
 					
 					Thread.sleep(2000);
 				}
+				List<Double> allUpdateTime = new TimelinessRecorder().getAllUpdateCostTime();
+				TimelinessExp.getInstance().writeToFile(allUpdateTime);
+				break;
+			case overhead:
+				rqstInterval = new Integer(input[1].trim());
+				accessTimes = new Integer(input[2].trim());
 				
-//				for(int round = 0; round < 50; round++){
-//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-//					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
-//					for (int i = 0; i < accessTimes; i++) {
-//						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
-//						if(updatePoints.get(i) != null){
-//							TravelCompUpdate.update(targetComp, updatePoints.get(i));
-//						}
-//						Thread.sleep(rqstInterval);
-//					}
-//					updateCountDown.await();
-//					
-//					
-//					Thread.sleep(3000);
-//
-//					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-//					for (int i = 0; i < accessTimes; i++) {
-//						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-//						Thread.sleep(rqstInterval);
-//					}
-//					normalCountDown.await();
-//					
-//					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
-//					disExp.writeToFile(data);
-//					
-//					Thread.sleep(3000);
-//				}
+				warmUpTimes = 100;
+				warmCountDown = new CountDownLatch(warmUpTimes);
+				for (int i = 0; i < warmUpTimes; i++) {
+					new CoordinationVisitorThread(node, warmCountDown).start();
+					Thread.sleep(rqstInterval);
+				}
+				warmCountDown.await();
 				
-				disExp.close();
+				Thread.sleep(3000);
 				
+				OverheadExp overExp = OverheadExp.getInstance();
+				List<Double> tuscanyBaseLine = new ArrayList<Double>();
+				for(int round = 0; round < 50; round++){
+					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+
+					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
+					for (int i = 0; i < accessTimes; i++) {
+						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+						Thread.sleep(rqstInterval);
+					}
+					normalCountDown.await();
+					
+					tuscanyBaseLine.add(resTimeRec.getTotalNormalResTime());
+					Thread.sleep(2000);
+				}
+				String data = "";
+				for(int m = 0; m < tuscanyBaseLine.size(); m++){
+					data += tuscanyBaseLine.get(m) + "\n";
+				}
+						
+				overExp.writeToFile(data);
+				break;
 			case help:
 				printHelp();
 				break;
@@ -247,6 +329,15 @@ public class CoordinationLauncher {
 	
 	private static void printHelp(){
 		System.out.println();
+		System.out.println("experiment of disruption ");
+		System.out.println("	[usage] disruption CurrencyConverter 500 50 25 VER_ONE\n");
+		
+		System.out.println("experiment of timeliness ");
+		System.out.println("	[usage] timeliness CurrencyConverter 500 50 25 VER_ONE\n");
+		
+		System.out.println("experiment of overhead ");
+		System.out.println("	[usage] overhead 500 50 \n");
+		
 		System.out.println("access specified times without executing update, e.g., ");
 		System.out.println("	[usage] access 500 50");
 		System.out.println("	[behavior] access the component 50 times, and the thread sleep 500ms before sending each request");
@@ -257,9 +348,6 @@ public class CoordinationLauncher {
 		System.out.println("	[usage] updateAt CurrencyConverter 500 50 25 VER_ONE");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 500ms before sending each request. " +
 				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 25th request");
-		
-		System.out.println("experiment of disruption ");
-		System.out.println("	[usage] disruption CurrencyConverter 500 50 25 VER_ONE\n\n");
 		
 		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
