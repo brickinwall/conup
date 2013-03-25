@@ -131,7 +131,6 @@ public class TranquillityImpl implements Algorithm {
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
 			break;
 		case ACK_SUBTX_INIT:
-//			LOGGER.warning("deprecated notification ACK_SUBTX_INIT");
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
 //			printer.printDeps(ddm.getRuntimeInDeps(), "In");
 //			printer.printDeps(ddm.getRuntimeDeps(), "Out");
@@ -290,7 +289,7 @@ public class TranquillityImpl implements Algorithm {
 		
 		return true;
 	}
-
+	
 	/**
 	 * during notify, the component status is valid, do the following action
 	 * @param txContext
@@ -417,6 +416,7 @@ public class TranquillityImpl implements Algorithm {
 				inDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
 				outDepRegistry.removeDependence(FUTURE_DEP, currentTx, hostComponent, hostComponent);
 				outDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
+				assert dynamicDepMgr.getScope() != null;
 				removeAllEdges(hostComponent, currentTx, dynamicDepMgr);
 			}
 			
@@ -818,7 +818,7 @@ public class TranquillityImpl implements Algorithm {
 	private boolean removeAllEdges(String hostComponent, String rootTx, DynamicDepManager depMgr){
 		Set<Dependence> rtOutDeps;
 		rtOutDeps = depMgr.getRuntimeDeps();
-
+		
 //		TransactionContext curTxCtx = depMgr.getTxs().get(rootTx);
 //		Map<String, String> subTxHostComps = curTxCtx.getSubTxHostComps();
 //		Iterator<Entry<String, String>> subCompsIterator = subTxHostComps

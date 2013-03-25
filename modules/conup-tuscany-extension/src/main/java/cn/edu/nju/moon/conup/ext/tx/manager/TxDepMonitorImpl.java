@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
@@ -19,7 +20,6 @@ import org.apache.tuscany.sca.runtime.DomainRegistry;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
@@ -37,6 +37,8 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
  */
 public class TxDepMonitorImpl implements TxDepMonitor {
 	private Logger LOGGER = Logger.getLogger(TxDepMonitorImpl.class.getName());
+	/** used to store the mapping between service name and component name*/
+	private static Map<String, String> serviceToComp = new ConcurrentHashMap<String, String>();
 	
 	/**
 	 * 
@@ -131,30 +133,41 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	}
 
 	private Set<String> convertServiceToComponent(Set<String> services, String hostComp){
+		long enterTime = System.nanoTime();
 		Set<String> comps = new HashSet<String>();
 		
-		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
-		Node node = compLifeCycleMgr.getNode();
-		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
-		Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 //		Iterator<Endpoint> endpointsIterator = endpoints.iterator(); 
+		
+		synchronized (serviceToComp) {
+			if(serviceToComp.size() == 0){
+				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
+				Node node = compLifeCycleMgr.getNode();
+				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
+				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
+				for(Endpoint ep : endpoints){
+					String URI = ep.getURI();
+					int leftParIndex = URI.indexOf("(");
+					int rightParIndex = URI.indexOf(")");
+					int sharpIndex = URI.indexOf("#");
+					String compName = URI.substring(0, sharpIndex);
+					String serviceName = URI.substring(leftParIndex + 1,rightParIndex);
+					
+					serviceToComp.put(serviceName, compName);
+				}
+			}
+		}
+		
 		
 		// convert fdeps, pdeps from service to comps
 		Iterator<String> iterator = services.iterator();
 		while(iterator.hasNext()){
-			String service = iterator.next();
-			for(Endpoint ep : endpoints){
-				String URI = ep.getURI();
-				String serviceName = service.substring(service.lastIndexOf(".") + 1);
-				if(URI.contains(serviceName + "/" + serviceName)){
-					int index = URI.indexOf("#");
-					comps.add(URI.substring(0, index));
-				}
-			}
-//			while(endpointsIterator.hasNext()){
-//				Endpoint ep = endpointsIterator.next();
+			String serviceName = iterator.next();
+			comps.add(serviceToComp.get(serviceName + "/" + serviceName));
+			
+//			for(Endpoint ep : endpoints){
 //				String URI = ep.getURI();
-//				if(URI.contains(service)){
+//				String serviceName = service.substring(service.lastIndexOf(".") + 1);
+//				if(URI.contains(serviceName + "/" + serviceName)){
 //					int index = URI.indexOf("#");
 //					comps.add(URI.substring(0, index));
 //				}
@@ -165,34 +178,36 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			LOGGER.warning("convert failure from service to component....\n" +
 					comps + "\n" + services + "\n");
 		}
-		
+		long leaveTime = System.nanoTime();
+		LOGGER.fine(hostComp + " new convertServiceToComponent cost time:" + (leaveTime - enterTime) / 1000000.0);
 		return comps;
 	}
 
 	public String convertServiceToComponent(String service, String hostComp){
-		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
-		Node node = compLifeCycleMgr.getNode();
-		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
-		Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
-		Iterator<Endpoint> endpointsIterator = endpoints.iterator(); 
-		String serviceName = service.substring(service.lastIndexOf(".") + 1);
-		
-		int totalComps = 0;
-		String compName = null;
-		while (endpointsIterator.hasNext()) {
-			Endpoint endpoint = (Endpoint) endpointsIterator.next();
-			String URI = endpoint.getURI();
-			if(URI.contains(serviceName + "/" + serviceName)){
-				int index = URI.indexOf("#");
-				compName = URI.substring(0, index);
-				totalComps ++;
-//				return URI.substring(0, index);
+		synchronized (serviceToComp) {
+			if(serviceToComp.size() == 0){
+				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
+				Node node = compLifeCycleMgr.getNode();
+				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
+				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
+				for(Endpoint ep : endpoints){
+					String URI = ep.getURI();
+					int leftParIndex = URI.indexOf("(");
+					int rightParIndex = URI.indexOf(")");
+					int sharpIndex = URI.indexOf("#");
+					String compName = URI.substring(0, sharpIndex);
+					String serviceName = URI.substring(leftParIndex + 1,rightParIndex);
+					
+					serviceToComp.put(serviceName, compName);
+				}
 			}
 		}
-		assert totalComps==1;
+		String serviceName = service.substring(service.lastIndexOf(".") + 1);
+		
+		String compName = null;
+		compName = serviceToComp.get(serviceName + "/" + serviceName);
 		
 		return compName;
-		
 	}
 
 	@Override

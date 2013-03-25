@@ -103,6 +103,10 @@ public class ServerIoHandler extends IoHandlerAdapter{
 	private ResponseObject manageDep(RequestObject reqObj) {
 		NodeManager nodeMgr = NodeManager.getInstance();
 		DynamicDepManager ddm = nodeMgr.getDynamicDepManager(reqObj.getTargetIdentifier());
+//		if(reqObj.getPayload().contains("NOTIFY_REMOTE_UPDATE_DONE")){
+//			LOGGER.warning("received NOTIFY_REMOTE_UPDATE_DONE src:" + reqObj.getSrcIdentifier() + 
+//					" target:" + reqObj.getTargetIdentifier());
+//		}
 		boolean manageResult = ddm.manageDependence(reqObj.getProtocol(), reqObj.getPayload());
 		ResponseObject responseObj = new ResponseObject();
 		responseObj.setProtocol(reqObj.getProtocol());

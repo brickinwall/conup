@@ -204,19 +204,19 @@ public class VersionConsistencyImpl implements Algorithm {
 	private void doNormal(TransactionContext txCtx, DynamicDepManagerImpl depMgr){
 		//if current tx is not a root tx
 		if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-			String hostComp = txCtx.getHostComponent();
-			if (txCtx.getEventType().equals(TxEventType.TransactionStart)) {
-//				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
-//						txCtx.getRootTx(), ConsistencyOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-				
-			} else if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
-//				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
-//						txCtx.getRootTx(), ConsistencyOperationType.NOTIFY_SUBTX_END, txCtx.getParentTx(), txCtx.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-			}
+//			String hostComp = txCtx.getHostComponent();
+//			if (txCtx.getEventType().equals(TxEventType.TransactionStart)) {
+////				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
+////						txCtx.getRootTx(), ConsistencyOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
+////				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+////				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+//				
+//			} else if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
+////				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
+////						txCtx.getRootTx(), ConsistencyOperationType.NOTIFY_SUBTX_END, txCtx.getParentTx(), txCtx.getCurrentTx());
+////				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+////				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+//			}
 		}
 		//if a root tx ends, it should recursively notify its sub-components
 //		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)
@@ -498,15 +498,6 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 		}
 		doValid(txContext, dynamicDepMgr);
-		
-//		while(dynamicDepMgr.isOndemandSetting()){
-//			try {
-//				Thread.sleep(200);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		// after component status become valid, doValid(...)
 		
 	}
 
@@ -1083,8 +1074,8 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 			if( pastFlag&&futureFlag ){
 				LOGGER.fine(deps.toString());
-				Printer printer = new Printer();
-				printer.printDeps(LOGGER, deps, "ALL:");
+//				Printer printer = new Printer();
+//				printer.printDeps(LOGGER, deps, "ALL:");
 				freeFlag = false;
 				break;
 			}
