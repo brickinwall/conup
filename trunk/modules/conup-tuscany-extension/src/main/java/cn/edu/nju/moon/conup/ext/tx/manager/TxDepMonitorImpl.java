@@ -234,16 +234,17 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			}
 		}
 		
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance(hostComp);
-		String completeAction = exeRecorder.getCompleteAction(rootTxId);
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance(hostComp);
+//		String completeAction = exeRecorder.getCompleteAction(rootTxId);
+		
 //		if(completeAction == null || completeAction.equals("null")){
 //			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
 //				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
 //		}
-		if(completeAction != null){
-			LOGGER.info(completeAction);
-		}
+//		if(completeAction != null){
+//			LOGGER.info(completeAction);
+//		}
 //		
 //		//when a root tx ends, remove it from TxLifecycleManager
 //		if(TxLifecycleManager.getRootTx(hostComp, rootTxId) != null){
