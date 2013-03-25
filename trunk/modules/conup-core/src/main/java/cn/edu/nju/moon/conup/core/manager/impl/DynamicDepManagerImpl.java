@@ -94,7 +94,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean manageDependence(TransactionContext txContext) {
 		LOGGER.fine("DynamicDepManagerImpl.manageDependence(...)");
+		long enterTime = System.nanoTime();
+		
 		algorithm.manageDependence(txContext);
+		
+		long leaveTime = System.nanoTime();
+		LOGGER.fine(txContext.getHostComponent() + " algorithm.doNormal() cost time:" + (leaveTime - enterTime) / 1000000.0);
 		return true;
 	}
 	
@@ -125,7 +130,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
-		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compStatus.equals(CompStatus.VALID));
+		LOGGER.fine("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compStatus.equals(CompStatus.VALID));
 		return compStatus.equals(CompStatus.VALID) && algReadyForUpdate;
 	}
 
@@ -243,23 +248,23 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		for (Dependence dep : inDepRegistry.getDependences()) {
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
 		
 		String outDepsStr = "";
 		for (Dependence dep : outDepRegistry.getDependences()) {
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
+		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
 		
 		Printer printer = new Printer();
-		LOGGER.info("ondemandSetupIsDone, Txs:");
+		LOGGER.fine("ondemandSetupIsDone, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 		
 		compStatus = CompStatus.VALID;
 		OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 		ondemandSetupHelper.resetIsOndemandRqstRcvd();
 		synchronized (ondemandSyncMonitor) {
-			LOGGER.info("--------------ondemand setup is done, now notify all...------\n\n");
+			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
 			ondemandSetupHelper.onDemandIsDone();
 			ondemandSyncMonitor.notifyAll();
 		}
@@ -276,16 +281,16 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		for (Dependence dep : inDepRegistry.getDependences()) {
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("achievedFree, inDepsStr:" + inDepsStr);
+		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
 		
 		String outDepsStr = "";
 		for (Dependence dep : outDepRegistry.getDependences()) {
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("achievedFree, outDepsStr:" + outDepsStr);
+		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
 		
 		Printer printer = new Printer();
-		LOGGER.info("achievedFree, Txs:");
+		LOGGER.fine("achievedFree, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (updatingSyncMonitor) {
@@ -306,7 +311,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	@Override
 	public void updating(){
-		LOGGER.info("Executing dynamic update for component '" + compObj.getIdentifier() + "'");
+		LOGGER.fine("Executing dynamic update for component '" + compObj.getIdentifier() + "'");
 		compStatus = CompStatus.UPDATING;
 	}
 	
@@ -321,16 +326,16 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		for (Dependence dep : inDepRegistry.getDependences()) {
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("achievedFree, inDepsStr:" + inDepsStr);
+		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
 		
 		String outDepsStr = "";
 		for (Dependence dep : outDepRegistry.getDependences()) {
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("achievedFree, outDepsStr:" + outDepsStr);
+		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
 		
 		Printer printer = new Printer();
-		LOGGER.info("achievedFree, Txs:");
+		LOGGER.fine("achievedFree, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (validToFreeSyncMonitor) {
@@ -375,13 +380,14 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void remoteDynamicUpdateIsDone() {
 		synchronized (waitingRemoteCompUpdateDoneMonitor) {
 //			compStatus = CompStatus.VALID;
-			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.VALID)){
-				LOGGER.warning("CompStatus is supposed to be NORMAL or VALID, but it's " + compStatus);
-			}
+			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.VALID);
+//			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.VALID)){
+//				LOGGER.warning("CompStatus is supposed to be NORMAL or VALID, but it's " + compStatus);
+//			}
+//			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.NORMAL;
-				LOGGER.info("remote update is done, CompStatus: " + compStatus + ", now notify all");
-//				System.out.println("remote update is done, CompStatus: " + compStatus + ", now notify all");
+				LOGGER.info(compObj.getIdentifier() + " remote update is done, CompStatus: " + compStatus + ", now notify all");
 				waitingRemoteCompUpdateDoneMonitor.notifyAll();
 			}
 		}

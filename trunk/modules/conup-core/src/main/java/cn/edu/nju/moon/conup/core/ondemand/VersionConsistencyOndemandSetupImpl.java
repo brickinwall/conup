@@ -452,7 +452,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
-		LOGGER.info("notifyFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -503,7 +503,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
-		LOGGER.info("notifyPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifyPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -553,7 +553,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean notifySubFutureOndemand(Dependence dep) {
-		LOGGER.info("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
@@ -581,7 +581,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		fDeps = getFDeps(curComp, subTx);
 		
-		LOGGER.info("fDeps:" + fDeps);
+		LOGGER.fine("fDeps:" + fDeps);
 		for(Dependence ose : fDeps){
 			if( !targetRef.contains(ose.getTargetCompObjIdentifer())){
 				continue;
@@ -602,7 +602,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		
 		sDeps = getSDeps(curComp, subTx);
-		LOGGER.info("sDeps:" + sDeps);
+		LOGGER.fine("sDeps:" + sDeps);
 		for(Dependence ose : sDeps){
 			if( !targetRef.contains(ose.getTargetCompObjIdentifer())){
 				continue;
@@ -623,7 +623,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	public boolean notifySubPastOndemand(Dependence dep) {
-		LOGGER.info("notifySubPastOndemand(Dependence dep) with " + dep.toString());
+		LOGGER.fine("notifySubPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
