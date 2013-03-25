@@ -7,6 +7,7 @@ import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
 
@@ -20,6 +21,7 @@ public class CoordinationVisitorThread extends Thread{
 	private int roundId;
 	private CountDownLatch countDown;
 	private ResponseTimeRecorder resTimeRec;
+	private TimelinessRecorder timelinessRec;
 	private String execType;
 	
 	public CoordinationVisitorThread(Node node) {
@@ -50,6 +52,13 @@ public class CoordinationVisitorThread extends Thread{
 		this.threadId = threadId;
 	}
 
+	public CoordinationVisitorThread(Node node,CountDownLatch countDown, int threadId, TimelinessRecorder timelinessRec) {
+		this.node = node;
+		this.countDown = countDown;
+		this.threadId = threadId;
+		this.timelinessRec = timelinessRec;
+	}
+
 	public void run() {
 		try {
 			long startTime = System.nanoTime();
@@ -59,16 +68,17 @@ public class CoordinationVisitorThread extends Thread{
 			countDown.countDown();
 			
 			long endTime = System.nanoTime();
-			
-			if( execType == null)
-				return;
-			else if(execType.equals("normal"))
-				resTimeRec.addNormalResponse(threadId, endTime - startTime);
-			else if(execType.equals("update"))
-				resTimeRec.addUpdateResponse(threadId, endTime - startTime);
-			else
-				return;
-			
+			System.out.println("response time:" + (endTime - startTime) / 1000000.0);
+			if (resTimeRec != null) {
+				if (execType == null)
+					return;
+				else if (execType.equals("normal")){
+					resTimeRec.addNormalResponse(threadId, endTime - startTime);
+					System.out.println("response time:" + (endTime - startTime) / 1000000.0);
+				}
+				else if (execType.equals("update"))
+					resTimeRec.addUpdateResponse(threadId, endTime - startTime);
+			} 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

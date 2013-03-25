@@ -8,21 +8,22 @@ import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 
-public class DisruptionExp {
-	private Logger LOGGER = Logger.getLogger(DisruptionExp.class.getName());
+public class OverheadExp {
+	private Logger LOGGER = Logger.getLogger(OverheadExp.class.getName());
 	private static String absolutePath = null;
 	private static String fileName = null;
-	private static DisruptionExp experiment = null;
+	private static OverheadExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
 	private int nThreads;
 	private int threadId;
+	private String algorithm = null;
 
 	public ExpSetting getExpSetting() {
 		return expSetting;
 	}
 
-	private DisruptionExp() {
+	private OverheadExp() {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
 		String tuscanyHomeLocation = xmlUtil.getTuscanyHome();
 		String algorithm = xmlUtil.getAlgorithmConf();
@@ -34,8 +35,7 @@ public class DisruptionExp {
 		String targetComp = expSetting.getTargetComp();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
-		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
-				+ targetComp + ".csv";
+		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);
@@ -46,25 +46,13 @@ public class DisruptionExp {
 		}
 	}
 
-	public static DisruptionExp getInstance() {
+	public static OverheadExp getInstance() {
 		if (experiment == null) {
-			synchronized (DisruptionExp.class) {
-				experiment = new DisruptionExp();
+			synchronized (OverheadExp.class) {
+				experiment = new OverheadExp();
 			}
 		}
 		return experiment;
-	}
-
-	public void writeResponseTimeToFile(int roundId, int curThreadId,
-			String statusWhenStart, String statusWhenEnd, double responseTime) {
-		synchronized (experiment) {
-			LOGGER.info("I'm writing to disruption.. ");
-			String data = roundId + "," + nThreads + "," + curThreadId + ","
-					+ statusWhenStart + "," + statusWhenEnd + ","
-					+ responseTime + "\n";
-			out.write(data);
-			out.flush();
-		}
 	}
 
 	public void writeToFile(String data) {
@@ -83,6 +71,6 @@ public class DisruptionExp {
 
 	@Override
 	public String toString() {
-		return "NormalTotalExecTime, UpdateExecTotalTime, Delta";
+		return "NormalTotalExecTime(" + algorithm + ")";
 	}
 }
