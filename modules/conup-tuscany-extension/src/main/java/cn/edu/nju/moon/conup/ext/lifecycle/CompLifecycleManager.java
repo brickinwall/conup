@@ -82,17 +82,18 @@ public class CompLifecycleManager {
 			if(compObj == null)
 				return null;
 			
-			clMgr = compClMgrs.get(compObj);
 			if( !compClMgrs.containsKey(compObj) ){
 				clMgr = new CompLifecycleManager();
 				compClMgrs.put(compObj, clMgr);
 				clMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
+			} else{
+				clMgr = compClMgrs.get(compObj);
 			}
 			clMgr.setCompObject(compObj);
 			assert clMgr.getCompUpdator()!=null;
 			
 		}
-		return compClMgrs.get(compObj);
+		return clMgr;
 	}
 	
 	/**

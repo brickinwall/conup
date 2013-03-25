@@ -72,7 +72,6 @@ public class NodeManager{
 			if(compObj == null)
 				return null;
 			
-			depMgr = depMgrs.get(compObj);
 			if( !depMgrs.containsKey(compObj) ){
 				depMgr = new ManagerFactory().createDynamicDepManager();
 				depMgrs.put(compObj, depMgr);
@@ -84,11 +83,12 @@ public class NodeManager{
 					throw new NullPointerException("alogrithm should not be null after createAlgorithm(...) in NodeManager");
 				}
 				depMgr.setAlgorithm(algorithm);
-				
+			} else{
+				depMgr = depMgrs.get(compObj);
 			}
 			
 		}
-		return depMgrs.get(compObj);
+		return depMgr;
 	}
 
 	/**
@@ -104,7 +104,6 @@ public class NodeManager{
 			if(compObj == null)
 				return null;
 			
-			helper = ondemandHelpers.get(compObj);
 			if( !ondemandHelpers.containsKey(compObj) ){
 				helper = new ManagerFactory().createOndemandSetupHelper();
 				ondemandHelpers.put(compObj, helper);
@@ -114,9 +113,11 @@ public class NodeManager{
 				ondemandSetup = new AlgorithmFactory().createOndemandSetup(compObj.getAlgorithmConf());
 				helper.setOndemand(ondemandSetup);
 				helper.setDynamicDepManager(getDynamicDepManager(compIdentifier));
+			} else{
+				helper = ondemandHelpers.get(compObj);
 			}
 		}
-		return ondemandHelpers.get(compObj);
+		return helper;
 	}
 	
 	/**

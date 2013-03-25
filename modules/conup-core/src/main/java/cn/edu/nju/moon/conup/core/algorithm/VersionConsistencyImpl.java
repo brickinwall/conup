@@ -203,7 +203,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	private void doNormal(TransactionContext txCtx, DynamicDepManagerImpl depMgr){
 		//if current tx is not a root tx
-		if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
+//		if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
 //			String hostComp = txCtx.getHostComponent();
 //			if (txCtx.getEventType().equals(TxEventType.TransactionStart)) {
 ////				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
@@ -217,7 +217,7 @@ public class VersionConsistencyImpl implements Algorithm {
 ////				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 ////				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 //			}
-		}
+//		}
 		//if a root tx ends, it should recursively notify its sub-components
 //		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)
 //				&& txCtx.getCurrentTx().equals(txCtx.getRootTx())) {
