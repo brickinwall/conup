@@ -123,6 +123,9 @@ public class CommServerManager {
 				DomainRegistry domainRegistry = node.getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 				for(Endpoint ep : endpoints){
+					String compName = ep.getComponent().getName();
+					if( compNameToAddressInfo.containsKey(compName))
+						continue;
 //					String deployURI = ep.getDeployedURI();
 					String bindingURI = ep.getBinding().getURI();
 					assert bindingURI != null;
@@ -131,10 +134,8 @@ public class CommServerManager {
 						String[] infos = bindingURI.split(":");
 						String ip = infos[1].substring(2);
 						int port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;
-						String compName = ep.getComponent().getName();
-						CompCommAddress cci = new CompCommAddress(targetComp, ip, port);
-						if(!compNameToAddressInfo.containsKey(compName))
-							compNameToAddressInfo.put(compName, cci);
+						CompCommAddress cci = new CompCommAddress(compName, ip, port);
+						compNameToAddressInfo.put(compName, cci);
 					} 
 				}
 			}
