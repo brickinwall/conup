@@ -22,7 +22,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+//import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
@@ -56,8 +56,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public void manageDependence(TransactionContext txContext) {
-		// TODO Auto-generated method stub
-		initDynamicDepMgr(txContext.getHostComponent());
+//		initDynamicDepMgr(txContext.getHostComponent());
 		CompStatus compStatus = depMgr.getCompStatus();
 		switch (compStatus) {
 		case NORMAL:
@@ -76,7 +75,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	private void doFree(TransactionContext txContext) {
-		initDynamicDepMgr(txContext.getHostComponent());
+//		initDynamicDepMgr(txContext.getHostComponent());
 		Object updatingMonitor = depMgr.getUpdatingSyncMonitor();
 		synchronized(updatingMonitor){
 			try {
@@ -156,7 +155,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 	
 	private void doNormal(TransactionContext txContext){
-		initDynamicDepMgr(txContext.getHostComponent());
+//		initDynamicDepMgr(txContext.getHostComponent());
 		depMgr.ondemandSetupIsDone();
 		doValid(txContext);
 	}
@@ -165,7 +164,7 @@ public class QuiescenceImpl implements Algorithm {
 		TxEventType txEventType = txCtx.getEventType();
 		String hostComp = txCtx.getHostComponent();
 		String rootTx = txCtx.getRootTx();
-		initDynamicDepMgr(txCtx.getHostComponent());
+//		initDynamicDepMgr(txCtx.getHostComponent());
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
@@ -208,7 +207,7 @@ public class QuiescenceImpl implements Algorithm {
 				
 				LOGGER.fine("before checkPassiveAndAck:");
 				Printer printer = new Printer();
-				initDynamicDepMgr(hostComp);
+//				initDynamicDepMgr(hostComp);
 				Map<String, TransactionContext> txs = depMgr.getTxs();
 //				printer.printTxs(txs);
 				checkPassiveAndAck(txCtx.getHostComponent());
@@ -226,7 +225,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	private boolean doNotifyRootTxEnd(String srcComp, String hostComp, String rootTx) {
 		TransactionContext txCtx;
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		Iterator<Entry<String, TransactionContext>>  txIterator = depMgr.getTxs().entrySet().iterator();
 		int existSubTxWithRoot = 0 ;
 		while(txIterator.hasNext()){
@@ -260,7 +259,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	private boolean doAckSubtxInit(String srcComp, String hostComp, String rootTx, String parentTxID, String subTxID){
 		
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		Map<String, TransactionContext> allTxs = depMgr.getTxs();
 		TransactionContext txCtx;
 		txCtx = allTxs.get(parentTxID);
@@ -276,7 +275,7 @@ public class QuiescenceImpl implements Algorithm {
 	private boolean doNotifySubTxEnd(String srcComp, String hostComp, String rootTx, String parentTx, String subTx){
 		
 		//maintain tx
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		Map<String, TransactionContext> allTxs = depMgr.getTxs();
 		TransactionContext txCtx;
 		txCtx = allTxs.get(parentTx);
@@ -298,7 +297,7 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private boolean doReqPassivate(String srcComp, String hostComp){
 		LOGGER.info(hostComp + " received reqPassivate from " + srcComp);
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		if(PASSIVATED){
 			if(!srcComp.equals(hostComp)){
 				ackPassivate(hostComp, srcComp);
@@ -315,7 +314,7 @@ public class QuiescenceImpl implements Algorithm {
 //
 				LOGGER.fine("before checkPassiveAndAck:");
 				Printer printer = new Printer();
-				initDynamicDepMgr(hostComp);
+//				initDynamicDepMgr(hostComp);
 				Map<String, TransactionContext> txs = depMgr.getTxs();
 //				printer.printTxs(txs);
 				
@@ -366,7 +365,7 @@ public class QuiescenceImpl implements Algorithm {
 			if(!allACKRCVD)
 				break;
 		}
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		if(allACKRCVD){
 			Map<String, TransactionContext> txs = depMgr.getTxs();
 			Iterator<Entry<String, TransactionContext>> txsIterator = txs.entrySet().iterator();
@@ -414,7 +413,7 @@ public class QuiescenceImpl implements Algorithm {
 //
 		LOGGER.fine("before checkPassiveAndAck:");
 		Printer printer = new Printer();
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		Map<String, TransactionContext> txs = depMgr.getTxs();
 //		printer.printTxs(txs);
 		
@@ -433,7 +432,7 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
 		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
-		initDynamicDepMgr(hostComp);
+//		initDynamicDepMgr(hostComp);
 		
 		//notify parent components that remote dynamic update is done
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
@@ -464,7 +463,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public boolean isReadyForUpdate(String compIdentifier) {
-		initDynamicDepMgr(compIdentifier);
+//		initDynamicDepMgr(compIdentifier);
 		return depMgr.getCompStatus().equals(CompStatus.Free);
 	}
 
@@ -502,10 +501,10 @@ public class QuiescenceImpl implements Algorithm {
 		this.isPassivateRCVD = isPassivateRCVD;
 	}
 	
-	private void initDynamicDepMgr(String compIdentifier){
-		if(this.depMgr == null)
-			this.depMgr = NodeManager.getInstance().getDynamicDepManager(compIdentifier);
-	}
+//	private void initDynamicDepMgr(String compIdentifier){
+//		if(this.depMgr == null)
+//			this.depMgr = NodeManager.getInstance().getDynamicDepManager(compIdentifier);
+//	}
 
 	@Override
 	public boolean updateIsDone(String hostComp) {
@@ -562,6 +561,11 @@ public class QuiescenceImpl implements Algorithm {
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
 		return true;
+	}
+
+	@Override
+	public void setDynamicDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
 	}
 
 }
