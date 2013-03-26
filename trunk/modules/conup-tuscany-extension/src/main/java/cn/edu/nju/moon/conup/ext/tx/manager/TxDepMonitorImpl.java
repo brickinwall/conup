@@ -157,11 +157,15 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			}
 		}
 		
-		
 		// convert fdeps, pdeps from service to comps
 		Iterator<String> iterator = services.iterator();
 		while(iterator.hasNext()){
+			/*
+			 * since the services in the parameter are services with their package name,
+			 * hence need to omit the package name first 
+			 */
 			String serviceName = iterator.next();
+			serviceName = serviceName.substring(serviceName.lastIndexOf(".") + 1);
 			comps.add(serviceToComp.get(serviceName + "/" + serviceName));
 			
 //			for(Endpoint ep : endpoints){
