@@ -7,6 +7,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -88,6 +89,12 @@ public class VersionConsistencyImpl implements Algorithm {
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void setDynamicDepMgr(DynamicDepManager depMgr) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

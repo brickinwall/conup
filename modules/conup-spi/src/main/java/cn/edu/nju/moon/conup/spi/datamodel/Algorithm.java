@@ -6,6 +6,8 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 import java.util.Map;
 import java.util.Set;
 
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+
 
 /**
  * Interface for different dynamic update algorithm, i.e., Version-consistency, Quiescence 
@@ -115,4 +117,6 @@ public interface Algorithm {
 	 * @param parentComp
 	 */
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
+	
+	public void setDynamicDepMgr(DynamicDepManager depMgr);
 }

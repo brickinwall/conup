@@ -82,6 +82,7 @@ public class NodeManager{
 				if(algorithm == null){
 					throw new NullPointerException("alogrithm should not be null after createAlgorithm(...) in NodeManager");
 				}
+				algorithm.setDynamicDepMgr(depMgr);
 				depMgr.setAlgorithm(algorithm);
 			} else{
 				depMgr = depMgrs.get(compObj);

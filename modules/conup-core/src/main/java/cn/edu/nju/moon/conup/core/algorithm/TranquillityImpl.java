@@ -33,7 +33,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+//import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 
@@ -53,27 +53,29 @@ public class TranquillityImpl implements Algorithm {
 	
 	public static Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
 	
+	private DynamicDepManager depMgr = null;
+	
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 		
 		LOGGER.fine("TranquillityImpl.manageDependence(...)");
 		String hostComponent = txContext.getHostComponent();
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(hostComponent);
-		CompStatus compStatus = dynamicDepMgr.getCompStatus();
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(hostComponent);
+		CompStatus compStatus = depMgr.getCompStatus();
 		
-		assert dynamicDepMgr != null;
+		assert depMgr != null;
 		
 		assert compStatus != null;
 		switch (compStatus) {
 		case NORMAL:
-			doNormal(txContext, dynamicDepMgr);
+			doNormal(txContext);
 			return;
 		case VALID:
-			doValid(txContext, dynamicDepMgr);
+			doValid(txContext);
 			break;
 		case ONDEMAND:
-			doOndemand(txContext, dynamicDepMgr);
+			doOndemand(txContext);
 			break;
 		case UPDATING:
 //			during updating, there is no notify happen, do not need to maintain deps, should throw an exception
@@ -92,7 +94,7 @@ public class TranquillityImpl implements Algorithm {
 	@Override
 	public boolean manageDependence(String payload) {
 		// print to terminal
-		NodeManager nodeMgr = NodeManager.getInstance();
+//		NodeManager nodeMgr = NodeManager.getInstance();
 		Printer printer = new Printer();
 		
 		boolean manageDepResult = false;
@@ -103,70 +105,70 @@ public class TranquillityImpl implements Algorithm {
 		String rootTx = payloadResolver.getParameter(TranquillityPayload.ROOT_TX);
 		TranquillityOperationType operationTypeInfo = payloadResolver.getOperation();
 		
-		DynamicDepManager ddm = nodeMgr.getDynamicDepManager(targetComp);
+//		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(targetComp);
 		
 		assert operationTypeInfo != null;
 		
 		switch(operationTypeInfo){
 		case NOTIFY_FUTURE_CREATE:
 //			LOGGER.info("before process NOTIFY_FUTURE_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 			manageDepResult = doNotifyFutureCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_FUTURE_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			break;
 		case NOTIFY_FUTURE_REMOVE:
 //			LOGGER.info("before process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 			manageDepResult = doNotifyFutureRemove(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_FUTURE_REMOVE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 			String parentTxID = payloadResolver.getParameter(TranquillityPayload.PARENT_TX);
 			String subTxID = payloadResolver.getParameter(TranquillityPayload.SUB_TX);
 			manageDepResult = doAckSubTxInit(srcComp, targetComp, rootTx, parentTxID, subTxID);
 //			
 //			LOGGER.info("after process ACK_SUBTX_INIT:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			break;
 		case NOTIFY_SUBTX_END:
 			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
 //			LOGGER.info("before process NOTIFY_SUBTX_END:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 //			String subTxEndParentTxID = payloadResolver.getParameter(TranquillityPayload.PARENT_TX);
 //			String subTxEndSubTxID = payloadResolver.getParameter(TranquillityPayload.SUB_TX);
 //			manageDepResult = doNotifySubTxEnd(srcComp, targetComp, rootTx, subTxEndParentTxID, subTxEndSubTxID);
 			
 //			LOGGER.info("after process NOTIFY_SUBTX_END:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 			manageDepResult = doNotifyPastCreate(srcComp, targetComp, rootTx);
 			
 //			LOGGER.info("after process NOTIFY_PAST_CREATE:");
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			break;
 		case NOTIFY_PAST_REMOVE:
 			manageDepResult = doNotifyPastRemove(srcComp, targetComp, rootTx);
@@ -186,7 +188,7 @@ public class TranquillityImpl implements Algorithm {
 		return manageDepResult;
 	}
 	
-	private void doNormal(TransactionContext txCtx, DynamicDepManagerImpl depMgr){
+	private void doNormal(TransactionContext txCtx){
 		//if current tx is not a root tx
 		if (!txCtx.getCurrentTx().equals(txCtx.getParentTx())) {
 //			String hostComp = txCtx.getHostComponent();
@@ -245,7 +247,7 @@ public class TranquillityImpl implements Algorithm {
 					}
 				}
 			}
-			doValid(txCtx, depMgr);
+			doValid(txCtx);
 			
 //			targetRef = new HashSet<String>();
 //			targetRef.addAll(txCtx.getFutureComponents());
@@ -268,8 +270,8 @@ public class TranquillityImpl implements Algorithm {
 	}
 	
 	private boolean doNormalRootTxEnd(String srcComp, String currentComp, String rootTx){
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(currentComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(currentComp);
 		TransactionContext txCtx = null;
 		
 		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
@@ -295,26 +297,26 @@ public class TranquillityImpl implements Algorithm {
 	 * @param txContext
 	 * @param dynamicDepMgr
 	 */
-	private void doValid(TransactionContext txContext, DynamicDepManagerImpl dynamicDepMgr) {
+	private void doValid(TransactionContext txContext) {
 		TxEventType txEventType = txContext.getEventType();
 		String parentTx = txContext.getParentTx();
 		String currentTx = txContext.getCurrentTx();
 		String hostComponent = txContext.getHostComponent();
 		
-		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
-		DependenceRegistry outDepRegistry = dynamicDepMgr.getOutDepRegistry();
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
+		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
 		Set<String> futureComponents = txContext.getFutureComponents();
 		
 		Set<String> targetRef = null;
 		Scope scope;
 		
 		targetRef = new HashSet<String>();
-		scope = dynamicDepMgr.getScope();
+		scope = depMgr.getScope();
 		String rootTx = null;
 		
 		//calculate target(sub) components
 		if(scope == null){
-			targetRef.addAll(dynamicDepMgr.getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		}
 		else{
 			targetRef.addAll(scope.getSubComponents(hostComponent));
@@ -323,7 +325,7 @@ public class TranquillityImpl implements Algorithm {
 		if (txEventType.equals(TxEventType.TransactionStart)) {
 			Set<String> parentComps;
 			if(scope == null){
-				parentComps = dynamicDepMgr.getStaticInDeps();
+				parentComps = depMgr.getStaticInDeps();
 			} else{
 				parentComps = scope.getParentComponents(hostComponent);
 			}
@@ -352,9 +354,9 @@ public class TranquillityImpl implements Algorithm {
 //			NodeManager nodeMgr = NodeManager.getInstance();
 //			Printer printer = new Printer();
 //			LOGGER.info("doVALID(TxEventType.TransactionStart):print deps:");
-//			DynamicDepManager ddm = nodeMgr.getDynamicDepManager(hostComponent);
-//			printer.printDeps(ddm.getRuntimeInDeps(), "In");
-//			printer.printDeps(ddm.getRuntimeDeps(), "Out");
+//			DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComponent);
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out");
 			
 			/* ACK_SUBTX_INIT
 			 * current transaction is not root
@@ -416,8 +418,8 @@ public class TranquillityImpl implements Algorithm {
 				inDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
 				outDepRegistry.removeDependence(FUTURE_DEP, currentTx, hostComponent, hostComponent);
 				outDepRegistry.removeDependence(PAST_DEP, currentTx, hostComponent, hostComponent);
-				assert dynamicDepMgr.getScope() != null;
-				removeAllEdges(hostComponent, currentTx, dynamicDepMgr);
+				assert depMgr.getScope() != null;
+				removeAllEdges(hostComponent, currentTx);
 			}
 			
 		} else {
@@ -447,12 +449,12 @@ public class TranquillityImpl implements Algorithm {
 	 * @param txContext
 	 * @param dynamicDepMgr
 	 */
-	private void doOndemand(TransactionContext txContext, DynamicDepManagerImpl dynamicDepMgr) {
+	private void doOndemand(TransactionContext txContext) {
 		// sleep until current status become valid
-		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				if (dynamicDepMgr.isOndemandSetting()) {
+				if (depMgr.isOndemandSetting()) {
 					System.out
 							.println("----------------ondemandSyncMonitor.wait();tranquillity algorithm------------");
 					ondemandSyncMonitor.wait();
@@ -462,7 +464,7 @@ public class TranquillityImpl implements Algorithm {
 			}
 		}
 		// after component status become valid, doValid(...)
-		doValid(txContext, dynamicDepMgr);
+		doValid(txContext);
 		
 	}
 	
@@ -486,10 +488,10 @@ public class TranquillityImpl implements Algorithm {
 
 	@Override
 	public boolean isReadyForUpdate(String compIdentifier) {
-		NodeManager nodeMgr = NodeManager.getInstance();
-		DynamicDepManager depMgr;
+//		NodeManager nodeMgr = NodeManager.getInstance();
+//		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		rtInDeps = depMgr.getRuntimeInDeps();
 		
 		Set<String> allRootTxs = new HashSet<String>();
@@ -526,9 +528,9 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifyFutureCreate(String srcComp, String targetComp, String rootTx) {
 		LOGGER.info(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
-		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		Dependence dep = new Dependence(FUTURE_DEP, rootTx, srcComp, targetComp, null, null);
 		inDepRegistry.addDependence(dep);
 		
@@ -544,9 +546,9 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifyPastRemove(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
-		DependenceRegistry inDepRegistry = depMgr.getInDepRegistry();
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		inDepRegistry.removeDependence(PAST_DEP, rootTx, srcComp, targetComp);
 		LOGGER.fine(PAST_DEP + " rootTx:" + rootTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 		
@@ -581,13 +583,13 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifyPastCreate(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
-		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		Dependence dependence = new Dependence(PAST_DEP, rootTx, srcComp, targetComp, null, null);
 		inDepRegistry.addDependence(dependence);
 		
-		Map<String, TransactionContext> txs = dynamicDepMgr.getTxs();
+		Map<String, TransactionContext> txs = depMgr.getTxs();
 		Iterator<Entry<String, TransactionContext>> iterator = txs.entrySet().iterator();
 		// flag indicate that there will be no localTxs
 		// whose rootTx is T
@@ -599,7 +601,7 @@ public class TranquillityImpl implements Algorithm {
 				break;
 			}
 		}
-		DependenceRegistry outDepRegistry = dynamicDepMgr.getOutDepRegistry();
+		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
 		if(!flag){
 			inDepRegistry.removeDependence(FUTURE_DEP, rootTx, targetComp, targetComp);
 			inDepRegistry.removeDependence(PAST_DEP, rootTx, targetComp, targetComp);
@@ -619,14 +621,14 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifySubTxEnd(String srcComp, String targetComp, String rootTx, String parentTx, String subTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTx + " rootTx:" + rootTx);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		
-		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			LOGGER.fine("doNotifySubTxEnd rootTx:" + parentTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 			//maintain tx
-			Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
+			Map<String, TransactionContext> allTxs = depMgr.getTxs();
 			TransactionContext txCtx;
 			txCtx = allTxs.get(parentTx);
 			assert(txCtx!=null);
@@ -636,23 +638,23 @@ public class TranquillityImpl implements Algorithm {
 			subTxStatuses.put(subTx, TxEventType.TransactionEnd);
 //			txCtx.getPastComponents().add(srcComp);
 			
-			if(dynamicDepMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
 				return true;
 			
-			Scope scope = dynamicDepMgr.getScope();
+			Scope scope = depMgr.getScope();
 			if(scope!=null && !scope.getSubComponents(targetComp).contains(srcComp)){
 				return true;
 			}
 			
 			Set<String> subComps;
 			if(scope == null){
-				subComps = dynamicDepMgr.getStaticDeps();
+				subComps = depMgr.getStaticDeps();
 			} else{
 				subComps = scope.getSubComponents(targetComp);
 			}
 			
 			if(subComps.contains(srcComp)){
-				DependenceRegistry outDepRegistry = dynamicDepMgr.getOutDepRegistry();
+				DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
 				Dependence dependence = new Dependence(PAST_DEP, parentTx, targetComp, srcComp, null, null);
 				outDepRegistry.addDependence(dependence);
 				
@@ -684,12 +686,12 @@ public class TranquillityImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doAckSubTxInit(String srcComp, String targetComp, String rootTx, String parentTxID, String subTxID) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		
-		Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
-			Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
+			Map<String, TransactionContext> allTxs = depMgr.getTxs();
 			TransactionContext txCtx;
 			txCtx = allTxs.get(parentTxID);
 			assert(txCtx!=null);
@@ -698,10 +700,10 @@ public class TranquillityImpl implements Algorithm {
 			subTxHostComps.put(subTxID, srcComp);
 			subTxStatuses.put(subTxID, TxEventType.TransactionStart);
 			
-			if(dynamicDepMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
 				return true;
 			
-			return removeFutureEdges(dynamicDepMgr, targetComp, rootTx, parentTxID, subTxID);
+			return removeFutureEdges(targetComp, rootTx, parentTxID, subTxID);
 		}
 		
 	}
@@ -716,9 +718,9 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifyFutureRemove(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
-		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		
 		inDepRegistry.removeDependence(FUTURE_DEP, rootTx, srcComp, targetComp);
 		
@@ -735,8 +737,8 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
 		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
@@ -757,9 +759,9 @@ public class TranquillityImpl implements Algorithm {
 	 * @param subTxID
 	 * @return
 	 */
-	private boolean removeFutureEdges(DynamicDepManagerImpl dynamicDepMgr, String currentComp, String rootTx, String currentTxID, String subTxID){
-		DependenceRegistry outDepRegistry = dynamicDepMgr.getOutDepRegistry();
-		DependenceRegistry inDepRegistry = dynamicDepMgr.getInDepRegistry();
+	private boolean removeFutureEdges(String currentComp, String rootTx, String currentTxID, String subTxID){
+		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
+		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		Set<Dependence> outFutureDeps = outDepRegistry.getDependencesViaType(FUTURE_DEP);
 		Set<Dependence> outFutureOneRoot = new HashSet<Dependence>();
 		
@@ -796,7 +798,7 @@ public class TranquillityImpl implements Algorithm {
 		
 		if(!inFutureFlag){
 //			TransactionContext txContext = TransactionRegistry.getInstance().getTransactionContext(currentTxID);
-			TransactionContext txContext = dynamicDepMgr.getTxs().get(currentTxID);
+			TransactionContext txContext = depMgr.getTxs().get(currentTxID);
 			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
 			
 			for(Dependence dep : outFutureOneRoot){
@@ -815,7 +817,7 @@ public class TranquillityImpl implements Algorithm {
 	}
 	
 	
-	private boolean removeAllEdges(String hostComponent, String rootTx, DynamicDepManager depMgr){
+	private boolean removeAllEdges(String hostComponent, String rootTx){
 		Set<Dependence> rtOutDeps;
 		rtOutDeps = depMgr.getRuntimeDeps();
 		
@@ -945,9 +947,9 @@ public class TranquillityImpl implements Algorithm {
 		isSetupDone.clear();
 
 		// notify parent components that dynamic update is done
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager
-				.getDynamicDepManager(hostComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager
+//				.getDynamicDepManager(hostComp);
 
 		// notify parent components that remote dynamic update is done
 		Scope scope = depMgr.getScope();
@@ -999,13 +1001,13 @@ public class TranquillityImpl implements Algorithm {
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
 			String parentTx, String subTx) {
 		if(subTxStatus.equals(TxEventType.TransactionStart)){
-			NodeManager nodeManager = NodeManager.getInstance();
-			DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager
-					.getDynamicDepManager(curComp);
+//			NodeManager nodeManager = NodeManager.getInstance();
+//			DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager
+//					.getDynamicDepManager(curComp);
 
-			Object ondemandSyncMonitor = dynamicDepMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
+				Map<String, TransactionContext> allTxs = depMgr.getTxs();
 				TransactionContext txCtx;
 				txCtx = allTxs.get(parentTx);
 				assert (txCtx != null);
@@ -1030,8 +1032,8 @@ public class TranquillityImpl implements Algorithm {
 
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
@@ -1064,6 +1066,11 @@ public class TranquillityImpl implements Algorithm {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public void setDynamicDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
 	}
 
 }
