@@ -61,13 +61,15 @@ public class CoordinationVisitorThread extends Thread{
 
 	public void run() {
 		try {
-			long startTime = System.nanoTime();
 			
 			Coordination scaTour = node.getService(Coordination.class, "Coordination#service-binding(Coordination/Coordination)");
+			long startTime = System.nanoTime();
 			scaTour.coordinate();
-			countDown.countDown();
-			
 			long endTime = System.nanoTime();
+			
+			if(countDown != null)
+				countDown.countDown();
+			
 			System.out.println("response time:" + (endTime - startTime) / 1000000.0);
 			if (resTimeRec != null) {
 				if (execType == null)
