@@ -31,7 +31,7 @@ public class CommServerManager {
 	private static Map<String, CommServer> commServers = new ConcurrentHashMap<String, CommServer>();
 	
 	/** used to store the mapping between CompName name and AddressInfo*/
-	private static Map<String, CompCommAddress> serviceToAddressInfo = new ConcurrentHashMap<String, CompCommAddress>();
+	private static Map<String, CompCommAddress> compNameToAddressInfo = new ConcurrentHashMap<String, CompCommAddress>();
 
 	private CommServerManager() {
 
@@ -115,47 +115,32 @@ public class CommServerManager {
 	 * @return target component's ip address and port: "ip:10.0.2.15,port:18080";
 	 */
 	public CompCommAddress getInfos(String srcComp, String targetComp) {
-		
-		synchronized (serviceToAddressInfo) {
-			if(serviceToAddressInfo.size() == 0){
+
+		synchronized (compNameToAddressInfo) {
+			if(compNameToAddressInfo.size() == 0){
 				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(srcComp);
 				NodeImpl node = (NodeImpl) compLifeCycleMgr.getNode();
-				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
+				DomainRegistry domainRegistry = node.getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 				for(Endpoint ep : endpoints){
-					String deployURI = ep.getDeployedURI();
-					if (deployURI.startsWith("http://")) {
+//					String deployURI = ep.getDeployedURI();
+					String bindingURI = ep.getBinding().getURI();
+					assert bindingURI != null;
+					if (bindingURI.startsWith("http://")) {
 						// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
-						String[] infos = deployURI.split(":");
+						String[] infos = bindingURI.split(":");
 						String ip = infos[1].substring(2);
 						int port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;
+						String compName = ep.getComponent().getName();
 						CompCommAddress cci = new CompCommAddress(targetComp, ip, port);
-						serviceToAddressInfo.put(targetComp, cci);
-						break;
+						if(!compNameToAddressInfo.containsKey(compName))
+							compNameToAddressInfo.put(compName, cci);
 					} 
 				}
 			}
 		}
 
-		return serviceToAddressInfo.get(targetComp);
-//		String ip = null;
-//		int port = 0;
-//		for (Endpoint ep : endpoints) {
-//			if (ep.getComponent().getName().equals(targetComp)) {
-//				String deployURI = ep.getDeployedURI();
-//				if (deployURI.startsWith("http://")) {
-//					// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
-//					String[] infos = deployURI.split(":");
-//					ip = infos[1].substring(2);
-//					port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;
-//					break;
-//				} else {
-//
-//				}
-//			}
-//		}
-//		CompCommAddress cci = new CompCommAddress(targetComp, ip, port);
-//		return cci;
+		return compNameToAddressInfo.get(targetComp);
 	}
 	
 	/**
