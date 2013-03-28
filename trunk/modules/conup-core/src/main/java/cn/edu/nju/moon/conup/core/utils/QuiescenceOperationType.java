@@ -4,6 +4,9 @@ package cn.edu.nju.moon.conup.core.utils;
  * @version Dec 18, 2012 4:24:02 PM
  */
 public enum QuiescenceOperationType {
+	//ondemand event type
+	REQ_ONDEMAND_SETUP,
+	CONFIRM_ONDEMAND_SETUP,
 	//tx operations
 	ACK_SUBTX_INIT,
 	NOTIFY_SUBTX_END,
