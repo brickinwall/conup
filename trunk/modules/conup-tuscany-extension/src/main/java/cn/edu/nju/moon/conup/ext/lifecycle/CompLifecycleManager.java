@@ -56,6 +56,16 @@ public class CompLifecycleManager {
 	
 	private ComponentUpdator updator = null;
 	
+	private DynamicDepManager depMgr = null;
+	
+	public DynamicDepManager getDepMgr() {
+		return depMgr;
+	}
+
+	public void setDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
+	}
+
 	public ComponentUpdator getCompUpdator() {
 		return updator;
 	}
@@ -86,10 +96,11 @@ public class CompLifecycleManager {
 				clMgr = new CompLifecycleManager();
 				compClMgrs.put(compObj, clMgr);
 				clMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
+				clMgr.setCompObject(compObj);
+				clMgr.setDepMgr(nodeMgr.getDynamicDepManager(compIdentifier));
 			} else{
 				clMgr = compClMgrs.get(compObj);
 			}
-			clMgr.setCompObject(compObj);
 			assert clMgr.getCompUpdator()!=null;
 			
 		}
@@ -195,10 +206,12 @@ public class CompLifecycleManager {
 	 */
 	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
 		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
+//		DynamicDepManager depMgr;
 		
 		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+		assert compObj.getIdentifier().equals(compIdentifier);
+		
 		PerformanceRecorder.getInstance(compIdentifier).updateReceived(System.nanoTime());
 		
 		synchronized (this) {
@@ -231,16 +244,16 @@ public class CompLifecycleManager {
 	}
 	
 	public boolean attemptToUpdate(){
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(compObj.getIdentifier());
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(compObj.getIdentifier());
 		
 		CompLifecycleManager compLcMgr;
 		compLcMgr = CompLifecycleManager.getInstance(compObj.getIdentifier());
 			
 		
-		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
-			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
+			if(depMgr.getCompStatus().equals(CompStatus.VALID) 
 				&& updateCtx != null && updateCtx.isLoaded()){
 				//calculate old version root txs
 				if(!updateCtx.isOldRootTxsInitiated()){
@@ -251,7 +264,7 @@ public class CompLifecycleManager {
 				String freenessConf = compObj.getFreenessConf();
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
 				if(freeness.isReadyForUpdate(compObj.getIdentifier())){
-					dynamicDepMgr.achievedFree();
+					depMgr.achievedFree();
 //				} else{
 //					try {
 //						LOGGER.fine("try to  free, try to update------------------CompLifecycleManager");
@@ -263,9 +276,9 @@ public class CompLifecycleManager {
 			}
 		}
 		
-		Object updatingSyncMonitor = dynamicDepMgr.getUpdatingSyncMonitor();
+		Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
-			if(dynamicDepMgr.getCompStatus().equals(CompStatus.Free)){
+			if(depMgr.getCompStatus().equals(CompStatus.Free)){
 				compLcMgr.executeUpdate();
 				compLcMgr.cleanupUpdate();
 			}
@@ -276,8 +289,8 @@ public class CompLifecycleManager {
 	
 	public boolean executeUpdate(){
 		String compIdentifier;
-		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
+//		NodeManager nodeMgr;
+//		DynamicDepManager depMgr;
 		//duplicated update
 		synchronized (this) {
 			if(isUpdated){
@@ -286,8 +299,8 @@ public class CompLifecycleManager {
 			}
 			isUpdated = true;
 			compIdentifier = compObj.getIdentifier();
-			nodeMgr = NodeManager.getInstance();
-			depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//			nodeMgr = NodeManager.getInstance();
+//			depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 			
 			depMgr.updating();
 		}
@@ -299,13 +312,13 @@ public class CompLifecycleManager {
 	}
 	
 	public boolean cleanupUpdate(){
-		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
+//		NodeManager nodeMgr;
+//		DynamicDepManager depMgr;
 		String compIdentifier;
 		
 		compIdentifier = compObj.getIdentifier();
-		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		nodeMgr = NodeManager.getInstance();
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 //		updator = UpdateFactory.createCompUpdator(compObj.getImplType());
 		// if dynamic update is done, cleanup is needed
 		LOGGER.info("**** BeforeSetToNewVersion");
@@ -420,13 +433,13 @@ public class CompLifecycleManager {
 	}
 	
 	public boolean initOldRootTxs(){
-		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
-		String compIdentifier;
-		
-		compIdentifier = compObj.getIdentifier();
-		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		NodeManager nodeMgr;
+//		DynamicDepManager depMgr;
+//		String compIdentifier;
+//		
+//		compIdentifier = compObj.getIdentifier();
+//		nodeMgr = NodeManager.getInstance();
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		if(!updateCtx.isOldRootTxsInitiated()){
 			updateCtx.setAlgorithmOldRootTxs(depMgr.getAlgorithmOldVersionRootTxs());
 			
@@ -440,13 +453,13 @@ public class CompLifecycleManager {
 	 * @return
 	 */
 	public boolean reinitOldRootTxs(){
-		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
-		String compIdentifier;
-		
-		compIdentifier = compObj.getIdentifier();
-		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+//		NodeManager nodeMgr;
+//		DynamicDepManager depMgr;
+//		String compIdentifier;
+//		
+//		compIdentifier = compObj.getIdentifier();
+//		nodeMgr = NodeManager.getInstance();
+//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		updateCtx.setAlgorithmOldRootTxs(depMgr.getAlgorithmOldVersionRootTxs());
 		LOGGER.fine("reinitOldRootTxs.getAlgorithmOldRootTxs:" + updateCtx.getAlgorithmOldRootTxs().size() + updateCtx.getAlgorithmOldRootTxs());
 
@@ -470,5 +483,6 @@ public class CompLifecycleManager {
 	public DynamicUpdateContext getUpdateCtx() {
 		return updateCtx;
 	}
+	
 	
 }
