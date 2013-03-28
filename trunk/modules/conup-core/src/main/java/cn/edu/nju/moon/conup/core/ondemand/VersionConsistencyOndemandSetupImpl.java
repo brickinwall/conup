@@ -42,11 +42,17 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private final static Logger LOGGER = Logger.getLogger(VersionConsistencyOndemandSetupImpl.class.getName());
 	
 	/**
+	 * components who send ondemand request to current component, when current component finish ondemand
+	 * need to send confirm message to them(sub components)
 	 * outer map's key is hostCompName
 	 * inner map's key is subComponentName
 	 */
 	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new HashMap<String, Map<String, Boolean>>();
 	/**
+	 * components who depend on current component, when all parent components finish its ondemand
+	 * they should send Confirm message to current component. 
+	 * when current component receive all its parents' confirm message, it should change status from ondemand to valid
+	 *  
 	 * outer map's key is hostCompName
 	 * inner map's key is parentComponentName
 	 */

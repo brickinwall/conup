@@ -34,11 +34,17 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	private OndemandSetupHelper ondemandHelper;
 
 	/**
+	 * components who send ondemand request to current component, when current component finish ondemand
+	 * need to send confirm message to them(sub components)
 	 * outer map's key is hostCompName
 	 * inner map's key is subComponentName
 	 */
 	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new HashMap<String, Map<String, Boolean>>();
 	/**
+	 * components who depend on current component, when all parent components finish its ondemand
+	 * they should send Confirm message to current component. 
+	 * when current component receive all its parents' confirm message, it should change status from ondemand to valid
+	 *  
 	 * outer map's key is hostCompName
 	 * inner map's key is parentComponentName
 	 */
@@ -52,7 +58,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		Scope scope = calcScope();
 		ondemandHelper.getDynamicDepManager().setScope(scope);
 		
-		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+//		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
 		assert scope != null;
 		
 		return reqOndemandSetup(hostComp, hostComp);
@@ -95,13 +101,13 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	}
 
 	@Override
-		public void onDemandIsDone() {
-			String hostComp = ondemandHelper.getCompObject().getIdentifier();
-			OndemandRequestStatus.remove(hostComp);
-			ConfirmOndemandStatus.remove(hostComp);
-	//		OndemandRequestStatus.clear();
-	//		ConfirmOndemandStatus.clear();
-		}
+	public void onDemandIsDone() {
+		String hostComp = ondemandHelper.getCompObject().getIdentifier();
+		OndemandRequestStatus.remove(hostComp);
+		ConfirmOndemandStatus.remove(hostComp);
+		// OndemandRequestStatus.clear();
+		// ConfirmOndemandStatus.clear();
+	}
 
 	@Override
 	public String getAlgorithmType() {

@@ -64,6 +64,9 @@ public class QuiescenceImpl implements Algorithm {
 		case VALID:
 			doValid(txContext);
 			break;
+		case ONDEMAND:
+			doOndemand(txContext);
+			break;
 		case Free:
 			doFree(txContext);
 			break;
@@ -136,6 +139,29 @@ public class QuiescenceImpl implements Algorithm {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * current component status is ondemand, suspend current execution until 
+	 * status becomes to valid
+	 * @param txContext
+	 * @param dynamicDepMgr
+	 */
+	private void doOndemand(TransactionContext txContext) {
+		// sleep until current status become valid
+		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		synchronized (ondemandSyncMonitor) {
+			try {
+				if (depMgr.isOndemandSetting()) {
+					LOGGER.fine("----------------ondemandSyncMonitor.wait();Quiescence algorithm------------");
+					ondemandSyncMonitor.wait();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		doValid(txContext);
+		
 	}
 	
 	private void doNormal(TransactionContext txCtx){
