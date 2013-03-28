@@ -74,22 +74,6 @@ public class QuiescenceImpl implements Algorithm {
 
 	}
 
-	private void doFree(TransactionContext txContext) {
-//		initDynamicDepMgr(txContext.getHostComponent());
-		Object updatingMonitor = depMgr.getUpdatingSyncMonitor();
-		synchronized(updatingMonitor){
-			try {
-				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
-					updatingMonitor.wait();
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		//TODO is here a doNormal() operation required?
-		doNormal(txContext);
-	}
-
 	@Override
 	public boolean manageDependence(String payload) {
 		boolean result = false;
@@ -154,10 +138,37 @@ public class QuiescenceImpl implements Algorithm {
 		return result;
 	}
 	
-	private void doNormal(TransactionContext txContext){
-//		initDynamicDepMgr(txContext.getHostComponent());
-		depMgr.ondemandSetupIsDone();
-		doValid(txContext);
+	private void doNormal(TransactionContext txCtx){
+//		depMgr.ondemandSetupIsDone();
+//		doValid(txContext);
+		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
+			String hostComp;
+			String rootTx;
+
+			hostComp = txCtx.getHostComponent();
+			rootTx = txCtx.getRootTx();
+			
+			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			synchronized (ondemandSyncMonitor) {
+				if( depMgr.isNormal()){
+					depMgr.getTxs().remove(txCtx.getCurrentTx());
+					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
+					
+					return;
+				} else{
+					try {
+						if (depMgr.isOndemandSetting()) {
+							LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
+							ondemandSyncMonitor.wait();
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			doValid(txCtx);
+		}
 	}
 
 	private void doValid(TransactionContext txCtx) {
@@ -167,11 +178,11 @@ public class QuiescenceImpl implements Algorithm {
 //		initDynamicDepMgr(txCtx.getHostComponent());
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
-			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
+//			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
 //				String payload = QuiescencePayloadCreator.createPayload(hostComp, txCtx.getParentComponent(), txCtx.getRootTx(), QuiescenceOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
 //				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 //				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
-			}
+//			}
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
 			
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
@@ -195,8 +206,8 @@ public class QuiescenceImpl implements Algorithm {
 						txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					}
 				}
-				Set<String> targetRef;
-				targetRef = depMgr.getStaticDeps();
+//				Set<String> targetRef;
+//				targetRef = depMgr.getStaticDeps();
 //				for(String subComp : targetRef){
 //					String payload = QuiescencePayloadCreator.createRootTxEndPayload(hostComp, subComp, rootTx, QuiescenceOperationType.NOTIFY_ROOT_TX_END);
 //					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
@@ -206,9 +217,9 @@ public class QuiescenceImpl implements Algorithm {
 				LOGGER.fine("root tx " + rootTx + " end, checkPassiveAndAck...");
 				
 				LOGGER.fine("before checkPassiveAndAck:");
-				Printer printer = new Printer();
+//				Printer printer = new Printer();
 //				initDynamicDepMgr(hostComp);
-				Map<String, TransactionContext> txs = depMgr.getTxs();
+//				Map<String, TransactionContext> txs = depMgr.getTxs();
 //				printer.printTxs(txs);
 				checkPassiveAndAck(txCtx.getHostComponent());
 				
@@ -222,6 +233,22 @@ public class QuiescenceImpl implements Algorithm {
 		Printer printer = new Printer();
 //		printer.printTxs(depMgr.getTxs());
 	}
+
+	private void doFree(TransactionContext txContext) {
+	//		initDynamicDepMgr(txContext.getHostComponent());
+			Object updatingMonitor = depMgr.getUpdatingSyncMonitor();
+			synchronized(updatingMonitor){
+				try {
+					if (depMgr.getCompStatus().equals(CompStatus.Free)) {
+						updatingMonitor.wait();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			//TODO is here a doNormal() operation required?
+			doNormal(txContext);
+		}
 
 	private boolean doNotifyRootTxEnd(String srcComp, String hostComp, String rootTx) {
 		TransactionContext txCtx;
@@ -344,6 +371,7 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private void ackPassivate(String hostComp, String targetComp) {
 		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
+		LOGGER.info("isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, QuiescenceOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
@@ -372,8 +400,8 @@ public class QuiescenceImpl implements Algorithm {
 			boolean bePassive = true;
 			while(txsIterator.hasNext()){
 				Entry<String, TransactionContext> entry = txsIterator.next();
-				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd) 
-					&& !entry.getValue().isFakeTx()){
+				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd) ){
+//					&& !entry.getValue().isFakeTx()){
 					bePassive = false;
 					break;
 				}
@@ -381,6 +409,9 @@ public class QuiescenceImpl implements Algorithm {
 			if(bePassive){
 				PASSIVATED = true;
 				LOGGER.info("**** passive has achieved for component: " + hostComp + "***********");
+//				Printer printer = new Printer();
+//				printer.printTxs(LOGGER, depMgr.getTxs());
+				
 				// confirm all reqPassive
 				for (String reqComp : REQS) {
 					ackPassivate(hostComp, reqComp);
@@ -471,9 +502,16 @@ public class QuiescenceImpl implements Algorithm {
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
 			TransactionContext txContext, boolean isUpdateReqRCVD) {	
 
-		boolean isRootComp = txContext.getHostComponent().equals(
-				txContext.getRootComponent());
-
+//		boolean isRootComp = txContext.getHostComponent().equals(
+//				txContext.getRootComponent());
+//		boolean isRootComp = txContext.getHostComponent().equals(
+//				depMgr.getCompObject().getIdentifier());
+		
+		boolean isRootComp = txContext.getRootTx()==null;
+		
+		LOGGER.info("isUpdateReqRCVD:" + isUpdateReqRCVD + "  isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED + "  isRootComp:" + isRootComp);
+		LOGGER.info("txCtx:\n" + txContext);
+		
 		if (!isUpdateReqRCVD) {
 			if (!isPassivateRCVD) {
 				return false;
