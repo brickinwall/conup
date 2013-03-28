@@ -387,7 +387,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //					LOGGER.fine("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
 					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)){
 						try {
-							LOGGER.fine("---blocked in quiescence----");
+							LOGGER.info("thread suspended to wait for remote update done--------------------------");
 							waitingRemoteCompUpdateDoneMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
