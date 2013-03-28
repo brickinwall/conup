@@ -343,22 +343,27 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			
 			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
 			Map<String, Object> msgHeaders = msg.getHeaders();
-			if (depMgr.isNormal()) {
-				// the invoked transaction is not a root transaction
-				if(txCtx.getRootTx() != null){
-					assert txCtx.getParentTx() != null;
-					assert txCtx.getParentComponent() != null;
-					assert msgHeaders.get(SUB_TX) != null;
-					txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
-							txCtx.getRootTx(), txCtx.getRootComponent(),
-							txCtx.getParentTx(), txCtx.getParentComponent());
-				}
-				return msg;
-			}
 
 			// waiting during on-demand setup
 			Object syncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (syncMonitor) {
+				if (depMgr.isNormal()) {
+					// the invoked transaction is not a root transaction
+					if(txCtx.getRootTx() != null){
+						assert txCtx.getParentTx() != null;
+						assert txCtx.getParentComponent() != null;
+						assert msgHeaders.get(SUB_TX) != null;
+						assert msgHeaders != null;
+						assert txDepMonitor != null;
+						assert msgHeaders.get(SUB_TX) != null;
+						
+						txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
+								txCtx.getRootTx(), txCtx.getRootComponent(),
+								txCtx.getParentTx(), txCtx.getParentComponent());
+					}
+					return msg;
+				}
+				
 				try {
 					if (depMgr.isOndemandSetting()) {
 						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
@@ -382,6 +387,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //					LOGGER.fine("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
 					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)){
 						try {
+							LOGGER.fine("---blocked in quiescence----");
 							waitingRemoteCompUpdateDoneMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
