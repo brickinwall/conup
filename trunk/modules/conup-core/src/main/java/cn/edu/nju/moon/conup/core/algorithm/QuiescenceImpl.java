@@ -371,7 +371,7 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private void ackPassivate(String hostComp, String targetComp) {
 		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
-		LOGGER.info("isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
+		LOGGER.fine(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, QuiescenceOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
@@ -462,14 +462,14 @@ public class QuiescenceImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
-		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
+		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
 //		initDynamicDepMgr(hostComp);
 		
 		//notify parent components that remote dynamic update is done
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : DEPS.keySet()){
 			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, QuiescenceOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.asynPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		// clean up
@@ -509,8 +509,8 @@ public class QuiescenceImpl implements Algorithm {
 		
 		boolean isRootComp = txContext.getRootTx()==null;
 		
-		LOGGER.info("isUpdateReqRCVD:" + isUpdateReqRCVD + "  isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED + "  isRootComp:" + isRootComp);
-		LOGGER.info("txCtx:\n" + txContext);
+		LOGGER.fine(txContext.getHostComponent() + "  " + "isUpdateReqRCVD:" + isUpdateReqRCVD + "  isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED + "  isRootComp:" + isRootComp);
+//		LOGGER.fine("txCtx:\n" + txContext);
 		
 		if (!isUpdateReqRCVD) {
 			if (!isPassivateRCVD) {
