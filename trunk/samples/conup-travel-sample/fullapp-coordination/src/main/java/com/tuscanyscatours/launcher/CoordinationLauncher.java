@@ -17,8 +17,10 @@ import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
@@ -63,12 +65,20 @@ public class CoordinationLauncher {
 	}
 	
 	public static void accessServices(Node node) throws Exception{
-		int accessTimes = 40;		//total request
-		int rqstInterval = 200;
-		String targetComp = "CurrencyConverter";	//target component for update
+		int accessTimes = 0;		//total request
+		int rqstInterval = 0;
 		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
 		
-//		System.out.println("Pls input the command, or input 'help' for help");
+		ExpXMLUtil xmlUtil = new ExpXMLUtil();
+		String algorithm = xmlUtil.getAlgorithmConf();
+		algorithm = algorithm.substring(0, algorithm.indexOf("_ALGORITHM"));
+		ExpSetting expSetting = xmlUtil.getExpSetting();
+		rqstInterval = expSetting.getRqstInterval();
+		int nThreads = expSetting.getnThreads();
+		int threadId = expSetting.getThreadId();
+		int indepRun = expSetting.getIndepRun();
+		String targetComp = expSetting.getTargetComp();	//target component for update
+		
 		printHelp();
 		Scanner scanner = new Scanner(System.in);
 		while(scanner.hasNextLine()){
@@ -127,8 +137,9 @@ public class CoordinationLauncher {
 						updatePoints.put(point, input[i+1]);
 				}
 				
+				CountDownLatch updateAtCountDown = new CountDownLatch(accessTimes);
 				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node, 0 , i + 1).start();
+					new CoordinationVisitorThread(node, 0 , i + 1, updateAtCountDown).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
 						TravelCompUpdate.update(targetComp, updatePoints.get(i));
@@ -136,108 +147,75 @@ public class CoordinationLauncher {
 				}
 				break;
 			case disruption:
-				targetComp = input[1].trim();
-				rqstInterval = new Integer(input[2].trim());
-				accessTimes = new Integer(input[3].trim());
-
-				for(int i=4; i<input.length; i+=2){
-					int point = new Integer(input[i].trim());
-					if(point < accessTimes)
-						updatePoints.put(point, input[i+1]);
-				}
 				
-				int warmUpTimes = 100;
+				int warmUpTimes = 400;
 				CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
-					Thread.sleep(rqstInterval);
+					if(i == 300){
+						TravelCompUpdate.update();
+					}
+					Thread.sleep(200);
 				}
 				warmCountDown.await();
 				
 				Thread.sleep(3000);
 				
 				DisruptionExp disExp = DisruptionExp.getInstance();
-//				double normalBaseLine = 0.0;
-//				int n = 4;
-//				for(int round = 0; round < n; round++){
-//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-//
-//					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-//					for (int i = 0; i < accessTimes; i++) {
-//						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-//						Thread.sleep(rqstInterval);
-//					}
-//					normalCountDown.await();
-//					
-//					normalBaseLine += resTimeRec.getTotalNormalResTime();
-//					Thread.sleep(2000);
-//				}
-//				normalBaseLine = normalBaseLine / n;
-//				LOGGER.info("normalBaseLine:" + normalBaseLine);
-//				
-//				for(int round = 0; round < 50; round++){
-//					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-//					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
-//					for (int i = 0; i < accessTimes; i++) {
-//						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
-//						if(updatePoints.get(i) != null){
-//							TravelCompUpdate.update(targetComp, updatePoints.get(i));
-//						}
-//						Thread.sleep(rqstInterval);
-//					}
-//					updateCountDown.await();
-//					
-//					String data = normalBaseLine + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - normalBaseLine) + "\n";
-//					disExp.writeToFile(data);
-//					
-//					Thread.sleep(2000);
-//				}
 				
-				for(int round = 0; round < 50; round++){
+				for(int round = 0; round < indepRun; round++){
 					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
-						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
-						if(updatePoints.get(i) != null){
-							TravelCompUpdate.update(targetComp, updatePoints.get(i));
-						}
-						Thread.sleep(rqstInterval);
-					}
-					updateCountDown.await();
+					System.out.println("-------------round " + round + "--------------");
 					
-					
-					Thread.sleep(3000);
-
-					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
+					CountDownLatch normalCountDown = new CountDownLatch(nThreads);
+					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
 						Thread.sleep(rqstInterval);
 					}
 					normalCountDown.await();
 					
-					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
-					disExp.writeToFile(data);
-					
 					Thread.sleep(3000);
+
+					CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+					for (int i = 0; i < nThreads; i++) {
+						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
+						if(i == threadId){
+							TravelCompUpdate.update();
+						}
+						Thread.sleep(rqstInterval);
+					}
+					updateCountDown.await();
+					
+					Thread.sleep(1000);
+					
+					Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
+					Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
+					System.out.println("normalRes.size() ==" + normalRes.size());
+					System.out.println("updateRes.size() ==" + updateRes.size());
+					assert normalRes.size() == nThreads;
+					assert updateRes.size() == nThreads;
+					
+					for(int i = 0; i < nThreads; i++){
+						String data = round + "," + (i+1) + "," + normalRes.get(i + 1) * 1e-6 + "," + updateRes.get(i+1) * 1e-6 + "\n";
+						disExp.writeToFile(data);
+					}
+//					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
+//					disExp.writeToFile(data);
+					
+					Thread.sleep(3500);
 				}
 				
-				disExp.close();
+//				disExp.close();
 				break;
 			case timeliness:
-				targetComp = input[1].trim();
-				rqstInterval = new Integer(input[2].trim());
-				accessTimes = new Integer(input[3].trim());
 
-				for(int i=4; i<input.length; i+=2){
-					int point = new Integer(input[i].trim());
-					if(point < accessTimes)
-						updatePoints.put(point, input[i+1]);
-				}
-				
-				warmUpTimes = 100;
+				warmUpTimes = 400;
 				warmCountDown = new CountDownLatch(warmUpTimes);
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
+					if(i == 300){
+						TravelCompUpdate.update();
+					}
 					Thread.sleep(rqstInterval);
 				}
 				warmCountDown.await();
@@ -245,12 +223,12 @@ public class CoordinationLauncher {
 				Thread.sleep(3000);
 				
 				TimelinessRecorder timelinessRec = new TimelinessRecorder();
-				for(int round = 0; round < 50; round++){
-					CountDownLatch updateCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
+				for(int round = 0; round < indepRun; round++){
+					CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, timelinessRec).start();
-						if(updatePoints.get(i) != null){
-							TravelCompUpdate.update(targetComp, updatePoints.get(i));
+						if(i == threadId){
+							TravelCompUpdate.update();
 						}
 						Thread.sleep(rqstInterval);
 					}
@@ -258,14 +236,13 @@ public class CoordinationLauncher {
 					
 					Thread.sleep(2000);
 				}
-				List<Double> allUpdateTime = new TimelinessRecorder().getAllUpdateCostTime();
-				TimelinessExp.getInstance().writeToFile(allUpdateTime);
+//				List<Double> allUpdateTime = timelinessRec.getAllUpdateCostTime();
+//				System.out.println(allUpdateTime);
+//				TimelinessExp.getInstance().writeToFile(allUpdateTime);
+				
 				break;
 			case overhead:
-				rqstInterval = new Integer(input[1].trim());
-				accessTimes = new Integer(input[2].trim());
-				
-				warmUpTimes = 100;
+				warmUpTimes = 400;
 				warmCountDown = new CountDownLatch(warmUpTimes);
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
@@ -277,11 +254,11 @@ public class CoordinationLauncher {
 				
 				OverheadExp overExp = OverheadExp.getInstance();
 				List<Double> tuscanyBaseLine = new ArrayList<Double>();
-				for(int round = 0; round < 50; round++){
+				for(int round = 0; round < indepRun; round++){
 					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
 
-					CountDownLatch normalCountDown = new CountDownLatch(accessTimes);
-					for (int i = 0; i < accessTimes; i++) {
+					CountDownLatch normalCountDown = new CountDownLatch(nThreads);
+					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
 						Thread.sleep(rqstInterval);
 					}
@@ -330,13 +307,13 @@ public class CoordinationLauncher {
 	private static void printHelp(){
 		System.out.println();
 		System.out.println("experiment of disruption ");
-		System.out.println("	[usage] disruption CurrencyConverter 500 50 25 VER_ONE\n");
+		System.out.println("	[usage] disruption\n");
 		
 		System.out.println("experiment of timeliness ");
-		System.out.println("	[usage] timeliness CurrencyConverter 500 50 25 VER_ONE\n");
+		System.out.println("	[usage] timeliness\n");
 		
 		System.out.println("experiment of overhead ");
-		System.out.println("	[usage] overhead 500 50 \n");
+		System.out.println("	[usage] overhead\n");
 		
 		System.out.println("access specified times without executing update, e.g., ");
 		System.out.println("	[usage] access 500 50");

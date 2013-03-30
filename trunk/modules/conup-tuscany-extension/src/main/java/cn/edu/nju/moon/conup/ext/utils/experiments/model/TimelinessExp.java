@@ -23,6 +23,7 @@ public class TimelinessExp {
 	private int nThreads;
 	private int threadId;
 	private String algorithm = null;
+	private String strategy = null;
 
 	public ExpSetting getExpSetting() {
 		return expSetting;
@@ -33,6 +34,8 @@ public class TimelinessExp {
 		String tuscanyHomeLocation = xmlUtil.getTuscanyHome();
 		algorithm = xmlUtil.getAlgorithmConf();
 		algorithm = algorithm.substring(0, algorithm.indexOf("_ALGORITHM"));
+		strategy = xmlUtil.getFreenessStrategy();
+		strategy = strategy.substring(0, strategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
@@ -40,7 +43,7 @@ public class TimelinessExp {
 		String targetComp = expSetting.getTargetComp();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
-		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
+		fileName = algorithm + "_" + strategy + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -69,7 +72,16 @@ public class TimelinessExp {
 				out.write(data);
 				out.flush();
 			}
-			out.close();
+//			out.close();
+		}
+	}
+	
+	public void writeToFile(double updateTime) throws IOException {
+		synchronized (timeliness) {
+			LOGGER.info("updateTime:" + updateTime);
+			String data = updateTime + "\n";
+			out.write(data);
+			out.flush();
 		}
 	}
 	
@@ -118,6 +130,6 @@ public class TimelinessExp {
 
 	@Override
 	public String toString() {
-		return "Quiescence, Tranquillty, Consistency(WF), Consistency(BF), Consistency(CV)";
+		return "Update cost time:";
 	}
 }
