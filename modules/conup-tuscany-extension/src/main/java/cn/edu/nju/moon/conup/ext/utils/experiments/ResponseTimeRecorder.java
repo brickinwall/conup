@@ -4,16 +4,29 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class ResponseTimeRecorder {
+	private static Logger LOGGER = Logger.getLogger(ResponseTimeRecorder.class.getName());
 	private Map<Integer, Long> normalRes = new ConcurrentHashMap<Integer, Long>();
 	private Map<Integer, Long> updateRes = new ConcurrentHashMap<Integer, Long>();
 	
+	public Map<Integer, Long> getNormalRes() {
+		return normalRes;
+	}
+
+	public Map<Integer, Long> getUpdateRes() {
+		return updateRes;
+	}
+
+	
 	public void addNormalResponse(int threadId, long time){
+		assert normalRes.get(threadId) == null;
 		normalRes.put(threadId, time);
 	}
 	
 	public void addUpdateResponse(int threadId, long time){
+		assert updateRes.get(threadId) == null;
 		updateRes.put(threadId, time);
 	}
 	
@@ -26,7 +39,7 @@ public class ResponseTimeRecorder {
 			Entry<Integer, Long> entry = iterator.next();
 			totalTime += entry.getValue();
 		}
-		return totalTime / 1000000.0;
+		return totalTime* 1e-6;
 	}
 	
 	public double getTotalUpdateResTime(){
@@ -38,7 +51,7 @@ public class ResponseTimeRecorder {
 			Entry<Integer, Long> entry = iterator.next();
 			totalTime += entry.getValue();
 		}
-		return totalTime / 1000000.0;
+		return totalTime* 1e-6;
 		
 	}
 	

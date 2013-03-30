@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.ext.utils.experiments;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -39,8 +40,12 @@ public class PerformanceRecorder {
 //		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
 		ExpSetting expSetting = TimelinessExp.getInstance().getExpSetting();
 		if(expSetting.getType().contains("timeliness")){
-			new TimelinessRecorder().addUpdateCostTime(this.endTime - startTime);
-//			TimelinessExp.getInstance().writeToFile(0, (this.endTime - startTime) / 1000000.0);
+//			new TimelinessRecorder().addUpdateCostTime(this.endTime - this.startTime);
+			try {
+				TimelinessExp.getInstance().writeToFile((this.endTime - this.startTime) / 1000000.0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

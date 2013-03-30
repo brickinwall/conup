@@ -27,6 +27,8 @@ public class DisruptionExp {
 		String tuscanyHomeLocation = xmlUtil.getTuscanyHome();
 		String algorithm = xmlUtil.getAlgorithmConf();
 		algorithm = algorithm.substring(0, algorithm.indexOf("_ALGORITHM"));
+		String freenessStrategy = xmlUtil.getFreenessStrategy();
+		freenessStrategy = freenessStrategy.substring(0, freenessStrategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
@@ -34,7 +36,7 @@ public class DisruptionExp {
 		String targetComp = expSetting.getTargetComp();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
-		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
+		fileName = algorithm + "_" + freenessStrategy + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -83,6 +85,6 @@ public class DisruptionExp {
 
 	@Override
 	public String toString() {
-		return "NormalTotalExecTime, UpdateExecTotalTime, Delta";
+		return "Round, ThreadId, NormalResponse, UpdateResponse";
 	}
 }

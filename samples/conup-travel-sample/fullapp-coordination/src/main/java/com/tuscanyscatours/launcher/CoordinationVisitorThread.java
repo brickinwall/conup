@@ -51,6 +51,13 @@ public class CoordinationVisitorThread extends Thread{
 		this.roundId = roundId;
 		this.threadId = threadId;
 	}
+	
+	public CoordinationVisitorThread(Node node,int roundId, int threadId, CountDownLatch countDown){
+		this.node = node;
+		this.roundId = roundId;
+		this.threadId = threadId;
+		this.countDown = countDown;
+	}
 
 	public CoordinationVisitorThread(Node node,CountDownLatch countDown, int threadId, TimelinessRecorder timelinessRec) {
 		this.node = node;
@@ -66,21 +73,24 @@ public class CoordinationVisitorThread extends Thread{
 			long startTime = System.nanoTime();
 			scaTour.coordinate();
 			long endTime = System.nanoTime();
+			countDown.countDown();
 			
-			if(countDown != null)
-				countDown.countDown();
-			
-			System.out.println("response time:" + (endTime - startTime) / 1000000.0);
 			if (resTimeRec != null) {
-				if (execType == null)
+				if (execType == null){
+					System.out.println("response time:" + (endTime - startTime) * 1e-6);
 					return;
+				}
 				else if (execType.equals("normal")){
 					resTimeRec.addNormalResponse(threadId, endTime - startTime);
-					System.out.println("response time:" + (endTime - startTime) / 1000000.0);
+					System.out.println("threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
 				}
-				else if (execType.equals("update"))
+				else if (execType.equals("update")){
 					resTimeRec.addUpdateResponse(threadId, endTime - startTime);
-			} 
+					System.out.println("threadId:" + threadId + "response time:" + (endTime - startTime) * 1e-6);
+				}
+			} else{
+				System.out.println("response time:" + (endTime - startTime) * 1e-6);
+			}
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

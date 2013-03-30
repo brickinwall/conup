@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
 
 public class TimelinessRecorder {
 	private static Map<Integer, Long> updateCostTime = new ConcurrentHashMap<Integer, Long>();
 	private static int count = 0;
+	private static final Logger LOGGER = Logger.getLogger(TimelinessRecorder.class.getName());
 	
 	public Map<Integer, Long> getUpdateCostTime() {
 		return updateCostTime;
@@ -18,13 +21,16 @@ public class TimelinessRecorder {
 	public List<Double> getAllUpdateCostTime(){
 		List<Double> allUpdateCostTime = new ArrayList<Double>();
 		Iterator<Entry<Integer, Long>> iter = updateCostTime.entrySet().iterator();
-		while(iter.hasNext())
+		while(iter.hasNext()){
 			allUpdateCostTime.add(iter.next().getValue() / 1000000.0);
+		}
+		System.out.println(allUpdateCostTime);
 		return allUpdateCostTime;
 	}
 
 	public void addUpdateCostTime(long time) {
 		count ++;
+		LOGGER.info("update is done:" + time);
 		updateCostTime.put(count, time);
 	}
 

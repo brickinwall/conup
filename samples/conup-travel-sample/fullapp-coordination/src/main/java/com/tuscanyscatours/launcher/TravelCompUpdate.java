@@ -14,6 +14,7 @@ public class TravelCompUpdate {
 //	public static String VER_ZERO = "VER_0";
 //	public static String VER_ONE = "VER_1";
 //	public static String VER_TWO = "VER_2";
+	private static int updateTimesCount = 0;
 	
 	public static void updateBankToVerOne() {
 		Thread thread = new Thread(new Runnable() {
@@ -166,6 +167,15 @@ public class TravelCompUpdate {
 			System.out.println("No such component for update or unsupported component.");
 			break;
 		}
+	}
+	
+	public static void update(){
+		if(updateTimesCount % 2 == 0)
+			updateCurrencyToVerOne();
+		else
+			updateCurrencyToVerTwo();
+		
+		updateTimesCount++;
 	}
 	
 	public static void main(String []args){
