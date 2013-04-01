@@ -34,7 +34,7 @@ public class OverheadExp {
 		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 
-		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
+		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/overhead/";
 		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {

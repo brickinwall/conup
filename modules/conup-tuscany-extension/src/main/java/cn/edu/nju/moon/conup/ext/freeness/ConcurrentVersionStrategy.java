@@ -71,7 +71,7 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 		Set<String> oldVersionRootTxs;
 		compLcMgr = CompLifecycleManager.getInstance(hostComp);
 		oldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-		LOGGER.info("oldVersionRootTxs:\n" + oldVersionRootTxs);
+		LOGGER.fine("oldVersionRootTxs:\n" + oldVersionRootTxs);
 		return compLcMgr.getUpdateCtx().isOldRootTxsEquals()
 				&& oldVersionRootTxs.size()==0;
 	}
