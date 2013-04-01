@@ -10,6 +10,7 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 
 
 public class CoordinationVisitorThread extends Thread{
@@ -64,20 +65,26 @@ public class CoordinationVisitorThread extends Thread{
 			Coordination scaTour = node.getService(Coordination.class, "Coordination#service-binding(Coordination/Coordination)");
 			long startTime = System.nanoTime();
 			scaTour.coordinate();
-			if(countDown != null)
-				countDown.countDown();
-			
 			long endTime = System.nanoTime();
-			LOGGER.info("response time:" + (endTime - startTime) / 1000000.0);
+			countDown.countDown();
 			
 			if (resTimeRec != null) {
-				if (execType == null)
+				if (execType == null){
+					System.out.println("response time:" + (endTime - startTime) * 1e-6);
 					return;
-				else if (execType.equals("normal"))
+				}
+				else if (execType.equals("normal")){
 					resTimeRec.addNormalResponse(threadId, endTime - startTime);
-				else if (execType.equals("update"))
+					System.out.println("normal threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
+				}
+				else if (execType.equals("update")){
 					resTimeRec.addUpdateResponse(threadId, endTime - startTime);
-			} 
+					resTimeRec.addUpdateResInfo(new RqstInfo(threadId, startTime, endTime));
+					System.out.println("update threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
+				}
+			} else{
+				System.out.println("response time:" + (endTime - startTime) * 1e-6);
+			}
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}
