@@ -88,4 +88,11 @@ public class ExpSetting {
 		this.ipAddress = ipAddress;
 	}
 
+	@Override
+	public String toString() {
+		return "indepRun:" + indepRun + " nThreads:" + nThreads + " threadId:" + threadId 
+				+ " rqstInterval:" + rqstInterval + " targetComp:" + targetComp 
+				+ " ipAddress:" + ipAddress + " baseDir:" + baseDir
+				+ " type:" + type;
+	}
 }
