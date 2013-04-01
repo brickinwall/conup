@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -62,14 +63,19 @@ import org.apache.tuscany.sca.runtime.RuntimeComponent;
 import org.apache.tuscany.sca.runtime.Version;
 import org.apache.tuscany.sca.shell.jline.JLine;
 
+import com.tuscanyscatours.coordination.CoordinationVisitorThread;
+
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.apppre.TuscanyProgramAnalyzer;
 import cn.edu.nju.moon.conup.experiments.utils.ConupExpCommands;
-import cn.edu.nju.moon.conup.experiments.utils.CoordinationVisitorThread;
 import cn.edu.nju.moon.conup.experiments.utils.TravelCompUpdate;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
@@ -200,51 +206,41 @@ public class Shell {
 			}
 			
 			switch (command) {
-			case timelinessExp1:
-				if( input.length == 1 ){
-					doTimelinessExp1(node);
+			case timelinessExp:
+				if(input.length == 1 ){
+					doTimelinessExp(node);
 				} else{
-					System.out.println("wrong number parameters for 'timelinessExp1'");
+					System.out.println("wrong number parameters for 'timelinessExp'");
 					break;
 				}
 				break;
-//			case update:
-//				String toVer = null;
-//				if( input.length == 3){
-//					targetComp = input[1].trim();
-//					toVer = input[2].trim();
-////					System.out.println("update " + targetComp + " " + toVer);
-//					TravelCompUpdate.update(targetComp, toVer);
-//				} else{
-//					System.out.println("Illegal parameters for 'update'");
-//					break;
-//				}
-//				break;
-//			case updateAt:
-//				if(input.length<=4 || input.length%2==1){
-//					System.out.println("Illegal parameters for 'updateAt'");
-//					break;
-//				}
-//				
-//				targetComp = input[1].trim();
-//				rqstInterval = new Integer(input[2].trim());
-//				accessTimes = new Integer(input[3].trim());
-//				
-//				for(int i=4; i<input.length; i+=2){
-//					int point = new Integer(input[i].trim());
-//					if(point < accessTimes)
-//						updatePoints.put(point, input[i+1]);
-//				}
-//				
-//				for (int i = 0; i < accessTimes; i++) {
-//					new CoordinationVisitorThread(node).start();
-//					Thread.sleep(rqstInterval);
-//					if(updatePoints.get(i) != null){
-////						System.out.println("update " + targetComp + " at " + i);
-//						TravelCompUpdate.update(targetComp, updatePoints.get(i));
-//					}
-//				}
-//				break;
+			case disruptionExp:
+				if(input.length == 1){
+					doDisruptionExp(node);
+				} else{
+					System.out.println("wrong number parameters for 'disruptionExp'");
+					break;
+				}
+				break;
+			case overheadExp:
+				doOverhead(node);
+				break;
+			case invoke:
+//				Experiment exp = Experiment.getInstance();
+//				exp.writeToFile("Round_Identifier,Thread_Identifier,Status_Start,Status_End,Response_Time\n");
+				int runningTimes = 0;
+				if( input.length == 2){
+					runningTimes = Integer.parseInt(input[1].trim());
+					for(int i = 1; i<= runningTimes; i++){
+						new CoordinationVisitorThread(node, i).start();
+						Thread.sleep(200);
+					}
+				} else{
+					System.out.println("Illegal parameters for 'invoke'");
+					break;
+				}
+		
+				break;
 			case help:
 				printHelp();
 				break;
@@ -258,12 +254,57 @@ public class Shell {
 		}//WHILE
 	}
     
-    private static void doTimelinessExp1(Node node) throws InterruptedException {
+    private static void doTimelinessExp(Node node) throws InterruptedException {
+	    	ExpXMLUtil xmlUtil = new ExpXMLUtil();
+	    	ExpSetting expSetting = xmlUtil.getExpSetting();
+	    	
+	    	// the interval between each request thread
+	    	int rqstInterval = expSetting.getRqstInterval();
+	    	int updateInterval = expSetting.getUpdateInterval();
+	
+	    	int indepRun = expSetting.getIndepRun();
+	    	int nThreads = expSetting.getnThreads();
+	    	// launching the update threadId
+	    	int threadId = expSetting.getThreadId();
+	    	String targetComp = expSetting.getTargetComp();
+	    	String ipAddress = expSetting.getIpAddress();
+	    	String baseDir = expSetting.getBaseDir();
+	    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
+	    	
+			// warm up code
+	    	int warmUpTimes = 400;
+			CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
+			for (int i = 0; i < warmUpTimes; i++) {
+				new CoordinationVisitorThread(node, warmCountDown).start();
+				if(i == 300){
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				}
+				Thread.sleep(rqstInterval);
+			}
+			warmCountDown.await();
+	
+			Thread.sleep(3000);
+	    	
+	    	for(int i = 0; i < indepRun; i++){
+	    		CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+				for (int j = 0; j < nThreads; j++) {
+					Thread.sleep(rqstInterval);
+					new CoordinationVisitorThread(node).start();
+					if(j == threadId)
+						TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				}
+				updateCountDown.await();
+	    		Thread.sleep(3000);
+	    	}
+		}
+
+	private static void doDisruptionExp(Node node) throws InterruptedException {
     	ExpXMLUtil xmlUtil = new ExpXMLUtil();
     	ExpSetting expSetting = xmlUtil.getExpSetting();
     	
     	// the interval between each request thread
-    	int rqstInterval = 200;
+    	int rqstInterval = expSetting.getRqstInterval();
+    	int updateInterval = expSetting.getUpdateInterval();
 
     	int indepRun = expSetting.getIndepRun();
     	int nThreads = expSetting.getnThreads();
@@ -272,28 +313,165 @@ public class Shell {
     	String targetComp = expSetting.getTargetComp();
     	String ipAddress = expSetting.getIpAddress();
     	String baseDir = expSetting.getBaseDir();
-    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
     	
-    	for(int i = 0; i < indepRun; i++){
-			for (int j = 0; j < nThreads; j++) {
-				Thread.sleep(rqstInterval);
-				new CoordinationVisitorThread(node).start();
-				if(j == threadId)
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+		int warmUpTimes = 400;
+		CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
+		for (int i = 0; i < warmUpTimes; i++) {
+			new CoordinationVisitorThread(node, warmCountDown).start();
+			if(i == 300){
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
 			}
-    		Thread.sleep(10000);
-    	}
+			Thread.sleep(rqstInterval);
+		}
+		warmCountDown.await();
+		
+		Thread.sleep(3000);
+		
+		DisruptionExp disExp = DisruptionExp.getInstance();
+		
+//		for(int round = 0; round < indepRun; round++){
+//			ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+//			CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+//			for (int i = 0; i < nThreads; i++) {
+//				new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
+//				if(i == threadId)
+//					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+//				Thread.sleep(rqstInterval);
+//			}
+//			updateCountDown.await();
+//			
+//			
+//			Thread.sleep(3000);
+//
+//			CountDownLatch normalCountDown = new CountDownLatch(nThreads);
+//			for (int i = 0; i < nThreads; i++) {
+//				new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+//				Thread.sleep(rqstInterval);
+//			}
+//			normalCountDown.await();
+//			
+//			String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
+//			disExp.writeToFile(data);
+//			
+//			Thread.sleep(3000);
+//		}
+		
+		for(int round = 0; round < indepRun; round++){
+			ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+			System.out.println("-------------round " + round + "--------------");
+			
+			CountDownLatch normalCountDown = new CountDownLatch(nThreads);
+			for (int i = 0; i < nThreads; i++) {
+				new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+				Thread.sleep(rqstInterval);
+			}
+			normalCountDown.await();
+			
+			Thread.sleep(3000);
+
+			CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+			for (int i = 0; i < nThreads; i++) {
+				new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
+				if(i == threadId){
+					disExp.setUpdateStartTime(System.nanoTime());
+//					TravelCompUpdate.update();
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				}
+				Thread.sleep(rqstInterval);
+			}
+			updateCountDown.await();
+			
+			Thread.sleep(1000);
+			
+			Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
+			Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
+			System.out.println("normalRes.size() ==" + normalRes.size());
+			System.out.println("updateRes.size() ==" + updateRes.size());
+			assert normalRes.size() == nThreads;
+			assert updateRes.size() == nThreads;
+			
+//			for(int i = 0; i < nThreads; i++){
+//				String data = round + "," + (i+1) + "," + normalRes.get(i + 1) * 1e-6 + "," + updateRes.get(i+1) * 1e-6 + "\n";
+//				disExp.writeToFile(data);
+//			}
+			double averageNormalResTime = resTimeRec.getAverageNormalResTime();
+			Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
+			Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
+			int count = 0;
+			String data = null;
+			while(iter.hasNext()){
+				Entry<Integer, Double> entry = iter.next();
+				int curThreadId = entry.getKey();
+				Double resTime = entry.getValue();
+				if(count == 0)
+					data = round + "," + curThreadId + "," + averageNormalResTime + "," + resTime + "," + disExp.getTimelinessTime() + "\n";
+				else
+					data = round + "," + curThreadId + "," + averageNormalResTime + "," + resTime + "\n";
+				LOGGER.fine(data);
+				disExp.writeToFile(data);
+				count++;
+			}
+			
+			Thread.sleep(3500);
+		}
+//		disExp.close();
+    	
+	}
+
+
+	private static void doOverhead(Node node) throws Exception {
+		ExpXMLUtil xmlUtil = new ExpXMLUtil();
+		ExpSetting expSetting = xmlUtil.getExpSetting();
+		
+		int rqstInterval = expSetting.getRqstInterval();
+		int indepRun = expSetting.getIndepRun();
+    	int nThreads = expSetting.getnThreads();
+		
+		int warmUpTimes = 400;
+		CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
+		for (int i = 0; i < warmUpTimes; i++) {
+			new CoordinationVisitorThread(node, warmCountDown).start();
+			Thread.sleep(rqstInterval);
+		}
+		warmCountDown.await();
+		
+		Thread.sleep(3000);
+		
+		OverheadExp overExp = OverheadExp.getInstance();
+		List<Double> tuscanyBaseLine = new ArrayList<Double>();
+		for(int round = 0; round < indepRun; round++){
+			ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+	
+			CountDownLatch normalCountDown = new CountDownLatch(nThreads);
+			for (int i = 0; i < nThreads; i++) {
+				new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+				Thread.sleep(rqstInterval);
+			}
+			normalCountDown.await();
+			
+			tuscanyBaseLine.add(resTimeRec.getTotalNormalResTime());
+			Thread.sleep(2000);
+		}
+		String data = "";
+		for(int m = 0; m < tuscanyBaseLine.size(); m++){
+			data += tuscanyBaseLine.get(m) + "\n";
+		}
+				
+		overExp.writeToFile(data);
+		overExp.close();
 	}
 
 	private static void printHelp(){
     	System.out.println();
-		System.out.println("1. Timeliness_Exp_1");
-		System.out.println("	[usage] timelinessExp1");
-		System.out.println("	[behavior] do independent run 200 times, and with nThreads 10, and update threadId is 5 for each time");
-		System.out.println("2. Timeliness_Exp_2");
-		System.out.println("3. Disruption_Exp_3");
-		System.out.println("4. Disruption_Exp_4");
-		System.out.println("5. Framework_Exp_5");
+		System.out.println("Timeliness_Exp");
+		System.out.println("\t[usage] timelinessExp");
+		System.out.println("\t[behavior] do timelinessExp by following the configuration file:");
+		System.out.println("Disruption_Exp");
+		System.out.println("\t[usage] disruptionExp");
+		System.out.println("\t[behavior] do Disruption_Exp by following the configuration file:");
+		System.out.println("Overhead_Exp");
+		System.out.println("\t[usage] overheadExp");
+		System.out.println("\t[behavior] do Overhead_Exp by following the configuration file:");
 		
 		System.out.println("'help' shows supported commands.");
 		System.out.println();
