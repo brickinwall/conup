@@ -60,14 +60,38 @@ public class XMLUtil {
 
 	public String getAlgorithmConf() {
 		Element configuration = root.getChild("configuration");
-		Element algorithm = configuration.getChild("algorithm");
-		return algorithm.getValue().trim();
+		Element algorithms = configuration.getChild("algorithms");
+		List allALgs = algorithms.getChildren();
+		Iterator algsIter = allALgs.iterator();
+		String algConf = null;
+		while(algsIter.hasNext()){
+			Element alg = (Element) algsIter.next();
+			if(alg.getAttributeValue("enable").equals("yes")){
+				algConf =  alg.getValue();
+				break;
+			}
+		}
+		
+		assert algConf != null;
+		return algConf;
 	}
 
 	public String getFreenessStrategy() {
 		Element configuration = root.getChild("configuration");
-		Element freenessStrategy = configuration.getChild("freenessStrategy");
-		return freenessStrategy.getValue().trim();
+		Element freenessStrategies = configuration.getChild("freenessStrategies");
+		List allStrategies = freenessStrategies.getChildren();
+		Iterator strategiesIter = allStrategies.iterator();
+		String strategyConf = null;
+		while(strategiesIter.hasNext()){
+			Element strategy = (Element) strategiesIter.next();
+			if(strategy.getAttributeValue("enable").equals("yes")){
+				strategyConf =  strategy.getValue();
+				break;
+			}
+		}
+		
+		assert strategyConf != null;
+		return strategyConf;
 	}
 
 	public Set<String> getParents(String compIdentifier) {
