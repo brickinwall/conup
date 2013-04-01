@@ -1,8 +1,10 @@
 package com.tuscanyscatours.launcher;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
@@ -19,7 +21,6 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
@@ -180,6 +181,7 @@ public class CoordinationLauncher {
 					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
 						if(i == threadId){
+							disExp.setUpdateStartTime(System.nanoTime());
 							TravelCompUpdate.update();
 						}
 						Thread.sleep(rqstInterval);
@@ -190,14 +192,31 @@ public class CoordinationLauncher {
 					
 					Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
 					Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
-					System.out.println("normalRes.size() ==" + normalRes.size());
-					System.out.println("updateRes.size() ==" + updateRes.size());
+//					System.out.println("normalRes.size() ==" + normalRes.size());
+//					System.out.println("updateRes.size() ==" + updateRes.size());
 					assert normalRes.size() == nThreads;
 					assert updateRes.size() == nThreads;
 					
-					for(int i = 0; i < nThreads; i++){
-						String data = round + "," + (i+1) + "," + normalRes.get(i + 1) * 1e-6 + "," + updateRes.get(i+1) * 1e-6 + "\n";
+//					for(int i = 0; i < nThreads; i++){
+//						String data = round + "," + (i+1) + "," + normalRes.get(i + 1) * 1e-6 + "," + updateRes.get(i+1) * 1e-6 + "\n";
+//						disExp.writeToFile(data);
+//					}
+					double averageNormalResTime = resTimeRec.getAverageNormalResTime();
+					Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
+					Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
+					int count = 0;
+					String data = null;
+					while(iter.hasNext()){
+						Entry<Integer, Double> entry = iter.next();
+						int curThreadId = entry.getKey();
+						Double resTime = entry.getValue();
+						if(count == 0)
+							data = round + "," + curThreadId + "," + averageNormalResTime + "," + resTime + "," + disExp.getTimelinessTime() + "\n";
+						else
+							data = round + "," + curThreadId + "," + averageNormalResTime + "," + resTime + "\n";
+						LOGGER.fine(data);
 						disExp.writeToFile(data);
+						count++;
 					}
 //					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
 //					disExp.writeToFile(data);
@@ -263,6 +282,8 @@ public class CoordinationLauncher {
 						Thread.sleep(rqstInterval);
 					}
 					normalCountDown.await();
+					//wait for all data store into collection
+					Thread.sleep(1000);
 					
 					tuscanyBaseLine.add(resTimeRec.getTotalNormalResTime());
 					Thread.sleep(2000);
