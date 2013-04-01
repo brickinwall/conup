@@ -42,7 +42,7 @@ public class TimelinessExp {
 		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 
-		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
+		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/timeliness/";
 		fileName = algorithm + "_" + strategy + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
