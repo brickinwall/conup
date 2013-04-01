@@ -10,6 +10,7 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 
 import com.tuscanyscatours.coordination.Coordination;
 
@@ -82,11 +83,12 @@ public class CoordinationVisitorThread extends Thread{
 				}
 				else if (execType.equals("normal")){
 					resTimeRec.addNormalResponse(threadId, endTime - startTime);
-					System.out.println("threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
+					System.out.println("normal threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
 				}
 				else if (execType.equals("update")){
 					resTimeRec.addUpdateResponse(threadId, endTime - startTime);
-					System.out.println("threadId:" + threadId + "response time:" + (endTime - startTime) * 1e-6);
+					resTimeRec.addUpdateResInfo(new RqstInfo(threadId, startTime, endTime));
+					System.out.println("update threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
 				}
 			} else{
 				System.out.println("response time:" + (endTime - startTime) * 1e-6);
