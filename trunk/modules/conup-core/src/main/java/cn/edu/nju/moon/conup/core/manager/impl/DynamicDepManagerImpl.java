@@ -9,6 +9,7 @@ import org.omg.CORBA.Principal;
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
 import cn.edu.nju.moon.conup.core.ondemand.OndemandSetupHelperImpl;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -387,8 +388,14 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.NORMAL;
-				LOGGER.info(compObj.getIdentifier() + " remote update is done, CompStatus: " + compStatus + ", now notify all");
+				String compIdentifier = compObj.getIdentifier();
+				LOGGER.info(compIdentifier + " remote update is done, CompStatus: " + compStatus + ", now notify all");
 				waitingRemoteCompUpdateDoneMonitor.notifyAll();
+				
+				// add for experiments
+				// record update cost time
+				if(compIdentifier.equals("Coordination"))
+					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 			}
 		}
 	}
