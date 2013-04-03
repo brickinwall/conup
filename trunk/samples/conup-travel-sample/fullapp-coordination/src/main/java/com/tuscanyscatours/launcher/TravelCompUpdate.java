@@ -56,7 +56,7 @@ public class TravelCompUpdate {
 		
 	}
 	
-	public static void updateShoppingcartToNew(){
+	public static void updateShoppingcartToVerOne(){
 		Thread thread = new Thread(new Runnable() {
 			
 			@Override
@@ -64,10 +64,48 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "ShoppingCart";
 				int port1 = 22307;
-				String baseDir1 = "/home/artemis";	//update component to version 
+				String baseDir1 = "/home/stone/deploy/travleSample/shoppingcartVer1";	//update component to version 
 				String classFilePath1 = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
 				String contributionUri1 = "fullapp-shoppingcart";
 				String compsiteUri1 = "fullapp-shoppingcart.composite";
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+			}
+		});
+		
+		thread.start();
+	}
+	
+	public static void updateHotelPartnerToVerOne(){
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				String targetIdentifier1 = "HotelPartner";
+				int port1 = 22301;
+				String baseDir1 = "/home/stone/deploy/travleSample/hotelVer1";	//update component to version 
+				String classFilePath1 = "com.tuscanyscatours.hotel.impl.HotelImpl";
+				String contributionUri1 = "fullapp-bespoketrip";
+				String compsiteUri1 = "fullapp-bespoketrip.composite";
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+			}
+		});
+		
+		thread.start();
+	}
+	
+	public static void updateTripPartnerToVerOne(){
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				String targetIdentifier1 = "TripPartner";
+				int port1 = 22304;
+				String baseDir1 = "/home/stone/deploy/travleSample/tripVer1";	//update component to version 
+				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
+				String contributionUri1 = "fullapp-packagedtrip";
+				String compsiteUri1 = "fullapp-packagedtrip.composite";
 				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
@@ -83,7 +121,7 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
-				String baseDir = "/home/artemis/Tuscany/deploy/cur1";
+				String baseDir = "/home/stone/deploy/travleSample/currencyVer1";
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
@@ -103,7 +141,7 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
-				String baseDir = "/home/artemis/Tuscany/deploy/cur2";
+				String baseDir = "/home/stone/deploy/travleSample/currencyVer2";
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
@@ -145,6 +183,48 @@ public class TravelCompUpdate {
 		}
 	}
 	
+	public static void updateShoppingcartToVer(CompVersion toVer){
+		switch (toVer) {
+		case VER_ONE:
+			updateShoppingcartToVerOne();
+			break;
+//		case VER_TWO:
+//			updateCurrencyToVerTwo();
+//			break;
+		default:
+			System.out.println("Unsupported component verson for update");
+			break;
+		}
+	}
+	
+	public static void updateHotelPartnerToVer(CompVersion toVer){
+		switch (toVer) {
+		case VER_ONE:
+			updateHotelPartnerToVerOne();
+			break;
+//		case VER_TWO:
+//			updateCurrencyToVerTwo();
+//			break;
+		default:
+			System.out.println("Unsupported component verson for update");
+			break;
+		}
+	}
+	
+	public static void updateTripPartnerToVer(CompVersion toVer){
+		switch (toVer) {
+		case VER_ONE:
+			updateTripPartnerToVerOne();
+			break;
+//		case VER_TWO:
+//			updateCurrencyToVerTwo();
+//			break;
+		default:
+			System.out.println("Unsupported component verson for update");
+			break;
+		}
+	}
+	
 	public static void update(String updateComp, String toVer){
 		UpdatableComp targetComp = null;
 		CompVersion targetVer = null;
@@ -162,6 +242,15 @@ public class TravelCompUpdate {
 			break;
 		case Bank:
 			updateBankToVer(targetVer);
+			break;
+		case ShoppingCart:
+			updateShoppingcartToVer(targetVer);
+			break;
+		case HotelPartner:
+			updateHotelPartnerToVer(targetVer);
+			break;
+		case TripPartner:
+			updateTripPartnerToVer(targetVer);
 			break;
 		default:
 			System.out.println("No such component for update or unsupported component.");
@@ -193,6 +282,9 @@ public class TravelCompUpdate {
 	
 	enum UpdatableComp{
 		CurrencyConverter,
-		Bank
+		Bank,
+		ShoppingCart,
+		HotelPartner,
+		TripPartner
 	}
 }
