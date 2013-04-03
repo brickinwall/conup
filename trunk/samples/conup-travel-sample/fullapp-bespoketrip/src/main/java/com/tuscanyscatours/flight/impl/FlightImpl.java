@@ -21,9 +21,9 @@ package com.tuscanyscatours.flight.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.oasisopen.sca.annotation.ComponentName;
-import org.oasisopen.sca.annotation.Init;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
@@ -36,22 +36,31 @@ import com.tuscanyscatours.common.TripLeg;
  */
 @Service( {FlightSearch.class, FlightBook.class})
 public class FlightImpl implements FlightSearch, FlightBook {
-
+	private Logger LOGGER = Logger.getLogger(FlightImpl.class.getName());
+	/** it's used to identify component version */
+	private String COMP_VER = "Ver_0";
     private List<FlightInfo> flights = new ArrayList<FlightInfo>();
 
     @ComponentName
     protected String componentName;
 
     private int percentComplete = 0;
-
-    @Init
-    public void init() {
+    
+    public FlightImpl(){
         flights.add(new FlightInfo("EA26", "Europe Airlines Airbus A300", "LGW", "FLR", "06/12/09", "06/12/09", "350",
-                                   250, "EUR", "http://localhost:8085/tbd"));
+                250, "EUR", "http://localhost:8085/tbd"));
         flights.add(new FlightInfo("EA27", "Europe Airlines Airbus A300", "FLR", "LGW", "13/12/09", "13/12/09", "350",
-                                   250, "EUR", "http://localhost:8085/tbd"));
-
+                250, "EUR", "http://localhost:8085/tbd"));    	
     }
+
+//    @Init
+//    public void init() {
+//        flights.add(new FlightInfo("EA26", "Europe Airlines Airbus A300", "LGW", "FLR", "06/12/09", "06/12/09", "350",
+//                                   250, "EUR", "http://localhost:8085/tbd"));
+//        flights.add(new FlightInfo("EA27", "Europe Airlines Airbus A300", "FLR", "LGW", "13/12/09", "13/12/09", "350",
+//                                   250, "EUR", "http://localhost:8085/tbd"));
+//
+//    }
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {

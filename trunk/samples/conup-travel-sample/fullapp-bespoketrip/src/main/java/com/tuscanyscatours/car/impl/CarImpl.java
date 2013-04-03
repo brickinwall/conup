@@ -22,8 +22,8 @@ package com.tuscanyscatours.car.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.oasisopen.sca.annotation.Init;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
@@ -36,17 +36,25 @@ import com.tuscanyscatours.common.TripLeg;
  */
 @Service( {CarSearch.class, CarBook.class})
 public class CarImpl implements CarSearch, CarBook {
-
+	private Logger LOGGER = Logger.getLogger(CarImpl.class.getName());
+	/** it's used to identify component version */
+	private String COMP_VER = "Ver_0";
     private List<CarInfo> cars = new ArrayList<CarInfo>();
 
-
-    @Init
-    public void init() {
+    public CarImpl(){
         cars.add(new CarInfo("Premier Cars", "BMW 5 Series", "FLR", "06/12/09", "5", 100.00, "EUR",
-                             "http://localhost:8085/tbd"));
+                "http://localhost:8085/tbd"));
         cars.add(new CarInfo("Premier Cars", "Ford Focus", "FLR", "06/12/09", "4", 60.00, "EUR",
-                             "http://localhost:8085/tbd"));
+                "http://localhost:8085/tbd"));
     }
+    
+//    @Init
+//    public void init() {
+//        cars.add(new CarInfo("Premier Cars", "BMW 5 Series", "FLR", "06/12/09", "5", 100.00, "EUR",
+//                             "http://localhost:8085/tbd"));
+//        cars.add(new CarInfo("Premier Cars", "Ford Focus", "FLR", "06/12/09", "4", 60.00, "EUR",
+//                             "http://localhost:8085/tbd"));
+//    }
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
