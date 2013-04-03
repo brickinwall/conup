@@ -342,11 +342,14 @@ public class CoordinationLauncher {
 		System.out.println("update specified component without accessing it. e.g., ");
 		System.out.println("	[usage] update CurrencyConverter VER_ONE");
 		System.out.println("	[behavior] update component 'CurrencyConverter' to VER_ONE");
+		System.out.println("	[usage] update ShoppingCart VER_ONE");
+		System.out.println("	[usage] update HotelPartner VER_ONE");
+		System.out.println("	[usage] update TripPartner VER_ONE");
 		System.out.println("update a component while requests ongoing, e.g., ");
 		System.out.println("	[usage] updateAt CurrencyConverter 500 50 25 VER_ONE");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 500ms before sending each request. " +
 				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 25th request");
-		
+		System.out.println("	[usage] updateAt ShoppingCart 500 50 25 VER_ONE");
 		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
 				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
