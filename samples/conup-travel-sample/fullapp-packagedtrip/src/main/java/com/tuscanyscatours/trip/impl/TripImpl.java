@@ -20,15 +20,12 @@ package com.tuscanyscatours.trip.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.oasisopen.sca.annotation.Callback;
-import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
-import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 
@@ -38,19 +35,29 @@ import com.tuscanyscatours.common.TripLeg;
 //@Scope("STATELESS")
 @Service( {TripSearch.class, TripBook.class})
 public class TripImpl implements TripSearch, TripBook {
-
+	private Logger LOGGER = Logger.getLogger(TripImpl.class.getName());
+	/** it's used to identify component version */
+	private String COMP_VER = "Ver_0";
     private List<TripInfo> trips = new ArrayList<TripInfo>();
-
-    @Init
-    public void init() {
-        trips.add(new TripInfo("FS1DEC06", "Florence and Siena pre-packaged tour", "LGW", "FLR", "06/12/09",
-                               "13/12/09", "27", 450, "EUR", "http://localhost:8085/tbd"));
-        trips.add(new TripInfo("FS1DEC13", "Florence and Siena pre-packaged tour 2", "LGW", "FLR", "13/12/09",
-                               "20/12/09", "27", 550, "EUR", "http://localhost:8085/tbd"));
+    
+    public TripImpl(){
+    	trips.add(new TripInfo("FS1DEC06", "Florence and Siena pre-packaged tour", "LGW", "FLR", "06/12/09",
+                "13/12/09", "27", 450, "EUR", "http://localhost:8085/tbd"));
+    	trips.add(new TripInfo("FS1DEC13", "Florence and Siena pre-packaged tour 2", "LGW", "FLR", "13/12/09",
+                "20/12/09", "27", 550, "EUR", "http://localhost:8085/tbd"));
     }
+    
+//    @Init
+//    public void init() {
+//        trips.add(new TripInfo("FS1DEC06", "Florence and Siena pre-packaged tour", "LGW", "FLR", "06/12/09",
+//                               "13/12/09", "27", 450, "EUR", "http://localhost:8085/tbd"));
+//        trips.add(new TripInfo("FS1DEC13", "Florence and Siena pre-packaged tour 2", "LGW", "FLR", "13/12/09",
+//                               "20/12/09", "27", 550, "EUR", "http://localhost:8085/tbd"));
+//    }
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
+    	LOGGER.fine("TripPartner " + COMP_VER);
         List<TripItem> items = new ArrayList<TripItem>();
 
         // find the pre-package trip

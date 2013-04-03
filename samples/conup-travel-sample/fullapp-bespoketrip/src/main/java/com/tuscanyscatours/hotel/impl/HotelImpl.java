@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.oasisopen.sca.annotation.Init;
+//import org.oasisopen.sca.annotation.Init;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
@@ -40,23 +40,37 @@ import com.tuscanyscatours.hotel.HotelSearch;
 @Service( {HotelSearch.class, HotelBook.class, HotelManagement.class})
 public class HotelImpl implements HotelSearch, HotelBook, HotelManagement {
 	private static Logger LOGGER = Logger.getLogger(HotelImpl.class.getName());
+	/** it's used to identify component version */
+	private String COMP_VER = "Ver_0";
 
     private List<HotelInfo> hotels = new ArrayList<HotelInfo>();
 
-    @Init
-    public void init() {
+    public HotelImpl(){
         hotels.add(new HotelInfo("Deep Bay Hotel", "Wonderful sea views and a relaxed atmosphere", "FLR", "06/12/09",
-                                 "200", 100, "EUR", "http://localhost:8085/tbd"));
+                "200", 100, "EUR", "http://localhost:8085/tbd"));
         hotels.add(new HotelInfo("Long Bay Hotel", "Friendly staff and an ocean breeze", "FLR", "06/12/09", "200", 100,
-                                 "EUR", "http://localhost:8085/tbd"));
+                "EUR", "http://localhost:8085/tbd"));
         hotels.add(new HotelInfo("City Hotel", "Smart rooms and early breakfasts", "FLR", "06/12/09", "200", 100,
-                                 "EUR", "http://localhost:8085/tbd"));
+                "EUR", "http://localhost:8085/tbd"));
         hotels.add(new HotelInfo("County Hotel", "The smell of the open country", "FLR", "06/12/09", "200", 100, "EUR",
-                                 "http://localhost:8085/tbd"));
+                "http://localhost:8085/tbd"));
     }
+    
+//    @Init
+//    public void init() {
+//        hotels.add(new HotelInfo("Deep Bay Hotel", "Wonderful sea views and a relaxed atmosphere", "FLR", "06/12/09",
+//                                 "200", 100, "EUR", "http://localhost:8085/tbd"));
+//        hotels.add(new HotelInfo("Long Bay Hotel", "Friendly staff and an ocean breeze", "FLR", "06/12/09", "200", 100,
+//                                 "EUR", "http://localhost:8085/tbd"));
+//        hotels.add(new HotelInfo("City Hotel", "Smart rooms and early breakfasts", "FLR", "06/12/09", "200", 100,
+//                                 "EUR", "http://localhost:8085/tbd"));
+//        hotels.add(new HotelInfo("County Hotel", "The smell of the open country", "FLR", "06/12/09", "200", 100, "EUR",
+//                                 "http://localhost:8085/tbd"));
+//    }
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
+    	LOGGER.fine("HotelPartner " + COMP_VER);
         List<TripItem> items = new ArrayList<TripItem>();
 
         // find available hotels
