@@ -295,6 +295,10 @@ public class CoordinationLauncher {
 						
 				overExp.writeToFile(data);
 				break;
+			case ger:
+				String gerResult =TravelExpResultQuery.queryExpResult(targetComp, QueryOperation.GET_EXECUTION_RECORDER);
+				System.out.println(gerResult);
+				break;
 			case help:
 				printHelp();
 				break;
@@ -353,6 +357,8 @@ public class CoordinationLauncher {
 		System.out.println("	[usage] updateAt CurrencyConverter 200 50 15 VER_ONE 35 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
 				" Meanwhile, update component 'CurrencyConverter' to VER_ONE at 15th request and to VER_TWO at 35th request");
+		System.out.println("get the execution recorder ");
+		System.out.println("	[usage] ger\n");
 		System.out.println("'help' shows supported commands.");
 		System.out.println();
 	}
