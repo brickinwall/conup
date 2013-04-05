@@ -39,9 +39,10 @@ public class DisruptionExp {
 		threadId = expSetting.getThreadId();
 		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
+		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/disruption/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
+		fileName = algorithm + "_" + freenessStrategy + "_" + expType + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
