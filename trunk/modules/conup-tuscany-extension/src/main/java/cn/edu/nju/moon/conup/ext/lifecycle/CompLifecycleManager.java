@@ -28,6 +28,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
@@ -213,6 +214,7 @@ public class CompLifecycleManager {
 		assert compObj.getIdentifier().equals(compIdentifier);
 		
 		PerformanceRecorder.getInstance(compIdentifier).updateReceived(System.nanoTime());
+		ExecutionRecorder.getInstance(compIdentifier).receiveUpdateRequest();
 		
 		synchronized (this) {
 			//If a dynamic update has received, return.
@@ -422,6 +424,19 @@ public class CompLifecycleManager {
 			
 		}
 		return true;
+	}
+	
+	public String experimentResult(String payload){
+		TuscanyPayloadResolver payloadResolver = new TuscanyPayloadResolver(payload);
+		TuscanyOperationType opTyep = payloadResolver.getOperation();
+		String compIdentifier = payloadResolver.getParameter(TuscanyPayload.COMP_IDENTIFIER);
+		if(opTyep.equals(TuscanyOperationType.GET_EXECUTION_RECORDER)){
+			return ExecutionRecorder.getInstance(compIdentifier).getActions();
+		} else{
+			LOGGER.warning("unsupported operation type for experiment");
+		}
+		//TODO 
+		return "no results";
 	}
 	
 	/**

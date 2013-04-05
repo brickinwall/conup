@@ -278,21 +278,21 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
 		exeRecorder.updateIsDone();
 		
-		String inDepsStr = "";
-		for (Dependence dep : inDepRegistry.getDependences()) {
-			inDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
-		
-		String outDepsStr = "";
-		for (Dependence dep : outDepRegistry.getDependences()) {
-			outDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
-		
-		Printer printer = new Printer();
-		LOGGER.fine("achievedFree, Txs:");
-		printer.printTxs(LOGGER, getTxs());
+//		String inDepsStr = "";
+//		for (Dependence dep : inDepRegistry.getDependences()) {
+//			inDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
+//		
+//		String outDepsStr = "";
+//		for (Dependence dep : outDepRegistry.getDependences()) {
+//			outDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
+//		
+//		Printer printer = new Printer();
+//		LOGGER.fine("achievedFree, Txs:");
+//		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (updatingSyncMonitor) {
 			algorithm.updateIsDone(compObj.getIdentifier());

@@ -5,5 +5,9 @@ public enum MsgType {
 	ONDEMAND_MSG,
 	DEPENDENCE_MSG,
 	NEGOTIATION_MSG,
-	REMOTE_CONF_MSG;
+	REMOTE_CONF_MSG,
+	/**
+	 * for experiment 
+	 */
+	EXPERIMENT_MSG
 }

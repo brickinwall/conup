@@ -6,5 +6,6 @@ package cn.edu.nju.moon.conup.ext.utils;
 public enum TuscanyOperationType {
 	ONDEMAND,
 	UPDATE,
-	QUERY;
+	QUERY,
+	GET_EXECUTION_RECORDER
 }
