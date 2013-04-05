@@ -81,7 +81,8 @@ public class SynCommClient {
 		session.getCloseFuture().awaitUninterruptibly();			// wait for all process finish, then connection off
 		connector.dispose();
 		if(returnResult != null)
-			return returnResult.toString();
+//			return returnResult.toString();
+			return returnResult.getPayload();
 		else
 			return "";
 	}

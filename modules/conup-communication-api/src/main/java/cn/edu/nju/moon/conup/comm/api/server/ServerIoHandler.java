@@ -52,10 +52,24 @@ public class ServerIoHandler extends IoHandlerAdapter{
 			return manageOndemand(reqObj);
 		} else if(msgType.equals(MsgType.REMOTE_CONF_MSG)){ 
 			return manageRemoteConf(reqObj);
+		} else if(msgType.equals(MsgType.EXPERIMENT_MSG)){
+			return manageExperimentResult(reqObj);
 		} else{
 			//TODO manage negotiation msg
 			return null;
 		}
+	}
+	
+	private ResponseObject manageExperimentResult(RequestObject reqObj){
+		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(reqObj.getTargetIdentifier());
+		String expResult = compLifeCycleMgr.experimentResult(reqObj.getPayload());
+		
+		ResponseObject responseObj = new ResponseObject();
+		responseObj.setProtocol(reqObj.getProtocol());
+		responseObj.setSrcIdentifier(reqObj.getTargetIdentifier());
+		responseObj.setTargetIdentifier(reqObj.getSrcIdentifier());
+		responseObj.setPayload(expResult);
+		return responseObj;
 	}
 
 	private ResponseObject manageRemoteConf(RequestObject reqObj) {
