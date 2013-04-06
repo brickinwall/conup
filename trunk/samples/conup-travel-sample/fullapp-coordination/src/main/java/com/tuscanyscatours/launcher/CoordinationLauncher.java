@@ -18,6 +18,7 @@ import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
@@ -154,7 +155,7 @@ public class CoordinationLauncher {
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					if(i == 300){
-						TravelCompUpdate.update();
+						TravelCompUpdate.update(targetComp);
 					}
 					Thread.sleep(200);
 				}
@@ -182,7 +183,7 @@ public class CoordinationLauncher {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
 						if(i == threadId){
 							disExp.setUpdateStartTime(System.nanoTime());
-							TravelCompUpdate.update();
+							TravelCompUpdate.update(targetComp);
 						}
 						Thread.sleep(rqstInterval);
 					}
@@ -233,7 +234,7 @@ public class CoordinationLauncher {
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					if(i == 300){
-						TravelCompUpdate.update();
+						TravelCompUpdate.update(targetComp);
 					}
 					Thread.sleep(rqstInterval);
 				}
@@ -247,7 +248,7 @@ public class CoordinationLauncher {
 					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, timelinessRec).start();
 						if(i == threadId){
-							TravelCompUpdate.update();
+							TravelCompUpdate.update(targetComp);
 						}
 						Thread.sleep(rqstInterval);
 					}
@@ -294,6 +295,43 @@ public class CoordinationLauncher {
 				}
 						
 				overExp.writeToFile(data);
+				break;
+			case correctness:
+				warmUpTimes = 100;
+				warmCountDown = new CountDownLatch(warmUpTimes);
+				for (int i = 0; i < warmUpTimes; i++) {
+					new CoordinationVisitorThread(node, warmCountDown).start();
+					Thread.sleep(200);
+				}
+				warmCountDown.await();
+				
+				Thread.sleep(3000);
+				
+				CorrectnessExp correctnessExp = CorrectnessExp.getInstance();
+				
+				for(int round = 0; round < indepRun; round++){
+					System.out.println("-------------round " + round + "--------------");
+					
+					CountDownLatch updateCountDown = new CountDownLatch(nThreads);
+					for (int i = 0; i < nThreads; i++) {
+						new CoordinationVisitorThread(node, updateCountDown).start();
+						if(i == threadId){
+							TravelCompUpdate.update(targetComp);
+						}
+						Thread.sleep(rqstInterval);
+					}
+					updateCountDown.await();
+					
+					Thread.sleep(1000);
+					
+					String gerResult =TravelExpResultQuery.queryExpResult(targetComp, ExperimentOperation.GET_EXECUTION_RECORDER);
+//					System.out.println(gerResult);
+					ExecutionRecorderAnalyzer analyzer = new ExecutionRecorderAnalyzer(gerResult);
+					int totalRecords = analyzer.getTotalRecords() - warmUpTimes - round * nThreads;
+					String correctnessExpData = round + ", " + analyzer.getInconsistentRecords() + ", " + totalRecords;
+					correctnessExp.writeToFile(correctnessExpData);
+					System.out.println("inconsistent/total: " + analyzer.getInconsistentRecords() + "/" + totalRecords);
+				}
 				break;
 			case ger:
 				String gerResult =TravelExpResultQuery.queryExpResult(targetComp, ExperimentOperation.GET_EXECUTION_RECORDER);
@@ -342,6 +380,9 @@ public class CoordinationLauncher {
 		
 		System.out.println("experiment of overhead ");
 		System.out.println("	[usage] overhead\n");
+		
+		System.out.println("experiment of correctness ");
+		System.out.println("	[usage] correctness\n");
 		
 		System.out.println("access specified times without executing update, e.g., ");
 		System.out.println("	[usage] access 500 50");

@@ -20,6 +20,8 @@ public enum COMMANDS {
 	timeliness,
 	/** used to overhead experiment */
 	overhead,
+	/** used to correctness experiment */
+	correctness,
 	/** get the execution recorder */
 	ger,
 	/** exit */
