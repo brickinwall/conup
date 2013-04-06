@@ -113,6 +113,25 @@ public class TravelCompUpdate {
 		thread.start();
 	}
 	
+	public static void updateTripPartnerToVerTwo(){
+		Thread thread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				String targetIdentifier1 = "TripPartner";
+				int port1 = 22304;
+				String baseDir1 = "/home/stone/deploy/travleSample/tripVer2";	//update component to version 
+				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
+				String contributionUri1 = "fullapp-packagedtrip";
+				String compsiteUri1 = "fullapp-packagedtrip.composite";
+				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+			}
+		});
+		
+		thread.start();
+	}
+	
 	public static void updateCurrencyToVerOne() {
 		Thread thread = new Thread(new Runnable() {
 			
@@ -216,9 +235,9 @@ public class TravelCompUpdate {
 		case VER_ONE:
 			updateTripPartnerToVerOne();
 			break;
-//		case VER_TWO:
-//			updateCurrencyToVerTwo();
-//			break;
+		case VER_TWO:
+			updateTripPartnerToVerTwo();
+			break;
 		default:
 			System.out.println("Unsupported component verson for update");
 			break;
