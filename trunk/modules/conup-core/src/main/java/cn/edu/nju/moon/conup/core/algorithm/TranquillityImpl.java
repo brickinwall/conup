@@ -963,7 +963,7 @@ public class TranquillityImpl implements Algorithm {
 			String payload = TranquillityPayloadCreator
 					.createRemoteUpdateIsDonePayload(hostComp, comp,
 							TranquillityOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY,
+			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY,
 					MsgType.DEPENDENCE_MSG, payload);
 		}
 

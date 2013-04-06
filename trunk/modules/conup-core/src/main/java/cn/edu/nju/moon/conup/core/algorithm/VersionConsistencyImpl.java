@@ -101,7 +101,9 @@ public class VersionConsistencyImpl implements Algorithm {
 	public boolean manageDependence(String payload) {
 		// print to terminal
 //		NodeManager nodeMgr = NodeManager.getInstance();
-		Printer printer = new Printer();
+//		Printer printer = new Printer();
+		if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+			return true;
 
 		boolean manageDepResult = false;
 		
@@ -744,7 +746,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
 			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		//clear local deps
@@ -1118,7 +1120,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		for(String comp : parentComps){
 			LOGGER.info("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
 			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.synPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		//clear local deps
