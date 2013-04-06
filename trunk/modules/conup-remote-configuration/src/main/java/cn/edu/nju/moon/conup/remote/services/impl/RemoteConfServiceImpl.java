@@ -39,6 +39,14 @@ public class RemoteConfServiceImpl {
 		return true;
 	}
 	
+	public String getExecutionRecorder(String ip, int port, String targetIdentifier, String proctocol){
+		MsgType msgType = MsgType.EXPERIMENT_MSG;
+		String payload = TuscanyPayloadCreator.createGetExecutionRecorderPayload(TuscanyOperationType.GET_EXECUTION_RECORDER, targetIdentifier);
+		SynCommClient synCommClient = new SynCommClient();
+		return synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
+		
+	}
+	
 	public static void main(String[] args) {
 		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 		String targetIdentifier = "AuthComponent";
