@@ -328,7 +328,7 @@ public class CoordinationLauncher {
 //					System.out.println(gerResult);
 					ExecutionRecorderAnalyzer analyzer = new ExecutionRecorderAnalyzer(gerResult);
 					int totalRecords = analyzer.getTotalRecords() - warmUpTimes - round * nThreads;
-					String correctnessExpData = round + ", " + analyzer.getInconsistentRecords() + ", " + totalRecords;
+					String correctnessExpData = round + ", " + analyzer.getInconsistentRecords() + ", " + totalRecords + "\n";
 					correctnessExp.writeToFile(correctnessExpData);
 					System.out.println("inconsistent/total: " + analyzer.getInconsistentRecords() + "/" + totalRecords);
 				}
