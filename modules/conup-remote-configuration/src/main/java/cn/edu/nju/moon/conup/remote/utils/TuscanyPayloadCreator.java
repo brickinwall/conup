@@ -41,4 +41,11 @@ public class TuscanyPayloadCreator {
 				TuscanyPayload.COMP_IDENTIFIER + ":" + targetCompIdentifier;
 		return result;
 	}
+	
+	public static String createGetExecutionRecorderPayload(TuscanyOperationType operationType, String targetCompIdentifier){
+		String result = null;
+		result = TuscanyPayload.OPERATION_TYPE + ":" + operationType + "," +
+				TuscanyPayload.COMP_IDENTIFIER + ":" + targetCompIdentifier;
+		return result;
+	}
 }
