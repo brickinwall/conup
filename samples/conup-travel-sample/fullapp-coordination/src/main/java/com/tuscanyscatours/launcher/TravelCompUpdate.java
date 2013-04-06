@@ -277,11 +277,13 @@ public class TravelCompUpdate {
 		}
 	}
 	
-	public static void update(){
+	public static void update(String updateComp){
 		if(updateTimesCount % 2 == 0)
-			updateCurrencyToVerOne();
+			update(updateComp, CompVersion.VER_ONE.toString());
+//			updateCurrencyToVerOne();
 		else
-			updateCurrencyToVerTwo();
+			update(updateComp, CompVersion.VER_TWO.toString());
+//			updateCurrencyToVerTwo();
 		
 		updateTimesCount++;
 	}
