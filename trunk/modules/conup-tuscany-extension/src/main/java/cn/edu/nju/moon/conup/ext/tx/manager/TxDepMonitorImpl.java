@@ -179,7 +179,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		}
 		
 		if(comps.size() != services.size()){
-			LOGGER.warning("convert failure from service to component....\n" +
+			LOGGER.fine("convert failure from service to component....\n" +
 					comps + "\n" + services + "\n");
 		}
 		long leaveTime = System.nanoTime();
@@ -286,16 +286,16 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			}
 		}
 		
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance(hostComp);
-		String completeAction = exeRecorder.getCompleteAction(rootTxId);
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance(hostComp);
+//		String completeAction = exeRecorder.getCompleteAction(rootTxId);
 //		if(completeAction == null || completeAction.equals("null")){
 //			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
 //				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
 //		}
-		if(completeAction != null){
-			LOGGER.info(completeAction);
-		}
+//		if(completeAction != null){
+//			LOGGER.fine(completeAction);
+//		}
 //		
 //		//when a root tx ends, remove it from TxLifecycleManager
 //		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);

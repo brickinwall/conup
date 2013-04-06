@@ -239,10 +239,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void ondemandSetupIsDone() {
-		//FOR TEST
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
-		exeRecorder.ondemandIsDone();
 		
 		//FOR TEST
 		String inDepsStr = "";
@@ -261,10 +257,16 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		LOGGER.fine("ondemandSetupIsDone, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 		
-		compStatus = CompStatus.VALID;
-		OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
-		ondemandSetupHelper.resetIsOndemandRqstRcvd();
 		synchronized (ondemandSyncMonitor) {
+			//FOR TEST
+			ExecutionRecorder exeRecorder;
+			exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+			exeRecorder.ondemandIsDone();
+			
+			compStatus = CompStatus.VALID;
+			OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+			ondemandSetupHelper.resetIsOndemandRqstRcvd();
+			
 			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
 			ondemandSetupHelper.onDemandIsDone();
 			ondemandSyncMonitor.notifyAll();
