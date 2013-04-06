@@ -46,47 +46,47 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
 	
 	private static Logger LOGGER = Logger.getLogger(ShoppingCartImpl.class.getName());
 
-//    protected CartStore cartStore;
-//    protected Payment payment;
-//    
-//    public CartStore getCartStore() {
-//		return cartStore;
-//	}
-//    
-//    @Reference
-//	public void setCartStore(CartStore cartStore) {
-//		this.cartStore = cartStore;
-//	}
-//
-//	public Payment getPayment() {
-//		return payment;
-//	}
-//	
-//	@Reference
-//	public void setPayment(Payment payment) {
-//		this.payment = payment;
-//	}
-
-    @Reference
     protected CartStore cartStore;
-
-    @Reference
     protected Payment payment;
+    
+    public CartStore getCartStore() {
+		return cartStore;
+	}
+    
+    @Reference
+	public void setCartStore(CartStore cartStore) {
+		this.cartStore = cartStore;
+	}
+
+	public Payment getPayment() {
+		return payment;
+	}
+	
+	@Reference
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+
+//    @Reference
+//    protected CartStore cartStore;
+//
+//    @Reference
+//    protected Payment payment;
 
     @ConupTransaction
     public String newCart() {
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "newCart." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
+//    	String threadID = getThreadID();
+//    	ExecutionRecorder exeRecorder;
+//		InterceptorCache interceptorCache;
+//		TransactionContext txContextInCache;
+//		String rootTx;
+//		String exeProc;
+//		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//		txContextInCache = interceptorCache.getTxCtx(threadID);
+//		rootTx = txContextInCache.getRootTx();
+//		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//		exeProc = "newCart." + COMP_VER;
+//		exeRecorder.addAction(rootTx, exeProc);
 		
         String cartId = UUID.randomUUID().toString();
         return cartId;
@@ -94,72 +94,72 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
 
     @ConupTransaction
     public void addTrip(String cartId, TripItem trip) {
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "addTrip." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
+//    	String threadID = getThreadID();
+//    	ExecutionRecorder exeRecorder;
+//		InterceptorCache interceptorCache;
+//		TransactionContext txContextInCache;
+//		String rootTx;
+//		String exeProc;
+//		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//		txContextInCache = interceptorCache.getTxCtx(threadID);
+//		rootTx = txContextInCache.getRootTx();
+//		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//		exeProc = "addTrip." + COMP_VER;
+//		exeRecorder.addAction(rootTx, exeProc);
 		
     	cartStore.addTrip(cartId, trip);
     }
 
     @ConupTransaction
     public void removeTrip(String cartId, TripItem trip) {
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "removeTrip." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
+//    	String threadID = getThreadID();
+//    	ExecutionRecorder exeRecorder;
+//		InterceptorCache interceptorCache;
+//		TransactionContext txContextInCache;
+//		String rootTx;
+//		String exeProc;
+//		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//		txContextInCache = interceptorCache.getTxCtx(threadID);
+//		rootTx = txContextInCache.getRootTx();
+//		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//		exeProc = "removeTrip." + COMP_VER;
+//		exeRecorder.addAction(rootTx, exeProc);
 		
     	cartStore.addTrip(cartId, trip);
     }
 
     @ConupTransaction
     public TripItem[] getTrips(String cartId) {
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "getTrips." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
+//    	String threadID = getThreadID();
+//    	ExecutionRecorder exeRecorder;
+//		InterceptorCache interceptorCache;
+//		TransactionContext txContextInCache;
+//		String rootTx;
+//		String exeProc;
+//		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//		txContextInCache = interceptorCache.getTxCtx(threadID);
+//		rootTx = txContextInCache.getRootTx();
+//		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//		exeProc = "getTrips." + COMP_VER;
+//		exeRecorder.addAction(rootTx, exeProc);
 		
     	return cartStore.getTrips(cartId);
     }
 
     @ConupTransaction
     public void checkout(String cartId, String customerName) {
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "checkout." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
+//    	String threadID = getThreadID();
+//    	ExecutionRecorder exeRecorder;
+//		InterceptorCache interceptorCache;
+//		TransactionContext txContextInCache;
+//		String rootTx;
+//		String exeProc;
+//		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//		txContextInCache = interceptorCache.getTxCtx(threadID);
+//		rootTx = txContextInCache.getRootTx();
+//		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//		exeProc = "checkout." + COMP_VER;
+//		exeRecorder.addAction(rootTx, exeProc);
 		
     	LOGGER.info("Shoppingcart " + COMP_VER);
         // get users credentials. Hard coded for now but should

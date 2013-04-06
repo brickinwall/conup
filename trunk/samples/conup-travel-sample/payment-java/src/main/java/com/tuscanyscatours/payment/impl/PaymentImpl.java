@@ -45,27 +45,61 @@ import com.tuscanyscatours.payment.creditcard.CreditCardPayment;
  */
 @Service(Payment.class)
 public class PaymentImpl implements Payment {
-	
 	private static Logger LOGGER = Logger.getLogger(Payment.class.getName());
-    @Reference
+	
+	@Property
+	protected float transactionFee = 0.01f;
+	
+//    @Reference
     protected CustomerRegistry customerRegistry;
 
-    @Reference
+//    @Reference
     protected CreditCardPayment creditCardPayment;
 
-    @Reference
-//    protected ServiceReference<EmailGateway> emailGateway;
+//    @Reference
     protected EmailGateway emailGateway;
 
-    @Property
-    protected float transactionFee = 0.01f;
-    
-    @Reference
+//    @Reference
     protected CurrencyConverter currencyConverter;
 
-//    private TxLifecycleManager _txLifecycleMgr;
     
-    @ConupTransaction
+    public CustomerRegistry getCustomerRegistry() {
+		return customerRegistry;
+	}
+
+    @Reference
+	public void setCustomerRegistry(CustomerRegistry customerRegistry) {
+		this.customerRegistry = customerRegistry;
+	}
+
+	public CreditCardPayment getCreditCardPayment() {
+		return creditCardPayment;
+	}
+
+	@Reference
+	public void setCreditCardPayment(CreditCardPayment creditCardPayment) {
+		this.creditCardPayment = creditCardPayment;
+	}
+
+	public EmailGateway getEmailGateway() {
+		return emailGateway;
+	}
+
+	@Reference
+	public void setEmailGateway(EmailGateway emailGateway) {
+		this.emailGateway = emailGateway;
+	}
+
+	public CurrencyConverter getCurrencyConverter() {
+		return currencyConverter;
+	}
+
+	@Reference
+	public void setCurrencyConverter(CurrencyConverter currencyConverter) {
+		this.currencyConverter = currencyConverter;
+	}
+
+	@ConupTransaction
     public String makePaymentMember(String customerId, float amount) {
         try {
             Customer customer = customerRegistry.getCustomer(customerId);

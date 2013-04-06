@@ -36,24 +36,68 @@ import com.tuscanyscatours.tripbooking.TripBooking;
  */
 @Service(TripBooking.class)
 public class TripBookingImpl implements TripBooking {
-
-    @Reference
+//    @Reference
     protected HotelBook hotelBook;
 
-    @Reference
+//    @Reference
     protected FlightBook flightBook;
 
-    @Reference
+//    @Reference
     protected CarBook carBook;
 
-    @Reference
+//    @Reference
     protected TripBook tripBook;
 
-    @Reference
+//    @Reference
     protected CartUpdates cartUpdates;
 
 
-    @ConupTransaction
+    public HotelBook getHotelBook() {
+		return hotelBook;
+	}
+
+    @Reference
+	public void setHotelBook(HotelBook hotelBook) {
+		this.hotelBook = hotelBook;
+	}
+
+	public FlightBook getFlightBook() {
+		return flightBook;
+	}
+
+	@Reference
+	public void setFlightBook(FlightBook flightBook) {
+		this.flightBook = flightBook;
+	}
+
+	public CarBook getCarBook() {
+		return carBook;
+	}
+
+	@Reference
+	public void setCarBook(CarBook carBook) {
+		this.carBook = carBook;
+	}
+
+	public TripBook getTripBook() {
+		return tripBook;
+	}
+
+	@Reference
+	public void setTripBook(TripBook tripBook) {
+		this.tripBook = tripBook;
+	}
+
+	public CartUpdates getCartUpdates() {
+		return cartUpdates;
+	}
+
+	@Reference
+	public void setCartUpdates(CartUpdates cartUpdates) {
+		this.cartUpdates = cartUpdates;
+	}
+
+	@ConupTransaction
     public TripItem bookTrip(String cartId, TripItem trip) {
 
         String bookingCode = "";
@@ -61,18 +105,17 @@ public class TripBookingImpl implements TripBooking {
         // book any nested items
         TripItem[] nestedItems = trip.getTripItems();
         if (nestedItems != null) {
-            for (int i = 0; i < nestedItems.length; i++) {
-                TripItem tripItem = nestedItems[i];
-                if (tripItem.getType().equals(TripItem.CAR)) {
-                    tripItem.setBookingCode(carBook.book(tripItem));
-                } else if (tripItem.getType().equals(TripItem.FLIGHT)) {
-                    tripItem.setBookingCode(flightBook.book(tripItem));
-                } else if (tripItem.getType().equals(TripItem.HOTEL)) {
-                    tripItem.setBookingCode(hotelBook.book(tripItem));
-                } else {
-                    tripItem.setBookingCode(tripItem.getType() + " is invalid");
-                }
-            }
+//            for(TripItem tripItem : nestedItems){
+//                if (tripItem.getType().equals(TripItem.CAR)) {
+//                    tripItem.setBookingCode(carBook.book(tripItem));
+//                } else if (tripItem.getType().equals(TripItem.FLIGHT)) {
+//                    tripItem.setBookingCode(flightBook.book(tripItem));
+//                } else if (tripItem.getType().equals(TripItem.HOTEL)) {
+//                    tripItem.setBookingCode(hotelBook.book(tripItem));
+//                } else {
+//                    tripItem.setBookingCode(tripItem.getType() + " is invalid");
+//                }
+//            }
         }
 
         // book the top level item if it's a packaged trip

@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
@@ -38,6 +41,7 @@ public class TripImpl implements TripSearch, TripBook {
 	private Logger LOGGER = Logger.getLogger(TripImpl.class.getName());
 	/** it's used to identify component version */
 	private String COMP_VER = "Ver_0";
+	private String COMP_NAME = "TripPartner";
     private List<TripInfo> trips = new ArrayList<TripInfo>();
     
     public TripImpl(){
@@ -57,7 +61,20 @@ public class TripImpl implements TripSearch, TripBook {
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
-    	LOGGER.fine("TripPartner " + COMP_VER);
+    	LOGGER.info("TripPartner " + COMP_VER);
+    	String threadID = getThreadID();
+    	ExecutionRecorder exeRecorder;
+		InterceptorCache interceptorCache;
+		TransactionContext txContextInCache;
+		String rootTx;
+		String exeProc;
+		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+		txContextInCache = interceptorCache.getTxCtx(threadID);
+		rootTx = txContextInCache.getRootTx();
+		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+		exeProc = "searchSynch." + COMP_VER;
+		exeRecorder.addAction(rootTx, exeProc);
+		
         List<TripItem> items = new ArrayList<TripItem>();
 
         // find the pre-package trip
@@ -78,11 +95,41 @@ public class TripImpl implements TripSearch, TripBook {
 
     @ConupTransaction
     public int getPercentComplete() {
+    	String threadID = getThreadID();
+    	ExecutionRecorder exeRecorder;
+		InterceptorCache interceptorCache;
+		TransactionContext txContextInCache;
+		String rootTx;
+		String exeProc;
+		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+		txContextInCache = interceptorCache.getTxCtx(threadID);
+		rootTx = txContextInCache.getRootTx();
+		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+		exeProc = "getPercentComplete." + COMP_VER;
+		exeRecorder.addAction(rootTx, exeProc);
+		
         return 100;
     }
 
     @ConupTransaction
     public String book(TripItem tripItem) {
+    	String threadID = getThreadID();
+    	ExecutionRecorder exeRecorder;
+		InterceptorCache interceptorCache;
+		TransactionContext txContextInCache;
+		String rootTx;
+		String exeProc;
+		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+		txContextInCache = interceptorCache.getTxCtx(threadID);
+		rootTx = txContextInCache.getRootTx();
+		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+		exeProc = "book." + COMP_VER;
+		exeRecorder.addAction(rootTx, exeProc);
+		
         return "trip1";
     }
+    
+	private String getThreadID(){
+		return new Integer(Thread.currentThread().hashCode()).toString();
+	}
 }

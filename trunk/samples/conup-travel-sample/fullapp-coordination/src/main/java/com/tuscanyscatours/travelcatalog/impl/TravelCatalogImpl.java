@@ -51,27 +51,71 @@ import com.tuscanyscatours.trip.impl.TripSearch;
  */
 @Service(TravelCatalogSearch.class)
 public class TravelCatalogImpl implements TravelCatalogSearch {
+	private List<TripItem> searchResults = new ArrayList<TripItem>();
+	
+	@Property
+	public String quoteCurrencyCode = "USD";
 
-    @Reference
+//    @Reference
     protected HotelSearch hotelSearch;
 
-    @Reference
+//    @Reference
     protected FlightSearch flightSearch;
 
-    @Reference
+//    @Reference
     protected CarSearch carSearch;
 
-    @Reference
+//    @Reference
     protected TripSearch tripSearch;
 
-    @Property
-    public String quoteCurrencyCode = "USD";
+//    @Reference
+    protected CurrencyConverter currencyConverter;
+    
+
+    public HotelSearch getHotelSearch() {
+		return hotelSearch;
+	}
 
     @Reference
-    protected CurrencyConverter currencyConverter;
+	public void setHotelSearch(HotelSearch hotelSearch) {
+		this.hotelSearch = hotelSearch;
+	}
 
-    private List<TripItem> searchResults = new ArrayList<TripItem>();
+	public FlightSearch getFlightSearch() {
+		return flightSearch;
+	}
 
+	@Reference
+	public void setFlightSearch(FlightSearch flightSearch) {
+		this.flightSearch = flightSearch;
+	}
+
+	public CarSearch getCarSearch() {
+		return carSearch;
+	}
+
+	@Reference
+	public void setCarSearch(CarSearch carSearch) {
+		this.carSearch = carSearch;
+	}
+
+	public TripSearch getTripSearch() {
+		return tripSearch;
+	}
+
+	@Reference
+	public void setTripSearch(TripSearch tripSearch) {
+		this.tripSearch = tripSearch;
+	}
+
+	public CurrencyConverter getCurrencyConverter() {
+		return currencyConverter;
+	}
+
+	@Reference
+	public void setCurrencyConverter(CurrencyConverter currencyConverter) {
+		this.currencyConverter = currencyConverter;
+	}
 
     // TravelSearch methods
     @ConupTransaction

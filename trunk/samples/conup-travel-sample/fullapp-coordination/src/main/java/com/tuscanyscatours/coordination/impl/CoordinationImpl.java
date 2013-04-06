@@ -18,18 +18,54 @@ import com.tuscanyscatours.tripbooking.TripBooking;
 @Service(Coordination.class)
 public class CoordinationImpl implements Coordination {
 	private static Logger LOGGER = Logger.getLogger(CoordinationImpl.class.getName());
-	@Reference
+//	@Reference
 	protected TravelCatalogSearch travelCatalogSearch;
 	
-	@Reference
+//	@Reference
 	protected TripBooking tripBooking;
 	
-	@Reference
+//	@Reference
 	protected CartInitialize cartInitialize;
 	
-	@Reference
+//	@Reference
 	protected CartCheckout cartCheckout;
 	
+	public TravelCatalogSearch getTravelCatalogSearch() {
+		return travelCatalogSearch;
+	}
+
+	@Reference
+	public void setTravelCatalogSearch(TravelCatalogSearch travelCatalogSearch) {
+		this.travelCatalogSearch = travelCatalogSearch;
+	}
+
+	public TripBooking getTripBooking() {
+		return tripBooking;
+	}
+
+	@Reference
+	public void setTripBooking(TripBooking tripBooking) {
+		this.tripBooking = tripBooking;
+	}
+
+	public CartInitialize getCartInitialize() {
+		return cartInitialize;
+	}
+
+	@Reference
+	public void setCartInitialize(CartInitialize cartInitialize) {
+		this.cartInitialize = cartInitialize;
+	}
+
+	public CartCheckout getCartCheckout() {
+		return cartCheckout;
+	}
+
+	@Reference
+	public void setCartCheckout(CartCheckout cartCheckout) {
+		this.cartCheckout = cartCheckout;
+	}
+
 	@Override
 	@ConupTransaction
 	public void coordinate() {
@@ -55,6 +91,7 @@ public class CoordinationImpl implements Coordination {
 		}
 		
 		cartCheckout.checkout(cartId, "c-0");
+		LOGGER.info("Coordination.coordinate().");
 	}
 
 }
