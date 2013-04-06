@@ -894,7 +894,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				}
 			}// END WHILE
 		} else{	// the txID has not started on local component
-			LOGGER.info("no local subTx running...");
+			LOGGER.fine("no local subTx running...");
 			Scope scope = depMgr.getScope();
 			if(scope == null){
 				futureC.addAll(depMgr.getStaticDeps());
