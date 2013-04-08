@@ -736,7 +736,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine("trying to change mode to ondemand");
 			
 			//change current componentStatus to 'ondemand'
-			ondemandHelper.getDynamicDepManager().setCompStatus(CompStatus.ONDEMAND);
+			ondemandHelper.getDynamicDepManager().ondemandSetting();
 			//send reqOndemandSetup(...) to parent components
 			sendReqOndemandSetup(parentComponents, currentComp);
 			//onDemandSetUp

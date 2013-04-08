@@ -41,7 +41,7 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 			LOGGER.info("duplicated OndemandSetup request for component " + compObj.getIdentifier());
 			return true;
 		}
-		
+		LOGGER.info("-----------------received ondemand setup request.");
 		isOndemandRqstRcvd = true;
 		
 		ondemandSetup.setOndemandHelper(this);
