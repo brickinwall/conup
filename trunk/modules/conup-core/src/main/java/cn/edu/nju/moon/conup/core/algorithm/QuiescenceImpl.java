@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.comm.api.peer.services.DepNotifyService;
@@ -39,7 +40,7 @@ public class QuiescenceImpl implements Algorithm {
 	private boolean isPassivateRCVD = false;
 	private DynamicDepManager depMgr = null;
 	
-	private Set<String> REQS = new HashSet<String>();
+	private Set<String> REQS = new ConcurrentSkipListSet<String>();
 	
 	private Map<String, Boolean> DEPS = new ConcurrentHashMap<String, Boolean>();
 	
@@ -61,6 +62,7 @@ public class QuiescenceImpl implements Algorithm {
 		switch (compStatus) {
 		case NORMAL:
 			doNormal(txContext);
+			break;
 		case VALID:
 			doValid(txContext);
 			break;
@@ -72,7 +74,7 @@ public class QuiescenceImpl implements Algorithm {
 			break;
 		default:
 //			doValid(txContext);
-			throw new RuntimeException("Quiescence algorithm cannot execute a transaction while component status is " + compStatus);
+			throw new RuntimeException("Quiescence algorithm cannot execute a transaction while " + txContext.getHostComponent() + " component status is " + compStatus);
 		}
 
 	}
@@ -173,7 +175,8 @@ public class QuiescenceImpl implements Algorithm {
 
 			hostComp = txCtx.getHostComponent();
 			rootTx = txCtx.getRootTx();
-			
+			if(rootTx.equals(txCtx.getCurrentTx()))
+				LOGGER.info("rootTx " + rootTx + " on " + hostComp + " ends.");
 			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				if( depMgr.isNormal()){
@@ -187,13 +190,13 @@ public class QuiescenceImpl implements Algorithm {
 						if (depMgr.isOndemandSetting()) {
 							LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
 							ondemandSyncMonitor.wait();
+							doValid(txCtx);
 						}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-			doValid(txCtx);
 		}
 	}
 
@@ -210,7 +213,8 @@ public class QuiescenceImpl implements Algorithm {
 //				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 //			}
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
-			
+			if(rootTx.equals(txCtx.getCurrentTx()))
+				LOGGER.info("rootTx " + rootTx + " on " + hostComp + " ends.");
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
 				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
@@ -222,23 +226,18 @@ public class QuiescenceImpl implements Algorithm {
 //				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 //				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 			} else{
-				Iterator<Entry<String, TransactionContext>> txIterator;
-				txIterator = depMgr.getTxs().entrySet().iterator();
-				while(txIterator.hasNext()){
-					TransactionContext tmpTxCtx;
-					tmpTxCtx = txIterator.next().getValue();
-					if(tmpTxCtx.getRootTx().equals(rootTx) && !tmpTxCtx.isFakeTx()){
-						txIterator.remove();
-						txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
-					}
-				}
-//				Set<String> targetRef;
-//				targetRef = depMgr.getStaticDeps();
-//				for(String subComp : targetRef){
-//					String payload = QuiescencePayloadCreator.createRootTxEndPayload(hostComp, subComp, rootTx, QuiescenceOperationType.NOTIFY_ROOT_TX_END);
-//					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//					depNotifyService.synPost(hostComp, subComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+//				Iterator<Entry<String, TransactionContext>> txIterator;
+//				txIterator = depMgr.getTxs().entrySet().iterator();
+//				while(txIterator.hasNext()){
+//					TransactionContext tmpTxCtx;
+//					tmpTxCtx = txIterator.next().getValue();
+//					if(tmpTxCtx.getRootTx().equals(rootTx) && !tmpTxCtx.isFakeTx()){
+//						txIterator.remove();
+//						txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+//					}
 //				}
+				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+				depMgr.getTxs().remove(txCtx.getCurrentTx());
 				// check passive when a root tx is end
 				LOGGER.fine("root tx " + rootTx + " end, checkPassiveAndAck...");
 				
@@ -397,7 +396,7 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private void ackPassivate(String hostComp, String targetComp) {
 		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
-		LOGGER.fine(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
+		LOGGER.info(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, QuiescenceOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
@@ -419,7 +418,6 @@ public class QuiescenceImpl implements Algorithm {
 			if(!allACKRCVD)
 				break;
 		}
-//		initDynamicDepMgr(hostComp);
 		if(allACKRCVD){
 			Map<String, TransactionContext> txs = depMgr.getTxs();
 			Iterator<Entry<String, TransactionContext>> txsIterator = txs.entrySet().iterator();
@@ -428,6 +426,7 @@ public class QuiescenceImpl implements Algorithm {
 				Entry<String, TransactionContext> entry = txsIterator.next();
 				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd) ){
 //					&& !entry.getValue().isFakeTx()){
+					LOGGER.info("not passive, because rootTx " + entry.getValue().getRootTx() + " running on " + hostComp);
 					bePassive = false;
 					break;
 				}
@@ -435,13 +434,20 @@ public class QuiescenceImpl implements Algorithm {
 			if(bePassive){
 				PASSIVATED = true;
 				LOGGER.info("**** passive has achieved for component: " + hostComp + "***********");
-//				Printer printer = new Printer();
-//				printer.printTxs(LOGGER, depMgr.getTxs());
+				Printer printer = new Printer();
+				LOGGER.info("TxRegistry on " + hostComp + " when it achievd passive");
+				printer.printTxs(LOGGER, depMgr.getTxs());
 				
 				// confirm all reqPassive
-				for (String reqComp : REQS) {
+				Iterator<String> reqsIter = REQS.iterator();
+				while(reqsIter.hasNext()){
+					String reqComp = reqsIter.next();
+					reqsIter.remove();
 					ackPassivate(hostComp, reqComp);
 				}
+//				for (String reqComp : REQS) {
+//					ackPassivate(hostComp, reqComp);
+//				}
 				
 				if(depMgr.isUpdateRequiredComp()){
 					LOGGER.info("**** QUIESCENCE has achieved for component: " + hostComp + "***********");
@@ -464,7 +470,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	private boolean doAckPassivate(String srcComp, String hostComp){
-		LOGGER.fine("receive ack passivate " + srcComp + "------->" + hostComp);
+		LOGGER.info("receive ack passivate " + srcComp + "------->" + hostComp);
 		DEPS.put(srcComp, true);
 		
 //
@@ -495,7 +501,7 @@ public class QuiescenceImpl implements Algorithm {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : DEPS.keySet()){
 			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, QuiescenceOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.asynPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		// clean up
@@ -575,7 +581,7 @@ public class QuiescenceImpl implements Algorithm {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : DEPS.keySet()){
 			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, QuiescenceOperationType.NOTIFY_REMOTE_UPDATE_DONE);
-			depNotifyService.asynPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
+			depNotifyService.synPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		// clean up
