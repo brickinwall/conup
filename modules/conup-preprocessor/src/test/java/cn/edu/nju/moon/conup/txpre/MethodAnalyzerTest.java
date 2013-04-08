@@ -160,12 +160,14 @@ public class MethodAnalyzerTest {
 		int n = txmn.instructions.size();
 		methodAnalyzer.initIsAnalyze(n);
 		int[] srcNum = new int[n];
+		int[] mark = new int[n];
 		for (int i = 0; i < n; i++) {
 			srcNum[i] = 0;
+			mark[i] = 0;
 		}
 		methodAnalyzer.recognizeState(0, 0, txmn.instructions,srcNum);
 		int insnsNum = txmn.instructions.size();
-		methodAnalyzer.getFirstRequestService(0, txmn.instructions, -1);
+		methodAnalyzer.getFirstRequestService(0, txmn.instructions, -1,mark);
 		assertEquals(1,methodAnalyzer.getRunInf().size());		
 	}
 	@Test
@@ -177,11 +179,12 @@ public class MethodAnalyzerTest {
 		int n = txWithSwitchMn.instructions.size();
 		methodAnalyzer.initIsAnalyze(n);
 		int[] srcNum = new int[n];
+		int[] mark = new int[n];
 		for (int i = 0; i < n; i++) {
-			srcNum[i] = 0;
+			mark[i] = 0;
 		}
 		methodAnalyzer.recognizeState(0, 0, txWithSwitchMn.instructions,srcNum);				
-		methodAnalyzer.getFirstRequestService(0, txWithSwitchMn.instructions, -1);
+		methodAnalyzer.getFirstRequestService(0, txWithSwitchMn.instructions, -1, mark);
 		assertEquals(6,methodAnalyzer.getRunInf().size());		
 	}
 }

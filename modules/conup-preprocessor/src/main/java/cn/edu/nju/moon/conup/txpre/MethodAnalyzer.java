@@ -33,8 +33,6 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 
 /**
- * 
- * 
  * @author Ping Su<njupsu@gmail.com>
  */
 public class MethodAnalyzer {
@@ -135,7 +133,7 @@ public class MethodAnalyzer {
 
 	public void printIsAnalyzed(int n) {
 		for (int i = 0; i < n; i++) {
-//			LOGGER.fine(i + ": " + isAnalyze[i]);
+//			System.out.println(i + ": " + isAnalyze[i]);
 		}
 	}
 
@@ -167,7 +165,7 @@ public class MethodAnalyzer {
 	public String getServiceName(String desc) {
 		String[] fields = desc.split(File.separator);
 		String serviceName = fields[fields.length - 1];
-		// LOGGER.fine(desc + " Servic Name is " + serviceName);
+		// System.out.println(desc + " Servic Name is " + serviceName);
 		return serviceName;
 	}
 
@@ -194,7 +192,7 @@ public class MethodAnalyzer {
 
 	public void printArray(int[] srcNum, int n) {
 		for (int i = 0; i < n; i++) {
-			LOGGER.fine(i + ":" + srcNum[i]);
+			System.out.println(i + ":" + srcNum[i]);
 		}
 	}
 
@@ -259,17 +257,25 @@ public class MethodAnalyzer {
 				int insnNum = mn.instructions.size();
 				initIsAnalyze(insnNum);
 				int[] srcNum = new int[insnNum];
+				int[] srcNum_firstRequestService = new int[insnNum];
 				for (int i = 0; i < insnNum; i++) {
 					srcNum[i] = 0;
+					srcNum_firstRequestService[i] = 0;
 				}
-				recognizeState(0, 0, mn.instructions, srcNum);
+				recognizeState(0, stateMachine.getStart(), mn.instructions, srcNum);
 				correctState();
 				List<AbstractInsnNode> multiSrcNode = this.getMultiSrcNode(
 						srcNum, insns);
-				getFirstRequestService(0, mn.instructions, -1);
+				
+				getFirstRequestService(0, mn.instructions, -1 ,srcNum_firstRequestService);
 				mergeState();
 				List<String>[] future = ExtractMetaData();
 				setStates(future);
+				State startState = this.getState(stateMachine.getStart(), states);
+				if(states.indexOf(startState) != 0){
+					states.remove(startState);
+					states.add(0, startState);
+				}
 				List<String> stateall = setStateAll();
 				List<String> next = setNext();
 				writeDDA(mn, stateall, next);
@@ -362,7 +368,7 @@ public class MethodAnalyzer {
 												insns, jumpE, localNum,
 												(LabelNode) i1dst);
 										((JumpInsnNode) src).label = nextOne;
-										// LOGGER.fine("--------------"
+										// System.out.println("--------------"
 										// + nextOne + "replaced"
 										// + ((JumpInsnNode) src).label);
 									} else {
@@ -469,8 +475,7 @@ public class MethodAnalyzer {
 					}
 				}
 				// insert end event
-				if (endinf.size() > 0) {
-					LOGGER.fine("asasda");
+				if (endinf.size() > 0) {					
 					for (AbstractInsnNode end : endinf) {						
 						InsnList trig = new InsnList();
 						trig.add(new VarInsnNode(ALOAD, localNum));
@@ -487,10 +492,8 @@ public class MethodAnalyzer {
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 								"trigger", "(Ljava/lang/String;)V"));
 						int op = end.getOpcode();
-						if(op == RETURN){
-							LOGGER.fine("return");
-							insns.insertBefore(end, trig);
-							
+						if(op == RETURN){							
+							insns.insertBefore(end, trig);							
 						}
 						else{						
 						AbstractInsnNode ilPre = end.getPrevious();
@@ -529,12 +532,12 @@ public class MethodAnalyzer {
 		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc.substring(
 				1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
-		// LOGGER.fine("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode("_E"));
-		// LOGGER.fine("----------------------StatesDDA"+statesDDA);
+		// System.out.println("----------------------StatesDDA"+statesDDA);
 		trigstart.add(new LdcInsnNode("_E"));
 		trigstart
 				.add(new MethodInsnNode(
@@ -606,12 +609,12 @@ public class MethodAnalyzer {
 		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc
 				.substring(1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
-		// LOGGER.fine("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode(statesDDA));
-		// LOGGER.fine("----------------------StatesDDA"+statesDDA);
+		// System.out.println("----------------------StatesDDA"+statesDDA);
 		trigstart.add(new LdcInsnNode(nextsDDA));
 		trigstart
 				.add(new MethodInsnNode(
@@ -750,15 +753,15 @@ public class MethodAnalyzer {
 				Iterator<AnnotationNode> fi = fn.visibleAnnotations.iterator();
 				while (fi.hasNext()) {
 					AnnotationNode fa = fi.next();
-					// LOGGER.fine(fa.values);
+					// System.out.println(fa.values);
 					if (fa.desc.contains("AEjb") || fa.desc.contains("Ejb")) {
 						// String ejb =
 						// fa.values.get(1).toString().split("/")[0];
 						String ejb = fn.desc.substring(1, fn.desc.length() - 1);
 						;
-						// LOGGER.fine(ejb+"-"+fn.name);
+						// System.out.println(ejb+"-"+fn.name);
 						ejball.put(ejb, (String) fn.name);
-						// LOGGER.fine(ejb+"-"+fn.value);
+						// System.out.println(ejb+"-"+fn.value);
 					}
 				}
 			}
@@ -779,7 +782,7 @@ public class MethodAnalyzer {
 			@Override
 			protected void newControlFlowEdge(int src, int dst) {
 				controlflow.addFlow(src, dst);
-//				LOGGER.fine(src+"->"+dst);
+//				System.out.println(src+"->"+dst);
 				if (src > dst) {
 					controlflow.getFlow(src).setIsWhile(true);
 				}
@@ -816,9 +819,8 @@ public class MethodAnalyzer {
 	public void recognizeState(int src, int last_state, InsnList insns,
 			int[] srcNum) {
 		srcNum[src]++;
-		if (src == stateMachine.getStart()) {
-			stateMachine.addState(src);
-			last_state = src;
+		if (last_state == stateMachine.getStart()&&!stateMachine.getStates().contains(last_state)) {
+			stateMachine.addState(last_state);			
 		}
 		if (stateMachine.getStates().contains(src) && (src != last_state)) {
 
@@ -839,9 +841,9 @@ public class MethodAnalyzer {
 						int next = (Integer) controlflow.getFlow(src).getDst()
 								.get(0);
 						MethodInsnNode method = ((MethodInsnNode) an);
-						// LOGGER.fine(an.toString()+"'owner is "+method.owner);
+						// System.out.println(an.toString()+"'owner is "+method.owner);
 						if (com.contains(method.owner)) {
-							// LOGGER.fine(an.toString()+"-------------owner is "+method.owner);
+							// System.out.println(an.toString()+"-------------owner is "+method.owner);
 							// String serName = getServiceName(method.owner);
 							// String e = "COM." + serName + "." + src;
 							String e = "COM." + method.owner + "." + src;						
@@ -969,13 +971,20 @@ public class MethodAnalyzer {
 	 * @param insns
 	 * @param branch
 	 */
-	public void getFirstRequestService(int src, InsnList insns, int branch) {
+	public void getFirstRequestService(int src, InsnList insns, int branch,int mark[]) {
+//		System.out.println("First request service:"+ src);
 		if (cominf.size() > 0) {
+			if(mark[src] == 1){
+				return;
+			}
+			else{
 			AbstractInsnNode an = insns.get(src);
 			if ((an.getOpcode() >= IRETURN && an.getOpcode() <= RETURN)
 					|| an.getOpcode() == ATHROW) {
+				mark[src] = 1;
 				return;
 			} else {
+				mark[src] = 1;
 				if (cominf.containsKey(an)) {
 					if (!runinf.contains(an)) {
 						runinf.add(an);
@@ -986,14 +995,15 @@ public class MethodAnalyzer {
 					if (branchNum > 1) {
 						for (int k = 0; k < branchNum; k++) {
 							int dst = (Integer) controlflow.getDst(src).get(k);
-							getFirstRequestService(dst, insns, k);
+							getFirstRequestService(dst, insns, k, mark);
 						}
 					} else {
 						int dst = (Integer) controlflow.getDst(src).get(0);
-						getFirstRequestService(dst, insns, branch);
+						getFirstRequestService(dst, insns, branch, mark);
 					}
 				}
 			}
+		}
 		}
 
 	}
@@ -1113,9 +1123,15 @@ public class MethodAnalyzer {
 	public void setStates(List<String>[] future) {
 		int states_count = stateMachine.getStatesCount();
 		for (int i = 0; i < states_count; i++) {
-			State state = new State(stateMachine.getStates().get(i));
+			int stateLocation = stateMachine.getStates().get(i);
+			State state = new State(stateLocation);
 			state.setFuture(future[i]);
-			states.add(state);
+			if(stateLocation == stateMachine.getStart()){
+				states.add(0, state);
+			}
+			else{
+				states.add(state);			}
+			
 			LOGGER.fine(i + ":" + future[i]);
 		}
 	}
@@ -1155,7 +1171,26 @@ public class MethodAnalyzer {
 		}
 		return false;
 	}
+	/**
+	 * according to the given location of the state, get the State in the List<State>
+	 * @param i
+	 * @param states
+	 * @return
+	 */
+		public State getState(int i,List<State> states) {
+			if (states != null) {
+				Iterator<State> s = states.iterator();
+				while (s.hasNext()) {
+					State state = s.next();
+					if (state.getLoc() == i) {
+						return state;
+					}
+				}
+				return null;
+			}
+			return null;
 
+		}
 	public State getState(int i) {
 		if (states != null) {
 			Iterator<State> s = states.iterator();
@@ -1189,7 +1224,7 @@ public class MethodAnalyzer {
 				State head = getState(headindex);
 				State tail = getState(tailindex);
 				if (equalState(head, tail)) {
-					LOGGER.fine(headindex + "==" + tailindex + "true");
+					System.out.println(headindex + "==" + tailindex + "true");
 					stateMachine.getEvents().remove(event);
 					stateMachine.mergeStates(headindex, tailindex);
 					states.remove(head);

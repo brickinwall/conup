@@ -1,12 +1,11 @@
 package cn.edu.nju.moon.conup.txpre;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 /**
- * 
- * 
  * @author Ping Su<njupsu@gmail.com>
  */
 public class StateMachine {
@@ -14,6 +13,7 @@ public class StateMachine {
 	
 	private int start;
 	
+//	private int end;
 	private Set<Integer> end = new ConcurrentSkipListSet<Integer>();
 	
 	private List<Integer> states = new LinkedList<Integer>();
@@ -22,11 +22,12 @@ public class StateMachine {
 
 	
 	public StateMachine() {
-
+		start = -1;
 	}
 	public StateMachine(List<Integer> states,List<Event> events) {		
 		this.states = states;
 		this.events = events;
+		start = -1;
 	}
 
 	/**
@@ -111,9 +112,18 @@ public class StateMachine {
 	 *  state location
 	 */
 	public void mergeStates(int s1, int s2) {
-
-		int s1_index = states.indexOf(s1);
-		states.remove(s1_index);
+		//delete s1, change to s2 where there is s1
+		if(s1 == start){
+			this.setStart(s2);
+//			System.out.println("$$$$$$$ change start to: "+s2);
+		}
+		if(states.contains(s1)){
+			int state_index = states.indexOf(s1);
+			states.remove(state_index);
+		}
+		else{
+			System.out.println("there is some wrong!");
+		}
 		for (int i = 0; i < events.size(); i++) {
 			Event e = events.get(i);
 			if (e.getTail() == s1) {
@@ -151,6 +161,29 @@ public class StateMachine {
 			}
 		}
 		return null;
+	}
+	/**
+	 * the next state from the current state
+	 * @param srcState
+	 * @return
+	 */
+	public Set<Integer> getNextStateLocation(int srcState){
+		Set<Integer> nextState = new HashSet<Integer>();
+		for(Event e: events){
+			if(e.getHead() == srcState){
+				nextState.add(e.getTail());
+			}
+		}
+		return nextState;
+	}
+	public List<Event> getNextEvent(int srcState){
+		List<Event> nextEvent = new LinkedList<Event>();
+		for(Event e: events){
+			if(e.getHead() == srcState){
+				nextEvent.add(e);
+			}
+		}
+		return nextEvent;
 	}
 
 }

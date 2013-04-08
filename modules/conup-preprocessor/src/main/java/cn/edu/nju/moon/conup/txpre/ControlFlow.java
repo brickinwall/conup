@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 /**
- * 
- * 
  * @author Ping Su<njupsu@gmail.com>
  */
 public class ControlFlow {
@@ -47,7 +45,7 @@ public class ControlFlow {
 			List<Integer> flDst = fl.getDst();
 			for(int d : flDst){
 				if(d == dst){
-					LOGGER.warning("The flow "+src+"->"+dst+"exists!");
+					LOGGER.fine("The flow "+src+"->"+dst+"exists!");
 					return;
 				}
 			}
@@ -85,7 +83,7 @@ public class ControlFlow {
 			for (int i = 0; i < d.size(); i++) {
 //				System.out.print(d.get(i) + ",");
 			}
-//			LOGGER.fine();
+//			System.out.println();
 		}
 
 	}
@@ -101,6 +99,7 @@ class NodeAndOutarcs {
 		this.src = src;
 		this.dst.add(dst);
 		isWhile = false;
+//		System.out.println(src+"->"+dst);
 	}
 
 	public void setSrc(int s) {
