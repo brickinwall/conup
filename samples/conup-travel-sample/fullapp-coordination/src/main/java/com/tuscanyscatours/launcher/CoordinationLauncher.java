@@ -327,7 +327,8 @@ public class CoordinationLauncher {
 					String gerResult =TravelExpResultQuery.queryExpResult(targetComp, ExperimentOperation.GET_EXECUTION_RECORDER);
 //					System.out.println(gerResult);
 					ExecutionRecorderAnalyzer analyzer = new ExecutionRecorderAnalyzer(gerResult);
-					int totalRecords = analyzer.getTotalRecords() - warmUpTimes - round * nThreads;
+//					int totalRecords = analyzer.getTotalRecords() - warmUpTimes - round * nThreads;
+					int totalRecords = analyzer.getTotalRecords();
 					String correctnessExpData = round + ", " + analyzer.getInconsistentRecords() + ", " + totalRecords + "\n";
 					correctnessExp.writeToFile(correctnessExpData);
 					System.out.println("inconsistent/total: " + analyzer.getInconsistentRecords() + "/" + totalRecords);

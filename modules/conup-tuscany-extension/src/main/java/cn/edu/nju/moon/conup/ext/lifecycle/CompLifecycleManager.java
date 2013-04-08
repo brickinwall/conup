@@ -207,10 +207,8 @@ public class CompLifecycleManager {
 	 */
 	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
 		NodeManager nodeMgr;
-//		DynamicDepManager depMgr;
 		
 		nodeMgr = NodeManager.getInstance();
-//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		assert compObj.getIdentifier().equals(compIdentifier);
 		
 		PerformanceRecorder.getInstance(compIdentifier).updateReceived(System.nanoTime());
@@ -431,7 +429,7 @@ public class CompLifecycleManager {
 		TuscanyOperationType opTyep = payloadResolver.getOperation();
 		String compIdentifier = payloadResolver.getParameter(TuscanyPayload.COMP_IDENTIFIER);
 		if(opTyep.equals(TuscanyOperationType.GET_EXECUTION_RECORDER)){
-			return ExecutionRecorder.getInstance(compIdentifier).getActions();
+			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
 		} else{
 			LOGGER.warning("unsupported operation type for experiment");
 		}
