@@ -95,7 +95,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void setCompStatus(CompStatus compStatus) {
+	public void ondemandSetting() {
 		// TODO Auto-generated method stub
 
 	}

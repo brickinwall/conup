@@ -176,15 +176,19 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return compStatus;
 	}
 
-	public void setCompStatus(CompStatus compStatus) {
-		synchronized (this) {
-			this.compStatus = compStatus;
+	public void ondemandSetting() {
+		synchronized (ondemandSyncMonitor) {
+			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
+			if(compStatus.equals(CompStatus.NORMAL))	
+				this.compStatus = CompStatus.ONDEMAND;
 		}
 	}
 
 	@Override
 	public boolean isOndemandSetting() {
-		return compStatus.equals(CompStatus.ONDEMAND);
+		synchronized (ondemandSyncMonitor) {
+			return compStatus.equals(CompStatus.ONDEMAND);
+		}
 	}
 
 	@Override
@@ -241,35 +245,41 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void ondemandSetupIsDone() {
 		
 		//FOR TEST
-		String inDepsStr = "";
-		for (Dependence dep : inDepRegistry.getDependences()) {
-			inDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
-		
-		String outDepsStr = "";
-		for (Dependence dep : outDepRegistry.getDependences()) {
-			outDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
-		
-		Printer printer = new Printer();
-		LOGGER.fine("ondemandSetupIsDone, Txs:");
-		printer.printTxs(LOGGER, getTxs());
+//		String inDepsStr = "";
+//		for (Dependence dep : inDepRegistry.getDependences()) {
+//			inDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+//		
+//		String outDepsStr = "";
+//		for (Dependence dep : outDepRegistry.getDependences()) {
+//			outDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
+//		
+//		Printer printer = new Printer();
+//		LOGGER.fine("ondemandSetupIsDone, Txs:");
+//		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (ondemandSyncMonitor) {
-			//FOR TEST
-			ExecutionRecorder exeRecorder;
-			exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
-			exeRecorder.ondemandIsDone();
-			
-			compStatus = CompStatus.VALID;
-			OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
-			ondemandSetupHelper.resetIsOndemandRqstRcvd();
-			
-			LOGGER.fine("--------------ondemand setup is done, now notify all...------\n\n");
-			ondemandSetupHelper.onDemandIsDone();
-			ondemandSyncMonitor.notifyAll();
+			assert compStatus.equals(CompStatus.ONDEMAND) || compStatus.equals(CompStatus.VALID);
+			if(compStatus.equals(CompStatus.ONDEMAND)){
+				//FOR TEST
+				ExecutionRecorder exeRecorder;
+				exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+				exeRecorder.ondemandIsDone();
+				
+				compStatus = CompStatus.VALID;
+				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+				ondemandSetupHelper.resetIsOndemandRqstRcvd();
+				
+				LOGGER.info("--------------ondemand setup is done, now notify all...------\n\n");
+				ondemandSetupHelper.onDemandIsDone();
+				ondemandSyncMonitor.notifyAll();
+				
+				if(isUpdateRequestReceived)
+					algorithm.initiate(compObj.getIdentifier());
+			}
 		}
 	}
 
@@ -297,13 +307,13 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (updatingSyncMonitor) {
-			algorithm.updateIsDone(compObj.getIdentifier());
 			//before changing to NORMAL, compStatus is supposed to be UPDATING.
 			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
 			isUpdateRequestReceived = false;
 			compStatus = CompStatus.NORMAL;
 			updatingSyncMonitor.notifyAll();
 			
+			algorithm.updateIsDone(compObj.getIdentifier());
 //			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
 //			isUpdateRequestReceived = false;
 //			compStatus = CompStatus.VALID;
@@ -325,23 +335,25 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
 		exeRecorder.achievedFree();
 		
-		String inDepsStr = "";
-		for (Dependence dep : inDepRegistry.getDependences()) {
-			inDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
-		
-		String outDepsStr = "";
-		for (Dependence dep : outDepRegistry.getDependences()) {
-			outDepsStr += "\n" + dep.toString();
-		}
-		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
-		
-		Printer printer = new Printer();
-		LOGGER.fine("achievedFree, Txs:");
-		printer.printTxs(LOGGER, getTxs());
+//		String inDepsStr = "";
+//		for (Dependence dep : inDepRegistry.getDependences()) {
+//			inDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
+//		
+//		String outDepsStr = "";
+//		for (Dependence dep : outDepRegistry.getDependences()) {
+//			outDepsStr += "\n" + dep.toString();
+//		}
+//		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
+//		
+//		Printer printer = new Printer();
+//		LOGGER.fine("achievedFree, Txs:");
+//		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (validToFreeSyncMonitor) {
+			LOGGER.info("compStatus: " + compStatus);
+			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.Free);
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.Free;
 				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
@@ -406,7 +418,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public boolean updateIsReceived() {
 		LOGGER.info("Received dynamic update request.");
 		isUpdateRequestReceived = true;
-		algorithm.initiate(compObj.getIdentifier());
+//		algorithm.initiate(compObj.getIdentifier());
 		return true;
 	}
 

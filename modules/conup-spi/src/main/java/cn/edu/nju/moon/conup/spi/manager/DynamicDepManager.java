@@ -105,10 +105,10 @@ public interface DynamicDepManager {
 	public void setAlgorithm(Algorithm algorithm);
 	
 	/**
-	 * 
+	 * ondemand setup is executing
 	 * @param compStatus
 	 */
-	public void setCompStatus(CompStatus compStatus);
+	public void ondemandSetting();
 
 	/**
 	 * @return if a component is in the process of the on-demand, return true. Otherwise, return false.

@@ -159,7 +159,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		hostComp = currentComp;
 		
 		//change component status to ONDEMAND
-		ondemandHelper.getDynamicDepManager().setCompStatus(CompStatus.ONDEMAND);
+		ondemandHelper.getDynamicDepManager().ondemandSetting();
 
 		//in this case, it means that current component is the target component for dynamic update
 		if (currentComp.equals(requestSrcComp)) {
