@@ -61,13 +61,14 @@ public class ExecutionRecorder {
 		
 	}
 	
-	public synchronized String getActions(){
+	public synchronized String getActionsAndClear(){
 		StringBuffer buffer = new StringBuffer();
 		Iterator<Entry<String, List<String>>> iterator = exeProc.entrySet().iterator();
 		while(iterator.hasNext()){
 			Entry<String, List<String>> entry = iterator.next();
 			buffer.append(entry.getKey() + ": " + entry.getValue().toString() + "\n");
 		}
+		exeProc.clear();
 		return buffer.toString();
 	}
 	
