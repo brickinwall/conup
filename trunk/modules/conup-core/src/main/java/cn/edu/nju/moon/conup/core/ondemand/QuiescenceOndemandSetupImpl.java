@@ -50,7 +50,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	 */
 	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
 	
-	private boolean isOndemandDone;
+	private boolean isOndemandDone = false;
 	
 	@Override
 	public boolean ondemand() {
@@ -79,10 +79,6 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 				Scope scope = Scope.inverse(scopeString);
 				ondemandHelper.getDynamicDepManager().setScope(scope);
 			}
-//			if(ondemandHelper.getDynamicDepManager().getScope() == null){
-//				Scope scope = calcScope();
-//				ondemandHelper.getDynamicDepManager().setScope(scope);
-//			}
 			reqOndemandSetup(curComp, srcComp);
 		} else if(operation.equals(QuiescenceOperationType.CONFIRM_ONDEMAND_SETUP)){
 			confirmOndemandSetup(srcComp, curComp);
@@ -214,10 +210,6 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			confirmStatus.put(parentComp, true);
 		else
 			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
-//		if (ConfirmOndemandStatus.containsKey(parentComp))
-//			ConfirmOndemandStatus.put(parentComp, true);
-//		else
-//			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
 		String confirmOndemandStatusStr = "ConfirmOndemandStatus:";
@@ -251,18 +243,11 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			reqStatus.put(requestSrcComp, true);
 		else
 			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
-//		if (OndemandRequestStatus.containsKey(requestSrcComp))
-//			OndemandRequestStatus.put(requestSrcComp, true);
-//		else{
-//			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
-//		}
 		
 		//print OndemandRequestStatus
 		String ondemandRequestStatusStr = "OndemandRequestStatus:";
-//		LOGGER.fine("OndemandRequestStatus:");
 		for(Entry<String, Boolean> entry : reqStatus.entrySet()){
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
-//			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 		LOGGER.fine(ondemandRequestStatusStr);
 
@@ -342,9 +327,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		LOGGER.fine("current compStatus=ondemand, before send req ondemand to parent component.");
 		
 		String str = "sendReqOndemandSetup(...) to parent components:";
-//		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
 		for(String component : parentComps){
-//			LOGGER.fine("\t" + component);
 			str += "\n\t" + component;
 		}
 		LOGGER.fine(str);
@@ -377,10 +360,8 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		String str = "sendConfirmOndemandSetup(...) to sub components:";
-//		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:");
 		for(String component : targetRef){
 			str += "\n\t" + component;
-//			LOGGER.fine("\t" + component);
 		}
 		LOGGER.fine(str);
 		
@@ -411,7 +392,6 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		XMLUtil xmlUtil = new XMLUtil();
 		String compIdentifier = ondemandHelper.getCompObject().getIdentifier();
 		
-//		Set<String> scopeComps = xmlUtil.getParents(compIdentifier);
 		Set<String> scopeComps = new HashSet<String>();
 		
 		Queue<String>  queue= new LinkedBlockingQueue<String>();
