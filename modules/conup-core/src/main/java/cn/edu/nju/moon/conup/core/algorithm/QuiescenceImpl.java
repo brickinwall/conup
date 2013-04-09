@@ -176,7 +176,7 @@ public class QuiescenceImpl implements Algorithm {
 			hostComp = txCtx.getHostComponent();
 			rootTx = txCtx.getRootTx();
 			if(rootTx.equals(txCtx.getCurrentTx()))
-				LOGGER.info("rootTx " + rootTx + " on " + hostComp + " ends.");
+				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
 			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				if( depMgr.isNormal()){
@@ -188,7 +188,7 @@ public class QuiescenceImpl implements Algorithm {
 				} else{
 					try {
 						if (depMgr.isOndemandSetting()) {
-							LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
+							LOGGER.fine("----------------ondemandSyncMonitor.wait();quiesence algorithm------------");
 							ondemandSyncMonitor.wait();
 							doValid(txCtx);
 						}
@@ -214,7 +214,7 @@ public class QuiescenceImpl implements Algorithm {
 //			}
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
 			if(rootTx.equals(txCtx.getCurrentTx()))
-				LOGGER.info("rootTx " + rootTx + " on " + hostComp + " ends.");
+				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
 				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
@@ -365,9 +365,9 @@ public class QuiescenceImpl implements Algorithm {
 				}
 //
 				LOGGER.fine("before checkPassiveAndAck:");
-				Printer printer = new Printer();
+//				Printer printer = new Printer();
 //				initDynamicDepMgr(hostComp);
-				Map<String, TransactionContext> txs = depMgr.getTxs();
+//				Map<String, TransactionContext> txs = depMgr.getTxs();
 //				printer.printTxs(txs);
 				
 				checkPassiveAndAck(hostComp);
@@ -426,7 +426,7 @@ public class QuiescenceImpl implements Algorithm {
 				Entry<String, TransactionContext> entry = txsIterator.next();
 				if(!entry.getValue().getEventType().equals(TxEventType.TransactionEnd) ){
 //					&& !entry.getValue().isFakeTx()){
-					LOGGER.info("not passive, because rootTx " + entry.getValue().getRootTx() + " running on " + hostComp);
+					LOGGER.info("not become passive, because rootTx " + entry.getValue().getRootTx() + " running on " + hostComp);
 					bePassive = false;
 					break;
 				}
@@ -434,20 +434,20 @@ public class QuiescenceImpl implements Algorithm {
 			if(bePassive){
 				PASSIVATED = true;
 				LOGGER.info("**** passive has achieved for component: " + hostComp + "***********");
-				Printer printer = new Printer();
-				LOGGER.info("TxRegistry on " + hostComp + " when it achievd passive");
-				printer.printTxs(LOGGER, depMgr.getTxs());
+//				Printer printer = new Printer();
+//				LOGGER.info("TxRegistry on " + hostComp + " when it achievd passive");
+//				printer.printTxs(LOGGER, depMgr.getTxs());
 				
 				// confirm all reqPassive
-				Iterator<String> reqsIter = REQS.iterator();
-				while(reqsIter.hasNext()){
-					String reqComp = reqsIter.next();
-					reqsIter.remove();
-					ackPassivate(hostComp, reqComp);
-				}
-//				for (String reqComp : REQS) {
+//				Iterator<String> reqsIter = REQS.iterator();
+//				while(reqsIter.hasNext()){
+//					String reqComp = reqsIter.next();
+//					reqsIter.remove();
 //					ackPassivate(hostComp, reqComp);
 //				}
+				for (String reqComp : REQS) {
+					ackPassivate(hostComp, reqComp);
+				}
 				
 				if(depMgr.isUpdateRequiredComp()){
 					LOGGER.info("**** QUIESCENCE has achieved for component: " + hostComp + "***********");
@@ -539,7 +539,7 @@ public class QuiescenceImpl implements Algorithm {
 //		boolean isRootComp = txContext.getHostComponent().equals(
 //				depMgr.getCompObject().getIdentifier());
 		
-		boolean isRootComp = txContext.getRootTx()==null;
+		boolean isRootComp = (txContext.getRootTx()==null);
 		
 		LOGGER.fine(txContext.getHostComponent() + "  " + "isUpdateReqRCVD:" + isUpdateReqRCVD + "  isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED + "  isRootComp:" + isRootComp);
 //		LOGGER.fine("txCtx:\n" + txContext);

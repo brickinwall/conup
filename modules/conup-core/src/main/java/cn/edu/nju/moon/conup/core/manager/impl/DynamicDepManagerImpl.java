@@ -262,6 +262,22 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (ondemandSyncMonitor) {
+			//FOR TEST
+//			ExecutionRecorder exeRecorder;
+//			exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+//			exeRecorder.ondemandIsDone();
+//			
+//			compStatus = CompStatus.VALID;
+//			OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+//			ondemandSetupHelper.resetIsOndemandRqstRcvd();
+//			
+//			LOGGER.info("--------------ondemand setup is done, now notify all...------\n\t compStatus:" + compStatus);
+//			ondemandSetupHelper.onDemandIsDone();
+//			ondemandSyncMonitor.notifyAll();
+//			if(isUpdateRequestReceived){
+//				algorithm.initiate(compObj.getIdentifier());
+//			}
+			
 			assert compStatus.equals(CompStatus.ONDEMAND) || compStatus.equals(CompStatus.VALID);
 			if(compStatus.equals(CompStatus.ONDEMAND)){
 				//FOR TEST
@@ -314,10 +330,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			updatingSyncMonitor.notifyAll();
 			
 			algorithm.updateIsDone(compObj.getIdentifier());
-//			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
-//			isUpdateRequestReceived = false;
-//			compStatus = CompStatus.VALID;
-//			updatingSyncMonitor.notifyAll();
 		}
 		
 	}
@@ -352,7 +364,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (validToFreeSyncMonitor) {
-			LOGGER.info("compStatus: " + compStatus);
+			LOGGER.fine("compStatus: " + compStatus);
 			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.Free);
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.Free;

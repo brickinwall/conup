@@ -105,17 +105,17 @@ public class TripBookingImpl implements TripBooking {
         // book any nested items
         TripItem[] nestedItems = trip.getTripItems();
         if (nestedItems != null) {
-//            for(TripItem tripItem : nestedItems){
-//                if (tripItem.getType().equals(TripItem.CAR)) {
-//                    tripItem.setBookingCode(carBook.book(tripItem));
-//                } else if (tripItem.getType().equals(TripItem.FLIGHT)) {
-//                    tripItem.setBookingCode(flightBook.book(tripItem));
-//                } else if (tripItem.getType().equals(TripItem.HOTEL)) {
-//                    tripItem.setBookingCode(hotelBook.book(tripItem));
-//                } else {
-//                    tripItem.setBookingCode(tripItem.getType() + " is invalid");
-//                }
-//            }
+            for(TripItem tripItem : nestedItems){
+                if (tripItem.getType().equals(TripItem.CAR)) {
+                    tripItem.setBookingCode(carBook.book(tripItem));
+                } else if (tripItem.getType().equals(TripItem.FLIGHT)) {
+                    tripItem.setBookingCode(flightBook.book(tripItem));
+                } else if (tripItem.getType().equals(TripItem.HOTEL)) {
+                    tripItem.setBookingCode(hotelBook.book(tripItem));
+                } else {
+                    tripItem.setBookingCode(tripItem.getType() + " is invalid");
+                }
+            }
         }
 
         // book the top level item if it's a packaged trip
