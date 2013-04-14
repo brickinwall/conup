@@ -17,7 +17,7 @@ public class ProcVisitorThread extends Thread {
 
 	public void run(){
 		try {
-			ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
+			ProcService pi = node.getService(ProcService.class, "ProcComponent/ProcService");
 			LOGGER.fine("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

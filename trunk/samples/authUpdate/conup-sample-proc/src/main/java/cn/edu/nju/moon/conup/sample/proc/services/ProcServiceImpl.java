@@ -42,7 +42,7 @@ public class ProcServiceImpl implements ProcService {
 		exeRecorder = ExecutionRecorder.getInstance("ProcComponent");
 //		exeRecorder.addAction(rootTx, exeProc);
 //		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
-		exeProc += ", ProcComponent.process." + version;
+		exeProc += "; ProcComponent.process." + version;
 		
 		exeProc = verify.verify(exeProc, token);
 		

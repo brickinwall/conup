@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.sample.auth.services.TokenService;
 
 
@@ -23,9 +22,9 @@ public class AuthVisitorThread extends Thread {
 	
 	public void run(){
 		try {
-			TokenService tokenService = node.getService(TokenService.class, "AuthComponent#service-binding(TokenService/TokenService)");
+			TokenService tokenService = node.getService(TokenService.class, "AuthComponent/TokenService");
 			String execStr = "";
-			LOGGER.fine("\t" + "" + tokenService.getToken(execStr, "nju,cs"));
+			LOGGER.info("\t" + "" + tokenService.getToken(execStr, "nju,cs"));
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

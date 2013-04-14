@@ -68,7 +68,7 @@ public class LaunchProc {
 			
 		while(true){
 			LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
-			ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
+			ProcService pi = node.getService(ProcService.class, "ProcComponent/ProcService");
 			LOGGER.fine("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
 			Thread.sleep(50);
 		}
@@ -82,16 +82,16 @@ public class LaunchProc {
 			
 //			
 //			LOGGER.fine("\nTry to access TokenComponent#service-binding(TokenService/TokenService):");
-//			TokenService ts = node.getService(TokenService.class, "TokenComponent#service-binding(TokenService/TokenService)");
+//			TokenService ts = node.getService(TokenService.class, "TokenComponent");
 //			String token = ts.getToken("nju,cs");
 //			LOGGER.fine("\t" + "" + token);
 //			
 //			LOGGER.fine("\nTry to access VerificationComponent#service-binding(VerificationService/VerificationService):");
-//			VerificationService vs = node.getService(VerificationService.class, "VerificationComponent#service-binding(VerificationService/VerificationService)");
+//			VerificationService vs = node.getService(VerificationService.class, "VerificationComponent");
 //			LOGGER.fine("\t" + "" + vs.verify(token));
 			
 //			LOGGER.fine("\nTry to access DBComponent#service-binding(DBService/DBService):");
-//			DBService db = node.getService(DBService.class, "DBComponent#service-binding(DBService/DBService)");
+//			DBService db = node.getService(DBService.class, "DBComponent");
 //			LOGGER.fine("\t" + "" + db.dbOperation());
 			
 		} catch (NoSuchServiceException e) {

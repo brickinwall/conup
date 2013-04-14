@@ -72,8 +72,7 @@ public class LaunchDB {
 
 			System.out
 					.println("\nTry to access DBComponent#service-binding(DBService/DBService):");
-			DBService db = node.getService(DBService.class,
-					"DBComponent#service-binding(DBService/DBService)");
+			DBService db = node.getService(DBService.class,	"DBComponent");
 			LOGGER.fine("\t" + "" + db.dbOperation("emptyExeProc"));
 
 		} catch (NoSuchServiceException e) {

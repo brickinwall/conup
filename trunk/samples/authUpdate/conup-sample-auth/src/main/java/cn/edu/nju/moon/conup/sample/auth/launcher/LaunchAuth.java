@@ -1,6 +1,8 @@
 package cn.edu.nju.moon.conup.sample.auth.launcher;
 
+import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -10,6 +12,9 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 
@@ -44,6 +49,7 @@ public class LaunchAuth {
         
         //access
 //        accessServices(node);
+//        sendOndemandRqst();
         
         System.in.read();
         LOGGER.fine("Stopping ...");
@@ -88,5 +94,31 @@ public class LaunchAuth {
 		});
 		
 		thread.start();
+	}
+	
+	public static void sendOndemandRqst() {
+		CompLifecycleManager compLcMgr;
+		NodeManager nodeMgr;
+		DynamicDepManager depMgr;
+		OndemandSetupHelper ondemandHelper;
+		String compIdentifier = "AuthComponent";
+		compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		nodeMgr = NodeManager.getInstance();
+		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
+		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
+		ondemandHelper.ondemandSetup();
+		Set<Dependence> outDeps = depMgr.getRuntimeDeps();
+		LOGGER.fine("OutDepRegistry:");
+		for (Iterator iterator = outDeps.iterator(); iterator.hasNext();) {
+			Dependence dependence = (Dependence) iterator.next();
+			LOGGER.fine(dependence.toString());
+		}
+
+		LOGGER.fine("InDepRegistry:");
+		Set<Dependence> inDeps = depMgr.getRuntimeInDeps();
+		for (Iterator iterator = inDeps.iterator(); iterator.hasNext();) {
+			Dependence dependence = (Dependence) iterator.next();
+			LOGGER.fine(dependence.toString());
+		}
 	}
 }
