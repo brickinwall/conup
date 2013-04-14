@@ -65,7 +65,7 @@ public class LaunchPortal {
 	
 	public static void accessServices(Node node) throws Exception{
 		int accessTimes = 40;		//total request
-		int rqstInterval = 200;
+		int rqstInterval = 1000;
 		String targetComp = "AuthComponent";	//target component for update
 		Map<Integer, String> updatePoints = new TreeMap<Integer, String>();
 		
@@ -94,7 +94,7 @@ public class LaunchPortal {
 				
 //				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
 				for (int i = 0; i < accessTimes; i++) {
-					new PortalVisitorThread(node).start();
+					new PortalVisitorThread(node, 0 ,i + 1).start();
 					Thread.sleep(rqstInterval);
 				}
 				break;
@@ -127,7 +127,7 @@ public class LaunchPortal {
 				}
 				
 				for (int i = 0; i < accessTimes; i++) {
-					new PortalVisitorThread(node).start();
+					new PortalVisitorThread(node, 0 , i + 1).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
 //						System.out.println("update " + targetComp + " at " + i);
