@@ -1,8 +1,9 @@
 package com.tuscanyscatours.launcher;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.CompVersion;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.UpdatableComp;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 
 /**
@@ -24,11 +25,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "Bank";
 				int port1 = 22313;
-				String baseDir1 = "/home/stone/deploy/travleSample/bankVer1";	//update component to version 1
+				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer1";	//update component to version 1
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
 				String contributionUri1 = "fullapp-bank";
 				String compsiteUri1 = "bank.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -44,11 +45,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "Bank";
 				int port1 = 22313;
-				String baseDir1 = "/home/stone/deploy/travleSample/bankVer2";	//update component to version 2
+				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer2";	//update component to version 2
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
 				String contributionUri1 = "fullapp-bank";
 				String compsiteUri1 = "bank.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -64,11 +65,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "ShoppingCart";
 				int port1 = 22307;
-				String baseDir1 = "/home/stone/deploy/travleSample/shoppingcartVer1";	//update component to version 
+				String baseDir1 = "/home/artemis/Tuscany/deploy/shoppingcartVer1";	//update component to version 
 				String classFilePath1 = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
 				String contributionUri1 = "fullapp-shoppingcart";
 				String compsiteUri1 = "fullapp-shoppingcart.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -83,11 +84,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "HotelPartner";
 				int port1 = 22301;
-				String baseDir1 = "/home/stone/deploy/travleSample/hotelVer1";	//update component to version 
+				String baseDir1 = "/home/artemis/Tuscany/deploy/hotelVer1";	//update component to version 
 				String classFilePath1 = "com.tuscanyscatours.hotel.impl.HotelImpl";
 				String contributionUri1 = "fullapp-bespoketrip";
 				String compsiteUri1 = "fullapp-bespoketrip.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -102,11 +103,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "TripPartner";
 				int port1 = 22304;
-				String baseDir1 = "/home/stone/deploy/travleSample/tripVer1";	//update component to version 
+				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer1";	//update component to version 
 				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
 				String contributionUri1 = "fullapp-packagedtrip";
 				String compsiteUri1 = "fullapp-packagedtrip.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -121,11 +122,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier1 = "TripPartner";
 				int port1 = 22304;
-				String baseDir1 = "/home/stone/deploy/travleSample/tripVer2";	//update component to version 
+				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer2";	//update component to version 
 				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
 				String contributionUri1 = "fullapp-packagedtrip";
 				String compsiteUri1 = "fullapp-packagedtrip.composite";
-				rcs.update("192.168.248.135", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		
@@ -140,11 +141,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
-				String baseDir = "/home/stone/deploy/travleSample/currencyVer1";
+				String baseDir = "/home/artemis/Tuscany/deploy/currencyVer1";
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("192.168.248.135", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 			}
 		});
@@ -160,11 +161,11 @@ public class TravelCompUpdate {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
-				String baseDir = "/home/stone/deploy/travleSample/currencyVer2";
+				String baseDir = "/home/artemis/Tuscany/deploy/currencyVer2";
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("192.168.248.135", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 			}
 		});
@@ -295,17 +296,17 @@ public class TravelCompUpdate {
 		Arrays.asList(values);
 	}
 	
-	enum CompVersion{
-		VER_ZERO,
-		VER_ONE,
-		VER_TWO
-	}
-	
-	enum UpdatableComp{
-		CurrencyConverter,
-		Bank,
-		ShoppingCart,
-		HotelPartner,
-		TripPartner
-	}
+//	enum CompVersion{
+//		VER_ZERO,
+//		VER_ONE,
+//		VER_TWO
+//	}
+//	
+//	enum UpdatableComp{
+//		CurrencyConverter,
+//		Bank,
+//		ShoppingCart,
+//		HotelPartner,
+//		TripPartner
+//	}
 }

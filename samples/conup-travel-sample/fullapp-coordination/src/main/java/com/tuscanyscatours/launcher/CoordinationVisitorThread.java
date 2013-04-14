@@ -70,7 +70,7 @@ public class CoordinationVisitorThread extends Thread{
 	public void run() {
 		try {
 			
-			Coordination scaTour = node.getService(Coordination.class, "Coordination#service-binding(Coordination/Coordination)");
+			Coordination scaTour = node.getService(Coordination.class, "Coordination/Coordination");
 			long startTime = System.nanoTime();
 			scaTour.coordinate();
 			long endTime = System.nanoTime();

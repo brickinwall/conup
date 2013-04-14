@@ -69,7 +69,7 @@ public class BespoketripLauncher {
 			
 			TripLeg tripLeg = new TripLeg("", "", "FLR", "06/12/09", "06/12/09", "2");
 			LOGGER.fine("\nTry to access CarPartner#service-binding(Search/Search):");
-			CarSearch carSearch = node.getService(CarSearch.class, "CarPartner#service-binding(Search/Search)");
+			CarSearch carSearch = node.getService(CarSearch.class, "CarPartner/CarSearch/CarSearch");
 			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 //			System.out
 //				.println("\nTry to access CarPartner#service-binding(Search/searchws):");
@@ -79,7 +79,7 @@ public class BespoketripLauncher {
 
 			LOGGER.fine("\nTry to access HotelPartner#service-binding(Search/Search):");
             TripLeg flightTrip = new TripLeg("", "LGW", "FLR", "06/12/09", "06/12/09", "1");
-            HotelSearch hotelSearch = node.getService(HotelSearch.class, "HotelPartner#service-binding(Search/Search)");
+            HotelSearch hotelSearch = node.getService(HotelSearch.class, "HotelPartner/HotelSearch/HotelSearch");
 			LOGGER.fine("\t" + "hotelSearch.searchSynch(tripLeg)=" + hotelSearch.searchSynch(flightTrip));
 
 		} catch (NoSuchServiceException e) {

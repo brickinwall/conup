@@ -1,9 +1,13 @@
 package com.tuscanyscatours.launcher;
 
+import it.unipr.ce.dsg.deus.core.Event;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -21,6 +25,7 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -150,6 +155,17 @@ public class CoordinationLauncher {
 				break;
 			case disruption:
 				
+				// make request arrival as poission process
+		    	Event event = null;
+		    	int seed = 123456789;
+		    	Properties params = new Properties();
+		    	float MeanArrival = rqstInterval;
+		    	params.setProperty("meanArrival", Float.toString(MeanArrival));
+		    	ArrayList<Event> refEvents = new ArrayList<Event>();
+		    	MyPoissonProcess mpp = new MyPoissonProcess("myPoissonProcess", params, null, refEvents);
+		    	Random random = new Random(seed);
+		    	mpp.setRandom(random);
+				
 				int warmUpTimes = 400;
 				CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
 				for (int i = 0; i < warmUpTimes; i++) {
@@ -172,12 +188,15 @@ public class CoordinationLauncher {
 					CountDownLatch normalCountDown = new CountDownLatch(nThreads);
 					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-						Thread.sleep(rqstInterval);
+						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 					}
 					normalCountDown.await();
 					
 					Thread.sleep(3000);
-
+					// reset random
+					random = new Random(seed);
+					mpp.setRandom(random);
+					
 					CountDownLatch updateCountDown = new CountDownLatch(nThreads);
 					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, resTimeRec, "update").start();
@@ -185,23 +204,22 @@ public class CoordinationLauncher {
 							disExp.setUpdateStartTime(System.nanoTime());
 							TravelCompUpdate.update(targetComp);
 						}
-						Thread.sleep(rqstInterval);
+						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 					}
 					updateCountDown.await();
 					
 					Thread.sleep(1000);
+					// reset random
+					random = new Random(seed);
+					mpp.setRandom(random);
 					
 					Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
 					Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
-//					System.out.println("normalRes.size() ==" + normalRes.size());
-//					System.out.println("updateRes.size() ==" + updateRes.size());
+					System.out.println("normalRes.size() ==" + normalRes.size());
+					System.out.println("updateRes.size() ==" + updateRes.size());
 					assert normalRes.size() == nThreads;
 					assert updateRes.size() == nThreads;
 					
-//					for(int i = 0; i < nThreads; i++){
-//						String data = round + "," + (i+1) + "," + normalRes.get(i + 1) * 1e-6 + "," + updateRes.get(i+1) * 1e-6 + "\n";
-//						disExp.writeToFile(data);
-//					}
 					double averageNormalResTime = resTimeRec.getAverageNormalResTime();
 					Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
 					Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
@@ -219,8 +237,6 @@ public class CoordinationLauncher {
 						disExp.writeToFile(data);
 						count++;
 					}
-//					String data = resTimeRec.getTotalNormalResTime() + "," + resTimeRec.getTotalUpdateResTime() + "," + (long)(resTimeRec.getTotalUpdateResTime() - resTimeRec.getTotalNormalResTime()) + "\n";
-//					disExp.writeToFile(data);
 					
 					Thread.sleep(3500);
 				}
