@@ -4,7 +4,7 @@ package cn.edu.nju.moon.conup.ext.utils.experiments.model;
 //	<nThreads>10</nThreads>
 //	<threadId>5</threadId>
 //	<targetComp>CurrencyConverter</targetComp>
-//	<ipAddress>192.168.8.128</ipAddress>
+//	<ipAddress>10.0.2.15</ipAddress>
 public class ExpSetting {
 	private int indepRun;
 	private int nThreads;
