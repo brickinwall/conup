@@ -67,13 +67,11 @@ public class ShoppingCartLauncher {
 //			Thread.sleep(2000);
 			
 			LOGGER.fine("\nTry to access ShoppingCart#service-binding(CartInitialize/CartInitialize):");
-			CartInitialize cartInitialize = node
-					.getService(CartInitialize.class,
-							"ShoppingCart#service-binding(CartInitialize/CartInitialize)");
+			CartInitialize cartInitialize = node.getService(CartInitialize.class, "ShoppingCart/CartInitialize");
 			String cartId = cartInitialize.newCart();
 			LOGGER.fine("create a new cartId: " + cartId);
 			
-			CartUpdates cartUpdate = node.getService(CartUpdates.class, "ShoppingCart#service-binding(CartUpdates/CartUpdates)");
+			CartUpdates cartUpdate = node.getService(CartUpdates.class, "ShoppingCart/CartUpdates");
 			TripItem trip = new TripItem("", "", TripItem.CAR, "FS1DEC06", "Florence and Siena pre-packaged tour", "LGW - FLR", "06/12/09", "13/12/09", 450, "EUR", "http://localhost:8085/tbd");
 			trip.setTripItems(new TripItem[]{});
 //			trip.setTripItems(new TripItem[]{new TripItem("", "", TripItem.CAR, "FS1DEC06", "Florence and Siena pre-packaged tour", "LGW - FLR", "06/12/09", "13/12/09", 450, "EUR", "http://localhost:8085/tbd")});
@@ -84,7 +82,7 @@ public class ShoppingCartLauncher {
 			TripItem[] tripItems = cartInitialize.getTrips(cartId);
 
 			
-			CartCheckout cartCheckout = node.getService(CartCheckout.class, "ShoppingCart#service-binding(CartCheckout/CartCheckout)");
+			CartCheckout cartCheckout = node.getService(CartCheckout.class, "ShoppingCart/CartCheckout");
 			cartCheckout.checkout(cartId, "c-0");
 //			String cartId2 = cartInitialize.newCart();
 //			LOGGER.fine("create a new cartId: " + cartId2);
