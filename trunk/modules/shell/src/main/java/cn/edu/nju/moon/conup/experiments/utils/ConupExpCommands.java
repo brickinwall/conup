@@ -4,6 +4,7 @@ public enum ConupExpCommands {
 	timelinessExp,
 	disruptionExp,
 	overheadExp,
+	correctnessExp,
 	frameworkExp5,
 	invoke,
 	help;
