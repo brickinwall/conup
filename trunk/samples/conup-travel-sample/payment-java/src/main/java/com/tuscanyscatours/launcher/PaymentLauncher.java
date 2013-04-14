@@ -64,8 +64,7 @@ public class PaymentLauncher {
 		try {
 			System.out
 					.println("\nTry to access Payment#service-binding(Payment/Payment):");
-			Payment payment = node.getService(Payment.class,
-					"Payment#service-binding(Payment/Payment)");
+			Payment payment = node.getService(Payment.class, "Payment/Payment");
 			LOGGER.fine(payment.makePaymentMember("c-0", 1000));
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

@@ -55,8 +55,7 @@ public class PackagedtripLauncher {
 			TripLeg tripLeg = new TripLeg("", "", "FLR", "06/12/09", "06/12/09", "2");
 			System.out
 				.println("\nTry to access TripPartner#service-binding(Search/Search):");
-			TripSearch carSearch = node.getService(TripSearch.class,
-					"TripPartner#service-binding(Search/Search)");
+			TripSearch carSearch = node.getService(TripSearch.class, "TripPartner/TripSearch");
 			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 
 		} catch (NoSuchServiceException e) {

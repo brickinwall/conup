@@ -61,8 +61,7 @@ public class CurrencyConverterLauncher {
 			
 			System.out
 					.println("\nTry to access CurrencyConverter#service-binding(CurrencyConverter/CurrencyConverter):");
-			CurrencyConverter currency = node.getService(CurrencyConverter.class,
-					"CurrencyConverter#service-binding(CurrencyConverter/CurrencyConverter)");
+			CurrencyConverter currency = node.getService(CurrencyConverter.class, "CurrencyConverter/CurrencyConverter");
 			LOGGER.fine("\t" + "CurrencyConverter.convert(\"USD\", \"EUR\", 100)=" + currency.convert("USD", "EUR", 100));
 
 		} catch (NoSuchServiceException e) {
