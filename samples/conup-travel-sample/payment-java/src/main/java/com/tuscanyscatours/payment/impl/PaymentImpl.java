@@ -28,7 +28,6 @@ import org.oasisopen.sca.annotation.Service;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
 import com.tuscanyscatours.creditcard.CreditCardPayment;
-import com.tuscanyscatours.currencyconverter.CurrencyConverter;
 import com.tuscanyscatours.customer.Customer;
 import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
