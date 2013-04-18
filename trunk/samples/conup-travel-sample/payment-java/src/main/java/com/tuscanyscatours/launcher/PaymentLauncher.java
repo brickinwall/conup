@@ -61,7 +61,7 @@ public class PaymentLauncher {
         depRecorder = DepRecorder.getInstance();
         
         //access
-//        accessServices(node);
+        accessServices(node);
 	}
 	
 	public static void accessServices(Node node){
