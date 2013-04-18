@@ -21,6 +21,8 @@ package com.tuscanyscatours.customer;
 
 import com.tuscanyscatours.payment.creditcard.CreditCardDetailsType;
 
+//import com.tuscanyscatours.payment.creditcard.CreditCardDetailsType;
+
 
 /**
  * Customer data

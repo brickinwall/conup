@@ -52,6 +52,10 @@ public class PaymentLauncher {
         CompLifecycleManager.getInstance("EmailGateway").setNode(node);
         CommServerManager.getInstance().start("EmailGateway");
         
+        nodeMgr.loadConupConf("CreditCardPayment", "oldVersion");
+        CompLifecycleManager.getInstance("CreditCardPayment").setNode(node);
+        CommServerManager.getInstance().start("CreditCardPayment");
+        
         //launch DepRecorder
         DepRecorder depRecorder;
         depRecorder = DepRecorder.getInstance();

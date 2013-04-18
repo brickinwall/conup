@@ -23,14 +23,12 @@ import java.util.Collection;
 
 import org.oasisopen.sca.annotation.Remotable;
 
-import com.tuscanyscatours.payment.creditcard.CreditCardDetailsType;
-
 /**
  * Customer registry interface
  */
 @Remotable
 public interface CustomerRegistry {
-    Customer createCustomer(String name, String email, CreditCardDetailsType creditCard);
+    Customer createCustomer(String name, String email);
 
     boolean updateCustomer(Customer customer);
 
