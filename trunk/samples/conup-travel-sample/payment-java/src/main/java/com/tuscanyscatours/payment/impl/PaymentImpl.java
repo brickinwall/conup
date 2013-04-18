@@ -48,9 +48,6 @@ public class PaymentImpl implements Payment {
 
     protected EmailGateway emailGateway;
 
-    protected CurrencyConverter currencyConverter;
-
-    
     public CustomerRegistry getCustomerRegistry() {
 		return customerRegistry;
 	}
@@ -76,15 +73,6 @@ public class PaymentImpl implements Payment {
 	@Reference
 	public void setEmailGateway(EmailGateway emailGateway) {
 		this.emailGateway = emailGateway;
-	}
-
-	public CurrencyConverter getCurrencyConverter() {
-		return currencyConverter;
-	}
-
-	@Reference
-	public void setCurrencyConverter(CurrencyConverter currencyConverter) {
-		this.currencyConverter = currencyConverter;
 	}
 
 	@ConupTransaction
