@@ -66,11 +66,16 @@ public class CarImpl implements CarSearch, CarBook {
                 TripItem item =
                     new TripItem("", "", TripItem.CAR, car.getName(), car.getDescription(), car.getLocation(), tripLeg
                         .getFromDate(), tripLeg.getToDate(), car.getPricePerDay(), car.getCurrency(), car.getLink());
-//                item.setTripItems(new TripItem[]{});
                 items.add(item);
             }
         }
-
+        // add 200ms delay
+        try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        
         return items.toArray(new TripItem[items.size()]);
     }
 

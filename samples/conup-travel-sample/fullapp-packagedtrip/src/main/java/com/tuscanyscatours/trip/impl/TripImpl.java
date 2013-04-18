@@ -89,7 +89,14 @@ public class TripImpl implements TripSearch, TripBook {
                 items.add(item);
             }
         }
-
+        
+        // add 200ms delay
+        try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        
         return items.toArray(new TripItem[items.size()]);
     }
 

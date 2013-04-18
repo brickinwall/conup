@@ -37,8 +37,8 @@ import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
 import com.tuscanyscatours.emailgateway.EmailGateway;
 import com.tuscanyscatours.payment.Payment;
-import com.tuscanyscatours.payment.creditcard.AuthorizeFault_Exception;
-import com.tuscanyscatours.payment.creditcard.CreditCardPayment;
+//import com.tuscanyscatours.payment.creditcard.AuthorizeFault_Exception;
+//import com.tuscanyscatours.payment.creditcard.CreditCardPayment;
 
 /**
  * The payment implementation
@@ -53,8 +53,8 @@ public class PaymentImpl implements Payment {
 //    @Reference
     protected CustomerRegistry customerRegistry;
 
-//    @Reference
-    protected CreditCardPayment creditCardPayment;
+////    @Reference
+//    protected CreditCardPayment creditCardPayment;
 
 //    @Reference
     protected EmailGateway emailGateway;
@@ -72,14 +72,14 @@ public class PaymentImpl implements Payment {
 		this.customerRegistry = customerRegistry;
 	}
 
-	public CreditCardPayment getCreditCardPayment() {
-		return creditCardPayment;
-	}
-
-	@Reference
-	public void setCreditCardPayment(CreditCardPayment creditCardPayment) {
-		this.creditCardPayment = creditCardPayment;
-	}
+//	public CreditCardPayment getCreditCardPayment() {
+//		return creditCardPayment;
+//	}
+//
+//	@Reference
+//	public void setCreditCardPayment(CreditCardPayment creditCardPayment) {
+//		this.creditCardPayment = creditCardPayment;
+//	}
 
 	public EmailGateway getEmailGateway() {
 		return emailGateway;
@@ -109,9 +109,12 @@ public class PaymentImpl implements Payment {
 //            		                                    customer.getEmail());
 //            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
             LOGGER.fine("before currencyConverter.convert(...)");
-            double result = currencyConverter.convert("USD", "GBP", amount);
-            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + result);
+//            double result = currencyConverter.convert("USD", "GBP", amount);
+//            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + result);
             LOGGER.fine("after currencyConverter.convert(...)");
+            
+            // add 2000ms delay
+            Thread.sleep(2000);
 //            return status;
             return "ok";
         } catch (CustomerNotFoundException ex) {
