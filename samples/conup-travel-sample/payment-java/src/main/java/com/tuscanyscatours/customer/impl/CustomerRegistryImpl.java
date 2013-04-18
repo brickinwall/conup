@@ -32,22 +32,18 @@ import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
 import com.tuscanyscatours.payment.creditcard.CreditCardDetailsType;
 import com.tuscanyscatours.payment.creditcard.CreditCardTypeType;
-import com.tuscanyscatours.payment.creditcard.ObjectFactory;
 import com.tuscanyscatours.payment.creditcard.PayerType;
+import com.tuscanyscatours.payment.creditcard.ObjectFactory;
 
 /**
  * An in-memory customer registry implementation
  */
 @Service(CustomerRegistry.class)
-//@Scope("COMPOSITE")
-//@EagerInit
-//TODO adapting to Tuscany 2
-//@Requires("{http://docs.oasis-open.org/ns/opencsa/sca/200912}managedTransaction.global")
 public class CustomerRegistryImpl implements CustomerRegistry {
     private volatile static int idGenerator = 0;
     private static Map<String, Customer> customers = new HashMap<String, Customer>();
     
-    static{
+    public CustomerRegistryImpl(){
     	ObjectFactory factory = new ObjectFactory();
     	CreditCardDetailsType cc = factory.createCreditCardDetailsType();
     	PayerType john = factory.createPayerType();
@@ -65,25 +61,13 @@ public class CustomerRegistryImpl implements CustomerRegistry {
     	customer.setCreditCard(cc);
     	customers.put(customer.getId(), customer);
     }
-
-//    @Init
-//    public void init() {
-//        // Load the customers
-////        createCustomer("John Smith", "john@xyz.com", cc);
-//    }
-
-//    @Destroy
-//    public void destroy() {
-//        // Save the customers
-//    }
-
+    
     @ConupTransaction
-    public Customer createCustomer(String name, String email, CreditCardDetailsType creditCard) {
+    public Customer createCustomer(String name, String email) {
         Customer customer = new Customer();
         customer.setId("c-" + idGenerator++);
         customer.setName(name);
         customer.setEmail(email);
-        customer.setCreditCard(creditCard);
         customers.put(customer.getId(), customer);
         return customer;
     }

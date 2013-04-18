@@ -21,28 +21,20 @@ package com.tuscanyscatours.payment.impl;
 
 import java.util.logging.Logger;
 
-import org.oasisopen.sca.ServiceReference;
 import org.oasisopen.sca.annotation.Property;
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
+import com.tuscanyscatours.creditcard.CreditCardPayment;
 import com.tuscanyscatours.currencyconverter.CurrencyConverter;
 import com.tuscanyscatours.customer.Customer;
 import com.tuscanyscatours.customer.CustomerNotFoundException;
 import com.tuscanyscatours.customer.CustomerRegistry;
 import com.tuscanyscatours.emailgateway.EmailGateway;
 import com.tuscanyscatours.payment.Payment;
-//import com.tuscanyscatours.payment.creditcard.AuthorizeFault_Exception;
-//import com.tuscanyscatours.payment.creditcard.CreditCardPayment;
 
-/**
- * The payment implementation
- */
 @Service(Payment.class)
 public class PaymentImpl implements Payment {
 	private static Logger LOGGER = Logger.getLogger(Payment.class.getName());
@@ -50,16 +42,12 @@ public class PaymentImpl implements Payment {
 	@Property
 	protected float transactionFee = 0.01f;
 	
-//    @Reference
     protected CustomerRegistry customerRegistry;
 
-////    @Reference
-//    protected CreditCardPayment creditCardPayment;
+    protected CreditCardPayment creditCardPayment;
 
-//    @Reference
     protected EmailGateway emailGateway;
 
-//    @Reference
     protected CurrencyConverter currencyConverter;
 
     
@@ -72,14 +60,14 @@ public class PaymentImpl implements Payment {
 		this.customerRegistry = customerRegistry;
 	}
 
-//	public CreditCardPayment getCreditCardPayment() {
-//		return creditCardPayment;
-//	}
-//
-//	@Reference
-//	public void setCreditCardPayment(CreditCardPayment creditCardPayment) {
-//		this.creditCardPayment = creditCardPayment;
-//	}
+	public CreditCardPayment getCreditCardPayment() {
+		return creditCardPayment;
+	}
+
+	@Reference
+	public void setCreditCardPayment(CreditCardPayment creditCardPayment) {
+		this.creditCardPayment = creditCardPayment;
+	}
 
 	public EmailGateway getEmailGateway() {
 		return emailGateway;
@@ -103,27 +91,17 @@ public class PaymentImpl implements Payment {
     public String makePaymentMember(String customerId, float amount) {
         try {
             Customer customer = customerRegistry.getCustomer(customerId);
-//            //String status = creditCardPayment.authorize(customer.getCreditCard(), 
-//            		                                    amount + transactionFee, 
-//            		                                    emailGateway,
-//            		                                    customer.getEmail());
-//            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
-            LOGGER.fine("before currencyConverter.convert(...)");
-//            double result = currencyConverter.convert("USD", "GBP", amount);
-//            LOGGER.fine("currencyConverter.convert(\"USD\", \"GBP\", amount);" + result);
-            LOGGER.fine("after currencyConverter.convert(...)");
+            String status= creditCardPayment.authorize(customer.getCreditCard(), amount);
+            emailGateway.sendEmail("order@tuscanyscatours.com", customer.getEmail(), "Status for your payment",
+                    customer + " >>> Status = " + status);
             
             // add 2000ms delay
             Thread.sleep(2000);
-//            return status;
-            return "ok";
+            return status;
         } catch (CustomerNotFoundException ex) {
             return "Payment failed due to " + ex.getMessage();
-        } 
-//        catch (AuthorizeFault_Exception e) {
-//            return e.getFaultInfo().getErrorCode();
-//        } 
-        catch (Throwable t) {
+        } catch (Throwable t) {
+        	System.out.println("error in makePaymentMember");
             return "Payment failed due to system error " + t.getMessage();
         }
     }

@@ -23,8 +23,6 @@
            targetNamespace="http://tuscanyscatours.com/"
            name="payment">
            
-        <!-- reference name="customerRegistry" target="CustomerRegistry" / -->
-        <!-- reference name="emailGateway" target="EmailGateway" /-->
     <component name="Payment">
         <implementation.java class="com.tuscanyscatours.payment.impl.PaymentImpl" />
         <service name="Payment" requires="trace" policySets="traceBindingPolicySet">
@@ -33,8 +31,8 @@
         <reference name="customerRegistry" requires="trace" policySets="traceBindingPolicySet">
         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12311/CustomerRegistry/CustomerRegistry" />
         </reference>
-        <reference name="creditCardPayment">
-            <binding.ws uri="http://10.0.2.15:8082/CreditCardPayment" />
+        <reference name="creditCardPayment" requires="trace" policySets="traceBindingPolicySet">
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/CreditCardPayment/CreditCardPayment" />
         </reference>
         <reference name="emailGateway" requires="trace" policySets="traceBindingPolicySet">
         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12312/EmailGateway/EmailGateway" />
@@ -54,9 +52,16 @@
             
     <component name="EmailGateway">
         <implementation.java class="com.tuscanyscatours.emailgateway.impl.EmailGatewayImpl" />
-        <service name="EmailGateway">
+        <service name="EmailGateway" requires="trace" policySets="traceBindingPolicySet">
             <tuscany:binding.jsonrpc uri="http://10.0.2.15:12312/EmailGateway/EmailGateway" />
         </service>
-    </component>    
+    </component>
+    
+    <component name="CreditCardPayment">
+        <implementation.java class="com.tuscanyscatours.creditcard.impl.CreditCardPaymentImpl" />
+        <service name="CreditCardPayment" requires="trace" policySets="traceBindingPolicySet">
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/CreditCardPayment/CreditCardPayment" />
+        </service>
+    </component>
     
 </composite>
