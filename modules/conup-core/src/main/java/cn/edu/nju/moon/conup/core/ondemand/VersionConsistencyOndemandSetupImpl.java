@@ -1,12 +1,12 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -28,7 +28,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -47,7 +46,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * outer map's key is hostCompName
 	 * inner map's key is subComponentName
 	 */
-	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new HashMap<String, Map<String, Boolean>>();
+	public static Map<String, Map<String, Boolean>> OndemandRequestStatus = new ConcurrentHashMap<String, Map<String, Boolean>>();
 	/**
 	 * components who depend on current component, when all parent components finish its ondemand
 	 * they should send Confirm message to current component. 
@@ -56,7 +55,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * outer map's key is hostCompName
 	 * inner map's key is parentComponentName
 	 */
-	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
+	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new ConcurrentHashMap<String, Map<String, Boolean>>();
 	
 	public static Logger getLogger() {
 		return LOGGER;
@@ -154,7 +153,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @param current component's sub-component
 	 * 
 	 */
-	public boolean reqOndemandSetup(String currentComp,
+	private boolean reqOndemandSetup(String currentComp,
 			String requestSrcComp) {
 		//suspend all the threads that is initiated
 		
@@ -185,7 +184,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		if(OndemandRequestStatus.containsKey(currentComp)){
 			reqStatus = OndemandRequestStatus.get(currentComp);
 		} else{
-			reqStatus = new HashMap<String, Boolean>();
+			reqStatus = new ConcurrentHashMap<String, Boolean>();
 			OndemandRequestStatus.put(currentComp, reqStatus);
 			
 			for(String subComponent : targetRef){
@@ -200,7 +199,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		if(ConfirmOndemandStatus.containsKey(currentComp)){
 			confirmStatus = ConfirmOndemandStatus.get(currentComp);
 		} else{
-			confirmStatus = new HashMap<String, Boolean>();
+			confirmStatus = new ConcurrentHashMap<String, Boolean>();
 			ConfirmOndemandStatus.put(currentComp, confirmStatus);
 			
 			for(String component : parentComps){
@@ -230,10 +229,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		return true;
 	}
 	
-	public boolean confirmOndemandSetup(String parentComp, 
+	private boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		if(ondemandHelper.getDynamicDepManager().isValid()){
+		DynamicDepManager depMgr = ondemandHelper.getDynamicDepManager();
+		if(depMgr.isValid()){
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -252,30 +252,35 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 //			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
-		String confirmOndemandStatusStr = "ConfirmOndemandStatus:";
+		String confirmOndemandStatusStr = "currentComp:" + currentComp + ",ConfirmOndemandStatus:";
 		for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
 			confirmOndemandStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
-		LOGGER.fine(confirmOndemandStatusStr);
+		LOGGER.info(confirmOndemandStatusStr);
 		
 		//isConfirmedAll?
 		boolean isConfirmedAll = true;
-		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
-			isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
-		}
-		if(isConfirmedAll){
-			//change current componentStatus to 'valid'
-			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp + 
-					", and confirmed All, trying to change mode to valid");
-			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-			//send confirmOndemandSetup(...)
-			sendConfirmOndemandSetup(currentComp);
+		synchronized (this) {
+
+			for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
+				isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
+			}
+
+			if (isConfirmedAll
+					&& depMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
+				// change current componentStatus to 'valid'
+				LOGGER.info("confirmOndemandSetup(...) from " + parentComp
+						+ ", and confirmed All, trying to change mode to valid");
+				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+				// send confirmOndemandSetup(...)
+				sendConfirmOndemandSetup(currentComp);
+			}
 		}
 		
 		return true;
 	}
 
-	public boolean onDemandSetUp() {
+	private boolean onDemandSetUp() {
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
@@ -457,7 +462,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @param dep a dependence that another component points to current component
 	 * @return
 	 */
-	public boolean notifyFutureOndemand(Dependence dep) {
+	private boolean notifyFutureOndemand(Dependence dep) {
 		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
@@ -508,7 +513,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @param dep a dependence that another component depends on current component
 	 * @return
 	 */
-	public boolean notifyPastOndemand(Dependence dep) {
+	private boolean notifyPastOndemand(Dependence dep) {
 		LOGGER.fine("notifyPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
@@ -558,7 +563,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 * @param dep a dependence that another component depends on current component
 	 * @return
 	 */
-	public boolean notifySubFutureOndemand(Dependence dep) {
+	private boolean notifySubFutureOndemand(Dependence dep) {
 		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
@@ -628,7 +633,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		return true;
 	}
 
-	public boolean notifySubPastOndemand(Dependence dep) {
+	private boolean notifySubPastOndemand(Dependence dep) {
 		LOGGER.fine("notifySubPastOndemand(Dependence dep) with " + dep.toString());
 		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
@@ -705,18 +710,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			reqStatus.put(requestSrcComp, true);
 		else
 			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
-//		if (OndemandRequestStatus.containsKey(requestSrcComp))
-//			OndemandRequestStatus.put(requestSrcComp, true);
-//		else{
-//			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
-//		}
 		
 		//print OndemandRequestStatus
-		String ondemandRequestStatusStr = "OndemandRequestStatus:";
-//		LOGGER.fine("OndemandRequestStatus:");
+		String ondemandRequestStatusStr = "currentComp: " + currentComp + ", OndemandRequestStatus:";
 		for(Entry<String, Boolean> entry : reqStatus.entrySet()){
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
-//			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 		LOGGER.fine(ondemandRequestStatusStr);
 
@@ -728,64 +726,88 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		for (Entry<String, Boolean> entry : reqStatus.entrySet()) {
 			isReceivedAll = isReceivedAll && (Boolean) entry.getValue();
 		}
+		synchronized (this) {
+			// if received all
+			if (isReceivedAll && ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.NORMAL)) {
+				LOGGER.info("Received reqOndemandSetup(...) from "
+						+ requestSrcComp);
+				LOGGER.info("Received all reqOndemandSetup(...)");
+				LOGGER.info("trying to change mode to ondemand");
 
-		// if received all
-		if (isReceivedAll) {
-			LOGGER.fine("Received reqOndemandSetup(...) from " + requestSrcComp);
-			LOGGER.fine("Received all reqOndemandSetup(...)");
-			LOGGER.fine("trying to change mode to ondemand");
-			
-			//change current componentStatus to 'ondemand'
-			ondemandHelper.getDynamicDepManager().ondemandSetting();
-			//send reqOndemandSetup(...) to parent components
-			sendReqOndemandSetup(parentComponents, currentComp);
-			//onDemandSetUp
-			Object ondemandSyncMonitor = ondemandHelper.getDynamicDepManager().getOndemandSyncMonitor();
-			synchronized (ondemandSyncMonitor) {
-				if(ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.ONDEMAND)){
-					//FOR TEST
-					Map<String, TransactionContext> allTxs = ondemandHelper.getDynamicDepManager().getTxs();
-					Iterator<Entry<String, TransactionContext>> txIterator = allTxs.entrySet().iterator();
-					String txStr = "";
-					while(txIterator.hasNext()){
-						TransactionContext txCtx = txIterator.next().getValue();
-						txStr += txCtx.toString() + "\n";
+				DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
+				if (ddm.getRuntimeInDeps().size() != 0) {
+					ddm.getRuntimeInDeps().clear();
+				}
+				if (ddm.getRuntimeDeps().size() != 0) {
+					ddm.getRuntimeDeps().clear();
+				}
+				assert ddm.getRuntimeInDeps().size() == 0;
+				assert ddm.getRuntimeDeps().size() == 0;
+
+				// change current componentStatus to 'ondemand'
+				ondemandHelper.getDynamicDepManager().ondemandSetting();
+				// send reqOndemandSetup(...) to parent components
+				sendReqOndemandSetup(parentComponents, currentComp);
+				// onDemandSetUp
+				Object ondemandSyncMonitor = ondemandHelper
+						.getDynamicDepManager().getOndemandSyncMonitor();
+				synchronized (ondemandSyncMonitor) {
+					if (ondemandHelper.getDynamicDepManager().getCompStatus()
+							.equals(CompStatus.ONDEMAND)) {
+						// FOR TEST
+						Map<String, TransactionContext> allTxs = ondemandHelper
+								.getDynamicDepManager().getTxs();
+						Iterator<Entry<String, TransactionContext>> txIterator = allTxs
+								.entrySet().iterator();
+						String txStr = "";
+						while (txIterator.hasNext()) {
+							TransactionContext txCtx = txIterator.next()
+									.getValue();
+							txStr += txCtx.toString() + "\n";
+						}
+						LOGGER.fine("TxRegistry:\n" + txStr);
+
+						LOGGER.fine("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
+						onDemandSetUp();
 					}
-					LOGGER.fine("TxRegistry:\n" + txStr);
-					
-					LOGGER.fine("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
-					onDemandSetUp();
 				}
-			}
-			//isConfirmedAll?
-			boolean isConfirmedAll = true;
-			Map<String, Boolean> confirmStatus = ConfirmOndemandStatus.get(currentComp);
-			for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
-				isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
-			}
-			
-			//print ConfirmOndemandStatus
-			String confirmOndemandStatusStr = "";
-			for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
-				confirmOndemandStatusStr += "\t" + entry.getKey() + ": " + entry.getValue();
-//				LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
-			}
-			LOGGER.fine(confirmOndemandStatusStr);
-			
-			if(isConfirmedAll){
-				if(ondemandHelper.getDynamicDepManager().isValid()){
-					LOGGER.fine("Confirmed all, and component status is valid");
-					return;
+				// isConfirmedAll?
+				boolean isConfirmedAll = true;
+				Map<String, Boolean> confirmStatus = ConfirmOndemandStatus
+						.get(currentComp);
+				if (confirmStatus == null) {
+					System.out.println("currentComp: " + currentComp + ", requestSrcComp:" + requestSrcComp + ", compStatus:"
+							+ ondemandHelper.getDynamicDepManager().getCompStatus() + ", confirmStatus:" + confirmStatus);
 				}
-				LOGGER.fine("Confirmed from all parent components in receivedReqOndemandSetup(...)");
-				LOGGER.fine("trying to change mode to valid");
-				
-				//change current componentStatus to 'valid'
-				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-				//send confirmOndemandSetup(...)
-				sendConfirmOndemandSetup(currentComp);
-			}
-		}//END IF
+				assert confirmStatus != null;
+				for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
+					isConfirmedAll = isConfirmedAll	&& (Boolean) entry.getValue();
+				}
+
+				// print ConfirmOndemandStatus
+				String confirmOndemandStatusStr = "currentComp:" + currentComp
+						+ " confirmOndemandStatusStr:";
+				for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
+					confirmOndemandStatusStr += "\t" + entry.getKey() + ": "
+							+ entry.getValue();
+				}
+				LOGGER.fine(confirmOndemandStatusStr);
+
+				if (isConfirmedAll) {
+					if (ondemandHelper.getDynamicDepManager().isValid()) {
+						LOGGER.fine("Confirmed all, and component status is valid");
+						return;
+					}
+					LOGGER.fine("Confirmed from all parent components in receivedReqOndemandSetup(...)");
+					LOGGER.fine("trying to change mode to valid");
+
+					// change current componentStatus to 'valid'
+					ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+					// send confirmOndemandSetup(...)
+					sendConfirmOndemandSetup(currentComp);
+				}
+			}// END IF
+		}
 
 	}
 	
@@ -795,10 +817,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		// FOR TEST
 		LOGGER.fine("current compStatus=ondemand, before send req ondemand to parent component.");
 		
-		String str = "sendReqOndemandSetup(...) to parent components:";
-//		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
+		String str = "currentComp:" + hostComp + ", sendReqOndemandSetup(...) to parent components:";
 		for(String component : parentComps){
-//			LOGGER.fine("\t" + component);
 			str += "\n\t" + component;
 		}
 		LOGGER.fine(str);
@@ -834,7 +854,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 //		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:");
 		for(String component : targetRef){
 			str += "\n\t" + component;
-//			LOGGER.fine("\t" + component);
 		}
 		LOGGER.fine(str);
 		
@@ -914,10 +933,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		StringBuffer strBuffer = new StringBuffer();
 		for(Dependence dep : result){
 			strBuffer.append("\n" + dep.toString());
-//			LOGGER.fine("\t" + dep.toString());
 		}
 		LOGGER.fine("In getFDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		LOGGER.fine("In getFDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -966,7 +983,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			strBuffer.append("\n" + dep.toString());
 		}
 		LOGGER.fine("In getPDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		LOGGER.fine("In getPDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -1025,7 +1041,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			strBuffer.append("\n" + dep.toString());
 		}
 		LOGGER.fine("In getSDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
-//		LOGGER.fine("In getSDeps(...), size=" + result.size() + ", for root=" + rootTx + strBuffer.toString());
 		
 		return result;
 	}
@@ -1065,7 +1080,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}// END WHILE
 		
 		LOGGER.fine("getHostSubTransaction(" + rootTx + ")=" + subTx);
-//		LOGGER.fine("getHostSubTransaction(" + rootTx + ")=" + subTx);
 		return subTx;
 	}
 	
