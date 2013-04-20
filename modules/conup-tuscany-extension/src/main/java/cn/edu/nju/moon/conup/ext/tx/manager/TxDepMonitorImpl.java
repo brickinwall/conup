@@ -20,13 +20,13 @@ import org.apache.tuscany.sca.runtime.DomainRegistry;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
 /**
  * It's used to monitor transaction status, maintain transaction context 
@@ -76,8 +76,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //			TX_IDS.remove(txContext.getHostComponent());
 			TX_IDS.remove(curTxID);
 			
-//			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
-//			interceptorCache.removeTxCtx(getThreadID());
+			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
+			interceptorCache.removeTxCtx(getThreadID());
 			
 			CompLifecycleManager compLcMgr;
 			compLcMgr = CompLifecycleManager.getInstance(txContext.getHostComponent());
