@@ -241,7 +241,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 		try {
 			DynamicUpdateClassLoader cl = new DynamicUpdateClassLoader(baseDir, classNames);
 			c = cl.loadClass(classNames[0]);
-			LOGGER.info("load class: " + c);
+			LOGGER.fine("load class: " + c);
 //			LOGGER.fine("c: " + c);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

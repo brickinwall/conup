@@ -355,7 +355,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						assert msgHeaders.get(SUB_TX) != null;
 						assert msgHeaders != null;
 						assert txDepMonitor != null;
-						assert msgHeaders.get(SUB_TX) != null;
 						
 						txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
@@ -366,8 +365,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				
 				try {
 					if (depMgr.isOndemandSetting()) {
-						LOGGER.info("ThreadID=" + getThreadID() + "----------------ondemandSyncMonitor.wait()------------");
+						LOGGER.fine("ThreadID=" + getThreadID() + " " +depMgr.getCompObject().getIdentifier()+ "----------------ondemandSyncMonitor.wait()------------");
 						syncMonitor.wait();
+						LOGGER.fine("ThreadID=" + getThreadID() + " " +depMgr.getCompObject().getIdentifier()+ "----------------finish ondemand------------");
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -387,7 +387,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //					LOGGER.fine("ThreadID=" + getThreadID() + ", in buffer, haven't received update request yet");
 					if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)){
 						try {
-							LOGGER.info("thread suspended to wait for remote update done--------------------------");
+							LOGGER.fine("ThreadID=" + getThreadID() + " " +depMgr.getCompObject().getIdentifier() + " thread suspended to wait for remote update done--------------------------");
 							waitingRemoteCompUpdateDoneMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -435,7 +435,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						depMgr.achievedFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
-						LOGGER.info("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
 //							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 //							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
@@ -453,7 +453,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
 			synchronized (updatingSyncMonitor) {
 				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
-					LOGGER.info("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + ", in buffer updatingSyncMonitor, is Free for update now, try to execute update...");
+					LOGGER.fine("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + ", in buffer updatingSyncMonitor, is Free for update now, try to execute update...");
 					clMgr.executeUpdate();
 					clMgr.cleanupUpdate();
 				}
@@ -480,7 +480,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * @return msg contains ended sub txs
 	 */
 	private Message attachEndedTxToResAtServicePolicy(Message msg) {
-			String currentTx = null;
+//			String currentTx = null;
 			String hostComp = null;
 			String rootTx = null;
 			String rootComp = null;
@@ -510,17 +510,24 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				threadID = getThreadID();
 				
 				// check interceptor cache
-				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
-				TransactionContext txCtx = cache.getTxCtx(threadID);
-				
-				rootTx = txCtx.getRootTx();
-				rootComp = txCtx.getRootComponent();
-				parentTx = txCtx.getParentTx();
-				parentComp = txCtx.getParentComponent();
-				currentTx = txCtx.getCurrentTx();
+//				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
+//				assert threadID != null;
+//				
+//				TransactionContext txCtx = cache.getTxCtx(threadID);
+//				if(txCtx == null){
+//					System.out.println("hostComp:" + hostComp+ ",currentThreadID:" + threadID);
+//					System.out.println(cache);
+//					System.out.println(InterceptorCache.allSequence);;
+//				}
+//				assert txCtx != null;
+//				rootTx = txCtx.getRootTx();
+//				rootComp = txCtx.getRootComponent();
+//				parentTx = txCtx.getParentTx();
+//				parentComp = txCtx.getParentComponent();
+//				currentTx = txCtx.getCurrentTx();
 				
 				//remove txCtx from InterceptorCache
-				cache.removeTxCtx(threadID);
+//				cache.removeTxCtx(threadID);
 				
 				if(msgHeader.get(SUB_TX) == null){
 					return msg;
@@ -528,13 +535,17 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				
 				subTx = msgHeader.get(SUB_TX).toString();
 				subComp = msgHeader.get(SUB_COMP).toString();
+				rootTx = (String) msgHeader.get(ROOT_TX);
+				rootComp = (String) msgHeader.get(ROOT_COMP);
+				parentTx = (String) msgHeader.get(PARENT_TX);
+				parentComp = (String) msgHeader.get(PARENT_COMP);
 				
 				assert subTx != null;
 				if( !hostComp.equals(subComp) ){
 					LOGGER.warning("hostComp: " + hostComp + " subComp: " + subComp);
 					assert hostComp.equals(subComp);
 				}
-				assert hostComp.equals(txCtx.getHostComponent());
+//				assert hostComp.equals(txCtx.getHostComponent());
 				
 				NodeManager nodeMgr = NodeManager.getInstance();
 				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
@@ -554,8 +565,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				endedSubTxTag.append(ROOT_COMP + ":" + rootComp + ";");
 				endedSubTxTag.append(PARENT_TX + ":" + parentTx + ";");
 				endedSubTxTag.append(PARENT_COMP + ":" + parentComp + ";");
-//				endedSubTxTag.append(SUB_TX + ":" + currentTx + ",");
-//				endedSubTxTag.append(SUB_COMP + ":" + hostComp );
 				endedSubTxTag.append(SUB_TX + ":" + subTx + ";");
 				endedSubTxTag.append(SUB_COMP + ":" + subComp );
 				endedSubTxTag.append("]");
@@ -570,90 +579,91 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				msgHeader.remove(PARENT_COMP);
 				msgHeader.remove(SUB_TX);
 				msgHeader.remove(SUB_COMP);
-			} else if(phase.equals(Phase.REFERENCE_POLICY)){
-				String subTx = null;
-				String subComp = null;
-				String endedSubTxTag = null;
-				String realMsgBody = null;
-//				for (Object object : msgBody) {
-//					if (object.toString().contains(
-//							TracePolicyInterceptor.ENDED_SUB_TX_TAG)) {
+			} 
+//			else if(phase.equals(Phase.REFERENCE_POLICY)){
+//				String subTx = null;
+//				String subComp = null;
+//				String endedSubTxTag = null;
+//				String realMsgBody = null;
+////				for (Object object : msgBody) {
+////					if (object.toString().contains(
+////							TracePolicyInterceptor.ENDED_SUB_TX_TAG)) {
+////						endedSubTxTag = object.toString();
+////						msgBody.remove(object);
+////						break;
+////					}
+////				}
+////				String msgBodyStr = msg.getBody().toString();
+////				if(msgBodyStr.contains(TracePolicyInterceptor.ENDED_SUB_TX_TAG)){
+////					int loc = msgBodyStr.indexOf(TracePolicyInterceptor.ENDED_SUB_TX_TAG);
+////					realMsgBody = msgBodyStr.substring(0, loc);
+////					endedSubTxTag = msgBodyStr.substring(loc);
+////					//TODO
+////					msg.setBody(realMsgBody);
+////				} else{
+////					return msg;
+////				}
+//				
+//				if(msg.getBody() == null){
+//					Object [] tmp = new Object[1];
+//					tmp[0] = (Object)"";
+//					msgBodyOriginal = Arrays.asList(tmp);
+//				}
+//				else
+//					msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
+//				
+//				msgBody.addAll(msgBodyOriginal);
+//				for(Object object : msgBody){
+//					
+//					if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
 //						endedSubTxTag = object.toString();
 //						msgBody.remove(object);
 //						break;
 //					}
 //				}
-//				String msgBodyStr = msg.getBody().toString();
-//				if(msgBodyStr.contains(TracePolicyInterceptor.ENDED_SUB_TX_TAG)){
-//					int loc = msgBodyStr.indexOf(TracePolicyInterceptor.ENDED_SUB_TX_TAG);
-//					realMsgBody = msgBodyStr.substring(0, loc);
-//					endedSubTxTag = msgBodyStr.substring(loc);
-//					//TODO
-//					msg.setBody(realMsgBody);
-//				} else{
+//				if(endedSubTxTag == null)
 //					return msg;
+//				LOGGER.fine("subContextTag:" + endedSubTxTag + ", msgBody:" + msgBody);
+//				
+//				// Here we need to pay attention, the body in this return message should be only one object, not an array.
+//				// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
+//				// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
+//				if(msgBody.size() != 0)
+//					msg.setBody(msgBody.get(0));
+//				
+//				
+//				LOGGER.fine("attach REFERENCE_POLICY: " + endedSubTxTag);
+//				
+//				Map<String, String> endedSubTxProperty = parseEndedSubTxTag(endedSubTxTag);
+//				
+//				if(endedSubTxProperty.size() == 0){
+//					LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
 //				}
-				
-				if(msg.getBody() == null){
-					Object [] tmp = new Object[1];
-					tmp[0] = (Object)"";
-					msgBodyOriginal = Arrays.asList(tmp);
-				}
-				else
-					msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
-				
-				msgBody.addAll(msgBodyOriginal);
-				for(Object object : msgBody){
-					
-					if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
-						endedSubTxTag = object.toString();
-						msgBody.remove(object);
-						break;
-					}
-				}
-				if(endedSubTxTag == null)
-					return msg;
-				LOGGER.fine("subContextTag:" + endedSubTxTag + ", msgBody:" + msgBody);
-				
-				// Here we need to pay attention, the body in this return message should be only one object, not an array.
-				// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
-				// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
-				if(msgBody.size() != 0)
-					msg.setBody(msgBody.get(0));
-				
-				
-				LOGGER.fine("attach REFERENCE_POLICY: " + endedSubTxTag);
-				
-				Map<String, String> endedSubTxProperty = parseEndedSubTxTag(endedSubTxTag);
-				
-				if(endedSubTxProperty.size() == 0){
-					LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
-				}
-				
-				rootTx = endedSubTxProperty.get(ROOT_TX);
-				rootComp = endedSubTxProperty.get(ROOT_COMP);
-				currentTx = endedSubTxProperty.get(PARENT_TX);
-				hostComp = endedSubTxProperty.get(PARENT_COMP);
-				subTx = endedSubTxProperty.get(SUB_TX);
-				subComp = endedSubTxProperty.get(SUB_COMP);
-				
-				assert hostComp.equals(getComponent().getName());
-				
-				if( !subComp.equals(hostComp)){
-					
-//					NodeManager nodeMgr = NodeManager.getInstance();
-//					DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-//					Printer printer = new Printer();
-//					LOGGER.fine("TxS before endRemoteSubTx:");
-//					printer.printTxs(LOGGER, depMgr.getTxs());
-					
-					TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-					txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
-					
-//					LOGGER.fine("TxS after endRemoteSubTx:");
-//					printer.printTxs(LOGGER, depMgr.getTxs());
-				}
-			}
+//				
+//				rootTx = endedSubTxProperty.get(ROOT_TX);
+//				rootComp = endedSubTxProperty.get(ROOT_COMP);
+//				currentTx = endedSubTxProperty.get(PARENT_TX);
+//				hostComp = endedSubTxProperty.get(PARENT_COMP);
+//				subTx = endedSubTxProperty.get(SUB_TX);
+//				subComp = endedSubTxProperty.get(SUB_COMP);
+//				
+//				assert hostComp.equals(getComponent().getName());
+//				
+//				if( !subComp.equals(hostComp)){
+//					
+////					NodeManager nodeMgr = NodeManager.getInstance();
+////					DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+////					Printer printer = new Printer();
+////					LOGGER.fine("TxS before endRemoteSubTx:");
+////					printer.printTxs(LOGGER, depMgr.getTxs());
+//					
+//					TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
+//					txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+//					
+////					LOGGER.fine("TxS after endRemoteSubTx:");
+////					printer.printTxs(LOGGER, depMgr.getTxs());
+//				}
+//			}
 			
 			return msg;
 		}

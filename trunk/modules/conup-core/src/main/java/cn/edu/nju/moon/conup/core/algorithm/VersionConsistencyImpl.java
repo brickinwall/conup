@@ -730,7 +730,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 	
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
-		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
+		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
 //		NodeManager nodeManager = NodeManager.getInstance();
 //		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
@@ -941,6 +941,8 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 		}
 		
+		assert depMgr.getTxDepMonitor() != null;
+		
 		if(depMgr.getTxDepMonitor() != null){
 			depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
 //		} else if(!depMgr.getTxs().isEmpty()){
@@ -1091,10 +1093,10 @@ public class VersionConsistencyImpl implements Algorithm {
 		String rootTx = txContext.getRootTx();
 		if ((algorithmOldVersionRootTxs != null)
 				&& algorithmOldVersionRootTxs.contains(rootTx) ){
-			LOGGER.info(txContext.getRootTx() + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs);
+			LOGGER.fine(txContext.getRootTx() + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return false;
 		} else{
-			LOGGER.info(txContext.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
+			LOGGER.fine(txContext.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return true;
 		}
 	}
@@ -1118,7 +1120,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		}
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
-			LOGGER.info("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
+			LOGGER.fine("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
 			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, ConsistencyOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
@@ -1197,7 +1199,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
 			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
 				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.info(lfe.toString());
+				LOGGER.fine(lfe.toString());
 				if(!rtInDeps.contains(lfe)){
 					rtInDeps.add(lfe);
 				}
@@ -1206,7 +1208,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 				
 				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.info(lpe.toString());
+				LOGGER.fine(lpe.toString());
 				if(!rtInDeps.contains(lpe)){
 					rtInDeps.add(lpe);
 				}
