@@ -76,7 +76,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		switch (compStatus) {
 		case NORMAL:
 			doNormal(txContext);
-			return;
+			break;
 		case VALID:
 			doValid(txContext);
 			break;
@@ -84,12 +84,11 @@ public class VersionConsistencyImpl implements Algorithm {
 			doOndemand(txContext);
 			break;
 		case UPDATING:
-//			during updating, there is no notify happen, do not need to maintain deps, should throw an exception
-//			doUpdating(txContext, dynamicDepMgr);
+			doValid(txContext);
 			break;
-//		case UPDATED:
-//			doValid(txContext, dynamicDepMgr);
-//			break;
+		case Free:
+			doValid(txContext);
+			break;
 		default:
 			LOGGER.fine("----------compStatus-------->" + compStatus);
 			LOGGER.fine("default process...");
@@ -287,52 +286,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		}
 	}
 	
-	private boolean doNormalRootTxEnd(String srcComp, String currentComp, String rootTx){
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl depMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(currentComp);
-		TransactionContext txCtx;
-		Iterator<Entry<String, TransactionContext>>  txIterator = depMgr.getTxs().entrySet().iterator();
-		int existSubTxWithRoot = 0 ;
-		while(txIterator.hasNext()){
-			txCtx = txIterator.next().getValue();
-			if(txCtx.getRootTx().equals(rootTx)){
-				existSubTxWithRoot ++;
-			}
-		}
-		
-		txIterator = depMgr.getTxs().entrySet().iterator();
-		while(txIterator.hasNext()){
-			txCtx = txIterator.next().getValue();
-//			if(txCtx.getRootTx().equals(rootTx) && txCtx.getParentComponent().equals(srcComp)){
-			if(txCtx.getRootTx().equals(rootTx)){
-//				txIterator.remove();
-				existSubTxWithRoot --;
-				if(existSubTxWithRoot == 0){
-					//remove all the tx associated with the given rootTx
-					Iterator<Entry<String, TransactionContext>> inIte;
-					inIte = depMgr.getTxs().entrySet().iterator();
-					while(inIte.hasNext()){
-						TransactionContext inCtx = inIte.next().getValue();
-						if(inCtx.getRootTx().equals(rootTx)){
-							inIte.remove();
-						}
-					}
-					txCtx.getTxDepMonitor().rootTxEnd(currentComp, rootTx);
-				}
-			}
-		}
-		
-		Set<String> targetRef;
-		targetRef = depMgr.getStaticDeps();
-		for(String subComp : targetRef){
-			String payload = ConsistencyPayloadCreator.createNormalRootTxEndPayload(currentComp, subComp, rootTx, ConsistencyOperationType.NORMAL_ROOT_TX_END);
-			DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-			depNotifyService.synPost(currentComp, subComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-		}
-		
-		return true;
-	}
-	
 	/**
 	 * during notify, the component status is valid, do the following action
 	 * @param txContext
@@ -432,10 +385,15 @@ public class VersionConsistencyImpl implements Algorithm {
 				outDepRegistry.removeDependence(PAST_DEP, rootTx, hostComponent, hostComponent);
 				
 				removeAllEdges(hostComponent, rootTx);
+				
+				LOGGER.fine("rootTx END " + hostComponent + " " + rootTx);
 
 				// remove root tx id from isSetupDone
 				isSetupDone.remove(currentTx);
 			}
+			
+			//remove tx ctx from TxRegistry
+			depMgr.getTxs().remove(currentTx);
 			
 		} else {
 			// up receiving FirstRequestService
@@ -941,20 +899,6 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 		}
 		
-		assert depMgr.getTxDepMonitor() != null;
-		
-		if(depMgr.getTxDepMonitor() != null){
-			depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
-//		} else if(!depMgr.getTxs().isEmpty()){
-//			for(Entry<String,TransactionContext> entry : depMgr.getTxs().entrySet()){
-//				TransactionContext txCtx = entry.getValue();
-//				txCtx.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
-//				break;
-//			}
-		} else{
-			LOGGER.warning("failed to remove rootTx " + rootTx + ", due to fail to get TxDepMonitor");
-		}
-		
 //		Printer printer = new Printer();
 //		printer.printDeps(LOGGER, rtInDeps, "rtInDeps removeAllEdges");
 //		
@@ -1000,6 +944,9 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 			}
 		}
+		
+		assert depMgr.getTxDepMonitor() != null;
+		depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
 		
 		return true;
 	}
