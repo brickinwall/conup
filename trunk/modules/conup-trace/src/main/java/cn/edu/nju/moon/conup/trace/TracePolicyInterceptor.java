@@ -226,19 +226,28 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			if(rootTx!=null && rootComponent!=null){
 				headers.put(ROOT_TX, rootTx);
 				headers.put(ROOT_COMP, rootComponent);
-			}
-			
-			if(parentTx!=null && parentComponent!=null){
+				
+				assert parentTx != null;
+				assert parentComponent != null;
+				assert subTx != null;
+				assert subComp != null;
+				
 				headers.put(PARENT_TX, parentTx);
 				headers.put(PARENT_COMP, parentComponent);
-			}
-			
-			if(subTx != null && subComp != null){
+				
 				headers.put(SUB_TX, subTx);
 				headers.put(SUB_COMP, subComp);
 			}
 			
-	//		assert !(subTx==null && subComp==null);
+//			if(parentTx!=null && parentComponent!=null){
+//				headers.put(PARENT_TX, parentTx);
+//				headers.put(PARENT_COMP, parentComponent);
+//			}
+//			
+//			if(subTx != null && subComp != null){
+//				headers.put(SUB_TX, subTx);
+//				headers.put(SUB_COMP, subComp);
+//			}
 			
 			//get host component name
 			hostComponent = getComponent().getName();
