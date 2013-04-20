@@ -21,9 +21,13 @@ public class CommServer {
 	
 	public boolean start(String ip, int port) {
 		acceptor = new NioSocketAcceptor();
-
+		
+		ObjectSerializationCodecFactory objSerialCodecFactory = new ObjectSerializationCodecFactory();
+		objSerialCodecFactory.setEncoderMaxObjectSize(2048576);	//2MB
+		objSerialCodecFactory.setDecoderMaxObjectSize(2048576);
+		
 		acceptor.getFilterChain().addLast("codec",
-				new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+				new ProtocolCodecFilter(objSerialCodecFactory));
 		
 		LoggingFilter logFilter = new LoggingFilter();
 		logFilter.setSessionClosedLogLevel(LogLevel.DEBUG);

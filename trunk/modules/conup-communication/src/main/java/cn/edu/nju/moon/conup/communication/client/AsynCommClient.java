@@ -42,7 +42,10 @@ public class AsynCommClient {
 		
 		IoConnector connector = new NioSocketConnector(); 
 		connector.setConnectTimeoutMillis(10000);
-		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+		ObjectSerializationCodecFactory objSerialCodecFactory = new ObjectSerializationCodecFactory();
+		objSerialCodecFactory.setEncoderMaxObjectSize(2048576);	//2MB
+		objSerialCodecFactory.setDecoderMaxObjectSize(2048576);
+		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(objSerialCodecFactory));
 		LoggingFilter logFilter = new LoggingFilter();
 		logFilter.setSessionClosedLogLevel(LogLevel.DEBUG);
 		logFilter.setSessionCreatedLogLevel(LogLevel.DEBUG);
