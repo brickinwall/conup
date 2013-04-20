@@ -42,8 +42,8 @@ public class InterceptorCache {
 			if( !nodeCache.containsKey(compObj) ){
 				nodeCache.put(compObj, new InterceptorCache());
 			}
+			return nodeCache.get(compObj);
 		}
-		return nodeCache.get(compObj);
 	}
 	
 	/**
@@ -58,8 +58,8 @@ public class InterceptorCache {
 			if( !nodeCache.containsKey(compObj) ){
 				nodeCache.put(compObj, new InterceptorCache());
 			}
+			return nodeCache.get(compObj);
 		}
-		return nodeCache.get(compObj);
 	}
 
 	/**
