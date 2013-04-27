@@ -2,9 +2,9 @@ package cn.edu.nju.moon.conup.remote.services.impl;
 
 import cn.edu.nju.moon.conup.communication.client.AsynCommClient;
 import cn.edu.nju.moon.conup.communication.client.SynCommClient;
-import cn.edu.nju.moon.conup.remote.utils.TuscanyOperationType;
 import cn.edu.nju.moon.conup.remote.utils.TuscanyPayloadCreator;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 
 
 /**
@@ -45,6 +45,13 @@ public class RemoteConfServiceImpl {
 		SynCommClient synCommClient = new SynCommClient();
 		return synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
 		
+	}
+	
+	public String getUpdateEndTime(String ip, int port, String targetIdentifier, String proctocol){
+		MsgType msgType = MsgType.EXPERIMENT_MSG;
+		String payload = TuscanyPayloadCreator.createGetExecutionRecorderPayload(TuscanyOperationType.GET_UPDATE_ENDTIME, targetIdentifier);
+		SynCommClient synCommClient = new SynCommClient();
+		return synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
 	}
 	
 	public static void main(String[] args) {
