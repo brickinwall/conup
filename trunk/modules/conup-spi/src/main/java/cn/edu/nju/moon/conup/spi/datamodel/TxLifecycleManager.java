@@ -1,19 +1,11 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
-
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
  * It's supposed to manage the transactions that are running on a tuscany node.
@@ -44,7 +36,7 @@ public class TxLifecycleManager {
 	 * key compIdentifier
 	 * key: parent tx, value: root tx
 	 */
-	private static Map<String, Map<String, String>>	OLD_ROOT_TXS = new ConcurrentHashMap<String, Map<String, String>>();
+//	private static Map<String, Map<String, String>>	OLD_ROOT_TXS = new ConcurrentHashMap<String, Map<String, String>>();
 	
 	/**
 	 * create transaction id
@@ -53,9 +45,7 @@ public class TxLifecycleManager {
 	public String createID(){
 		String txID = null;
 		
-		/**
-		 * use UUID to generate txID
-		 */
+		// use UUID to generate txID
 		UUID uuid = UUID.randomUUID();
 		txID = uuid.toString();
 		
@@ -64,10 +54,9 @@ public class TxLifecycleManager {
 		assert(componentIdentifier != null);
 		associateTx.remove(threadID);
 		
-		/**
-		 * get info from interceptor cache
-		 * according threadID 
-		 */
+		
+		// get info from interceptor cache
+		// according threadID 
 		InterceptorCache interceptorCache = InterceptorCache.getInstance(componentIdentifier);
 		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
 		String rootTx = txContextInCache.getRootTx();
@@ -77,9 +66,7 @@ public class TxLifecycleManager {
 		String rootComponent = txContextInCache.getRootComponent();
 		String parentComponent = txContextInCache.getParentComponent();
 		
-		/**
-		 * associate currentTxId with parent/root
-		 */
+		// associate currentTxId with parent/root
 		if(rootTx==null && parentTx==null 
 				&& currentTx==null && hostComponent!=null){
 			//current transaction is root
@@ -163,84 +150,5 @@ public class TxLifecycleManager {
 	public void addToAssociateTx(String threadID, String identifier){
 		associateTx.put(threadID, identifier);
 	}
-	
-//	/** 
-//	 * when a business request with root/parent txs accepted, TxLifecycleManager should 
-//	 * get notified. 
-//	 */
-//	public static void addRootTx(String hostComp, String parentTxId, String rootTxId){
-//		synchronized (OLD_ROOT_TXS) {
-//			assert hostComp != null;
-//			if(rootTxId != null){
-//				if(OLD_ROOT_TXS.get(hostComp) != null)
-//					OLD_ROOT_TXS.get(hostComp).put(parentTxId, rootTxId);
-//				else{
-//					Map<String, String> txInfo = new ConcurrentHashMap<String, String>();
-//					txInfo.put(parentTxId, rootTxId);
-//					OLD_ROOT_TXS.put(hostComp, txInfo);
-//				}
-//			}
-//		}
-//	}
-//	
-//	public static String getRootTx(String hostComp, String parentTxId){
-//		synchronized (OLD_ROOT_TXS) {
-//			assert hostComp != null && parentTxId != null;
-//			if(OLD_ROOT_TXS.get(hostComp) != null)
-//				return OLD_ROOT_TXS.get(hostComp).get(parentTxId);
-//			else
-//				return null;
-//		}
-//	}
-//	
-//	/**
-//	 * when a root tx ended on the component, TxLifecycleManager should 
-//	 * get notified. 
-//	 * remove all the txs whose root is marked with given rootTx or parentTx
-//	 * @param rootTx
-//	 */
-//	public static void removeRootTx(String hostComp, String rootTx){
-//		synchronized (OLD_ROOT_TXS) {
-//			assert hostComp != null;
-//			Iterator<Entry<String, String>> iterator;
-//			if(OLD_ROOT_TXS.get(hostComp) == null)
-//				return;
-//			iterator = OLD_ROOT_TXS.get(hostComp).entrySet().iterator();
-//			while(iterator.hasNext()){
-//				Entry<String, String> entry;
-//				entry = iterator.next();
-//				if(entry.getValue().equals(rootTx) || entry.getKey().equals(rootTx))
-//					iterator.remove();
-//			}
-//		}
-//	}
-//	
-//	/**
-//	 * Exactly remove a entry from the OLD_ROOT_TXS
-//	 * @param parentTx
-//	 * @param rootTx
-//	 */
-//	public static void removeRootTx(String hostComp, String parentTx, String rootTx){
-//		synchronized (OLD_ROOT_TXS) {
-//			assert hostComp != null;
-//			if(OLD_ROOT_TXS.get(hostComp) == null)
-//				return;
-//			OLD_ROOT_TXS.get(hostComp).remove(parentTx);
-//		}
-//	}
-//	
-//	/**
-//	 * @return a copy of all the root txs that are running on the component
-//	 */
-//	public static Set<String>  copyOfOldRootTxs(String hostComp){
-//		synchronized (OLD_ROOT_TXS) {
-//			DynamicDepManager depMgr;
-//			depMgr = NodeManager.getInstance().getDynamicDepManager(hostComp);
-//			if(OLD_ROOT_TXS.get(hostComp) != null)
-//				return depMgr.convertToAlgorithmRootTxs(OLD_ROOT_TXS.get(hostComp));
-//			else
-//				return new HashSet<String>();
-//		}
-//	}
 	
 }

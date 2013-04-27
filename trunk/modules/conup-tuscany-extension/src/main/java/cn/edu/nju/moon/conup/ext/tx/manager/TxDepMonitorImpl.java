@@ -231,8 +231,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 
 				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
-				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)
-						&& compLcMgr.isDynamicUpdateRqstRCVD()) {
+				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
 					compLcMgr.attemptToUpdate();
 				}
 			}
@@ -255,50 +254,6 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 //			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
 //		}
 //		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
-		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
-	}
-	
-	@Override
-	public void rootTxEnd(String hostComp, String parentTxId, String rootTxId){
-		CompLifecycleManager compLcMgr;
-		NodeManager nodeManager = NodeManager.getInstance();
-		
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
-		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
-		synchronized (validToFreeSyncMonitor) {
-//			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
-//				&& compLcMgr.isDynamicUpdateRqstRCVD()
-//				&& compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-//				if(TxLifecycleManager.getRootTx(rootTxId) != null){
-//					rootTxId = TxLifecycleManager.getRootTx(rootTxId);
-//				}
-				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
-//				compLcMgr.getUpdateCtx().removeBufferOldRootTx(rootTxId);
-
-				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
-
-				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)
-						&& compLcMgr.isDynamicUpdateRqstRCVD()) {
-					compLcMgr.attemptToUpdate();
-				}
-			}
-		}
-		
-//		ExecutionRecorder exeRecorder;
-//		exeRecorder = ExecutionRecorder.getInstance(hostComp);
-//		String completeAction = exeRecorder.getCompleteAction(rootTxId);
-//		if(completeAction == null || completeAction.equals("null")){
-//			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
-//				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
-//		}
-//		if(completeAction != null){
-//			LOGGER.fine(completeAction);
-//		}
-//		
-//		//when a root tx ends, remove it from TxLifecycleManager
-//		TxLifecycleManager.removeRootTx(hostComp, parentTxId, rootTxId);
 		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	

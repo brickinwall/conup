@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.datamodel;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -91,6 +92,19 @@ public class InterceptorCache {
 
 	public Set<Entry<String, TransactionContext>> getTxContexts() {
 		return compTxCtx.entrySet();
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer strBuffer = new StringBuffer();
+		Iterator<Entry<String, TransactionContext>> iter = compTxCtx.entrySet().iterator();
+		while(iter.hasNext()){
+			Entry<String, TransactionContext> entry = iter.next();
+			strBuffer.append("ThreadID:").append(entry.getKey())
+			.append(", TransactionContext:").append(entry.getValue()).append("\n");
+		}
+		
+		return strBuffer.toString();
 	}
 	
 }

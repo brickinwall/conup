@@ -106,8 +106,10 @@ public interface Algorithm {
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 
 	/**
-	 * the host component is going to init a sub-transaction for another component.
+	 * the host component is going to init a sub-transaction by another component.
 	 * However, the sub-transaction has not truely been started.
+	 * during initLocalSubTx, if the component status become ondemand, in Tranquillity, Consistency algorithm
+	 * we need to make sure consistency, so we add future, past edge to itself
 	 * 
 	 * @param hostComp
 	 * @param fakeSubTx the fake tx id
@@ -118,5 +120,10 @@ public interface Algorithm {
 	 */
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
+	/**
+	 * set a depMgr to algorithm, although this parameter is not useful for Quiescence
+	 * Algorithm and depMgr is 1-1 with ComponentObject
+	 * @param depMgr
+	 */
 	public void setDynamicDepMgr(DynamicDepManager depMgr);
 }

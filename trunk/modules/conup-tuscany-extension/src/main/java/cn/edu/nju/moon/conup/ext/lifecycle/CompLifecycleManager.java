@@ -17,19 +17,18 @@ import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyOperationType;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.experiments.PerformanceRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * Component life cycle manager
@@ -430,6 +429,8 @@ public class CompLifecycleManager {
 		String compIdentifier = payloadResolver.getParameter(TuscanyPayload.COMP_IDENTIFIER);
 		if(opTyep.equals(TuscanyOperationType.GET_EXECUTION_RECORDER)){
 			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
+		} else if(opTyep.equals(TuscanyOperationType.GET_UPDATE_ENDTIME)){
+			return Long.toString(DisruptionExp.getInstance().getUpdateEndTime());
 		} else{
 			LOGGER.warning("unsupported operation type for experiment");
 		}

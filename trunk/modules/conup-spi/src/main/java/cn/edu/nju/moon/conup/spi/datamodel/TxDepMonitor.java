@@ -25,14 +25,6 @@ public interface TxDepMonitor {
 	public void rootTxEnd(String hostComp, String rootTxId);
 	
 	/**
-	 * With the given parentTx/rootTx, exactly remove 
-	 * @param hostComp
-	 * @param parentTxId
-	 * @param rootTxId
-	 */
-	public void rootTxEnd(String hostComp, String parentTxId, String rootTxId);
-	
-	/**
 	 * 
 	 * @return a new instance of TxDepMonitor
 	 */

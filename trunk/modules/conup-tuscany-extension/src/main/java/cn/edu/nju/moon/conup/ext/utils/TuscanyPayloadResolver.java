@@ -3,6 +3,8 @@ package cn.edu.nju.moon.conup.ext.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
+
 
 /**
  * @author rgc
