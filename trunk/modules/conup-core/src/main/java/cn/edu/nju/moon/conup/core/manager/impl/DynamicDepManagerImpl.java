@@ -95,12 +95,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean manageDependence(TransactionContext txContext) {
 		LOGGER.fine("DynamicDepManagerImpl.manageDependence(...)");
-		long enterTime = System.nanoTime();
 		
 		algorithm.manageDependence(txContext);
-		
-		long leaveTime = System.nanoTime();
-		LOGGER.fine(txContext.getHostComponent() + " algorithm.doNormal() cost time:" + (leaveTime - enterTime) / 1000000.0);
 		return true;
 	}
 	
@@ -178,6 +174,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	public void ondemandSetting() {
 		synchronized (ondemandSyncMonitor) {
+			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.ONDEMAND))
+				System.out.println(compObj.getIdentifier() + "--> compStatus:" + compStatus);
 			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
 			if(compStatus.equals(CompStatus.NORMAL))	
 				this.compStatus = CompStatus.ONDEMAND;
@@ -289,7 +287,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 				ondemandSetupHelper.resetIsOndemandRqstRcvd();
 				
-				LOGGER.info("--------------ondemand setup is done, now notify all...------\n\n");
+				LOGGER.info("-------------- " + compObj.getIdentifier() + "ondemand setup is done, now notify all...------\n\n");
 				ondemandSetupHelper.onDemandIsDone();
 				ondemandSyncMonitor.notifyAll();
 				

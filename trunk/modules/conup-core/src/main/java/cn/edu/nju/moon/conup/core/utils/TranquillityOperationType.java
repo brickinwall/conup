@@ -10,13 +10,13 @@ public enum TranquillityOperationType {
 	 * should recursively notify its sub components to make sure each
 	 * component's txRegistry is correct.
 	 */
-	NORMAL_ROOT_TX_END,
+//	NORMAL_ROOT_TX_END,
 	//dep event type
 	NOTIFY_FUTURE_CREATE,
 	ACK_FUTURE_CREATE,
 	NOTIFY_FUTURE_REMOVE,
 	ACK_SUBTX_INIT,
-	NOTIFY_SUBTX_END,
+//	NOTIFY_SUBTX_END,
 	NOTIFY_PAST_CREATE,
 	NOTIFY_PAST_REMOVE,
 	//ondemand event type

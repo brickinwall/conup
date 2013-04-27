@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import cn.edu.nju.moon.conup.comm.api.peer.services.DepNotifyService;
 import cn.edu.nju.moon.conup.comm.api.peer.services.impl.DepNotifyServiceImpl;
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
-//import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
@@ -28,8 +27,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-//import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
+//import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -47,23 +45,11 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	private DynamicDepManager depMgr = null;
 	
-	/**
-	 * When dynamic update is done, the CompStatus of a component should be changed to NORMAL.
-	 * Before that, however, there are many dynamic dependences which should be removed.
-	 * Map<String, Map<String, Boolean>> takes the hostComponent as the key, 
-	 * and the inner Map<String, Boolean> takes the parent-components as the key.
-	 */
-//	public static Map<String, Map<String, Boolean>> isCleanUpForUpdateSent = new ConcurrentHashMap<String, Map<String, Boolean>>();
-//	public static Map<String, Integer> isCleanUpForUpdateDone = new ConcurrentHashMap<String, Integer>();
-	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
 	
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 		LOGGER.fine("VersionConsistencyImpl.manageDependence(...)");
-		String hostComponent = txContext.getHostComponent();
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(hostComponent);
 		CompStatus compStatus = depMgr.getCompStatus();
 		
 		assert depMgr != null;
@@ -98,9 +84,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	@Override
 	public boolean manageDependence(String payload) {
-		// print to terminal
-//		NodeManager nodeMgr = NodeManager.getInstance();
-//		Printer printer = new Printer();
 		if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
 			return true;
 
@@ -112,9 +95,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		String targetComp = plResolver.getParameter(ConsistencyPayload.TARGET_COMPONENT);
 		String rootTx = plResolver.getParameter(ConsistencyPayload.ROOT_TX);
 		ConsistencyOperationType operationType = plResolver.getOperation();
-		
-		
-//		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(targetComp);
 		
 		assert operationType != null;
 		
@@ -158,18 +138,6 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(LOGGER, depMgr.getRuntimeInDeps(), "In" + ", after process ACK_SUBTX_INIT");
 //			printer.printDeps(LOGGER, depMgr.getRuntimeDeps(), "Out" + ", after process ACK_SUBTX_INIT");
 			break;
-		case NOTIFY_SUBTX_END:
-			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
-//			printer.printDeps(depMgr.getRuntimeInDeps(), "In" + ", before process NOTIFY_SUBTX_END");
-//			printer.printDeps(depMgr.getRuntimeDeps(), "Out" + ", before process NOTIFY_SUBTX_END");
-//			
-//			String subTxEndParentTxID = plResolver.getParameter(ConsistencyPayload.PARENT_TX);
-//			String subTxEndSubTxID = plResolver.getParameter(ConsistencyPayload.SUB_TX);
-//			manageDepResult = doNotifySubTxEnd(srcComp, targetComp, rootTx, subTxEndParentTxID, subTxEndSubTxID);
-//			
-//			printer.printDeps(depMgr.getRuntimeInDeps(), "In" + ", after process NOTIFY_SUBTX_END");
-//			printer.printDeps(depMgr.getRuntimeDeps(), "Out" + ", after process NOTIFY_SUBTX_END");
-			break;
 		case NOTIFY_PAST_CREATE:
 //			LOGGER.info("before process NOTIFY_PAST_CREATE:");
 //			printer.printDeps(LOGGER, depMgr.getRuntimeInDeps(), "In" + ",before process NOTIFY_PAST_CREATE:");
@@ -190,14 +158,6 @@ public class VersionConsistencyImpl implements Algorithm {
 //			printer.printDeps(depMgr.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_REMOVE:");
 //			printer.printDeps(depMgr.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_REMOVE:");
 			break;
-		case NORMAL_ROOT_TX_END:
-			LOGGER.warning("deprecated notification: NORMAL_ROOT_TX_END");
-//			ConsistencyOndemandPayloadResolver resolver;
-//			resolver = new ConsistencyOndemandPayloadResolver(payload);
-//			manageDepResult = doNormalRootTxEnd(resolver.getParameter(ConsistencyPayload.SRC_COMPONENT),
-//					resolver.getParameter(ConsistencyPayload.TARGET_COMPONENT),
-//					resolver.getParameter(ConsistencyPayload.ROOT_TX));
-			break;
 		case NOTIFY_REMOTE_UPDATE_DONE:
 			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp);
 			break;
@@ -206,25 +166,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 	
 	private void doNormal(TransactionContext txCtx){
-		//if current tx is not a root tx
-//		if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-//			String hostComp = txCtx.getHostComponent();
-//			if (txCtx.getEventType().equals(TxEventType.TransactionStart)) {
-////				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
-////						txCtx.getRootTx(), ConsistencyOperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
-////				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-////				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-//				
-//			} else if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
-////				String payload = ConsistencyPayloadCreator.createPayload(hostComp, txCtx.getParentComponent(),
-////						txCtx.getRootTx(), ConsistencyOperationType.NOTIFY_SUBTX_END, txCtx.getParentTx(), txCtx.getCurrentTx());
-////				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-////				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
-//			}
-//		}
-		//if a root tx ends, it should recursively notify its sub-components
-//		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)
-//				&& txCtx.getCurrentTx().equals(txCtx.getRootTx())) {
+		
 		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
 			String hostComp;
 			String rootTx;
@@ -425,16 +367,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	/**
-	 * during updating process, we still need to maintain the dependences
-	 * @param txContext
-	 * @param dynamicDepMgr
-	 */
-	@Deprecated
-	private void doUpdating(TransactionContext txContext, DynamicDepManager dynamicDepMgr) {
-		doValid(txContext);
-	}
-
-	/**
 	 * current component status is ondemand, suspend current execution until 
 	 * status becomes to valid
 	 * @param txContext
@@ -466,8 +398,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doNotifyFutureCreate(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
 		Dependence dep = new Dependence(FUTURE_DEP, rootTx, srcComp, targetComp, null, null);
@@ -506,8 +436,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doNotifyPastRemove(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		inDepRegistry.removeDependence(PAST_DEP, rootTx, srcComp, targetComp);
 		return removeAllEdges(targetComp, rootTx);
@@ -523,8 +451,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doNotifyPastCreate(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		Dependence dependence = new Dependence(PAST_DEP, rootTx, srcComp, targetComp, null, null);
 		inDepRegistry.addDependence(dependence);
@@ -563,8 +489,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doNotifySubTxEnd(String srcComp, String targetComp, String rootTx, String parentTx, String subTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTx + " rootTx:" + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		
 		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
@@ -610,8 +534,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doAckSubTxInit(String srcComp, String targetComp, String rootTx, String parentTxID, String subTxID) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTxID + " rootTx:" + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		
 		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
@@ -655,8 +577,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private boolean doNotifyFutureRemove(String srcComp, String targetComp, String rootTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		
 		inDepRegistry.removeDependence(FUTURE_DEP, rootTx, srcComp, targetComp);
@@ -666,8 +586,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 	
 	private boolean doNotifyStartRemoteSubTx(String srcComp, String targetComp, String rootTx){
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager.getDynamicDepManager(targetComp);
 		Set<Dependence>	rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
@@ -1077,6 +995,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
 		
+		LOGGER.info("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
+		
 		return true;
 	}
 
@@ -1107,9 +1027,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
 			String parentTx, String subTx) {
 		if (subTxStatus.equals(TxEventType.TransactionStart)) {
-//			NodeManager nodeManager = NodeManager.getInstance();
-//			DynamicDepManagerImpl dynamicDepMgr = (DynamicDepManagerImpl) nodeManager
-//					.getDynamicDepManager(curComp);
 
 			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
@@ -1135,8 +1052,6 @@ public class VersionConsistencyImpl implements Algorithm {
 
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
