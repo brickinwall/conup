@@ -831,8 +831,6 @@ public class TranquillityImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
 		
-		// record the update end time
-		DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 		return true;
 	}
 

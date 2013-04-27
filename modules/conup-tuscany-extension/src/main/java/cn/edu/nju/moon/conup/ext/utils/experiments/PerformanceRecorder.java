@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
 
 /**
@@ -16,9 +15,15 @@ public class PerformanceRecorder {
 	private static Map<String, PerformanceRecorder> componentIdentifierToPerformanceRecorderMap = new ConcurrentSkipListMap<String, PerformanceRecorder>();
 	
 	
-	private long startTime;
+	private long updateStartTime;
+	private long updateEndTime;
 	
-	private long endTime;
+	public long getUpdateEndTime() {
+		return updateEndTime;
+	}
+
+	private long ondemandStartTime;
+	private long ondemandEndTime;
 	
 	private PerformanceRecorder(){
 		
@@ -34,23 +39,30 @@ public class PerformanceRecorder {
 		}
 	}
 	
+	public void ondemandRqstReceived(long ondemandStartTime){
+		this.ondemandStartTime = ondemandStartTime;
+	}
 	
-	public void updateIsDone(long endTime){
-		this.endTime = endTime;
-//		String data ="update has taken time:," + (this.endTime - startTime) / 1000000.0 + "\n";
-		ExpSetting expSetting = TimelinessExp.getInstance().getExpSetting();
-		if(expSetting.getType().contains("timeliness")){
-//			new TimelinessRecorder().addUpdateCostTime(this.endTime - this.startTime);
-			try {
-				TimelinessExp.getInstance().writeToFile((this.endTime - this.startTime) / 1000000.0);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	public void ondemandIsDone(long ondemandEndTime){
+		this.ondemandEndTime = ondemandEndTime;
+	}
+	
+	public void updateIsDone(long endTime) {
+		this.updateEndTime = endTime;
+
+		try {
+			String data = (this.ondemandEndTime - this.ondemandStartTime)
+					* 1e-6 + "," + (this.updateEndTime - this.updateStartTime)
+					* 1e-6;
+			TimelinessExp.getInstance().writeToFile(data);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 	}
 	
 	public void updateReceived(long startTime){
-		this.startTime = startTime;
+		this.updateStartTime = startTime;
 	}
 	
 }

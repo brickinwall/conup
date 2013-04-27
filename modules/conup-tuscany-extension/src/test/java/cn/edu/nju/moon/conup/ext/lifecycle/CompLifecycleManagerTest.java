@@ -28,7 +28,6 @@ import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyOperationType;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;
 import cn.edu.nju.moon.conup.sample.auth.services.TokenService;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;

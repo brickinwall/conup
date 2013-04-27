@@ -12,7 +12,7 @@ public class ExpXMLUtilTest {
 	ExpXMLUtil expXMLUtil = null;
 	@Before
 	public void setUp() throws Exception {
-		expXMLUtil = new ExpXMLUtil("src/test/resources/Conup.xml");
+		expXMLUtil = new ExpXMLUtil("src/test/resources/");
 	}
 
 	@Test

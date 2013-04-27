@@ -23,24 +23,33 @@ import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
 public class ExpXMLUtil {
 	private String tuscanyHome;
 	private String conupXmlPath;
-	Element root = null;
+	private String expXmlPath = null;
+	
+	Element conupRoot = null;
+	Document conupDoc = null;
+	Element expRoot = null;
+	Document expDoc = null;
 
 	public ExpXMLUtil() {
 		
 		String disPath = getDistributionEnvPath();
-		if(disPath != null){
+		if (disPath != null) {
 			conupXmlPath = disPath + "/Conup.xml";
+			expXmlPath = disPath + "/ExpSetting.xml";
 		}
 		SAXBuilder sb = new SAXBuilder();
 		try {
-			Document doc = sb.build(conupXmlPath);
-			root = doc.getRootElement();
+			conupDoc = sb.build(conupXmlPath);
+			conupRoot = conupDoc.getRootElement();
+			expDoc = sb.build(expXmlPath);
+			expRoot = expDoc.getRootElement();
 		} catch (JDOMException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			if(disPath == "" || disPath == null){
-				throw new ConupEnvException("TUSCANY_HOME environment is not set!");
-			} else{
+			if (disPath == "" || disPath == null) {
+				throw new RuntimeException(
+						"TUSCANY_HOME environment is not set!");
+			} else {
 				e.printStackTrace();
 			}
 		}
@@ -49,8 +58,10 @@ public class ExpXMLUtil {
 	public ExpXMLUtil(String xmlPath) {
 		SAXBuilder sb = new SAXBuilder();
 		try {
-			Document doc = sb.build(xmlPath);
-			root = doc.getRootElement();
+			conupDoc = sb.build(xmlPath + "Conup.xml");
+			conupRoot = conupDoc.getRootElement();
+			expDoc = sb.build(xmlPath + "ExpSetting.xml");
+			expRoot = expDoc.getRootElement();
 		} catch (JDOMException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -64,8 +75,8 @@ public class ExpXMLUtil {
 
 	public ExpSetting getExpSetting(){
 		ExpSetting expSetting = new ExpSetting();
-		Element experiment = root.getChild("experiment");
-		List settings = experiment.getChildren("setting");
+//		Element experiment = root.getChild("experiment");
+		List settings = expRoot.getChildren("setting");
 		Iterator settingIter = settings.iterator();
 		Element setting = null;
 		while(settingIter.hasNext()){
@@ -100,7 +111,7 @@ public class ExpXMLUtil {
 	}
 	
 	public String getAlgorithmConf() {
-		Element configuration = root.getChild("configuration");
+		Element configuration = conupRoot.getChild("configuration");
 		Element algorithms = configuration.getChild("algorithms");
 		List allALgs = algorithms.getChildren();
 		Iterator algsIter = allALgs.iterator();
@@ -118,7 +129,7 @@ public class ExpXMLUtil {
 	}
 
 	public String getFreenessStrategy() {
-		Element configuration = root.getChild("configuration");
+		Element configuration = conupRoot.getChild("configuration");
 		Element freenessStrategies = configuration.getChild("freenessStrategies");
 		List allStrategies = freenessStrategies.getChildren();
 		Iterator strategiesIter = allStrategies.iterator();
