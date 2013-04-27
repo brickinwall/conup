@@ -1,7 +1,6 @@
 package cn.edu.nju.moon.conup.remote.utils;
 
-
-
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 /**
  * @author rgc
  * @version Dec 2, 2012 1:30:48 PM

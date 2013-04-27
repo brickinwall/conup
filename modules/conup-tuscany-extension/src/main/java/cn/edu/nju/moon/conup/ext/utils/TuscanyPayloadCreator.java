@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.ext.utils;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
+
 
 /**
  * @author rgc
