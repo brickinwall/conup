@@ -112,15 +112,13 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			msg = trace(msg);
 			msg = buffer(msg);
 		}
-//		return getNext().invoke(msg);
 		
 		//test
-		String hostComponent = null;
-		if(getComponent() != null)
-			hostComponent = getComponent().getName();
+//		String hostComponent = null;
+//		if(getComponent() != null)
+//			hostComponent = getComponent().getName();
 		
 		msg = getNext().invoke(msg);
-		
 		
 		if(phase.equals(Phase.SERVICE_POLICY)){
 			msg = attachEndedTxToResAtServicePolicy(msg);
@@ -184,7 +182,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	}
 
 	private Message traceServicePhase(Message msg, String transactionTag, List<Object> msgBody) {
-			String currentTx = null;
+//			String currentTx = null;
 			String hostComponent = null;
 			String rootTx = null;
 			String rootComponent = null;
@@ -205,21 +203,38 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			//get root, parent and current transaction id
 			if(transactionTag != null){
 				String target = getTargetString(transactionTag);
-				String rootInfo = target.split(",")[0];
-				String parentInfo = target.split(",")[1];
-				String subInfo = target.split(",")[2];
-				rootTx = rootInfo.split(":")[0].equals("null") ? null
-						: rootInfo.split(":")[0];
-				rootComponent = rootInfo.split(":")[1].equals("null") ? null
-						: rootInfo.split(":")[1];
-				parentTx = parentInfo.split(":")[0].equals("null") ? null
-						: parentInfo.split(":")[0];
-				parentComponent = parentInfo.split(":")[1].equals("null") ? null
-						: parentInfo.split(":")[1];
-				subTx = subInfo.split(":")[0].equals("null") ? null
-						: subInfo.split(":")[0];
-				subComp = subInfo.split(":")[1].equals("null") ? null
-						: subInfo.split(":")[1];
+				String[] txInfos = target.split(","); 
+				String rootInfo = txInfos[0];
+				String parentInfo = txInfos[1];
+				String subInfo = txInfos[2];
+				
+				String[] rootInfos = rootInfo.split(":");
+				rootTx = rootInfos[0].equals("null") ? null : rootInfos[0];
+				rootComponent = rootInfos[1].equals("null") ? null : rootInfos[1];
+				
+				String[] parentInfos = parentInfo.split(":");
+				parentTx = parentInfos[0].equals("null") ? null : parentInfos[0];
+				parentComponent = parentInfos[1].equals("null") ? null : parentInfos[1];
+				
+				String[] subInfos = subInfo.split(":");
+				subTx = subInfos[0].equals("null") ? null : subInfos[0];
+				subComp = subInfos[1].equals("null") ? null : subInfos[1];
+				
+//				String rootInfo = target.split(",")[0];
+//				String parentInfo = target.split(",")[1];
+//				String subInfo = target.split(",")[2];
+//				rootTx = rootInfo.split(":")[0].equals("null") ? null
+//						: rootInfo.split(":")[0];
+//				rootComponent = rootInfo.split(":")[1].equals("null") ? null
+//						: rootInfo.split(":")[1];
+//				parentTx = parentInfo.split(":")[0].equals("null") ? null
+//						: parentInfo.split(":")[0];
+//				parentComponent = parentInfo.split(":")[1].equals("null") ? null
+//						: parentInfo.split(":")[1];
+//				subTx = subInfo.split(":")[0].equals("null") ? null
+//						: subInfo.split(":")[0];
+//				subComp = subInfo.split(":")[1].equals("null") ? null
+//						: subInfo.split(":")[1];
 			}
 			
 			Map<String, Object> headers = msg.getHeaders();
@@ -239,16 +254,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				headers.put(SUB_COMP, subComp);
 			}
 			
-//			if(parentTx!=null && parentComponent!=null){
-//				headers.put(PARENT_TX, parentTx);
-//				headers.put(PARENT_COMP, parentComponent);
-//			}
-//			
-//			if(subTx != null && subComp != null){
-//				headers.put(SUB_TX, subTx);
-//				headers.put(SUB_COMP, subComp);
-//			}
-			
 			//get host component name
 			hostComponent = getComponent().getName();
 	//		if(subComp != null)
@@ -262,16 +267,18 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				// generate and init TransactionDependency
 				txContext = new TransactionContext();
 				txContext.setCurrentTx(null);
-				txContext.setHostComponent(hostComponent);
+//				txContext.setHostComponent(hostComponent);
 				txContext.setParentTx(parentTx);
 				txContext.setParentComponent(parentComponent);
 				txContext.setRootTx(rootTx);
 				txContext.setRootComponent(rootComponent);
 				//add to InterceptorCacheImpl
 				cache.addTxCtx(threadID, txContext);
-			} else{
-				txContext.setHostComponent(hostComponent);
-			}
+			} 
+			txContext.setHostComponent(hostComponent);
+//			else{
+//				txContext.setHostComponent(hostComponent);
+//			}
 			
 			String hostInfo = TracePolicyInterceptor.HOSTIDENTIFIER + "," + threadID + "," + hostComponent;
 			msgBody.add(hostInfo);
@@ -446,14 +453,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 							txCtx.getRootTx(), hostComp, txCtx, true)) {
 						LOGGER.fine("ThreadID=" + getThreadID()	+ "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:" + txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 						try {
-//							TxLifecycleManager.removeRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
-//							clMgr.removeBufferoldRootTxs(txCtx.getParentTx(), txCtx.getRootTx());
 							validToFreeSyncMonitor.wait();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					} else {
-						// clMgr.getUpdateCtx().getBufferOldRootTxs().add(txCtx.getRootTx());
 					}
 				}
 			}
@@ -469,7 +473,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				
 			}
 			
-//			TxLifecycleManager.addRootTx(hostComp, txCtx.getParentTx(), txCtx.getRootTx());
 			// the invoked transaction is not a root transaction
 			if(txCtx.getRootTx() != null){
 				assert txCtx.getParentTx() != null;
@@ -495,7 +498,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			String rootComp = null;
 			String parentTx = null;
 			String parentComp = null;
-			String threadID = null;
+//			String threadID = null;
 			
 			//locate ROOT_PARENT_IDENTIFIER in message body
 			List<Object> msgBodyOriginal;
@@ -516,28 +519,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				
 				//get host component name
 				hostComp = getComponent().getName();
-				threadID = getThreadID();
+//				threadID = getThreadID();
 				
-				// check interceptor cache
-//				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
-//				assert threadID != null;
-//				
-//				TransactionContext txCtx = cache.getTxCtx(threadID);
-//				if(txCtx == null){
-//					System.out.println("hostComp:" + hostComp+ ",currentThreadID:" + threadID);
-//					System.out.println(cache);
-//					System.out.println(InterceptorCache.allSequence);;
-//				}
-//				assert txCtx != null;
-//				rootTx = txCtx.getRootTx();
-//				rootComp = txCtx.getRootComponent();
-//				parentTx = txCtx.getParentTx();
-//				parentComp = txCtx.getParentComponent();
-//				currentTx = txCtx.getCurrentTx();
-				
-				//remove txCtx from InterceptorCache
-//				cache.removeTxCtx(threadID);
-				
+				// current tx is a root tx, no need to attach any information to its response 
 				if(msgHeader.get(SUB_TX) == null){
 					return msg;
 				}
@@ -589,117 +573,18 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				msgHeader.remove(SUB_TX);
 				msgHeader.remove(SUB_COMP);
 			} 
-//			else if(phase.equals(Phase.REFERENCE_POLICY)){
-//				String subTx = null;
-//				String subComp = null;
-//				String endedSubTxTag = null;
-//				String realMsgBody = null;
-////				for (Object object : msgBody) {
-////					if (object.toString().contains(
-////							TracePolicyInterceptor.ENDED_SUB_TX_TAG)) {
-////						endedSubTxTag = object.toString();
-////						msgBody.remove(object);
-////						break;
-////					}
-////				}
-////				String msgBodyStr = msg.getBody().toString();
-////				if(msgBodyStr.contains(TracePolicyInterceptor.ENDED_SUB_TX_TAG)){
-////					int loc = msgBodyStr.indexOf(TracePolicyInterceptor.ENDED_SUB_TX_TAG);
-////					realMsgBody = msgBodyStr.substring(0, loc);
-////					endedSubTxTag = msgBodyStr.substring(loc);
-////					//TODO
-////					msg.setBody(realMsgBody);
-////				} else{
-////					return msg;
-////				}
-//				
-//				if(msg.getBody() == null){
-//					Object [] tmp = new Object[1];
-//					tmp[0] = (Object)"";
-//					msgBodyOriginal = Arrays.asList(tmp);
-//				}
-//				else
-//					msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
-//				
-//				msgBody.addAll(msgBodyOriginal);
-//				for(Object object : msgBody){
-//					
-//					if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
-//						endedSubTxTag = object.toString();
-//						msgBody.remove(object);
-//						break;
-//					}
-//				}
-//				if(endedSubTxTag == null)
-//					return msg;
-//				LOGGER.fine("subContextTag:" + endedSubTxTag + ", msgBody:" + msgBody);
-//				
-//				// Here we need to pay attention, the body in this return message should be only one object, not an array.
-//				// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
-//				// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
-//				if(msgBody.size() != 0)
-//					msg.setBody(msgBody.get(0));
-//				
-//				
-//				LOGGER.fine("attach REFERENCE_POLICY: " + endedSubTxTag);
-//				
-//				Map<String, String> endedSubTxProperty = parseEndedSubTxTag(endedSubTxTag);
-//				
-//				if(endedSubTxProperty.size() == 0){
-//					LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
-//				}
-//				
-//				rootTx = endedSubTxProperty.get(ROOT_TX);
-//				rootComp = endedSubTxProperty.get(ROOT_COMP);
-//				currentTx = endedSubTxProperty.get(PARENT_TX);
-//				hostComp = endedSubTxProperty.get(PARENT_COMP);
-//				subTx = endedSubTxProperty.get(SUB_TX);
-//				subComp = endedSubTxProperty.get(SUB_COMP);
-//				
-//				assert hostComp.equals(getComponent().getName());
-//				
-//				if( !subComp.equals(hostComp)){
-//					
-////					NodeManager nodeMgr = NodeManager.getInstance();
-////					DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-////					Printer printer = new Printer();
-////					LOGGER.fine("TxS before endRemoteSubTx:");
-////					printer.printTxs(LOGGER, depMgr.getTxs());
-//					
-//					TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-//					txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
-//					
-////					LOGGER.fine("TxS after endRemoteSubTx:");
-////					printer.printTxs(LOGGER, depMgr.getTxs());
-//				}
-//			}
-			
 			return msg;
 		}
 
-//	private void removeFakeSubTx(String hostComp, String fakeSubTx){
-//		NodeManager nodeMgr = NodeManager.getInstance();
-//		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-//		
-//		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
-//		synchronized (ondemandMonitor) {
-//			depMgr.getTxs().remove(fakeSubTx);
-//		}
-//	}
 	/**
 	 * this method should be named as analysis the attached sub txs info from the returned message body
 	 * @param msg
 	 * @return msg
 	 */
 	private Message attachEndedTxToResAtRefernecePolicy(Message msg) {
-//		System.out.println(msg.getBody());
 		String currentTx = null;
 		String hostComp = null;
 		String rootTx = null;
-//		String rootComp = null;
-//		String parentTx = null;
-//		String parentComp = null;
-//		String threadID = null;
 		String subTx = null;
 		String subComp = null;
 		
@@ -747,7 +632,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 		
 		rootTx = endedSubTxProperty.get(ROOT_TX);
-//		rootComp = endedSubTxProperty.get(ROOT_COMP);
 		currentTx = endedSubTxProperty.get(PARENT_TX);
 		hostComp = endedSubTxProperty.get(PARENT_COMP);
 		subTx = endedSubTxProperty.get(SUB_TX);
