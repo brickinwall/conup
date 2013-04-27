@@ -17,6 +17,7 @@ import cn.edu.nju.moon.conup.core.utils.ConsistencyOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayload;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
+import cn.edu.nju.moon.conup.ext.utils.experiments.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
@@ -70,6 +71,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
 		ondemandHelper.getDynamicDepManager().setScope(scope);
+		
+		PerformanceRecorder.getInstance(hostComp).ondemandRqstReceived(System.nanoTime());
 		
 		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
 		if(ddm.getRuntimeInDeps().size() != 0){
@@ -246,30 +249,24 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			confirmStatus.put(parentComp, true);
 		else
 			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
-//		if (ConfirmOndemandStatus.containsKey(parentComp))
-//			ConfirmOndemandStatus.put(parentComp, true);
-//		else
-//			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
 		String confirmOndemandStatusStr = "currentComp:" + currentComp + ",ConfirmOndemandStatus:";
 		for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
 			confirmOndemandStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
-		LOGGER.info(confirmOndemandStatusStr);
+		LOGGER.fine(confirmOndemandStatusStr);
 		
 		//isConfirmedAll?
 		boolean isConfirmedAll = true;
 		synchronized (this) {
-
 			for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 				isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 			}
-
 			if (isConfirmedAll
 					&& depMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 				// change current componentStatus to 'valid'
-				LOGGER.info("confirmOndemandSetup(...) from " + parentComp
+				LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
 						+ ", and confirmed All, trying to change mode to valid");
 				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
 				// send confirmOndemandSetup(...)
@@ -291,6 +288,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		txs = depMgr.getTxs();
+		
+		LOGGER.fine("txs.size()=" + txs.size() + "\n" + txs);
 		
 		Set<Dependence> fDeps = new HashSet<Dependence>();
 		Set<Dependence> pDeps = new HashSet<Dependence>();
@@ -729,10 +728,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		synchronized (this) {
 			// if received all
 			if (isReceivedAll && ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.NORMAL)) {
-				LOGGER.info("Received reqOndemandSetup(...) from "
+				LOGGER.fine("Received reqOndemandSetup(...) from "
 						+ requestSrcComp);
-				LOGGER.info("Received all reqOndemandSetup(...)");
-				LOGGER.info("trying to change mode to ondemand");
+				LOGGER.fine("Received all reqOndemandSetup(...)");
+				LOGGER.fine("trying to change mode to ondemand");
 
 				DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
 				if (ddm.getRuntimeInDeps().size() != 0) {
@@ -1130,6 +1129,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		OndemandRequestStatus.remove(hostComp);
 		ConfirmOndemandStatus.remove(hostComp);
+		PerformanceRecorder.getInstance(hostComp).ondemandIsDone(System.nanoTime());
 //		OndemandRequestStatus.clear();
 //		ConfirmOndemandStatus.clear();
 	}

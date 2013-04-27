@@ -10,13 +10,13 @@ public enum ConsistencyOperationType {
 	 * if a root tx ends while the component status is normal, root component should recursively 
 	 * notify its sub components to make sure each component's txRegistry is correct.
 	 */
-	NORMAL_ROOT_TX_END,
+//	NORMAL_ROOT_TX_END,
 	//dep event type
 	NOTIFY_FUTURE_CREATE,
 	ACK_FUTURE_CREATE,
 	NOTIFY_FUTURE_REMOVE,
 	ACK_SUBTX_INIT,
-	NOTIFY_SUBTX_END,
+//	NOTIFY_SUBTX_END,
 	NOTIFY_PAST_CREATE,
 	NOTIFY_PAST_REMOVE,
 	NOTIFY_START_REMOTE_SUB_TX,	//
