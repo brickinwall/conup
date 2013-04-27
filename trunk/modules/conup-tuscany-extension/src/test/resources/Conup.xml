@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE conup [
+<!-- <!DOCTYPE conup [
 <!ENTITY experiment SYSTEM "ExpSetting.xml">
-]>
+]> -->
 <conup>
 	<configuration>
 		<algorithms>
@@ -16,7 +16,7 @@
 		</freenessStrategies>
 	</configuration>
 
-&experiment;
+<!-- &experiment; -->
 	<staticDeps>
 		<component name="CurrencyConverter">
 			<parent>TravelCatalog</parent>

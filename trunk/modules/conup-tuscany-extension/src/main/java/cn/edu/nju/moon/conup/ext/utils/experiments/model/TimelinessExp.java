@@ -1,9 +1,6 @@
 package cn.edu.nju.moon.conup.ext.utils.experiments.model;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,9 +38,10 @@ public class TimelinessExp {
 		threadId = expSetting.getThreadId();
 		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
+		int rqstInterval = expSetting.getRqstInterval();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/timeliness/";
-		fileName = algorithm + "_" + strategy + "_" + expType + "_{" + nThreads + "}_" + threadId + "_"
+		fileName = algorithm + "_" + strategy + "_" + expType + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -76,17 +74,25 @@ public class TimelinessExp {
 		}
 	}
 	
-	public void writeToFile(double updateTime) throws IOException {
+	/*public void writeToFile(double updateTime) throws IOException {
 		synchronized (timeliness) {
 			LOGGER.info("updateTime:" + updateTime);
 			String data = updateTime + "\n";
 			out.write(data);
 			out.flush();
 		}
+	}*/
+	
+	public void writeToFile(String data) throws IOException {
+		synchronized (timeliness) {
+			data = data + "\n";
+			out.write(data);
+			out.flush();
+		}
 	}
 	
 
-	public void addColumn(List<Double> updateTime) throws IOException {
+	/*public void addColumn(List<Double> updateTime) throws IOException {
 		synchronized (timeliness) {
 //			LOGGER.info("I'm writing: " + roundId + "," + updateTime);
 			assert algorithm != null;
@@ -120,7 +126,7 @@ public class TimelinessExp {
 //			out.write(data);
 //			out.flush();
 		}
-	}
+	}*/
 
 	public void close() {
 		synchronized (timeliness) {
@@ -130,6 +136,6 @@ public class TimelinessExp {
 
 	@Override
 	public String toString() {
-		return "Update cost time:";
+		return "OndemandTime, UpdateTime";
 	}
 }

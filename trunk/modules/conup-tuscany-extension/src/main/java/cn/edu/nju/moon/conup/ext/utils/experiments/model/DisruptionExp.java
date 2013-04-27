@@ -109,18 +109,18 @@ public class DisruptionExp {
 		
 		return disruptedResTime;
 	}
-
-	public void writeResponseTimeToFile(int roundId, int curThreadId,
-			String statusWhenStart, String statusWhenEnd, double responseTime) {
-		synchronized (experiment) {
-			LOGGER.info("I'm writing to disruption.. ");
-			String data = roundId + "," + nThreads + "," + curThreadId + ","
-					+ statusWhenStart + "," + statusWhenEnd + ","
-					+ responseTime + "\n";
-			out.write(data);
-			out.flush();
-		}
-	}
+	
+//	public void writeResponseTimeToFile(int roundId, int curThreadId,
+//			String statusWhenStart, String statusWhenEnd, double responseTime) {
+//		synchronized (experiment) {
+//			LOGGER.info("I'm writing to disruption.. ");
+//			String data = roundId + "," + nThreads + "," + curThreadId + ","
+//					+ statusWhenStart + "," + statusWhenEnd + ","
+//					+ responseTime + "\n";
+//			out.write(data);
+//			out.flush();
+//		}
+//	}
 
 	public void writeToFile(String data) {
 		synchronized (experiment) {

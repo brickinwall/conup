@@ -430,7 +430,7 @@ public class CompLifecycleManager {
 		if(opTyep.equals(TuscanyOperationType.GET_EXECUTION_RECORDER)){
 			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
 		} else if(opTyep.equals(TuscanyOperationType.GET_UPDATE_ENDTIME)){
-			return Long.toString(DisruptionExp.getInstance().getUpdateEndTime());
+			return Long.toString(PerformanceRecorder.getInstance(compIdentifier).getUpdateEndTime());
 		} else{
 			LOGGER.warning("unsupported operation type for experiment");
 		}
