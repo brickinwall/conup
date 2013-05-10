@@ -297,5 +297,12 @@ public interface DynamicDepManager {
 	 * @param parentComp
 	 */
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
+
+	/**
+	 * when dependency changed, we need to check whether ready for update
+	 * here we check when pastDepCreate, pastDepRemove two events
+	 * @param hostComp
+	 */
+	public void dependenceChanged(String hostComp);
 	
 }

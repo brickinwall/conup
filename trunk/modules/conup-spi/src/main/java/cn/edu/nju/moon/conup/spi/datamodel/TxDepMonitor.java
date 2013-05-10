@@ -68,6 +68,17 @@ public interface TxDepMonitor {
 	 */
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
+	/**
+	 * 
+	 * @param hostComp
+	 * @param fakeSubTx
+	 * @return
+	 */
 	public boolean endLocalSubTx(String hostComp, String fakeSubTx);
+	
+	/**
+	 * check for freeness
+	 */
+	public void checkFreeness(String hostComp);
 	
 }

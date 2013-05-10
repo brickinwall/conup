@@ -23,7 +23,7 @@ import cn.edu.nju.moon.conup.core.utils.TranquillityOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.TranquillityOperationType;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayload;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayloadCreator;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -526,6 +526,8 @@ public class TranquillityImpl implements Algorithm {
 			outDepRegistry.removeDependence(PAST_DEP, rootTx, targetComp, targetComp);
 		}
 		
+		depMgr.dependenceChanged(targetComp);
+		
 		return true;
 	}
 	
@@ -647,7 +649,7 @@ public class TranquillityImpl implements Algorithm {
 	 * @return
 	 */
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp){
-		LOGGER.info(hostComp + " received notifyRemoteUpdateDone from " + srComp);
+		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
 		
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
@@ -818,7 +820,7 @@ public class TranquillityImpl implements Algorithm {
 		parentComps = scope.getParentComponents(hostComp);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for (String comp : parentComps) {
-			LOGGER.info("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
+			LOGGER.fine("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
 			String payload = TranquillityPayloadCreator
 					.createRemoteUpdateIsDonePayload(hostComp, comp,
 							TranquillityOperationType.NOTIFY_REMOTE_UPDATE_DONE);

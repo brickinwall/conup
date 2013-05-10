@@ -180,7 +180,7 @@ public class VersionConsistencyImpl implements Algorithm {
 //					Printer printer = new Printer();
 //					LOGGER.fine("TxS before notified TransactionEnd:");
 //					printer.printTxs(LOGGER, depMgr.getTxs());
-					
+					LOGGER.fine("depMgr.getTxs().size():" + depMgr.getTxs().size());
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
 					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
@@ -438,6 +438,10 @@ public class VersionConsistencyImpl implements Algorithm {
 		LOGGER.fine(srcComp + "-->" + targetComp + " rootTx: " + rootTx);
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		inDepRegistry.removeDependence(PAST_DEP, rootTx, srcComp, targetComp);
+		
+		// dependency changed, check for freeness
+		depMgr.dependenceChanged(targetComp);
+		
 		return removeAllEdges(targetComp, rootTx);
 	}
 	
@@ -474,6 +478,8 @@ public class VersionConsistencyImpl implements Algorithm {
 			outDepRegistry.removeDependence(FUTURE_DEP, rootTx, targetComp, targetComp);
 			outDepRegistry.removeDependence(PAST_DEP, rootTx, targetComp, targetComp);
 		}
+		
+		depMgr.dependenceChanged(targetComp);
 		
 		removeFutureEdges(targetComp, rootTx);
 		
@@ -914,10 +920,7 @@ public class VersionConsistencyImpl implements Algorithm {
 
 	@Override
 	public boolean isReadyForUpdate(String compIdentifier) {
-//		NodeManager nodeMgr = NodeManager.getInstance();
-//		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
-//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		rtInDeps = depMgr.getRuntimeInDeps();
 		
 		Set<String> allRootTxs = new HashSet<String>();
@@ -995,7 +998,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
 		
-		LOGGER.info("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
+		LOGGER.fine("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
 		
 		return true;
 	}
