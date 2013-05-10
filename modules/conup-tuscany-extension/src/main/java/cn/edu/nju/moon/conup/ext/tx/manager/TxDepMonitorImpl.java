@@ -222,6 +222,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
 		compLcMgr = CompLifecycleManager.getInstance(hostComp);
 		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+		LOGGER.fine("txID:" + rootTxId + " hostComp:" + hostComp + " compStatus:" + dynamicDepMgr.getCompStatus());
 		synchronized (validToFreeSyncMonitor) {
 //			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
 //				&& compLcMgr.isDynamicUpdateRqstRCVD()
@@ -320,6 +321,24 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			depMgr.getTxs().remove(fakeSubTx);
 		}
 		return true;
+	}
+
+	@Override
+	public void checkFreeness(String hostComp) {
+		CompLifecycleManager compLcMgr;
+		NodeManager nodeManager = NodeManager.getInstance();
+		
+		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
+		compLcMgr = CompLifecycleManager.getInstance(hostComp);
+		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+		synchronized (validToFreeSyncMonitor) {
+			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
+
+				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
+					compLcMgr.attemptToUpdate();
+				}
+			}
+		}
 	}
 	
 }

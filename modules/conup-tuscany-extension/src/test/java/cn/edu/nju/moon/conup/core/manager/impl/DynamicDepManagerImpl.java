@@ -277,4 +277,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return null;
 	}
 
+	@Override
+	public void dependenceChanged(String hostComp) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -9,7 +9,7 @@ import org.omg.CORBA.Principal;
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
 import cn.edu.nju.moon.conup.core.ondemand.OndemandSetupHelperImpl;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -462,6 +462,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
 		return algorithm.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
+	}
+
+	@Override
+	public void dependenceChanged(String hostComp) {
+		txDepMonitor.checkFreeness(hostComp);
 	}
 	
 }
