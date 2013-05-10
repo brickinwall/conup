@@ -362,17 +362,18 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 
 			// waiting during on-demand setup
 			Object syncMonitor = depMgr.getOndemandSyncMonitor();
+			Object subTx = msgHeaders.get(SUB_TX);
 			synchronized (syncMonitor) {
 				if (depMgr.isNormal()) {
 					// the invoked transaction is not a root transaction
 					if(txCtx.getRootTx() != null){
 						assert txCtx.getParentTx() != null;
 						assert txCtx.getParentComponent() != null;
-						assert msgHeaders.get(SUB_TX) != null;
+						assert subTx != null;
 						assert msgHeaders != null;
 						assert txDepMonitor != null;
 						
-						txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
+						txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
@@ -413,8 +414,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 					if(txCtx.getRootTx() != null){
 						assert txCtx.getParentTx() != null;
 						assert txCtx.getParentComponent() != null;
-						assert msgHeaders.get(SUB_TX) != null;
-						txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
+						assert subTx != null;
+						txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
@@ -477,8 +478,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			if(txCtx.getRootTx() != null){
 				assert txCtx.getParentTx() != null;
 				assert txCtx.getParentComponent() != null;
-				assert msgHeaders.get(SUB_TX) != null;
-				txDepMonitor.initLocalSubTx(hostComp, msgHeaders.get(SUB_TX).toString(), 
+				assert subTx != null;
+				txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
 						txCtx.getRootTx(), txCtx.getRootComponent(),
 						txCtx.getParentTx(), txCtx.getParentComponent());
 			}
