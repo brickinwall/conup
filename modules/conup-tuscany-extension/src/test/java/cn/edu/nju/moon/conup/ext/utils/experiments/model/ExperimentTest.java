@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.Experiment;
+
 public class ExperimentTest {
 	
 	private Experiment exp = null;

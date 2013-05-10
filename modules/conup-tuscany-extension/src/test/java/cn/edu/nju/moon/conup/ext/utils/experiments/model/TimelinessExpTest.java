@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessExp;
+
 public class TimelinessExpTest {
 	TimelinessExp timelinessExp = TimelinessExp.getInstance();
 

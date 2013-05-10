@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.ext.utils.experiments;
+package cn.edu.nju.moon.conup.ext.utils.experiments.model;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -8,8 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.DisruptionExp;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
+import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 
 public class ResponseTimeRecorder {
 	private static Logger LOGGER = Logger.getLogger(ResponseTimeRecorder.class.getName());
