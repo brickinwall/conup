@@ -4,11 +4,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.omg.CORBA.Principal;
-
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.TransactionRegistry;
-import cn.edu.nju.moon.conup.core.ondemand.OndemandSetupHelperImpl;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -22,7 +19,6 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * For managing/maintaining transactions and dependences
@@ -466,7 +462,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void dependenceChanged(String hostComp) {
-		txDepMonitor.checkFreeness(hostComp);
+		if(isUpdateRequestReceived)
+			txDepMonitor.checkFreeness(hostComp);
 	}
 	
 }
