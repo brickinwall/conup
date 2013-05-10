@@ -56,16 +56,17 @@ public class MyPoissonProcess extends Process {
 	public static void main(String[] args) throws InvalidParamsException {
 		int seed = 123456789;
 		Properties params = new Properties();
-		float MeanArrival = 25.0f;
+		float MeanArrival = 100.0f;
 		params.setProperty("meanArrival", Float.toString(MeanArrival));
 		ArrayList<Event> refEvents = new ArrayList<Event>();
 		MyPoissonProcess mpp = new MyPoissonProcess("myPoissonProcess", params, null, refEvents);
 		Event event = null;
-		for(int i = 0; i < 10; i++){
+		for(int i = 0; i < 1; i++){
 			Random random = new Random(seed);
 			mpp.setRandom(random);
-			for(int j = 0; j < 10; j++){
-				System.out.println("round " + i + ":" +mpp.getNextTriggeringTime(event, 0));
+			for(int j = 0; j < 100; j++){
+//				System.out.println("round " + i + ":" +mpp.getNextTriggeringTime(event, 0));
+				System.out.println(mpp.getNextTriggeringTime(event, 0));
 			}
 		}
 	}

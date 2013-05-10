@@ -7,5 +7,6 @@ public enum ConupExpCommands {
 	correctnessExp,
 	frameworkExp5,
 	invoke,
+	update,
 	help;
 }
