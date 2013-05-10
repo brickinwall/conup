@@ -17,7 +17,7 @@ import cn.edu.nju.moon.conup.core.utils.ConsistencyOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayload;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
-import cn.edu.nju.moon.conup.ext.utils.experiments.PerformanceRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
