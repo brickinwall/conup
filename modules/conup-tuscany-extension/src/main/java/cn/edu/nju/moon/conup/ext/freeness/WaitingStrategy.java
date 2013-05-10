@@ -1,7 +1,5 @@
 package cn.edu.nju.moon.conup.ext.freeness;
 
-
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
@@ -34,31 +32,11 @@ public class WaitingStrategy implements FreenessStrategy {
 //			return true;
 		return false;
 	}
-	
-	
-//	private Set<Dependence> getDepsBelongToSameRootTx(String rootTxID, Set<Dependence> allDeps){
-//		Set<Dependence> result = new HashSet<Dependence>();
-//		for (Dependence dep : allDeps) {
-//			if(dep.getRootTx().equals(rootTxID)){
-//				result.add(dep);
-//			}
-//		}
-//		return result;
-//	}
 
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
 		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
-		CompLifecycleManager compLcMgr;
-		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-		/*
-		 * As to waiting strategy, in order to achieve free, it won't block any request, which means
-		 * that when trying to judge whether the component is ready for update, it should re-calculate
-		 * the old root tx, not just when the component received update request.
-		 */
-		compLcMgr.reinitOldRootTxs();
-		return depManager.isReadyForUpdate()
-				&& compLcMgr.getUpdateCtx().isOldRootTxsEquals();
+		return depManager.isReadyForUpdate();
 	}
 
 }

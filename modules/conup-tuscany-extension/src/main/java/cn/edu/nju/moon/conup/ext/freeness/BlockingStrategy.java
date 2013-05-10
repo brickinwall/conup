@@ -62,14 +62,7 @@ public class BlockingStrategy implements FreenessStrategy {
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
 		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
-		CompLifecycleManager compLcMgr;
-//		Set<String> oldRootTxs;
-		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-//		Set<String> oldVersionRootTxs;
-//		oldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-		return compLcMgr.getUpdateCtx().isOldRootTxsEquals()
-				&& depManager.isReadyForUpdate();
-//				&& oldVersionRootTxs.size()==0;
+		return depManager.isReadyForUpdate();
 	}
 
 }

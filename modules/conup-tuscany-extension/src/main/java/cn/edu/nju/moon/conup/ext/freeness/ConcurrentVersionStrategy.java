@@ -66,14 +66,15 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
-//		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
+		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
 		CompLifecycleManager compLcMgr;
 		Set<String> oldVersionRootTxs;
 		compLcMgr = CompLifecycleManager.getInstance(hostComp);
 		oldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
+		LOGGER.fine("oldVersionRootTxs.size()=" + oldVersionRootTxs.size());
 		LOGGER.fine("oldVersionRootTxs:\n" + oldVersionRootTxs);
-		return compLcMgr.getUpdateCtx().isOldRootTxsEquals()
-				&& oldVersionRootTxs.size()==0;
+//		return oldVersionRootTxs.size()==0;
+		return depManager.isReadyForUpdate() || oldVersionRootTxs.size()==0;
 	}
 
 }
