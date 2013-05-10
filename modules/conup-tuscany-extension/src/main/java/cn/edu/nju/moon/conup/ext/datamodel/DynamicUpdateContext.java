@@ -76,6 +76,7 @@ public class DynamicUpdateContext {
 		return algorithmOldRootTxs != null;
 	}
 	
+	@Deprecated
 	public boolean isOldRootTxsEquals(){
 		return true;
 //		boolean isEquals = false;
