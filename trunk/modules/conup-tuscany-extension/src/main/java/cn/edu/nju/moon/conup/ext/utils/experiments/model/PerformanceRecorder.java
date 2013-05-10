@@ -1,10 +1,10 @@
-package cn.edu.nju.moon.conup.ext.utils.experiments;
+package cn.edu.nju.moon.conup.ext.utils.experiments.model;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessExp;
+import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessExp;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>

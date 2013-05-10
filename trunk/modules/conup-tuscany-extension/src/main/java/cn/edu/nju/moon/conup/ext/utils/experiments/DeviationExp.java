@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.ext.utils.experiments.model;
+package cn.edu.nju.moon.conup.ext.utils.experiments;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,28 +10,21 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 
-/** 
- * 	@author JiangWang<jiang.wang88@gmail.com>
- *	
- */
-public class CorrectnessExp {
-	private Logger LOGGER = Logger.getLogger(DisruptionExp.class.getName());
+public class DeviationExp {
+	private Logger LOGGER = Logger.getLogger(DeviationExp.class.getName());
 	private static String absolutePath = null;
 	private static String fileName = null;
-	private static CorrectnessExp experiment = null;
+	private static DeviationExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
 	private int nThreads;
 	private int threadId;
 	
-	// update startTime, endTime
-	private long updateStartTime = 0L;
-	private long updateEndTime = 0L;
-	private long updateCostTime = 0L;
-
-	private CorrectnessExp() {
+	private DeviationExp() {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
 		String tuscanyHomeLocation = xmlUtil.getTuscanyHome();
 		String algorithm = xmlUtil.getAlgorithmConf();
@@ -45,8 +38,8 @@ public class CorrectnessExp {
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	
-		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/correctness/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + "correctness" + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
+		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/deviation/";
+		fileName = algorithm + "_" + freenessStrategy + "_" + expType + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -62,21 +55,13 @@ public class CorrectnessExp {
 		return expSetting;
 	}
 
-	public static CorrectnessExp getInstance() {
-		synchronized (DisruptionExp.class) {
-			if (experiment == null) {
-				experiment = new CorrectnessExp();
+	public static DeviationExp getInstance() {
+		if (experiment == null) {
+			synchronized (DeviationExp.class) {
+				experiment = new DeviationExp();
 			}
 		}
 		return experiment;
-	}
-	
-	public void writeToFile(String data) {
-		synchronized (experiment) {
-			LOGGER.fine("I'm writing: " + data);
-			out.write(data);
-			out.flush();
-		}
 	}
 
 	public void close() {
@@ -87,6 +72,17 @@ public class CorrectnessExp {
 	
 	@Override
 	public String toString() {
-		return "Round, InconsistentRequests, totalRequest";
+		return "Round, ThreadId, NormalResponse, UpdateResponse";
+	}
+
+	public void writeToFile(int round, Map<Integer, Long> normalRes, Map<Integer, Long> updateRes) {
+		synchronized (experiment) {
+			String data = null;
+			for(int i = 1; i <= 100; i++){
+				data = round + "," + i + "," + normalRes.get(new Integer(i)) * 1e-6 + "," + updateRes.get(new Integer(i)) * 1e-6 + "\n";
+				out.write(data);
+				out.flush();
+			}
+		}
 	}
 }

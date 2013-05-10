@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.ext.utils.experiments.model;
+package cn.edu.nju.moon.conup.ext.utils.experiments;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 
 public class Experiment {
