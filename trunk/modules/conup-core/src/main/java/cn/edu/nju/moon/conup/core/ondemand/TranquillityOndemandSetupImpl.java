@@ -118,7 +118,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 		
 		assert ondemandHelper.getDynamicDepManager().getScope() != null;
-		LOGGER.info("Scope:\n\t" + ondemandHelper.getDynamicDepManager().getScope());
+		LOGGER.fine("Scope:\n\t" + ondemandHelper.getDynamicDepManager().getScope());
 		return true;
 	}
 
@@ -148,7 +148,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	public boolean reqOndemandSetup(String currentComp, String requestSrcComp) {
 		// suspend all the threads that is initiated
 
-		LOGGER.info("**** in reqOndemandSetup(...):" + "\t"
+		LOGGER.fine("**** in reqOndemandSetup(...):" + "\t"
 				+ "currentComponent=" + currentComp + "\t"
 				+ "requestSourceComponent=" + requestSrcComp);
 
@@ -209,18 +209,18 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		// print ConfirmOndemandStatus
-		LOGGER.info("ConfirmOndemandStatus:");
+		LOGGER.fine("ConfirmOndemandStatus:");
 		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
-			LOGGER.info("\t" + entry.getKey() + ": " + entry.getValue());
+			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		if (isConfirmedAll) {
 			if (ondemandHelper.getDynamicDepManager().isValid()) {
-				LOGGER.info("Confirmed all, and component status is valid");
+				LOGGER.fine("Confirmed all, and component status is valid");
 				return true;
 			}
-			LOGGER.info("Confirmed from all parent components in reqOndemandSetup(...)");
-			LOGGER.info("trying to change mode to valid");
+			LOGGER.fine("Confirmed from all parent components in reqOndemandSetup(...)");
+			LOGGER.fine("trying to change mode to valid");
 			
 //			Printer printer = new Printer();
 //			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeInDeps(), "in");
@@ -243,7 +243,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	private void sendConfirmOndemandSetup(String currentComp,
 			String requestSrcComp) {
-		LOGGER.info("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
+		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:\n\t" + requestSrcComp);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
@@ -528,9 +528,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 * @return
 	 */
 	public boolean confirmOndemandSetup(String parentComp, String currentComp) {
-		LOGGER.info("**** " + "confirmOndemandSetup(...) from " + parentComp);
+		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
 		if (ondemandHelper.getDynamicDepManager().isValid()) {
-			LOGGER.info("**** component status is valid, and return");
+			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
 
@@ -539,7 +539,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		if (confirmStatus.containsKey(parentComp))
 			confirmStatus.put(parentComp, true);
 		else
-			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
+			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
 		
 //		if (ConfirmOndemandStatus.containsKey(parentComp))
 //			ConfirmOndemandStatus.put(parentComp, true);
@@ -547,9 +547,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 //			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
 
 		// print ConfirmOndemandStatus
-		LOGGER.info("ConfirmOndemandStatus:");
+		LOGGER.fine("ConfirmOndemandStatus:");
 		for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
-			LOGGER.info("\t" + entry.getKey() + ": " + entry.getValue());
+			LOGGER.fine("\t" + entry.getKey() + ": " + entry.getValue());
 		}
 
 		// isConfirmedAll?
@@ -559,7 +559,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 		if (isConfirmedAll) {
 			// change current componentStatus to 'valid'
-			LOGGER.info("confirmOndemandSetup(...) from " + parentComp
+			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
 					+ ", and confirmed All, trying to change mode to valid");
 			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
 			// send confirmOndemandSetup(...) no need to send confirm!!(because ondemand only concerns two components)
@@ -610,9 +610,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 	private boolean sendReqOndemandSetup(Set<String> parentComps,
 			String hostComp) {
-		LOGGER.info("sendReqOndemandSetup(...) to parent components:");
+		LOGGER.fine("sendReqOndemandSetup(...) to parent components:");
 		for (String component : parentComps)
-			LOGGER.info("\t" + component);
+			LOGGER.fine("\t" + component);
 
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
