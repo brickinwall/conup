@@ -39,7 +39,7 @@ public class DeviationExp {
 		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/deviation/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + expType + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
+		fileName = algorithm + "_" + freenessStrategy + "_" + "deviation" + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -72,14 +72,48 @@ public class DeviationExp {
 	
 	@Override
 	public String toString() {
-		return "Round, ThreadId, NormalResponse, UpdateResponse";
+		return "Round, ThreadId, RequestArrivalTime, NormalResponse, UpdateResponse, TimelinessTime";
 	}
 
 	public void writeToFile(int round, Map<Integer, Long> normalRes, Map<Integer, Long> updateRes) {
 		synchronized (experiment) {
 			String data = null;
-			for(int i = 1; i <= 100; i++){
+			for(int i = 1; i <= normalRes.size(); i++){
 				data = round + "," + i + "," + normalRes.get(new Integer(i)) * 1e-6 + "," + updateRes.get(new Integer(i)) * 1e-6 + "\n";
+				out.write(data);
+				out.flush();
+			}
+		}
+	}
+
+	public void writeToFile(int round, Set<RqstInfo> updateResInfos) {
+		synchronized (experiment) {
+			String data = null;
+			for(RqstInfo rqstInfo : updateResInfos){
+				data = round + ","  + rqstInfo.getThreadId() + "," + rqstInfo.getAbsoluteTime() + "," + (rqstInfo.getEndTime() - rqstInfo.getStartTime()) * 1e-6 + "\n";
+				out.write(data);
+				out.flush();
+			}
+		}
+	}
+
+	public void writeToFile(int round, Set<RqstInfo> updateResInfos, Map<Integer, Long> normalRes, double timelinessTime) {
+		synchronized (experiment) {
+			String data = null;
+			int i = 0;
+			for(RqstInfo rqstInfo : updateResInfos){
+				if(i == 0){
+					data = round + ","  + rqstInfo.getThreadId() + "," + rqstInfo.getAbsoluteTime() 
+							+ "," + normalRes.get(rqstInfo.getThreadId()) * 1e-6
+							+ "," + (rqstInfo.getEndTime() - rqstInfo.getStartTime()) * 1e-6 
+							+ "," + timelinessTime + "\n";
+				} else {
+					data = round + ","  + rqstInfo.getThreadId() + "," + rqstInfo.getAbsoluteTime() 
+							+ "," + normalRes.get(rqstInfo.getThreadId()) * 1e-6
+							+ "," + (rqstInfo.getEndTime() - rqstInfo.getStartTime()) * 1e-6 
+							+ "\n";
+				}
+				i ++;
 				out.write(data);
 				out.flush();
 			}
