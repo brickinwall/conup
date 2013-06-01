@@ -46,6 +46,10 @@ public class ResponseTimeRecorder {
 		updateRes.put(threadId, time);
 	}
 
+	public Set<RqstInfo> getUpdateResInfos() {
+		return updateResInfos;
+	}
+	
 	public double getTotalNormalResTime() {
 		long totalTime = 0;
 		Iterator<Entry<Integer, Long>> iterator;

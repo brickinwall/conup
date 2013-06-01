@@ -28,6 +28,8 @@ public class DisruptionExp {
 	private long updateStartTime = 0L;
 	private long updateEndTime = 0L;
 	private long updateCostTime = 0L;
+	private boolean updateFinished = false;
+	private CallBack callBack = null;
 
 	private DisruptionExp() {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
@@ -56,6 +58,14 @@ public class DisruptionExp {
 		}
 	}
 
+	public boolean isUpdateFinished() {
+		return updateFinished;
+	}
+
+	public void setUpdateFinished(boolean updateFinished) {
+		this.updateFinished = updateFinished;
+	}
+	
 	public long getUpdateStartTime() {
 		return updateStartTime;
 	}
@@ -70,6 +80,9 @@ public class DisruptionExp {
 
 	public void setUpdateEndTime(long updateEndTime) {
 		this.updateEndTime = updateEndTime;
+		this.updateFinished = true;
+		if(callBack != null)
+			this.callBack.callback();
 	}
 
 	public ExpSetting getExpSetting() {
@@ -145,5 +158,11 @@ public class DisruptionExp {
 	@Override
 	public String toString() {
 		return "Round, ThreadId, NormalResponse, UpdateResponse, timelinessTime";
+	}
+
+	public void setUpdateIsDoneCallBack(CallBack callBack) {
+		LOGGER.fine("setUpdateIsDoneCallBack(...) " + callBack);
+		this.callBack = callBack;
+		LOGGER.fine("setUpdateIsDoneCallBack(...) " + this.callBack);
 	}
 }
