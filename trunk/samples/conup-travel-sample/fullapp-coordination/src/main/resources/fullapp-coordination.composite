@@ -8,41 +8,41 @@
     <component name="Coordination">
     	<implementation.java class="com.tuscanyscatours.coordination.impl.CoordinationImpl" />
     	<service name="Coordination" requires="trace" policySets="traceBindingPolicySet">
-    		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12309/Coordination/Coordination" />
+    		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12309/Coordination/Coordination" />
     	</service>
     	<reference name="travelCatalogSearch" requires="trace" policySets="traceBindingPolicySet">
-    		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12305/TravelCatalogSearch/TravelCatalogSearch" />
+    		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12305/TravelCatalogSearch/TravelCatalogSearch" />
     	</reference>
     	<reference name="tripBooking" requires="trace" policySets="traceBindingPolicySet">
-    		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12306/TripBooking/TripBooking" />
+    		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12306/TripBooking/TripBooking" />
     	</reference> 
     	<reference name="cartInitialize" requires="trace" policySets="traceBindingPolicySet">
-    		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12307/ShoppingCart/CartInitialize" />
+    		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartInitialize" />
     	</reference> 
     	<reference name="cartCheckout" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://192.168.248.135:12307/ShoppingCart/CartCheckout" />
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartCheckout" />
         </reference>
     </component>
     
     <component name="TravelCatalog">
         <implementation.java class="com.tuscanyscatours.travelcatalog.impl.TravelCatalogImpl"/>
 		<service name="TravelCatalogSearch" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://192.168.248.135:12305/TravelCatalogSearch/TravelCatalogSearch" />
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12305/TravelCatalogSearch/TravelCatalogSearch" />
 		</service>
         <reference name="hotelSearch" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://192.168.248.135:12301/HotelPartner/HotelSearch" />
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelSearch" />
         </reference>
         <reference name="flightSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://192.168.248.135:12302/FlightPartner/FlightSearch" />
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightSearch" />
         </reference> 
         <reference name="carSearch" requires="trace" policySets="traceBindingPolicySet">
-         	<tuscany:binding.jsonrpc uri="http://192.168.248.135:12303/CarPartner/CarSearch"/>
+         	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarSearch"/>
         </reference>    
         <reference name="tripSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://192.168.248.135:12304/TripPartner/TripSearch" />
+            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripSearch" />
         </reference>
         <reference name="currencyConverter" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12300/CurrencyConverter/CurrencyConverter"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12300/CurrencyConverter/CurrencyConverter"/>
         </reference>
         <property name="quoteCurrencyCode">GBP</property>
     </component>
@@ -50,23 +50,24 @@
     <component name="TripBooking">
         <implementation.java class="com.tuscanyscatours.tripbooking.impl.TripBookingImpl"/>
         <service name="TripBooking" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://192.168.248.135:12306/TripBooking/TripBooking" />
+			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12306/TripBooking/TripBooking" />
 		</service>
         <reference name="hotelBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12301/HotelPartner/HotelBook"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelBook"/>
         </reference>
         <reference name="flightBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12302/FlightPartner/FlightBook"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightBook"/>
         </reference>
         <reference name="carBook" requires="trace" policySets="traceBindingPolicySet">
-       		<tuscany:binding.jsonrpc uri="http://192.168.248.135:12303/CarPartner/CarBook"/>
+       		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarBook"/>
         </reference>
         <reference name="tripBook" requires="trace" policySets="traceBindingPolicySet">  
-        	<tuscany:binding.jsonrpc uri="http://192.168.248.135:12304/TripPartner/TripBook"/>
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12304/TripPartner/TripBook"/>
         </reference>
         <reference name="cartUpdates" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://192.168.248.135:12307/ShoppingCart/CartUpdates" />
+        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartUpdates" />
         </reference>
     </component>
     
 </composite>
+
