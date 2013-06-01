@@ -6,11 +6,9 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
-import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 
 
 public class CoordinationVisitorThread extends Thread{
@@ -23,6 +21,7 @@ public class CoordinationVisitorThread extends Thread{
 	private ResponseTimeRecorder resTimeRec;
 	private TimelinessRecorder timelinessRec;
 	private String execType;
+	private Long rqstAbsoluteStartTime = null;
 	
 	public CoordinationVisitorThread(Node node) {
 		this.node = node;
@@ -38,6 +37,13 @@ public class CoordinationVisitorThread extends Thread{
 		this.threadId = threadId;
 	}
 	
+	public CoordinationVisitorThread(Node node, int threadId, ResponseTimeRecorder resTimeRec, String execType){
+		this.node = node;
+		this.threadId = threadId;
+		this.resTimeRec = resTimeRec;
+		this.execType = execType;
+	}
+	
 	public CoordinationVisitorThread(Node node, CountDownLatch countDown, int threadId, ResponseTimeRecorder resTimeRec, String execType){
 		this.node = node;
 		this.countDown = countDown;
@@ -46,17 +52,24 @@ public class CoordinationVisitorThread extends Thread{
 		this.execType = execType;
 	}
 	
-	public CoordinationVisitorThread(Node node,int roundId, int threadId){
+	public CoordinationVisitorThread(Node node, int threadId,ResponseTimeRecorder resTimeRec, String execType, long rqstAbsoluteStartTime) {
 		this.node = node;
-		this.roundId = roundId;
 		this.threadId = threadId;
+		this.resTimeRec = resTimeRec;
+		this.execType = execType;
+		this.rqstAbsoluteStartTime = rqstAbsoluteStartTime;
 	}
 
-	public CoordinationVisitorThread(Node node,CountDownLatch countDown, int threadId, TimelinessRecorder timelinessRec) {
+	public CoordinationVisitorThread(Node node,
+			CountDownLatch updateCountDown, int threadId,
+			ResponseTimeRecorder resTimeRec, String execType, long rqstAbsoluteStartTime) {
+		
 		this.node = node;
-		this.countDown = countDown;
+		this.countDown = updateCountDown;
 		this.threadId = threadId;
-		this.timelinessRec = timelinessRec;
+		this.resTimeRec = resTimeRec;
+		this.execType = execType;
+		this.rqstAbsoluteStartTime = rqstAbsoluteStartTime;
 	}
 
 	public void run() {
@@ -66,7 +79,8 @@ public class CoordinationVisitorThread extends Thread{
 			long startTime = System.nanoTime();
 			scaTour.coordinate();
 			long endTime = System.nanoTime();
-			countDown.countDown();
+			if(countDown != null)
+				countDown.countDown();
 			
 			if (resTimeRec != null) {
 				if (execType == null){
@@ -79,7 +93,11 @@ public class CoordinationVisitorThread extends Thread{
 				}
 				else if (execType.equals("update")){
 					resTimeRec.addUpdateResponse(threadId, endTime - startTime);
-					resTimeRec.addUpdateResInfo(new RqstInfo(threadId, startTime, endTime));
+					if(rqstAbsoluteStartTime != null)
+						resTimeRec.addUpdateResInfo(new RqstInfo(threadId, startTime, endTime, rqstAbsoluteStartTime));
+					else{
+						resTimeRec.addUpdateResInfo(new RqstInfo(threadId, startTime, endTime));
+					}
 					System.out.println("update threadId:" + threadId + " response time:" + (endTime - startTime) * 1e-6);
 				}
 			} else{
