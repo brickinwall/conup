@@ -22,22 +22,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 
-import org.oasisopen.sca.ComponentContext;
-import org.oasisopen.sca.RequestContext;
-import org.oasisopen.sca.ServiceReference;
-import org.oasisopen.sca.annotation.Callback;
-import org.oasisopen.sca.annotation.Context;
 import org.oasisopen.sca.annotation.Property;
 import org.oasisopen.sca.annotation.Reference;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 
 import com.tuscanyscatours.car.impl.CarSearch;
-import com.tuscanyscatours.common.SearchCallback;
 import com.tuscanyscatours.common.TripItem;
 import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.currencyconverter.CurrencyConverter;
@@ -139,8 +131,7 @@ public class TravelCatalogImpl implements TravelCatalogSearch {
         for (TripItem tripItem : searchResults) {
             tripItem.setId(UUID.randomUUID().toString());
             tripItem.setTripId(tripLeg.getId());
-            tripItem
-                .setPrice(currencyConverter.convert(tripItem.getCurrency(), quoteCurrencyCode, tripItem.getPrice()));
+            tripItem.setPrice(currencyConverter.convert(tripItem.getCurrency(), quoteCurrencyCode, tripItem.getPrice()));
             tripItem.setCurrency(quoteCurrencyCode);
         }
 
