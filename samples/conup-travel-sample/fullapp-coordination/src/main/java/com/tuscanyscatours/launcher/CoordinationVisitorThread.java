@@ -6,11 +6,9 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.ResponseTimeRecorder;
-import cn.edu.nju.moon.conup.ext.utils.experiments.TimelinessRecorder;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 
 import com.tuscanyscatours.coordination.Coordination;
 
@@ -47,6 +45,20 @@ public class CoordinationVisitorThread extends Thread{
 		this.execType = execType;
 	}
 	
+	public CoordinationVisitorThread(Node node, CountDownLatch countDown, int threadId, ResponseTimeRecorder resTimeRec){
+		this.node = node;
+		this.countDown = countDown;
+		this.threadId = threadId;
+		this.resTimeRec = resTimeRec;
+	}
+	
+	public CoordinationVisitorThread(Node node, int threadId, ResponseTimeRecorder resTimeRec, String execType){
+		this.node = node;
+		this.threadId = threadId;
+		this.resTimeRec = resTimeRec;
+		this.execType = execType;
+	}
+	
 	public CoordinationVisitorThread(Node node,int roundId, int threadId){
 		this.node = node;
 		this.roundId = roundId;
@@ -74,7 +86,8 @@ public class CoordinationVisitorThread extends Thread{
 			long startTime = System.nanoTime();
 			scaTour.coordinate();
 			long endTime = System.nanoTime();
-			countDown.countDown();
+			if(countDown != null)
+				countDown.countDown();
 			
 			if (resTimeRec != null) {
 				if (execType == null){
