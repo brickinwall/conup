@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
@@ -24,8 +20,7 @@ public class CorrectnessExp {
 	private static CorrectnessExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
-	private int nThreads;
-	private int threadId;
+	private CallBack callBack = null;
 	
 	// update startTime, endTime
 	private long updateStartTime = 0L;
@@ -40,14 +35,12 @@ public class CorrectnessExp {
 		String freenessStrategy = xmlUtil.getFreenessStrategy();
 		freenessStrategy = freenessStrategy.substring(0, freenessStrategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
-		nThreads = expSetting.getnThreads();
-		threadId = expSetting.getThreadId();
 		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/correctness/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + "correctness" + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
+		fileName = algorithm + "_" + freenessStrategy + "_" + "correctness" + "_"  + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
@@ -57,10 +50,6 @@ public class CorrectnessExp {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public ExpSetting getExpSetting() {
-		return expSetting;
 	}
 
 	public static CorrectnessExp getInstance() {
@@ -88,6 +77,7 @@ public class CorrectnessExp {
 	
 	@Override
 	public String toString() {
-		return "Round, InconsistentRequests, totalRequest";
+		return "Round, InconsistentReqs, DisruptedReqs";
 	}
+
 }
