@@ -19,6 +19,7 @@ import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
+import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -430,6 +431,9 @@ public class CompLifecycleManager {
 			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
 		} else if(opTyep.equals(TuscanyOperationType.GET_UPDATE_ENDTIME)){
 			return Long.toString(PerformanceRecorder.getInstance(compIdentifier).getUpdateEndTime());
+		} else if(opTyep.equals(TuscanyOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP)){
+			DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
+			return "ok";
 		} else{
 			LOGGER.warning("unsupported operation type for experiment");
 		}
