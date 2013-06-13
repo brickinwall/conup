@@ -9,7 +9,7 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.Experiment;
+import cn.edu.nju.moon.conup.ext.utils.experiments.Experiment;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
