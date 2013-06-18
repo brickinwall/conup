@@ -38,9 +38,11 @@ public class PackagedtripLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("TripPartner", "oldVersion");
-//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("TripPartner").setNode(node);
 		CommServerManager.getInstance().start("TripPartner");
+
+//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetupIsDone();
 
 		// launch DepRecorder
 		DepRecorder depRecorder;

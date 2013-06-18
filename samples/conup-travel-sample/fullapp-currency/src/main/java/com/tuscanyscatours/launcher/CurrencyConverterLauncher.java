@@ -42,10 +42,12 @@ public class CurrencyConverterLauncher {
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf("CurrencyConverter", "oldVersion");
-//        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetupIsDone();
         CompLifecycleManager.getInstance("CurrencyConverter").setNode(node);
         CommServerManager.getInstance().start("CurrencyConverter");
         
+//        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetting();
+//        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetupIsDone();
+
         //launch DepRecorder
         DepRecorder depRecorder;
         depRecorder = DepRecorder.getInstance();

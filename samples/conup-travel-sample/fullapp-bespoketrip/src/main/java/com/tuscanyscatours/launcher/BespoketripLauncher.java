@@ -40,19 +40,24 @@ public class BespoketripLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("HotelPartner", "oldVersion");
-		//nodeMgr.getDynamicDepManager("HotelPartner").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("HotelPartner").setNode(node);
 		CommServerManager.getInstance().start("HotelPartner");
 
 		nodeMgr.loadConupConf("FlightPartner", "oldVersion");
-//		nodeMgr.getDynamicDepManager("FlightPartner").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("FlightPartner").setNode(node);
 		CommServerManager.getInstance().start("FlightPartner");
 		
 		nodeMgr.loadConupConf("CarPartner", "oldVersion");
-//		nodeMgr.getDynamicDepManager("CarPartner").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("CarPartner").setNode(node);
 		CommServerManager.getInstance().start("CarPartner");
+
+//		nodeMgr.getDynamicDepManager("HotelPartner").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("FlightPartner").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("CarPartner").ondemandSetting();
+//		
+//		nodeMgr.getDynamicDepManager("HotelPartner").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("FlightPartner").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("CarPartner").ondemandSetupIsDone();
 
 		// launch DepRecorder
 		DepRecorder depRecorder;
