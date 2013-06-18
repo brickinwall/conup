@@ -72,7 +72,7 @@ public class TripImpl implements TripSearch, TripBook {
 		txContextInCache = interceptorCache.getTxCtx(threadID);
 		rootTx = txContextInCache.getRootTx();
 		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "searchSynch." + COMP_VER;
+		exeProc = "TripPartner.searchSynch." + COMP_VER;
 		exeRecorder.addAction(rootTx, exeProc);
 		
         List<TripItem> items = new ArrayList<TripItem>();
@@ -130,7 +130,7 @@ public class TripImpl implements TripSearch, TripBook {
 		txContextInCache = interceptorCache.getTxCtx(threadID);
 		rootTx = txContextInCache.getRootTx();
 		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "book." + COMP_VER;
+		exeProc = "TripPartner.book." + COMP_VER;
 		exeRecorder.addAction(rootTx, exeProc);
 		
         return "trip1";
