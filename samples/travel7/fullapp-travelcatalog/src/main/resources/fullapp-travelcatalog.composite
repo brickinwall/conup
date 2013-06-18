@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+		xmlns:tuscany="http://tuscany.apache.org/xmlns/sca/1.1"
+		xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+           targetNamespace="http://tuscanyscatours.com/"
+           name="fullapp-travelcatalog">
+    
+    <component name="TravelCatalog">
+        <implementation.java class="com.tuscanyscatours.travelcatalog.impl.TravelCatalogImpl"/>
+		<service name="TravelCatalogSearch" requires="trace" policySets="traceBindingPolicySet">
+			<tuscany:binding.jsonrpc uri="http://114.212.191.25:12305/TravelCatalogSearch/TravelCatalogSearch" />
+		</service>
+        <reference name="hotelSearch" requires="trace" policySets="traceBindingPolicySet">
+        	<tuscany:binding.jsonrpc uri="http://114.212.191.23:12301/HotelPartner/HotelSearch" />
+        </reference>
+        <reference name="flightSearch" requires="trace" policySets="traceBindingPolicySet">
+            <tuscany:binding.jsonrpc uri="http://114.212.191.23:12302/FlightPartner/FlightSearch" />
+        </reference> 
+        <reference name="carSearch" requires="trace" policySets="traceBindingPolicySet">
+         	<tuscany:binding.jsonrpc uri="http://114.212.191.23:12303/CarPartner/CarSearch"/>
+        </reference>    
+        <reference name="tripSearch" requires="trace" policySets="traceBindingPolicySet">
+            <tuscany:binding.jsonrpc uri="http://114.212.191.24:12304/TripPartner/TripSearch" />
+        </reference>
+        <reference name="currencyConverter" requires="trace" policySets="traceBindingPolicySet">
+       		<tuscany:binding.jsonrpc uri="http://114.212.191.14:12300/CurrencyConverter/CurrencyConverter"/>
+        </reference>
+        <property name="quoteCurrencyCode">GBP</property>
+    </component>
+
+</composite>
