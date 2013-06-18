@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE conup [
+<!ENTITY experiment SYSTEM "ExpSetting.xml">
+]>
+<conup>
+	<configuration>
+		<algorithms>
+			<algorithm enable="yes">CONSISTENCY_ALGORITHM</algorithm>
+			<algorithm enable="no">TRANQUILLITY_ALGORITHM</algorithm>
+			<algorithm enable="no">QUIESCENCE_ALGORITHM</algorithm>
+		</algorithms>
+		<freenessStrategies>
+			<freenessStrategy enable="no">BLOCKING_FOR_FREENESS</freenessStrategy>
+			<freenessStrategy enable="yes">CONCURRENT_VERSION_FOR_FREENESS</freenessStrategy>
+			<freenessStrategy enable="no">WAITING_FOR_FREENESS</freenessStrategy>
+		</freenessStrategies>
+	</configuration>
+
+&experiment;
+	<staticDeps>
+		<!-- paper sample-->
+		<component name="PortalComponent">
+			<child>AuthComponent</child>
+			<child>ProcComponent</child>
+		</component>
+	
+		<component name="ProcComponent">
+			<parent>PortalComponent</parent>
+			<child>AuthComponent</child>
+			<child>DBComponent</child>
+		</component>
+		
+		<component name="AuthComponent">
+			<parent>PortalComponent</parent>
+			<parent>ProcComponent</parent>
+		</component>
+		
+		<component name="DBComponent">
+			<parent>ProcComponent</parent>
+		</component>
+
+	</staticDeps>
+
+</conup>
