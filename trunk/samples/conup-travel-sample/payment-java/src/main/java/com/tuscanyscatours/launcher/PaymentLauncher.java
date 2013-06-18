@@ -56,12 +56,23 @@ public class PaymentLauncher {
         CompLifecycleManager.getInstance("CreditCardPayment").setNode(node);
         CommServerManager.getInstance().start("CreditCardPayment");
         
+//        nodeMgr.getDynamicDepManager("Payment").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("CustomerRegistry").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("EmailGateway").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("CreditCardPayment").ondemandSetting();
+//		
+//		nodeMgr.getDynamicDepManager("Payment").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("CustomerRegistry").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("EmailGateway").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("CreditCardPayment").ondemandSetupIsDone();
+
+        
         //launch DepRecorder
         DepRecorder depRecorder;
         depRecorder = DepRecorder.getInstance();
         
         //access
-        accessServices(node);
+//        accessServices(node);
 	}
 	
 	public static void accessServices(Node node){
@@ -69,7 +80,7 @@ public class PaymentLauncher {
 			System.out
 					.println("\nTry to access Payment#service-binding(Payment/Payment):");
 			Payment payment = node.getService(Payment.class, "Payment/Payment");
-			LOGGER.fine(payment.makePaymentMember("c-0", 1000));
+			LOGGER.info(payment.makePaymentMember("c-0", 1000));
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
 		}

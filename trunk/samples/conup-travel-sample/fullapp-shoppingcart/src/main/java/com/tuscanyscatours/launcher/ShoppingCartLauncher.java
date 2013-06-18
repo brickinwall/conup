@@ -43,14 +43,18 @@ public class ShoppingCartLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("ShoppingCart", "oldVersion");
-//		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("ShoppingCart").setNode(node);
 		CommServerManager.getInstance().start("ShoppingCart");
 		
 		nodeMgr.loadConupConf("CartStore", "oldVersion");
-//		nodeMgr.getDynamicDepManager("CartStore").ondemandSetupIsDone();
 		CompLifecycleManager.getInstance("CartStore").setNode(node);
 		CommServerManager.getInstance().start("CartStore");
+		
+//		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetting();
+//		nodeMgr.getDynamicDepManager("CartStore").ondemandSetting();
+//
+//		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager("CartStore").ondemandSetupIsDone();
 
 		// launch DepRecorder
 		DepRecorder depRecorder;
