@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>org.apache.tuscany.sca</groupId>
 		<artifactId>tuscany-sca</artifactId>
-		<version>0.9.1-DU-SNAPSHOT</version>
+		<version>0.9.5-DU</version>
 	</parent>
 
 	<groupId>org.apache.tuscany.sca.samples</groupId>
 	<artifactId>tuscany-distribution</artifactId>
-	<version>0.9.1-DU-SNAPSHOT</version>
+	<version>0.9.5-DU</version>
 	<packaging>pom</packaging>
 	<name>Conup distributions</name>
 
