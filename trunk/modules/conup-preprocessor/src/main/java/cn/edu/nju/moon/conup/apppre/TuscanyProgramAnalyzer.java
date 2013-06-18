@@ -334,15 +334,20 @@ public class TuscanyProgramAnalyzer {
 			TuscanyProgramAnalyzer analyse = new TuscanyProgramAnalyzer();			
 			
 			List<String> targetProjs = new ArrayList<String>();
-			targetProjs.add("fullapp-bespoketrip");
-			targetProjs.add("fullapp-coordination");
-			targetProjs.add("fullapp-currency");
-			targetProjs.add("fullapp-packagedtrip");
-			targetProjs.add("fullapp-shoppingcart");
-			targetProjs.add("payment-java");
-			//targetProjs.add("fullapp-bank");
+			targetProjs.add("conup-travel-sample/fullapp-bespoketrip");
+			targetProjs.add("conup-travel-sample/fullapp-coordination");
+			targetProjs.add("conup-travel-sample/fullapp-currency");
+			targetProjs.add("conup-travel-sample/fullapp-packagedtrip");
+			targetProjs.add("conup-travel-sample/fullapp-shoppingcart");
+			targetProjs.add("conup-travel-sample/fullapp-bank");
+			targetProjs.add("conup-travel-sample/payment-java");
 			
-			String baseDir = "/home/valerio/workspace/conUp/tuscany-sca/samples/conup-travel-sample/";
+			targetProjs.add("authUpdate/conup-sample-auth");
+			targetProjs.add("authUpdate/conup-sample-db");
+			targetProjs.add("authUpdate/conup-sample-portal");
+			targetProjs.add("authUpdate/conup-sample-proc");
+			
+			String baseDir = "/home/artemis/Tuscany/samples/";
 			for(String projLoc : targetProjs){
 				projLoc = baseDir + projLoc + "/target/classes";
 				analyse.analyzeApplication(projLoc, "");
