@@ -115,10 +115,11 @@
 		<module>maven/archetypes</module> 
                 <module>testing/compliance-tests</module>
                 -->
+		<module>distribution</module>
 		<module>maven/archetypes</module>
 		<module>samples</module>
                 <module>modules</module>
-		<module>distribution</module>
+		
             </modules>
         </profile>
         <!-- ====================================================================== -->
