@@ -20,7 +20,7 @@ public class Printer {
 	}
 	
 	public void printDeps(Set<Dependence> deps, String type){
-//		LOGGER.info("Deps:" + type);
+//		LOGGER.fine("Deps:" + type);
 		String result = "Deps:" + type + "\n\t";
 		for (Iterator<Dependence> iterator = deps.iterator(); iterator.hasNext();) {
 			Dependence dependence = (Dependence) iterator.next();
@@ -30,17 +30,17 @@ public class Printer {
 	}
 	
 	public void printDeps(Logger LOGGER, Set<Dependence> deps, String type){
-//		LOGGER.info("Deps:" + type);
+//		LOGGER.fine("Deps:" + type);
 		String result = "Deps:" + type + "\n\t";
 		for (Iterator<Dependence> iterator = deps.iterator(); iterator.hasNext();) {
 			Dependence dependence = (Dependence) iterator.next();
 			result += dependence + "\n\t";
 		}
-		LOGGER.info(result);
+		LOGGER.fine(result);
 	}
 	
 	public void printTxs(Map<String, TransactionContext> txs){
-//		LOGGER.info("Txs:");
+//		LOGGER.fine("Txs:");
 		Iterator<Entry<String, TransactionContext>> txsIterator = txs.entrySet().iterator();
 		String result = "Txs:\n\t";
 		while(txsIterator.hasNext()){
@@ -49,7 +49,7 @@ public class Printer {
 			TransactionContext tc = entry.getValue();
 			result += tc.toString() + "\n\t";
 		}
-		LOGGER.info(result);
+		LOGGER.fine(result);
 	}
 	
 	public void printTxs(Logger LOGGER, Map<String, TransactionContext> txs){
