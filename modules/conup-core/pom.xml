@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-core</artifactId>
-	<version>0.9.5-DU</version>
+	<version>0.9.6-DU-SNAPSHOT</version>
 	<name>conup-core</name>
 	<description>conup-core</description>
 
@@ -26,12 +26,12 @@
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>0.9.5-DU</version>
+			<version>0.9.6-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-communication-api</artifactId>
-			<version>0.9.5-DU</version>
+			<version>0.9.6-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
