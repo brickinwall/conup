@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import cn.edu.nju.moon.conup.comm.api.peer.services.DepNotifyService;
 import cn.edu.nju.moon.conup.comm.api.peer.services.impl.DepNotifyServiceImpl;
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
-import cn.edu.nju.moon.conup.core.TransactionRegistry;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
@@ -23,7 +22,7 @@ import cn.edu.nju.moon.conup.core.utils.TranquillityOndemandPayloadResolver;
 import cn.edu.nju.moon.conup.core.utils.TranquillityOperationType;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayload;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayloadCreator;
-import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
+import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -31,6 +30,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -827,6 +827,9 @@ public class TranquillityImpl implements Algorithm {
 			depNotifyService.asynPost(hostComp, comp, CommProtocol.TRANQUILLITY,
 					MsgType.DEPENDENCE_MSG, payload);
 		}
+		
+		// for experiment
+		//notifyCoordinationUpdateIsDone(hostComp);
 
 		// clear local deps
 		depMgr.getRuntimeDeps().clear();
@@ -834,6 +837,13 @@ public class TranquillityImpl implements Algorithm {
 //		depMgr.setScope(null);
 		
 		return true;
+	}
+
+	private void notifyCoordinationUpdateIsDone(String hostComp) {
+		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+		String payload = TuscanyPayloadCreator.createPayload(TuscanyOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP, "Coordination");
+		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.TRANQUILLITY,
+				MsgType.EXPERIMENT_MSG, payload);
 	}
 
 	@Override
