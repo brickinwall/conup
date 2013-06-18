@@ -22,11 +22,11 @@
     <parent>
         <groupId>org.apache.tuscany.sca.samples</groupId>
         <artifactId>tuscany-samples</artifactId>
-        <version>0.9.1-DU-SNAPSHOT</version>
+        <version>0.9.5-DU</version>
     </parent>
 
     <artifactId>authUpdate</artifactId>
-    <version>0.9.1-DU-SNAPSHOT</version>
+    <version>0.9.5-DU</version>
     <packaging>pom</packaging>
     <name>Conup update samples</name>
 

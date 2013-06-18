@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-remote-configuration</artifactId>
-	<version>0.9.1-DU-SNAPSHOT</version>
+	<version>0.9.5-DU</version>
 	<name>conup-remote-configuration</name>
 	<description>conup-remote-configuration</description>
 
@@ -15,12 +15,12 @@
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-communication</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 	</dependencies>
 

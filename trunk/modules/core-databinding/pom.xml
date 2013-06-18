@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.tuscany.sca</groupId>
         <artifactId>tuscany-modules</artifactId>
-        <version>0.9.1-DU-SNAPSHOT</version>
+        <version>0.9.5-DU</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.apache.tuscany.sca</groupId>
             <artifactId>tuscany-core</artifactId>
-            <version>0.9.1-DU-SNAPSHOT</version>
+            <version>0.9.5-DU</version>
             <scope>compile</scope>
         </dependency>
         

@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tuscanyscatours</groupId>
 	<artifactId>fullapp-shoppingcart</artifactId>
-	<version>0.9.1-DU-SNAPSHOT</version>
+	<version>0.9.5-DU</version>
 
 	<properties>
 		<module.name>travel-sample/shoppingcart</module.name>
@@ -84,7 +83,7 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -95,32 +94,32 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-implementation-java-runtime</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-spi</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-trace</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-communication-api</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-remote-configuration</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
         <dependency>
 			<groupId>com.tuscanyscatours</groupId>
 			<artifactId>common</artifactId>
-			<version>0.9.1-DU-SNAPSHOT</version>
+			<version>0.9.5-DU</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -203,8 +202,7 @@
 								<delete dir="target/module" />
 								<property name="module.dir" value="samples/${module.path}/" />
 
-								<copy file="target/${project.artifactId}-${project.version}.jar"
-									tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
+								<copy file="target/${project.artifactId}-${project.version}.jar" tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
 
 								<echo>Module ${module.name} has been created in the	TUSCANY_HOME/samples directory.</echo>
 							</target>
