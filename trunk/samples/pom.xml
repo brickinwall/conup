@@ -33,8 +33,9 @@
 
     <modules>
         <module>authUpdate</module>
-	<module>conup-travel-sample</module>
+	<module>travel7</module>
 		<!--
+	<module>conup-travel-sample</module>
         <module>getting-started</module>
         <module>running-tuscany</module>
 		<module>learning-more</module>
