@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tuscanyscatours</groupId>
 	<artifactId>common</artifactId>
-	<version>0.9.5-DU</version>
+	<version>0.9.6-DU-SNAPSHOT</version>
 
 	<properties>
 		<module.name>travel-common</module.name>

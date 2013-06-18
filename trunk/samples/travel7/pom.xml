@@ -5,11 +5,11 @@
     <parent>
         <groupId>org.apache.tuscany.sca.samples</groupId>
         <artifactId>tuscany-samples</artifactId>
-        <version>0.9.5-DU</version>
+        <version>0.9.6-DU-SNAPSHOT</version>
     </parent>
 
     <artifactId>conup-travel-sample</artifactId>
-    <version>0.9.5-DU</version>
+    <version>0.9.6-DU-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Conup sca tours samples</name>
 

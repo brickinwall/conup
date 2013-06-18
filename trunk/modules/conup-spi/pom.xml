@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.edu.nju.moon</groupId>
 	<artifactId>conup-spi</artifactId>
-	<version>0.9.5-DU</version>
+	<version>0.9.6-DU-SNAPSHOT</version>
 	<name>conup-spi</name>
 	<description>conup-spi</description>
 
