@@ -245,6 +245,7 @@ public class MethodAnalyzer {
 			LocalVariableNode selfNode = this.findVariableLabel(mn, "this");
 			LabelNode start = selfNode.start;
 			LabelNode last = selfNode.end;
+			
 			if (com.size() == 0) {				
 				start = this.transformWhenNoInvocation(cn, insns, localNum);
 			} 
@@ -296,6 +297,7 @@ public class MethodAnalyzer {
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 								"getInstance",
 								"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
+						
 						setUp.add(new MethodInsnNode(
 								INVOKEVIRTUAL,
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
@@ -329,10 +331,11 @@ public class MethodAnalyzer {
 								"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 
 						trig.add(new LdcInsnNode(cominf.get(com)));
+						trig.add(new VarInsnNode(ALOAD, localNum+1));
 						trig.add(new MethodInsnNode(
 								INVOKEVIRTUAL,
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-								"trigger", "(Ljava/lang/String;)V"));
+								"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 						AbstractInsnNode ilPost = com.getNext();
 						int op = ilPost.getOpcode();
 						// save the results of the method invocation
@@ -384,11 +387,13 @@ public class MethodAnalyzer {
 												"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 
 										trig.add(new LdcInsnNode(jumpE));
+										trig.add(new VarInsnNode(ALOAD,
+												localNum+1));
 										trig.add(new MethodInsnNode(
 												INVOKEVIRTUAL,
 												"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 												"trigger",
-												"(Ljava/lang/String;)V"));
+												"(Ljava/lang/String;Ljava/lang/String;)V"));
 										insns.insert(src, trig);
 									}
 								} else {
@@ -465,10 +470,11 @@ public class MethodAnalyzer {
 										"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 
 								trig.add(new LdcInsnNode(jumpE));
+								trig.add(new VarInsnNode(ALOAD, localNum+1));
 								trig.add(new MethodInsnNode(
 										INVOKEVIRTUAL,
 										"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-										"trigger", "(Ljava/lang/String;)V"));
+										"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 								insns.insertBefore(ilPost, trig);
 							}
 						}
@@ -487,10 +493,11 @@ public class MethodAnalyzer {
 								"getInstance",
 								"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 						trig.add(new LdcInsnNode(""));
+						trig.add(new VarInsnNode(ALOAD, localNum+1));
 						trig.add(new MethodInsnNode(
 								INVOKEVIRTUAL,
 								"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-								"trigger", "(Ljava/lang/String;)V"));
+								"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 						int op = end.getOpcode();
 						if(op == RETURN){							
 							insns.insertBefore(end, trig);							
@@ -524,16 +531,24 @@ public class MethodAnalyzer {
 	public LabelNode transformWhenNoInvocation(ClassNode cn, InsnList insns, int localNum){
 		// insert transaction id
 		InsnList trigstart = new InsnList();
-		LabelNode startLabel = new LabelNode();
+		LabelNode startLabel = new LabelNode();		
 		trigstart.add(startLabel);
 		trigstart.add(new VarInsnNode(ALOAD, 0));
 		trigstart
 				.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr, TxlcMgrDesc));
-		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc.substring(
+		trigstart.add(new MethodInsnNode(INVOKEINTERFACE, TxlcMgrDesc.substring(
 				1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
 		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
+		//insert getComponentIdentifier
+		trigstart.add(new VarInsnNode(ALOAD, 0));
+		trigstart
+				.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr, TxlcMgrDesc));
+		trigstart.add(new MethodInsnNode(INVOKEINTERFACE, TxlcMgrDesc.substring(
+				1, TxlcMgrDesc.length() - 1), "getCompIdentifier", "()Ljava/lang/String;"));
+		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		trigstart.add(new VarInsnNode(ASTORE, localNum+1));
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode("_E"));
@@ -546,9 +561,11 @@ public class MethodAnalyzer {
 						"getInstance",
 						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 		trigstart.add(new LdcInsnNode("Start"));
-		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL,
+		trigstart.add(new VarInsnNode(ALOAD, localNum+1));
+		trigstart.add(new MethodInsnNode(
+				INVOKEVIRTUAL,
 				"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-				"trigger", "(Ljava/lang/String;)V"));
+				"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 		insns.insertBefore(insns.getFirst(), trigstart);
 		Iterator<AbstractInsnNode> i = insns.iterator();
 		while(i.hasNext()){
@@ -564,10 +581,11 @@ public class MethodAnalyzer {
 						"getInstance",
 						"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 				trig.add(new LdcInsnNode(""));
+				trig.add(new VarInsnNode(ALOAD, localNum+1));
 				trig.add(new MethodInsnNode(
 						INVOKEVIRTUAL,
 						"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-						"trigger", "(Ljava/lang/String;)V"));
+						"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 				if(node.getOpcode() == RETURN){
 					insns.insertBefore(node, trig);
 				}
@@ -606,11 +624,20 @@ public class MethodAnalyzer {
 		trigstart.add(new VarInsnNode(ALOAD, 0));
 		trigstart.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr,
 				TxlcMgrDesc));
-		trigstart.add(new MethodInsnNode(INVOKEVIRTUAL, TxlcMgrDesc
+		trigstart.add(new MethodInsnNode(INVOKEINTERFACE, TxlcMgrDesc
 				.substring(1, TxlcMgrDesc.length() - 1), "createID",
 				"()Ljava/lang/String;"));
 		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
 		trigstart.add(new VarInsnNode(ASTORE, localNum));
+		////////////////////////
+		trigstart.add(new VarInsnNode(ALOAD, 0));
+		trigstart
+				.add(new FieldInsnNode(GETFIELD, cn.name, TxlcMgr, TxlcMgrDesc));
+		trigstart.add(new MethodInsnNode(INVOKEINTERFACE, TxlcMgrDesc.substring(
+				1, TxlcMgrDesc.length() - 1), "getCompIdentifier", "()Ljava/lang/String;"));
+		// System.out.println("TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1) = "+TxlcMgrDesc.substring(1,TxlcMgrDesc.length()-1));
+		trigstart.add(new VarInsnNode(ASTORE, localNum+1));
+		
 		// insert start inf
 		trigstart.add(new VarInsnNode(ALOAD, localNum));
 		trigstart.add(new LdcInsnNode(statesDDA));
@@ -623,11 +650,11 @@ public class MethodAnalyzer {
 						"getInstance",
 						"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 		trigstart.add(new LdcInsnNode("Start"));
-		trigstart
-				.add(new MethodInsnNode(
-						INVOKEVIRTUAL,
-						"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-						"trigger", "(Ljava/lang/String;)V"));
+		trigstart.add(new VarInsnNode(ALOAD, localNum+1));
+		trigstart.add(new MethodInsnNode(
+				INVOKEVIRTUAL,
+				"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
+				"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 		insns.insertBefore(insns.getFirst(), trigstart);
 		return startLabel;
 	}
@@ -657,10 +684,11 @@ public class MethodAnalyzer {
 					"getInstance",
 					"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 			trig.add(new LdcInsnNode(jumpE));
+			trig.add(new VarInsnNode(ALOAD, localNum+1));
 			trig.add(new MethodInsnNode(
 					INVOKEVIRTUAL,
 					"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-					"trigger", "(Ljava/lang/String;)V"));
+					"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 			insns.insertBefore(sourceLabel, trig);
 		} else {		
 			trig.add(new JumpInsnNode(GOTO, sourceLabel));
@@ -674,10 +702,11 @@ public class MethodAnalyzer {
 					"getInstance",
 					"(Ljava/lang/String;)Lcn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager;"));
 			trig.add(new LdcInsnNode(jumpE));
+			trig.add(new VarInsnNode(ALOAD, localNum+1));
 			trig.add(new MethodInsnNode(
 					INVOKEVIRTUAL,
 					"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
-					"trigger", "(Ljava/lang/String;)V"));			
+					"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));		
 			insns.insertBefore(sourceLabel, trig);
 		}
 		return nextOne;

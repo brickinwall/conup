@@ -46,7 +46,7 @@ public class TuscanyProgramAnalyzer {
 	 * id.
 	 */
 	String fieldName = "_txLifecycleMgr";
-	String fieldDesc = "Lcn/edu/nju/moon/conup/spi/datamodel/TxLifecycleManager;";
+	String fieldDesc = "Lcn/edu/nju/moon/conup/spi/tx/TxLifecycleManager;";
 	
 //	public List<String> getAllServices(){
 //		return allServices;
@@ -347,7 +347,7 @@ public class TuscanyProgramAnalyzer {
 			targetProjs.add("authUpdate/conup-sample-portal");
 			targetProjs.add("authUpdate/conup-sample-proc");
 			
-			String baseDir = "/home/artemis/Tuscany/samples/";
+			String baseDir = "/home/artemis/Documents/conup/samples/";
 			for(String projLoc : targetProjs){
 				projLoc = baseDir + projLoc + "/target/classes";
 				analyse.analyzeApplication(projLoc, "");
