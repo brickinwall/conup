@@ -11,9 +11,14 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class LaunchPortal {
@@ -37,9 +42,19 @@ public class LaunchPortal {
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf("PortalComponent", "oldVersion");
+        ComponentObject compObj = nodeMgr.getComponentObject("PortalComponent");
 //        nodeMgr.getDynamicDepManager("PortalComponent").ondemandSetupIsDone();
         
-        CompLifecycleManager.getInstance("PortalComponent").setNode(node);
+//        CompLifecycleManagerImpl.getInstance("PortalComponent").setNode(node);
+        
+        CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+		compLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("PortalComponent", compLifecycleManager);
+		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+		nodeMgr.setTxDepMonitor("PortalComponent", txDepMonitor);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		nodeMgr.setTxLifecycleManager("PortalComponent", txLifecycleMgr);
+		
         CommServerManager.getInstance().start("PortalComponent");
         
         //launch DepRecorder

@@ -9,11 +9,17 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.sample.proc.services.ProcService;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 public class LaunchProc {
 	private static Logger LOGGER = Logger.getLogger(LaunchProc.class.getName());
@@ -42,9 +48,18 @@ public class LaunchProc {
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf("ProcComponent", "oldVersion");
+        ComponentObject compObj = nodeMgr.getComponentObject("ProcComponent");
 //        nodeMgr.getDynamicDepManager("ProcComponent").ondemandSetupIsDone();
 
-        CompLifecycleManager.getInstance("ProcComponent").setNode(node);
+//        CompLifecycleManagerImpl.getInstance("ProcComponent").setNode(node);
+        
+        CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+		compLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("ProcComponent", compLifecycleManager);
+		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+		nodeMgr.setTxDepMonitor("ProcComponent", txDepMonitor);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		nodeMgr.setTxLifecycleManager("ProcComponent", txLifecycleMgr);
         
         CommServerManager.getInstance().start("ProcComponent");
         
@@ -105,7 +120,7 @@ public class LaunchProc {
 		DynamicDepManager depMgr;
 		OndemandSetupHelper ondemandHelper;
 		String compIdentifier = "ProcComponent";
-		compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 		nodeMgr = NodeManager.getInstance();
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
