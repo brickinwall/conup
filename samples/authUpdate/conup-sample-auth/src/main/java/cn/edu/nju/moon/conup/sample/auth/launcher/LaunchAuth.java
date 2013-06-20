@@ -10,12 +10,18 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 
 public class LaunchAuth {
@@ -41,14 +47,21 @@ public class LaunchAuth {
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf("AuthComponent", "oldVersion");
+        ComponentObject compObj = nodeMgr.getComponentObject("AuthComponent");
 //        nodeMgr.getDynamicDepManager("AuthComponent").ondemandSetupIsDone();
-
-        CompLifecycleManager.getInstance("AuthComponent").setNode(node);
+//        CompLifecycleManagerImpl.getInstance("AuthComponent").setNode(node);
         
-        CommServerManager.getInstance().start("AuthComponent");
+        CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+		compLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("AuthComponent", compLifecycleManager);
+		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+		nodeMgr.setTxDepMonitor("AuthComponent", txDepMonitor);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		nodeMgr.setTxLifecycleManager("AuthComponent", txLifecycleMgr);
         
+		CommServerManager.getInstance().start("AuthComponent");
         //access
-//        accessServices(node);
+        accessServices(node);
 //        sendOndemandRqst();
         
         System.in.read();
@@ -59,7 +72,7 @@ public class LaunchAuth {
 	
 	private static void accessServices(Node node) throws InterruptedException {
 		
-		int threadNum = 100;
+		int threadNum = 1;
 		Random random = new Random(System.currentTimeMillis());
 		for(int i=0; i<threadNum; i++){
 			LOGGER.fine("Try to access AuthComponent#service-binding(TokenService/TokenService)");
@@ -102,7 +115,7 @@ public class LaunchAuth {
 		DynamicDepManager depMgr;
 		OndemandSetupHelper ondemandHelper;
 		String compIdentifier = "AuthComponent";
-		compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 		nodeMgr = NodeManager.getInstance();
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
