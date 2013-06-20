@@ -8,9 +8,10 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.utils.experiments.Experiment;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
@@ -101,7 +102,10 @@ public class ExperimentsLauncher {
 	private static void loadConupConfAndStart(String compIdentifier, String versionNum) {
 		NodeManager nodeMgr= NodeManager.getInstance();
 		nodeMgr.loadConupConf(compIdentifier, versionNum);
-		CompLifecycleManager.getInstance(compIdentifier).setNode(node);
+//		CompLifecycleManager.getInstance(compIdentifier).setNode(node);
+		ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
+		CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+		compLifecycleManager.setNode(node);
 		CommServerManager.getInstance().start(compIdentifier);
 	}
 	

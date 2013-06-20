@@ -1,6 +1,5 @@
 package com.tuscanyscatours.launcher;
 
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,9 +14,14 @@ import com.tuscanyscatours.shoppingcart.CartInitialize;
 import com.tuscanyscatours.shoppingcart.CartUpdates;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class ShoppingCartLauncher {
@@ -42,12 +46,34 @@ public class ShoppingCartLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
+//		nodeMgr.loadConupConf("ShoppingCart", "oldVersion");
+//		CompLifecycleManager.getInstance("ShoppingCart").setNode(node);
+//		CommServerManager.getInstance().start("ShoppingCart");
+		
 		nodeMgr.loadConupConf("ShoppingCart", "oldVersion");
-		CompLifecycleManager.getInstance("ShoppingCart").setNode(node);
+		ComponentObject shoppingCartCompObj = nodeMgr.getComponentObject("ShoppingCart");
+		CompLifecycleManagerImpl shoppingCartCompLifecycleManager = new CompLifecycleManagerImpl(shoppingCartCompObj);
+		shoppingCartCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("ShoppingCart", shoppingCartCompLifecycleManager);
+		TxDepMonitor shoppingCartTxDepMonitor = new TxDepMonitorImpl(shoppingCartCompObj);
+		nodeMgr.setTxDepMonitor("ShoppingCart", shoppingCartTxDepMonitor);
+		TxLifecycleManager shoppingCartTxLifecycleMgr = new TxLifecycleManagerImpl(shoppingCartCompObj);
+		nodeMgr.setTxLifecycleManager("ShoppingCart", shoppingCartTxLifecycleMgr);
 		CommServerManager.getInstance().start("ShoppingCart");
 		
+//		nodeMgr.loadConupConf("CartStore", "oldVersion");
+//		CompLifecycleManager.getInstance("CartStore").setNode(node);
+//		CommServerManager.getInstance().start("CartStore");
+		
 		nodeMgr.loadConupConf("CartStore", "oldVersion");
-		CompLifecycleManager.getInstance("CartStore").setNode(node);
+		ComponentObject cartStoreCompObj = nodeMgr.getComponentObject("CartStore");
+		CompLifecycleManagerImpl cartStoreCompLifecycleManager = new CompLifecycleManagerImpl(cartStoreCompObj);
+		cartStoreCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("CartStore", cartStoreCompLifecycleManager);
+		TxDepMonitor cartStoreTxDepMonitor = new TxDepMonitorImpl(cartStoreCompObj);
+		nodeMgr.setTxDepMonitor("CartStore", cartStoreTxDepMonitor);
+		TxLifecycleManager cartStoreTxLifecycleMgr = new TxLifecycleManagerImpl(cartStoreCompObj);
+		nodeMgr.setTxLifecycleManager("CartStore", cartStoreTxLifecycleMgr);
 		CommServerManager.getInstance().start("CartStore");
 		
 //		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetting();

@@ -12,13 +12,17 @@ import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.trip.impl.TripSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class PackagedtripLauncher {
-	private static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private static Logger LOGGER = Logger.getLogger(PackagedtripLauncher.class.getName());
 	public static void main(String[] args) throws Exception{
 		
 		LOGGER.setLevel(Level.OFF);
@@ -37,10 +41,21 @@ public class PackagedtripLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
-		nodeMgr.loadConupConf("TripPartner", "oldVersion");
-		CompLifecycleManager.getInstance("TripPartner").setNode(node);
-		CommServerManager.getInstance().start("TripPartner");
+//		nodeMgr.loadConupConf("TripPartner", "oldVersion");
+//		CompLifecycleManager.getInstance("TripPartner").setNode(node);
+//		CommServerManager.getInstance().start("TripPartner");
 
+		nodeMgr.loadConupConf("TripPartner", "oldVersion");
+		ComponentObject triPartnerCompObj = nodeMgr.getComponentObject("TripPartner");
+		CompLifecycleManagerImpl triPartnerCompLifecycleManager = new CompLifecycleManagerImpl(triPartnerCompObj);
+		triPartnerCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("TripPartner", triPartnerCompLifecycleManager);
+		TxDepMonitor triPartnerTxDepMonitor = new TxDepMonitorImpl(triPartnerCompObj);
+		nodeMgr.setTxDepMonitor("TripPartner", triPartnerTxDepMonitor);
+		TxLifecycleManager triPartnerTxLifecycleMgr = new TxLifecycleManagerImpl(triPartnerCompObj);
+		nodeMgr.setTxLifecycleManager("TripPartner", triPartnerTxLifecycleMgr);
+		CommServerManager.getInstance().start("TripPartner");
+		
 //		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetting();
 //		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetupIsDone();
 

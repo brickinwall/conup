@@ -23,7 +23,9 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CallBack;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DeviationExp;
@@ -35,7 +37,10 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class CoordinationLauncher {
@@ -56,16 +61,51 @@ public class CoordinationLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
+//		nodeMgr.loadConupConf("TravelCatalog", "oldVersion");
+//		CompLifecycleManager.getInstance("TravelCatalog").setNode(node);
+//		CommServerManager.getInstance().start("TravelCatalog");
+		
 		nodeMgr.loadConupConf("TravelCatalog", "oldVersion");
-		CompLifecycleManager.getInstance("TravelCatalog").setNode(node);
+		ComponentObject travelCatalogCompObj = nodeMgr.getComponentObject("TravelCatalog");
+		CompLifecycleManagerImpl travelCatalogCompLifecycleManager = new CompLifecycleManagerImpl(travelCatalogCompObj);
+		travelCatalogCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("TravelCatalog", travelCatalogCompLifecycleManager);
+		TxDepMonitor travelCatalogTxDepMonitor = new TxDepMonitorImpl(travelCatalogCompObj);
+		nodeMgr.setTxDepMonitor("TravelCatalog", travelCatalogTxDepMonitor);
+		TxLifecycleManager travelCatalogTxLifecycleMgr = new TxLifecycleManagerImpl(travelCatalogCompObj);
+		nodeMgr.setTxLifecycleManager("TravelCatalog", travelCatalogTxLifecycleMgr);
 		CommServerManager.getInstance().start("TravelCatalog");
+		
 
+//		nodeMgr.loadConupConf("TripBooking", "oldVersion");
+//		CompLifecycleManager.getInstance("TripBooking").setNode(node);
+//		CommServerManager.getInstance().start("TripBooking");
+		
 		nodeMgr.loadConupConf("TripBooking", "oldVersion");
-		CompLifecycleManager.getInstance("TripBooking").setNode(node);
+		ComponentObject tripBookingCompObj = nodeMgr.getComponentObject("TripBooking");
+		CompLifecycleManagerImpl tripBookingCompLifecycleManager = new CompLifecycleManagerImpl(tripBookingCompObj);
+		tripBookingCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("TripBooking", tripBookingCompLifecycleManager);
+		TxDepMonitor tripBookingTxDepMonitor = new TxDepMonitorImpl(tripBookingCompObj);
+		nodeMgr.setTxDepMonitor("TripBooking", tripBookingTxDepMonitor);
+		TxLifecycleManager tripBookingTxLifecycleMgr = new TxLifecycleManagerImpl(tripBookingCompObj);
+		nodeMgr.setTxLifecycleManager("TripBooking", tripBookingTxLifecycleMgr);
 		CommServerManager.getInstance().start("TripBooking");
 		
+		
+//		nodeMgr.loadConupConf("Coordination", "oldVersion");
+//		CompLifecycleManager.getInstance("Coordination").setNode(node);
+//		CommServerManager.getInstance().start("Coordination");
+		
 		nodeMgr.loadConupConf("Coordination", "oldVersion");
-		CompLifecycleManager.getInstance("Coordination").setNode(node);
+		ComponentObject coordinationCompObj = nodeMgr.getComponentObject("Coordination");
+		CompLifecycleManagerImpl coordinationCompLifecycleManager = new CompLifecycleManagerImpl(coordinationCompObj);
+		coordinationCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("Coordination", coordinationCompLifecycleManager);
+		TxDepMonitor coordinationTxDepMonitor = new TxDepMonitorImpl(coordinationCompObj);
+		nodeMgr.setTxDepMonitor("Coordination", coordinationTxDepMonitor);
+		TxLifecycleManager coordinationTxLifecycleMgr = new TxLifecycleManagerImpl(coordinationCompObj);
+		nodeMgr.setTxLifecycleManager("Coordination", coordinationTxLifecycleMgr);
 		CommServerManager.getInstance().start("Coordination");
 
 //		nodeMgr.getDynamicDepManager("TravelCatalog").ondemandSetting();
