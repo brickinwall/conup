@@ -6,21 +6,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
 import org.apache.tuscany.sca.contribution.Contribution;
 import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
-import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
+
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
-import cn.edu.nju.moon.conup.ext.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.complifecycle.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
@@ -36,8 +37,8 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
  * @author JiangWang<jiang.wang88@gmail.com>
  *
  */
-public class CompLifecycleManager {
-	private final static Logger LOGGER = Logger.getLogger(CompLifecycleManager.class.getName());
+public class CompLifecycleManagerImpl implements CompLifecycleManager {
+	private final static Logger LOGGER = Logger.getLogger(CompLifecycleManagerImpl.class.getName());
 	/** DynamicUpdateContext */
 	private DynamicUpdateContext updateCtx = null;
 	/** a business tuscany node */
@@ -49,8 +50,8 @@ public class CompLifecycleManager {
 	/** is updated? */
 	private boolean isUpdated = false;
 	/** all the component life cycle managers */
-	private static Map<ComponentObject, CompLifecycleManager> compClMgrs = 
-			new ConcurrentHashMap<ComponentObject, CompLifecycleManager>();
+//	private static Map<ComponentObject, CompLifecycleManagerImpl> compClMgrs = 
+//			new ConcurrentHashMap<ComponentObject, CompLifecycleManagerImpl>();
 	
 	private ReflectiveInstanceFactory instanceFactory;
 	
@@ -58,60 +59,68 @@ public class CompLifecycleManager {
 	
 	private DynamicDepManager depMgr = null;
 	
+	@Override
 	public DynamicDepManager getDepMgr() {
 		return depMgr;
 	}
 
+	@Override
 	public void setDepMgr(DynamicDepManager depMgr) {
 		this.depMgr = depMgr;
 	}
 
+	@Override
 	public ComponentUpdator getCompUpdator() {
 		return updator;
 	}
 
+	@Override
 	public void setCompUpdator(ComponentUpdator compUpdator) {
 		this.updator = compUpdator;
 	}
 
-	private CompLifecycleManager(){
+	public CompLifecycleManagerImpl(ComponentObject compObj){
+		setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
+		setDepMgr(NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier()));
+		this.compObj = compObj;
 	}
 	
 	public static Logger getLogger() {
 		return LOGGER;
 	}
 	
-	public static CompLifecycleManager getInstance(String compIdentifier){
-		ComponentObject compObj;
+	public static CompLifecycleManagerImpl getInstance(String compIdentifier){
 		NodeManager nodeMgr;
-		CompLifecycleManager clMgr;
-		
 		nodeMgr = NodeManager.getInstance();
-		synchronized (compClMgrs) {
-			compObj = nodeMgr.getComponentObject(compIdentifier);
-			if(compObj == null)
-				return null;
-			
-			if( !compClMgrs.containsKey(compObj) ){
-				clMgr = new CompLifecycleManager();
-				compClMgrs.put(compObj, clMgr);
-				clMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
-				clMgr.setCompObject(compObj);
-				clMgr.setDepMgr(nodeMgr.getDynamicDepManager(compIdentifier));
-			} else{
-				clMgr = compClMgrs.get(compObj);
-			}
-			assert clMgr.getCompUpdator()!=null;
-			
-		}
-		return clMgr;
+		
+		return (CompLifecycleManagerImpl) nodeMgr.getCompLifecycleManager(compIdentifier);
+		
+//		ComponentObject compObj;
+//		NodeManager nodeMgr;
+//		CompLifecycleManagerImpl clMgr;
+//		
+//		nodeMgr = NodeManager.getInstance();
+//		synchronized (compClMgrs) {
+//			compObj = nodeMgr.getComponentObject(compIdentifier);
+//			if(compObj == null)
+//				return null;
+//			
+//			if( !compClMgrs.containsKey(compObj) ){
+//				clMgr = new CompLifecycleManagerImpl();
+//				compClMgrs.put(compObj, clMgr);
+//				clMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
+//				clMgr.setCompObject(compObj);
+//				clMgr.setDepMgr(nodeMgr.getDynamicDepManager(compIdentifier));
+//			} else{
+//				clMgr = compClMgrs.get(compObj);
+//			}
+//			assert clMgr.getCompUpdator()!=null;
+//			
+//		}
+//		return clMgr;
 	}
 	
-	/**
-	 * 
-	 * @param contributionURI
-	 * @return
-	 */
+	@Override
 	public boolean uninstall(String contributionURI){
 	    //create Tuscany node
 		boolean isUninstalled = true;
@@ -155,14 +164,7 @@ public class CompLifecycleManager {
 		return isUninstalled;
 	}
 
-	/**
-	 * 
-	 * @param domainURI
-	 * @param contributionURI
-	 * @param contributionURL
-	 * @param compositeURI
-	 * @return
-	 */
+	@Override
 	public boolean install(String contributionURI, String contributionURL){
 		boolean isInstalled = false;
 		String cd = null;
@@ -183,27 +185,14 @@ public class CompLifecycleManager {
 		return isInstalled;
 	}
 	
-	/**
-	 * stop a contribution
-	 * @param contributionURI
-	 * @return
-	 */
+	@Override
 	public boolean stop(String contributionURI){
 //		boolean isStopped = true;
 		//TODO every node could install only one contribution?
 		return uninstall(contributionURI);
 	}
 	
-	/**
-	 * 
-	 * @param implType the implementation type of the component, e.g., POJO, EJB.
-	 * @param baseDir
-	 * @param classPath
-	 * @param contributionURI
-	 * @param compositeURI
-	 * @param compIdentifier target component's identifier
-	 * @return
-	 */
+	@Override
 	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
 		NodeManager nodeMgr;
 		
@@ -224,7 +213,7 @@ public class CompLifecycleManager {
 			
 			//initiate updator
 			updator.initUpdator(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier);
-			depMgr.setTxDepMonitor(new TxDepMonitorImpl());
+//			depMgr.setTxDepMonitor(new TxDepMonitorImpl());
 			depMgr.updateIsReceived();
 		}
 		
@@ -242,12 +231,13 @@ public class CompLifecycleManager {
 		return true;
 	}
 	
+	@Override
 	public boolean attemptToUpdate(){
 //		NodeManager nodeManager = NodeManager.getInstance();
 //		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(compObj.getIdentifier());
 		
 		CompLifecycleManager compLcMgr;
-		compLcMgr = CompLifecycleManager.getInstance(compObj.getIdentifier());
+		compLcMgr = CompLifecycleManagerImpl.getInstance(compObj.getIdentifier());
 			
 		
 		Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
@@ -286,6 +276,7 @@ public class CompLifecycleManager {
 		return true;
 	}
 	
+	@Override
 	public boolean executeUpdate(){
 		String compIdentifier;
 //		NodeManager nodeMgr;
@@ -310,6 +301,7 @@ public class CompLifecycleManager {
 		return true;
 	}
 	
+	@Override
 	public boolean cleanupUpdate(){
 //		NodeManager nodeMgr;
 //		DynamicDepManager depMgr;
@@ -351,6 +343,7 @@ public class CompLifecycleManager {
 		return true;
 	}
 	
+	@Override
 	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx) {
 		this.updateCtx = updateCtx;
 	}
@@ -363,10 +356,12 @@ public class CompLifecycleManager {
 		this.instanceFactory = instanceFactory;
 	}
 	
+	@Override
 	public void setCompObject(ComponentObject compObj){
 		this.compObj = compObj;
 	}
 	
+	@Override
 	public ComponentObject getCompObject(){
 		return compObj;
 	}
@@ -387,21 +382,12 @@ public class CompLifecycleManager {
 //		this.commServer = commServer;
 //	}
 	
-	/**
-	 * whethe the component is updated to new version?
-	 * ATTENTION: temporally, the parameter is of no use 
-	 * @param newVerId new version id of the component
-	 * @return
-	 */
+	@Override
 	public boolean isUpdatedTo(String newVerId){
 		return isUpdated;
 	}
 	
-	/**
-	 * it's a user-oriented method which is used for remote configuration
-	 * @param payload
-	 * @return
-	 */
+	@Override
 	public boolean remoteConf(String payload){
 		TuscanyPayloadResolver payloadResolver = new TuscanyPayloadResolver(payload);
 		TuscanyOperationType opTyep = payloadResolver.getOperation();
@@ -441,14 +427,12 @@ public class CompLifecycleManager {
 		return "no results";
 	}
 	
-	/**
-	 * if a component has received dynamic update request and is in the process of finishing update, return true.
-	 * @return
-	 */
+	@Override
 	public boolean isDynamicUpdateRqstRCVD(){
 		return updateCtx!=null && updateCtx.isLoaded();
 	}
 	
+	@Override
 	public boolean initOldRootTxs(){
 //		NodeManager nodeMgr;
 //		DynamicDepManager depMgr;
@@ -465,10 +449,7 @@ public class CompLifecycleManager {
 		return true;
 	}
 	
-	/**
-	 * re-calculate the old root tx sets, no matter whether the sets are initiated.
-	 * @return
-	 */
+	@Override
 	public boolean reinitOldRootTxs(){
 //		NodeManager nodeMgr;
 //		DynamicDepManager depMgr;
@@ -497,9 +478,26 @@ public class CompLifecycleManager {
 //		return true;
 //	}
 	
+	@Override
 	public DynamicUpdateContext getUpdateCtx() {
 		return updateCtx;
 	}
 	
-	
+	@Override
+	public void checkFreeness(String hostComp) {
+		CompLifecycleManager compLcMgr;
+		NodeManager nodeManager = NodeManager.getInstance();
+		
+		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
+		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
+		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+		synchronized (validToFreeSyncMonitor) {
+			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
+
+				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
+					compLcMgr.attemptToUpdate();
+				}
+			}
+		}
+	}
 }

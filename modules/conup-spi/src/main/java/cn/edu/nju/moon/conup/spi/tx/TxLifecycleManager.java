@@ -1,34 +1,28 @@
-package cn.edu.nju.moon.conup.spi.datamodel;
+package cn.edu.nju.moon.conup.spi.tx;
 
-/**
- * @author JiangWang<jiang.wang88@gmail.com>
- *
- */
-public interface TxDepMonitor {
-	public boolean notify(TxEventType et, String curTxID);
-	
+public interface TxLifecycleManager {
+
 	/**
-	 * 
-	 * @param txID current tx id
-	 * @param compIdentifier target component
+	 * create transaction id
 	 * @return
 	 */
-	public boolean isLastUse(String currentTxID, String targetCompIdentifier, String hostComp);
-	
+	public String createID();
+
 	/**
-	 * when a root tx ends, TxDepMonitor should be notified.
-	 * Given a parentTxId, which means that only the root Txs associated with the parentTxId
-	 * @param hostComp
-	 * @param rootTxId
+	 * create a temporary transaction id
 	 * @return
 	 */
-	public void rootTxEnd(String hostComp, String rootTxId);
-	
+	public String createFakeTxId();
+
 	/**
-	 * 
-	 * @return a new instance of TxDepMonitor
+	 * @param id the transaction id that needs to be destroyed
 	 */
-	public TxDepMonitor newInstance();
+	public void destroyID(String id);
+
+	/**
+	 * @return total transactions that are running
+	 */
+	public int getTxs();
 	
 	/**
 	 * the host component started a sub-transaction on a remote component
@@ -77,8 +71,18 @@ public interface TxDepMonitor {
 	public boolean endLocalSubTx(String hostComp, String fakeSubTx);
 	
 	/**
-	 * check for freeness
+	 * when a root tx ends, TxDepMonitor should be notified.
+	 * Given a parentTxId, which means that only the root Txs associated with the parentTxId
+	 * @param hostComp
+	 * @param rootTxId
+	 * @return
 	 */
-	public void checkFreeness(String hostComp);
+	public void rootTxEnd(String hostComp, String rootTxId);
 	
+	/**
+	 * because every component type 1 to 1 correspondence to a TxLifecycleManager
+	 * @return component identifier
+	 */
+	public String getCompIdentifier();
+
 }

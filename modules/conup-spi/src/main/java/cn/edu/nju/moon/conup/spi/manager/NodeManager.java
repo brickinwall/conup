@@ -4,12 +4,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.exception.ConupMgrNotFoundException;
 import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.factory.ManagerFactory;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -39,15 +43,28 @@ public class NodeManager{
 	 */
 	private Map<ComponentObject, OndemandSetupHelper> ondemandHelpers;
 	
-	/*
-	 * all communication component run in current node
+	/**
+	 * 	Each component has one TxLifecycleManager
 	 */
+	private Map<ComponentObject, TxLifecycleManager> txLifecycleMgrs;
 	
+	/**
+	 * 	Each component has one TxDepMonitor
+	 */
+	private Map<ComponentObject, TxDepMonitor> txDepMonitors;
+	
+	/**
+	 * 	Each component has one CompLifecycleManager
+	 */
+	private Map<ComponentObject, CompLifecycleManager> compLifecycleMgrs;
 	
 	private NodeManager(){
 		compObjects = new ConcurrentHashMap<String, ComponentObject>();
 		depMgrs = new ConcurrentHashMap<ComponentObject, DynamicDepManager>();
 		ondemandHelpers = new ConcurrentHashMap<ComponentObject, OndemandSetupHelper>();
+		txLifecycleMgrs = new ConcurrentHashMap<ComponentObject, TxLifecycleManager>();
+		txDepMonitors = new ConcurrentHashMap<ComponentObject, TxDepMonitor>();
+		compLifecycleMgrs = new ConcurrentHashMap<ComponentObject, CompLifecycleManager>();
 	}
 	
 	/**
@@ -57,7 +74,73 @@ public class NodeManager{
 	public static NodeManager getInstance(){
 		return nodeManager;
 	}
-
+	
+	/**
+	 * each component has only one CompLifecycleManager
+	 * @param compIdentifier component object identifier
+	 * @return corresponding CompLifecycleManager of the specified compIdentifier, 
+	 * 		   if the compIdentifier is invalid, return null
+	 */
+	public CompLifecycleManager getCompLifecycleManager(String compIdentifier){
+		ComponentObject compObj;
+		CompLifecycleManager compLifecycleMgr;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !compLifecycleMgrs.containsKey(compObj) ){
+				throw new ConupMgrNotFoundException("CompLifecycleManager not found.");
+			} else{
+				compLifecycleMgr = compLifecycleMgrs.get(compObj);
+			}
+		}
+		return compLifecycleMgr;
+	}
+	
+	/**
+	 * each component has only one TxDepMonitor
+	 * @param compIdentifier component object identifier
+	 * @return corresponding TxDepMonitor of the specified compIdentifier, 
+	 * 		   if the compIdentifier is invalid, return null
+	 */
+	public TxDepMonitor getTxDepMonitor(String compIdentifier){
+		ComponentObject compObj;
+		TxDepMonitor txDepMonitor;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !txDepMonitors.containsKey(compObj) ){
+				throw new ConupMgrNotFoundException("TxDepMonitor not found.");
+			} else{
+				txDepMonitor = txDepMonitors.get(compObj);
+			}
+		}
+		return txDepMonitor;
+	}
+	
+	/**
+	 * each component has only one TxLifecycleManager
+	 * @param compIdentifier component object identifier
+	 * @return corresponding TxLifecycleManager of the specified compIdentifier, 
+	 * 		   if the compIdentifier is invalid, return null
+	 */
+	public TxLifecycleManager getTxLifecycleManager(String compIdentifier){
+		ComponentObject compObj;
+		TxLifecycleManager txLifecycleMgr;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !txLifecycleMgrs.containsKey(compObj) ){
+				throw new ConupMgrNotFoundException("TxLifecycleManager not found.");
+			} else{
+				txLifecycleMgr = txLifecycleMgrs.get(compObj);
+			}
+		}
+		return txLifecycleMgr;
+	}
+	
 	/**
 	 * each component has only one DynamicDepManager
 	 * @param compIdentifier component object identifier
@@ -192,6 +275,45 @@ public class NodeManager{
 		ComponentObject compObj = new ComponentObject(compIdentifier, versionNum, algorithmType, freenessStrategy, childrenComps, parentComps, compImplType);
 		addComponentObject(compIdentifier, compObj);
 		return true;
+	}
+
+	public boolean setCompLifecycleManager(String compIdentifier, CompLifecycleManager compLifecycleMgr){
+		ComponentObject compObj;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if( !compLifecycleMgrs.containsKey(compObj) ){
+				compLifecycleMgrs.put(compObj, compLifecycleMgr);
+				return true;
+			} else{
+				return false;
+			}
+		}
+	}
+
+	public boolean setTxDepMonitor(String compIdentifier, TxDepMonitor txDepMonitor) {
+		ComponentObject compObj;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if( !txDepMonitors.containsKey(compObj) ){
+				txDepMonitors.put(compObj, txDepMonitor);
+				return true;
+			} else{
+				return false;
+			}
+		}
+	}
+
+	public boolean setTxLifecycleManager(String compIdentifier, TxLifecycleManager txLifecycleMgr) {
+		ComponentObject compObj;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if( !txLifecycleMgrs.containsKey(compObj) ){
+				txLifecycleMgrs.put(compObj, txLifecycleMgr);
+				return true;
+			} else{
+				return false;
+			}
+		}
 	}
 	
 } 

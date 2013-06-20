@@ -8,7 +8,8 @@ import org.apache.mina.core.session.IoSession;
 import cn.edu.nju.moon.conup.communication.model.CommType;
 import cn.edu.nju.moon.conup.communication.model.RequestObject;
 import cn.edu.nju.moon.conup.communication.model.ResponseObject;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -61,7 +62,7 @@ public class ServerIoHandler extends IoHandlerAdapter{
 	}
 	
 	private ResponseObject manageExperimentResult(RequestObject reqObj){
-		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(reqObj.getTargetIdentifier());
+		CompLifecycleManagerImpl compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(reqObj.getTargetIdentifier());
 		String expResult = compLifeCycleMgr.experimentResult(reqObj.getPayload());
 		
 		ResponseObject responseObj = new ResponseObject();
@@ -73,7 +74,7 @@ public class ServerIoHandler extends IoHandlerAdapter{
 	}
 
 	private ResponseObject manageRemoteConf(RequestObject reqObj) {
-		CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(reqObj.getTargetIdentifier());
+		CompLifecycleManager compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(reqObj.getTargetIdentifier());
 		boolean updateResult = compLifeCycleMgr.remoteConf(reqObj.getPayload());
 		
 		ResponseObject responseObj = new ResponseObject();

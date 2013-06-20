@@ -26,7 +26,7 @@ import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
-import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
+import cn.edu.nju.moon.conup.ext.datamodel.POJODynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;
 import cn.edu.nju.moon.conup.sample.auth.services.TokenService;
@@ -40,7 +40,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
  */
 public class CompLifecycleManagerTest {
 	private static Logger LOGGER = Logger.getLogger(CompLifecycleManagerTest.class.getName());
-	CompLifecycleManager clm = null;
+	CompLifecycleManagerImpl clm = null;
 	Node node = null;
 
 	@Before
@@ -55,9 +55,11 @@ public class CompLifecycleManagerTest {
 		String compIdentifier = "HelloworldComponent";
 		ComponentObject comObj = new ComponentObject(compIdentifier, "1.1", ALGORITHM_TYPE, CONCURRENT_VERSION, staticDeps,null , implType);
 		nodeMgr.addComponentObject(compIdentifier, comObj);
-		CompLifecycleManager compLifecycleMgr = CompLifecycleManager.getInstance(compIdentifier);
+		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(comObj);
+		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleMgr);
+//		CompLifecycleManagerImpl compLifecycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		compLifecycleMgr.setNode(node);
-		clm = CompLifecycleManager.getInstance(compIdentifier);
+		clm = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		
 	}
 	

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cn.edu.nju.moon.conup.ext.update;
+package cn.edu.nju.moon.conup.spi.complifecycle;
 
 /**
  * 	A uniform interface for updating components implemented in different implementation type, 

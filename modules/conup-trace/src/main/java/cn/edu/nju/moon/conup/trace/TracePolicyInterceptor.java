@@ -27,19 +27,17 @@ import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.invocation.PhasedInterceptor;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
-import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 
 public class TracePolicyInterceptor implements PhasedInterceptor {
@@ -319,13 +317,17 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			parentTx = currentTx;
 			parentComponent = hostComponent;
 			
-			TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-			subTx = new TxLifecycleManager().createFakeTxId();
+//			TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
+//			subTx = new TxLifecycleManagerImpl().createFakeTxId();
+			TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(hostComponent);
+			TxLifecycleManager txLifecycleMgr = NodeManager.getInstance().getTxLifecycleManager(hostComponent);
+			subTx = txLifecycleMgr.createFakeTxId();
 			subComp = txDepMonitor.convertServiceToComponent(getTargetServiceName(), hostComponent);
 			
 			assert subComp != null;
 			
-			txDepMonitor.startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
+//			txDepMonitor.startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
+			txLifecycleMgr.startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
 		}//else(dependency != null)
 		
 		//generate transaction tag(identifier)
@@ -357,7 +359,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			threadID = getThreadID();
 			TransactionContext txCtx = cache.getTxCtx(threadID);
 			
-			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
+//			TxDepMonitor txDepMonitor = new TxDepMonitorImpl();
+			TxDepMonitor txDepMonitor = nodeMgr.getTxDepMonitor(hostComp);
+			TxLifecycleManager txLifecycleMgr = NodeManager.getInstance().getTxLifecycleManager(hostComp);
 			Map<String, Object> msgHeaders = msg.getHeaders();
 
 			// waiting during on-demand setup
@@ -373,7 +377,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						assert msgHeaders != null;
 						assert txDepMonitor != null;
 						
-						txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
+						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
@@ -391,7 +395,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				}
 			}
 			
-			clMgr = CompLifecycleManager.getInstance(hostComp);
+			clMgr = CompLifecycleManagerImpl.getInstance(hostComp);
 			String freenessConf = depMgr.getCompObject().getFreenessConf();
 			FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
 			assert freeness!= null;
@@ -415,7 +419,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 						assert txCtx.getParentTx() != null;
 						assert txCtx.getParentComponent() != null;
 						assert subTx != null;
-						txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
+						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
 								txCtx.getRootTx(), txCtx.getRootComponent(),
 								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
@@ -479,7 +483,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert txCtx.getParentTx() != null;
 				assert txCtx.getParentComponent() != null;
 				assert subTx != null;
-				txDepMonitor.initLocalSubTx(hostComp, subTx.toString(), 
+				txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
 						txCtx.getRootTx(), txCtx.getRootComponent(),
 						txCtx.getParentTx(), txCtx.getParentComponent());
 			}
@@ -542,14 +546,10 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //				assert hostComp.equals(txCtx.getHostComponent());
 				
 				NodeManager nodeMgr = NodeManager.getInstance();
-				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-//				Printer printer = new Printer();
-//				LOGGER.fine("TxS before removeFakeSubTx:");
-//				printer.printTxs(LOGGER, depMgr.getTxs());
-//				removeFakeSubTx(hostComp, subTx);
-				depMgr.getTxDepMonitor().endLocalSubTx(hostComp, subTx);
-//				LOGGER.fine("TxS after removeFakeSubTx:");
-//				printer.printTxs(LOGGER, depMgr.getTxs());
+//				DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+////				removeFakeSubTx(hostComp, subTx);
+//				depMgr.getTxDepMonitor().endLocalSubTx(hostComp, subTx);
+				nodeMgr.getTxLifecycleManager(hostComp).endLocalSubTx(hostComp, subTx);
 				
 				//generate info required to be attatched to the response msg body
 				StringBuffer endedSubTxTag = new StringBuffer();
@@ -643,14 +643,15 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		
 		if( !subComp.equals(hostComp)){
 			
-//			NodeManager nodeMgr = NodeManager.getInstance();
+			NodeManager nodeMgr = NodeManager.getInstance();
 //			DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
 //			Printer printer = new Printer();
 			LOGGER.fine("TxS before endRemoteSubTx:");
 //			printer.printTxs(LOGGER, depMgr.getTxs());
 			
-			TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
-			txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+//			TxDepMonitorImpl txDepMonitor = new TxDepMonitorImpl();
+//			txDepMonitor.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+			nodeMgr.getTxLifecycleManager(hostComp).endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
 			
 			LOGGER.fine("TxS after endRemoteSubTx:");
 //			printer.printTxs(LOGGER, depMgr.getTxs());

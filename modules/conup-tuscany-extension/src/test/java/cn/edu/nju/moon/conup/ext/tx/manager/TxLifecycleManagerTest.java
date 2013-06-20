@@ -11,20 +11,35 @@ import org.junit.Test;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
  * @author rgc
  */
 public class TxLifecycleManagerTest {
-	TxLifecycleManager txLifecycleMgr = null;
+	TxLifecycleManagerImpl txLifecycleMgr = null;
 	ComponentObject compObj = null;
 	NodeManager nodeMgr = null;
 	
 	@Before
 	public void setUp() throws Exception {
-		txLifecycleMgr = new TxLifecycleManager();
+		String compIdentifier = null;
+		String compVer = null;
+		String algorithmConf = null;
+		String freenessConf = null;
+		compIdentifier = "AuthComponent";
+		compVer = "1.1";
+		algorithmConf = "";
+		final String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
+		freenessConf = CONCURRENT_VERSION;
+		String JAVA_POJO_IMPL_TYPE = "JAVA_POJO";
+		
+		nodeMgr = NodeManager.getInstance();
+		compObj = new ComponentObject(compIdentifier, compVer, algorithmConf, freenessConf, 
+				null,null, JAVA_POJO_IMPL_TYPE);
+		nodeMgr.addComponentObject(compObj.getIdentifier(), compObj);
+		
+		txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		if(txLifecycleMgr.getTxs() != 0){
 			Map<String, TransactionContext> txCtxs = txLifecycleMgr.TX_IDS;
 			Iterator<Entry<String, TransactionContext>> iterator = txCtxs.entrySet().iterator();
@@ -34,27 +49,12 @@ public class TxLifecycleManagerTest {
 			}
 		}
 		
-		nodeMgr = NodeManager.getInstance();
-		
-		final String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
-		String compIdentifier = null;
-		String compVer = null;
-		String algorithmConf = null;
-		String freenessConf = null;
-		compIdentifier = "AuthComponent";
-		compVer = "1.1";
-		algorithmConf = "";
-		freenessConf = CONCURRENT_VERSION;
-		String JAVA_POJO_IMPL_TYPE = "JAVA_POJO";
-		compObj = new ComponentObject(compIdentifier, compVer, algorithmConf, freenessConf, 
-				null,null, JAVA_POJO_IMPL_TYPE);
-		nodeMgr.addComponentObject(compObj.getIdentifier(), compObj);
 	}
 
 	@Test
 	public void testCreateID() {
 		String componentIdentifier = "AuthComponent";
-		txLifecycleMgr.addToAssociateTx(getThreadID(), componentIdentifier);
+//		txLifecycleMgr.addToAssociateTx(getThreadID(), componentIdentifier);
 		InterceptorCache interceptorCache = InterceptorCache.getInstance(componentIdentifier);
 		
 		String hostComp = componentIdentifier;

@@ -13,11 +13,11 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
 /**
@@ -49,11 +49,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	private Object updatingSyncMonitor = new Object();
 	
 	/**
-	 * 
+	 * semaphore which is used to synchronize the re
 	 */
 	private Object waitingRemoteCompUpdateDoneMonitor = new Object();
 	
-	private TxDepMonitor txDepMonitor = null;
+//	private TxDepMonitor txDepMonitor = null;
+	private TxLifecycleManager txLifecycleMgr = null;
 
 	public DynamicDepManagerImpl() {
 	}
@@ -444,16 +445,17 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
 	}
 	
-	public TxDepMonitor getTxDepMonitor() {
-//		return txDepMonitor;
-		if(txDepMonitor == null)
-			return null;
-		return txDepMonitor.newInstance();
-	}
-
-	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
-		this.txDepMonitor = txDepMonitor;
-	}
+//	public TxDepMonitor getTxDepMonitor() {
+////		return txDepMonitor;
+//		if(txDepMonitor == null)
+//			return null;
+////		return txDepMonitor.newInstance();
+//		return NodeManager.getInstance().getTxDepMonitor(compObj.getIdentifier());
+//	}
+//
+//	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
+//		this.txDepMonitor = txDepMonitor;
+//	}
 
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
@@ -462,8 +464,19 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void dependenceChanged(String hostComp) {
-		if(isUpdateRequestReceived)
-			txDepMonitor.checkFreeness(hostComp);
+		if(isUpdateRequestReceived){
+//			txDepMonitor.checkFreeness(hostComp);
+			NodeManager.getInstance().getCompLifecycleManager(hostComp).checkFreeness(hostComp);
+		}
 	}
+	
+	public TxLifecycleManager getTxLifecycleMgr() {
+		if(txLifecycleMgr == null){
+			txLifecycleMgr = NodeManager.getInstance().getTxLifecycleManager(compObj.getIdentifier());
+		}
+		assert txLifecycleMgr != null;
+		return txLifecycleMgr;
+	}
+
 	
 }

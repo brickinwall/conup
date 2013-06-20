@@ -3,7 +3,8 @@ package cn.edu.nju.moon.conup.ext.freeness;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
@@ -44,7 +45,7 @@ public class BlockingStrategy implements FreenessStrategy {
 		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
 		if( isUpdateReqRCVD ){
-			compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+			compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 			algorithmOldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		} else{
 			algorithmOldVersionRootTxs = null;

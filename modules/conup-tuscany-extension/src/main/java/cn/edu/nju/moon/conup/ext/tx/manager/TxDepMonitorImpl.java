@@ -18,15 +18,16 @@ import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.runtime.DomainRegistry;
 
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 
 /**
  * It's used to monitor transaction status, maintain transaction context 
@@ -40,6 +41,17 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	/** used to store the mapping between service name and component name*/
 	private static Map<String, String> serviceToComp = new ConcurrentHashMap<String, String>();
 	
+//	private String compIdentifier = null;
+	private ComponentObject compObject = null;
+	
+	public TxDepMonitorImpl(ComponentObject compObject){
+		this.compObject = compObject;
+	}
+	
+//	public TxDepMonitorImpl(String compIdentifier){
+//		this.compIdentifier = compIdentifier;
+//	}
+	
 	/**
 	 * 
 	 * @param TxEventType 
@@ -51,14 +63,14 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		/*
 		 * set eventType, futureC, pastC 
 		 */
-		Map<String, TransactionContext> TX_IDS = TxLifecycleManager.TX_IDS;
+		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
 		TransactionContext txContext = TX_IDS.get(curTxID);
 		txContext.setEventType(et);
 		
 		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()));
 		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), txContext.getHostComponent()));
-		txContext.setTxDepMonitor(this);
+//		txContext.setTxDepMonitor(this);
 		/*
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
@@ -66,9 +78,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(txContext.getHostComponent());
 		
 		//save a TxDepMonitor into DynamicDepManager
-		if(dynamicDepMgr.getTxDepMonitor() == null){
-			dynamicDepMgr.setTxDepMonitor(this);
-		}
+//		if(dynamicDepMgr.getTxDepMonitor() == null){
+//			dynamicDepMgr.setTxDepMonitor(this);
+//		}
 		
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TX_IDS.
@@ -80,7 +92,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			interceptorCache.removeTxCtx(getThreadID());
 			
 			CompLifecycleManager compLcMgr;
-			compLcMgr = CompLifecycleManager.getInstance(txContext.getHostComponent());
+			compLcMgr = CompLifecycleManagerImpl.getInstance(txContext.getHostComponent());
 			
 			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
 					&& compLcMgr.isDynamicUpdateRqstRCVD()){
@@ -140,7 +152,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
+				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
 				Node node = compLifeCycleMgr.getNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
@@ -187,10 +199,11 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		return comps;
 	}
 
+	@Override
 	public String convertServiceToComponent(String service, String hostComp){
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(hostComp);
+				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
 				Node node = compLifeCycleMgr.getNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
@@ -214,131 +227,113 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		return compName;
 	}
 
-	@Override
-	public void rootTxEnd(String hostComp, String rootTxId) {
-		CompLifecycleManager compLcMgr;
-		NodeManager nodeManager = NodeManager.getInstance();
-		
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
-		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
-		LOGGER.fine("txID:" + rootTxId + " hostComp:" + hostComp + " compStatus:" + dynamicDepMgr.getCompStatus());
-		synchronized (validToFreeSyncMonitor) {
-//			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
-//				&& compLcMgr.isDynamicUpdateRqstRCVD()
-//				&& compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
-
-				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
-
-				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
-					compLcMgr.attemptToUpdate();
-				}
-			}
-		}
-		
-//		ExecutionRecorder exeRecorder;
-//		exeRecorder = ExecutionRecorder.getInstance(hostComp);
-//		String completeAction = exeRecorder.getCompleteAction(rootTxId);
-		
-//		if(completeAction == null || completeAction.equals("null")){
-//			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
-//				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
-//		}
-//		if(completeAction != null){
-//			LOGGER.info(completeAction);
+//	@Override
+//	public void rootTxEnd(String hostComp, String rootTxId) {
+//		CompLifecycleManager compLcMgr;
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		
+//		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
+//		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
+//		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+//		LOGGER.fine("txID:" + rootTxId + " hostComp:" + hostComp + " compStatus:" + dynamicDepMgr.getCompStatus());
+//		synchronized (validToFreeSyncMonitor) {
+////			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
+////				&& compLcMgr.isDynamicUpdateRqstRCVD()
+////				&& compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
+//			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
+//				compLcMgr.getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
+//
+//				LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
+//
+//				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
+//					compLcMgr.attemptToUpdate();
+//				}
+//			}
 //		}
 //		
-//		//when a root tx ends, remove it from TxLifecycleManager
-//		if(TxLifecycleManager.getRootTx(hostComp, rootTxId) != null){
-//			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
-//		}
-//		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
-		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
-	}
+////		ExecutionRecorder exeRecorder;
+////		exeRecorder = ExecutionRecorder.getInstance(hostComp);
+////		String completeAction = exeRecorder.getCompleteAction(rootTxId);
+//		
+////		if(completeAction == null || completeAction.equals("null")){
+////			if(TxLifecycleManager.getRootTx(hostComp, rootTxId)  != null)
+////				completeAction = exeRecorder.getCompleteAction(TxLifecycleManager.getRootTx(hostComp, rootTxId));
+////		}
+////		if(completeAction != null){
+////			LOGGER.info(completeAction);
+////		}
+////		
+////		//when a root tx ends, remove it from TxLifecycleManager
+////		if(TxLifecycleManager.getRootTx(hostComp, rootTxId) != null){
+////			rootTxId = TxLifecycleManager.getRootTx(hostComp, rootTxId);
+////		}
+////		TxLifecycleManager.removeRootTx(hostComp, rootTxId);
+//		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
+//	}
 	
 	/** return current thread ID. */
 	private String getThreadID(){
 		return new Integer(Thread.currentThread().hashCode()).toString();
 	}
 
-	@Override
-	public TxDepMonitor newInstance() {
-		return new TxDepMonitorImpl();
-	}
+//	public TxDepMonitor newInstance() {
+//		return new TxDepMonitorImpl();
+//	}
 
-	@Override
-	public boolean startRemoteSubTx(String subComp, String curComp,
-			String rootTx, String parentTx, String subTx) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
-		
-		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, 
-				subComp, curComp, rootTx, parentTx, subTx);
-	}
+//	@Override
+//	public boolean startRemoteSubTx(String subComp, String curComp,
+//			String rootTx, String parentTx, String subTx) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+//		
+//		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, 
+//				subComp, curComp, rootTx, parentTx, subTx);
+//	}
+//
+//	@Override
+//	public boolean endRemoteSubTx(String subComp, String curComp,
+//			String rootTx, String parentTx, String subTx) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+//		
+//		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
+//				subComp, curComp, rootTx, parentTx, subTx);
+//	}
+//
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+//		TransactionContext txCtx;
+//		
+//		txCtx = new TransactionContext();
+//		txCtx.setFakeTx(true);
+//		txCtx.setCurrentTx(fakeSubTx);
+//		txCtx.setHostComponent(hostComp);
+//		txCtx.setEventType(TxEventType.TransactionStart);
+//		txCtx.setFutureComponents(new HashSet<String>());
+//		txCtx.setPastComponents(new HashSet<String>());
+//		txCtx.setParentComponent(parentComp);
+//		txCtx.setParentTx(parentTx);
+//		txCtx.setRootTx(rootTx);
+//		txCtx.setRootComponent(rootComp);
+//		
+//		depMgr.getTxs().put(fakeSubTx, txCtx);
+//		
+//		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
+//	}
+//
+//	@Override
+//	public boolean endLocalSubTx(String hostComp, String fakeSubTx) {
+//		NodeManager nodeMgr = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
+//		
+//		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+//		synchronized (ondemandMonitor) {
+//			depMgr.getTxs().remove(fakeSubTx);
+//		}
+//		return true;
+//	}
 
-	@Override
-	public boolean endRemoteSubTx(String subComp, String curComp,
-			String rootTx, String parentTx, String subTx) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
-		
-		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
-				subComp, curComp, rootTx, parentTx, subTx);
-	}
 
-	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
-		TransactionContext txCtx;
-		
-		txCtx = new TransactionContext();
-		txCtx.setFakeTx(true);
-		txCtx.setCurrentTx(fakeSubTx);
-		txCtx.setHostComponent(hostComp);
-		txCtx.setEventType(TxEventType.TransactionStart);
-		txCtx.setFutureComponents(new HashSet<String>());
-		txCtx.setPastComponents(new HashSet<String>());
-		txCtx.setParentComponent(parentComp);
-		txCtx.setParentTx(parentTx);
-		txCtx.setRootTx(rootTx);
-		txCtx.setRootComponent(rootComp);
-		
-		depMgr.getTxs().put(fakeSubTx, txCtx);
-		
-		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
-	}
-
-	@Override
-	public boolean endLocalSubTx(String hostComp, String fakeSubTx) {
-		NodeManager nodeMgr = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
-		
-		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
-		synchronized (ondemandMonitor) {
-			depMgr.getTxs().remove(fakeSubTx);
-		}
-		return true;
-	}
-
-	@Override
-	public void checkFreeness(String hostComp) {
-		CompLifecycleManager compLcMgr;
-		NodeManager nodeManager = NodeManager.getInstance();
-		
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
-		compLcMgr = CompLifecycleManager.getInstance(hostComp);
-		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
-		synchronized (validToFreeSyncMonitor) {
-			if(compLcMgr.isDynamicUpdateRqstRCVD() && compLcMgr.getUpdateCtx().isOldRootTxsInitiated()){
-
-				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
-					compLcMgr.attemptToUpdate();
-				}
-			}
-		}
-	}
-	
 }

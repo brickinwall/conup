@@ -181,7 +181,8 @@ public class QuiescenceImpl implements Algorithm {
 			synchronized (ondemandSyncMonitor) {
 				if( depMgr.isNormal()){
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
-					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+//					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
 					
 					return;
@@ -216,10 +217,12 @@ public class QuiescenceImpl implements Algorithm {
 			if(rootTx.equals(txCtx.getCurrentTx()))
 				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+//				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+				depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
 			} else{
-				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+//				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+				depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
 				// check passive when a root tx is end
 				LOGGER.fine("root tx " + rootTx + " end, checkPassiveAndAck...");
