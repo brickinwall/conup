@@ -27,11 +27,6 @@ public class ComponentObject {
 
 	/** implementation type of the component */
 	private String implType = null;
-//	private String ipAndPort = null;
-	/** component's communication module's info */
-//	private CompCommInfo compCommInfo = null;
-	/** component's all static info(including who depends on current component and depend on other component */
-//	private Map<String, List<CompCommInfo>> allStaticDeps = null;
 	
 	public Set<String> getStaticInDeps() {
 		return staticInDeps;
@@ -40,30 +35,6 @@ public class ComponentObject {
 	public void setStaticInDeps(Set<String> staticInDeps) {
 		this.staticInDeps = staticInDeps;
 	}
-//	public CompCommInfo getCompCommInfo() {
-//		return compCommInfo;
-//	}
-//
-//	public void setCompCommInfo(CompCommInfo compCommInfo) {
-//		this.compCommInfo = compCommInfo;
-//	}
-
-	
-//	public Map<String, List<CompCommInfo>> getAllStaticDeps() {
-//		return allStaticDeps;
-//	}
-//
-//	public void setAllStaticDeps(Map<String, List<CompCommInfo>> allStaticDeps) {
-//		this.allStaticDeps = allStaticDeps;
-//	}
-
-//	public String getIpAndPort() {
-//		return ipAndPort;
-//	}
-//	
-//	public void setIpAndPort(String ipAndPort) {
-//		this.ipAndPort = ipAndPort;
-//	}
 
 	public String getImplType() {
 		return implType;
@@ -89,7 +60,6 @@ public class ComponentObject {
 		this.staticDeps = staticDeps;
 		this.implType = implType;
 		this.staticInDeps = staticIndeps;
-//		this.allStaticDeps = new HashMap<String, List<CompCommInfo>>();
 	}
 	
 	/**

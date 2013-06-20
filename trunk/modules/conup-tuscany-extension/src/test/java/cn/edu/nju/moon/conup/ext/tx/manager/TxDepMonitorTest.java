@@ -15,13 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
-import cn.edu.nju.moon.conup.spi.datamodel.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 /**
  * @author rgc
@@ -31,7 +27,11 @@ public class TxDepMonitorTest {
 	Node node = null;
 	@Before
 	public void setUp() throws Exception {
-		txDepMonitor = new TxDepMonitorImpl();
+		NodeManager nodeMgr = NodeManager.getInstance();
+		String componentName = "AuthComponent";
+		nodeMgr.loadConupConf(componentName , "Version");
+		ComponentObject compObj = nodeMgr.getComponentObject(componentName);
+		txDepMonitor = new TxDepMonitorImpl(compObj);
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		node = runtime.createNode();
 		if(node.getStartedCompositeURIs().get("conup-sample-hello-auth") != null){
@@ -65,24 +65,26 @@ public class TxDepMonitorTest {
 
 	@Test
 	public void testNotifyTxEventTypeString() throws ContributionReadException, ValidationException, ActivationException {
-		
+		String hostCompName = "AuthComponent";
 		final String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
 		String curTxID = UUID.randomUUID().toString();
 		TransactionContext tc = new TransactionContext();
 		tc.setCurrentTx(curTxID);
-		tc.setHostComponent("AuthComponent");
+		tc.setHostComponent(hostCompName);
 		String JAVA_POJO_IMPL_TYPE = "JAVA_POJO";
 		ComponentObject compObject = new ComponentObject("AuthComponent", "1.1", 
 				"CONSISTENCY_ALGORITHM", CONCURRENT_VERSION, 
 				null, null, JAVA_POJO_IMPL_TYPE);
 		NodeManager nodeMgr = NodeManager.getInstance();
 		nodeMgr.addComponentObject("AuthComponent", compObject);
+		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(compObject);
+		nodeMgr.addComponentObject(hostCompName, compObject);
 //		DynamicDepManager ddm = nodeMgr.getDynamicDepManager("AuthComponent");
 		
-		CompLifecycleManager compLifecycleMgr = CompLifecycleManager.getInstance("AuthComponent");
+//		CompLifecycleManagerImpl compLifecycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance("AuthComponent");
 		compLifecycleMgr.setNode(node);
 //		ddm.setCompStatus(CompStatus.NORMAL);
-		Map<String, TransactionContext> TX_IDS = TxLifecycleManager.TX_IDS;
+		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
 		
 		TX_IDS.put(curTxID, tc);
 		

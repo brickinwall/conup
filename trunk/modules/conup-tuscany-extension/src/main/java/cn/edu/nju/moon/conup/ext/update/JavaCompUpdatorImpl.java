@@ -26,8 +26,12 @@ import org.apache.tuscany.sca.implementation.java.invocation.JavaImplementationP
 import org.apache.tuscany.sca.provider.ImplementationProvider;
 import org.apache.tuscany.sca.runtime.RuntimeComponent;
 
-import cn.edu.nju.moon.conup.ext.datamodel.DynamicUpdateContext;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.datamodel.POJODynamicUpdateContext;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.complifecycle.DynamicUpdateContext;
+import cn.edu.nju.moon.conup.spi.complifecycle.Transformer;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 
@@ -55,13 +59,13 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	public boolean initUpdator(String baseDir, String classPath,
 			String contributionURI, String compositeURI, String compIdentifier) {
-		CompLifecycleManager compLcMgr;
+		CompLifecycleManagerImpl compLcMgr;
 //		NodeManager nodeMgr;
 //		DynamicDepManager depMgr;
 		
 //		nodeMgr = NodeManager.getInstance();
 //		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
-		compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		
 //		Set<String> oldVersionRootTxIds = depMgr.getOldVersionRootTxs();
 		if(tuscanyNode == null){
@@ -96,7 +100,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 						new String[] { classPath });
 				DynamicUpdateContext updateCtx = compLcMgr.getUpdateCtx();
 				if(updateCtx == null){
-					updateCtx = new DynamicUpdateContext();
+					updateCtx = new POJODynamicUpdateContext();
 					compLcMgr.setDynamicUpdateContext(updateCtx);
 				}
 				updateCtx.setOldVerClass(originalClass);
@@ -123,11 +127,11 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	@Override
 	public boolean executeUpdate(String compIdentifier) {
-		CompLifecycleManager compLcMgr;
+		CompLifecycleManagerImpl compLcMgr;
 		ReflectiveInstanceFactory instanceFactory;
 		Class<?> compClass;
 		
-		compLcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		instanceFactory = compLcMgr.getInstanceFactory();
 		compClass = compLcMgr.getUpdateCtx().getNewVerClass();
 		try {
@@ -223,11 +227,11 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	public boolean cleanUpdate(String compIdentifier) {
 //		NodeManager nodeMgr;
 //		DynamicDepManager depMgr;
-		CompLifecycleManager lcMgr;
+		CompLifecycleManagerImpl lcMgr;
 		
 //		nodeMgr = NodeManager.getInstance();
 //		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
-		lcMgr = CompLifecycleManager.getInstance(compIdentifier);
+		lcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		
 		lcMgr.setDynamicUpdateContext(null);
 		lcMgr.setInstanceFactory(null);

@@ -9,9 +9,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -252,18 +253,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public TxDepMonitor getTxDepMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx,
 			String rootComp, String parentTx, String parentComp) {
 		// TODO Auto-generated method stub
@@ -274,6 +263,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void dependenceChanged(String hostComp) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public TxLifecycleManager getTxLifecycleMgr() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

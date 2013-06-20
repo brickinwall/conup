@@ -8,9 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cn.edu.nju.moon.conup.ext.freeness.ConcurrentVersionStrategy;
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
-import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>

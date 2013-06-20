@@ -21,11 +21,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
@@ -360,7 +361,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 				boolean flag = true;
 				if(subFlag){
 					boolean isLastuse = true;
-					TxDepMonitor txDepMonitor = txCtx.getTxDepMonitor();
+//					TxDepMonitor txDepMonitor = txCtx.getTxDepMonitor();
+					TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(curComp);
 					isLastuse = txDepMonitor.isLastUse(txCtx.getCurrentTx(), targetComp, curComp);
 					flag = flag && isLastuse;
 				} else{

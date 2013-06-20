@@ -24,10 +24,11 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -182,7 +183,8 @@ public class VersionConsistencyImpl implements Algorithm {
 //					printer.printTxs(LOGGER, depMgr.getTxs());
 					LOGGER.fine("depMgr.getTxs().size():" + depMgr.getTxs().size());
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
-					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+//					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
+					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
 					
 //					LOGGER.fine("TxS after notified TransactionEnd:");
@@ -682,7 +684,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		if(!inFutureFlag){
 			TransactionContext txContext = depMgr.getTxs().get(currentTxID);
 			
-			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
+			TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(currentComp);
 			
 			for(Dependence dep : outFutureOneRoot){
 				boolean isLastUse = txDepMonitor.isLastUse(currentTxID, dep.getTargetCompObjIdentifer(), currentComp);
@@ -869,8 +871,11 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 		}
 		
-		assert depMgr.getTxDepMonitor() != null;
-		depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
+//		assert depMgr.getTxDepMonitor() != null;
+//		depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
+		
+		assert depMgr.getTxLifecycleMgr() != null;
+		depMgr.getTxLifecycleMgr().rootTxEnd(hostComponent, rootTx);
 		
 		return true;
 	}

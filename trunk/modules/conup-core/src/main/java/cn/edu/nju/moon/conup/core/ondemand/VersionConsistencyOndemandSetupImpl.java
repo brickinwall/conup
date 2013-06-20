@@ -24,11 +24,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -372,7 +373,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				boolean lastUseFlag = true;
 				if(subFlag){
 					boolean isLastuse = true;
-					TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
+//					TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
+					TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(curComp);
 					isLastuse = txDepMonitor.isLastUse(txContext.getCurrentTx(), targetComp, curComp);
 					lastUseFlag = lastUseFlag && isLastuse;
 					// at this moment, we can insure dep will not be used in the future, delete it from fDeps

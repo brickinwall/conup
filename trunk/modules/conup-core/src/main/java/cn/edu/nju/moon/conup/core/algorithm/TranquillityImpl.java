@@ -31,11 +31,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 //import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 
 
 /**
@@ -174,7 +175,8 @@ public class TranquillityImpl implements Algorithm {
 				if( depMgr.isNormal()){
 					//TODO need to think more about rootTxEnd
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
-					txCtx.getTxDepMonitor().rootTxEnd(hostComp, txCtx.getRootTx());
+//					txCtx.getTxDepMonitor().rootTxEnd(hostComp, txCtx.getRootTx());
+					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, txCtx.getRootTx());
 //					LOGGER.info("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
 					
 //					Printer printer = new Printer();
@@ -480,7 +482,8 @@ public class TranquillityImpl implements Algorithm {
 			}
 		}
 		
-		depMgr.getTxDepMonitor().rootTxEnd(targetComp, rootTx);
+//		depMgr.getTxDepMonitor().rootTxEnd(targetComp, rootTx);
+		depMgr.getTxLifecycleMgr().rootTxEnd(targetComp, rootTx);
 //		if(txCtx != null){
 //			//TODO Bug comes here: the third parameter is extremely confusing.
 //			txCtx.getTxDepMonitor().rootTxEnd(targetComp, rootTx, rootTx);
@@ -709,8 +712,9 @@ public class TranquillityImpl implements Algorithm {
 		
 		if(!inFutureFlag){
 //			TransactionContext txContext = TransactionRegistry.getInstance().getTransactionContext(currentTxID);
-			TransactionContext txContext = depMgr.getTxs().get(currentTxID);
-			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
+//			TransactionContext txContext = depMgr.getTxs().get(currentTxID);
+//			TxDepMonitor txDepMonitor = txContext.getTxDepMonitor();
+			TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(currentComp);
 			
 			for(Dependence dep : outFutureOneRoot){
 				boolean isLastUse = txDepMonitor.isLastUse(currentTxID, dep.getTargetCompObjIdentifer(), currentComp);
@@ -753,9 +757,15 @@ public class TranquillityImpl implements Algorithm {
 		}
 		
 		
-		if(depMgr.getTxDepMonitor() != null){
-			depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
-		} else{
+//		if(depMgr.getTxDepMonitor() != null){
+//			depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
+//		} else{
+//			LOGGER.warning("failed to remove rootTx " + rootTx + ", due to fail to get TxDepMonitor");
+//		}
+		
+		if(depMgr.getTxLifecycleMgr() != null){
+			depMgr.getTxLifecycleMgr().rootTxEnd(hostComponent, rootTx);
+		} else {
 			LOGGER.warning("failed to remove rootTx " + rootTx + ", due to fail to get TxDepMonitor");
 		}
 		

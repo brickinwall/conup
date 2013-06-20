@@ -8,8 +8,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 
 
 
@@ -32,7 +33,9 @@ public class LocalDynamicDependencesManager {
 	/**
 	 * The object to notify the events they cared happens.
 	 */	
-	private TxDepMonitorImpl monitor = new TxDepMonitorImpl();
+//	private TxDepMonitorImpl txDepMointor = new TxDepMonitorImpl();
+	//TODO tell ping to change her function call code
+	private TxDepMonitor txDepMointor = null;
 	/**
 	 * Unique identifier of a transaction runs.
 	 */
@@ -212,7 +215,7 @@ public class LocalDynamicDependencesManager {
 	 * EventType : first request service from other component
 	 */
 	public void FirstRequestService() {
-		monitor.notify(TxEventType.FirstRequestService,transactionID);
+		txDepMointor.notify(TxEventType.FirstRequestService,transactionID);
 	}
 
 	/**
@@ -220,16 +223,20 @@ public class LocalDynamicDependencesManager {
 	 * 
 	 * @param event
 	 */
-	public void trigger(String event) {	
+	public void trigger(String event, String compIdentifier) {	
 		if (event.contains("Start")) {
 			currentState = 0;
 			past = new ConcurrentSkipListSet<String>();
-			monitor.notify(TxEventType.TransactionStart, transactionID);
+			if(txDepMointor == null){
+				this.txDepMointor = NodeManager.getInstance().getTxDepMonitor(compIdentifier);
+			}
+			assert txDepMointor != null;
+			txDepMointor.notify(TxEventType.TransactionStart, transactionID);
 			LOGGER.fine("Transaction  " + transactionID + "  is start!");			
 			}
 		else {
 			if (event.isEmpty()) {	
-				monitor.notify(TxEventType.TransactionEnd, transactionID);
+				txDepMointor.notify(TxEventType.TransactionEnd, transactionID);
 				ddes.remove(transactionID);
 				LOGGER.fine("Transaction  " + transactionID + "  is end!");	}
 			else {
@@ -244,7 +251,7 @@ public class LocalDynamicDependencesManager {
 				for (String e : eveinf) {
 					if (e.contains(event)) {
 						currentState = Integer.parseInt(e.split("-")[1]);
-						monitor.notify(TxEventType.DependencesChanged, transactionID);						
+						txDepMointor.notify(TxEventType.DependencesChanged, transactionID);						
 						LOGGER.fine("Transaction  " + transactionID + "  dynamic dependences have been changed!");
 						return;
 				}				

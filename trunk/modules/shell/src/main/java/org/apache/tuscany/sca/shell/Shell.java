@@ -81,7 +81,9 @@ import cn.edu.nju.moon.conup.experiments.utils.ExecutionRecorderAnalyzer;
 import cn.edu.nju.moon.conup.experiments.utils.MyPoissonProcess;
 import cn.edu.nju.moon.conup.experiments.utils.TravelCompUpdate;
 import cn.edu.nju.moon.conup.experiments.utils.TravelExpResultQuery;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CallBack;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DeviationExp;
@@ -92,8 +94,11 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 /**
  * A little SCA command shell.
@@ -194,7 +199,22 @@ public class Shell {
 							RuntimeComponent runtimeComponent = (RuntimeComponent)comp;
 							String componentName = runtimeComponent.getName();
 							nodeMgr.loadConupConf(componentName, "Version");
-							CompLifecycleManager.getInstance(componentName).setNode(node);
+							ComponentObject compObj = nodeMgr.getComponentObject(componentName);
+							
+							// create CompLifecycleManager, TxDepMonitor, TxLifecycleMgr
+							CompLifecycleManager compLifecycleMgr = new CompLifecycleManagerImpl(compObj);
+//							compLifecycleMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
+//							compLifecycleMgr.setCompObject(compObj);
+//							compLifecycleMgr.setDepMgr(nodeMgr.getDynamicDepManager(componentName));
+							nodeMgr.setCompLifecycleManager(componentName, compLifecycleMgr);
+							
+							TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+							nodeMgr.setTxDepMonitor(componentName, txDepMonitor);
+							
+							TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+							nodeMgr.setTxLifecycleManager(componentName, txLifecycleMgr);
+							
+							((CompLifecycleManagerImpl)compLifecycleMgr).setNode(node);
 						    CommServerManager.getInstance().start(componentName);
 						}
 					}

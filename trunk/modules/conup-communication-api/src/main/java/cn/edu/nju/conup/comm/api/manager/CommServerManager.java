@@ -14,7 +14,7 @@ import org.apache.tuscany.sca.runtime.DomainRegistry;
 
 import cn.edu.nju.moon.conup.comm.api.server.CommServer;
 import cn.edu.nju.moon.conup.comm.api.utils.CompCommAddress;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 
 /**
  * @author rgc
@@ -118,7 +118,7 @@ public class CommServerManager {
 
 		synchronized (compNameToAddressInfo) {
 			if(compNameToAddressInfo.size() == 0){
-				CompLifecycleManager compLifeCycleMgr = CompLifecycleManager.getInstance(srcComp);
+				CompLifecycleManagerImpl compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(srcComp);
 				NodeImpl node = (NodeImpl) compLifeCycleMgr.getNode();
 				DomainRegistry domainRegistry = node.getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
@@ -151,7 +151,7 @@ public class CommServerManager {
 	 * @return
 	 */
 	public CompCommAddress getInfos(String hostComponentIdentifier) {
-		CompLifecycleManager compLifecycleMgr = CompLifecycleManager.getInstance(hostComponentIdentifier);
+		CompLifecycleManagerImpl compLifecycleMgr = CompLifecycleManagerImpl.getInstance(hostComponentIdentifier);
 		
 		NodeImpl node = (NodeImpl) compLifecycleMgr.getNode();
 		DomainRegistry domainRegistry = node.getDomainRegistry();

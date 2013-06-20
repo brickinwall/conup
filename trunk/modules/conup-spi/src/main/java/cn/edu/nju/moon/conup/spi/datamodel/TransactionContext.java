@@ -51,7 +51,7 @@ public class TransactionContext {
 	/** subTx's statuses, it takes sub-tx id as the key */
 	private Map<String, TxEventType> subTxStatuses;
 	
-	private TxDepMonitor txDepMonitor;
+//	private TxDepMonitor txDepMonitor;
 	
 	public TransactionContext(){
 		if(subTxHostComps == null)
@@ -183,20 +183,20 @@ public class TransactionContext {
 		this.eventType = eventType;
 	}
 	
-	/**
-	 * Each tx has one TxDepMonitor
-	 * @return
-	 */
-	public TxDepMonitor getTxDepMonitor() {
-		return txDepMonitor;
-	}
-
-	/**
-	 * Each tx has one TxDepMonitor
-	 */
-	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
-		this.txDepMonitor = txDepMonitor;
-	}
+//	/**
+//	 * Each tx has one TxDepMonitor
+//	 * @return
+//	 */
+//	public TxDepMonitor getTxDepMonitor() {
+//		return txDepMonitor;
+//	}
+//
+//	/**
+//	 * Each tx has one TxDepMonitor
+//	 */
+//	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
+//		this.txDepMonitor = txDepMonitor;
+//	}
 	
 	public boolean isFakeTx() {
 		return isFakeTx;
