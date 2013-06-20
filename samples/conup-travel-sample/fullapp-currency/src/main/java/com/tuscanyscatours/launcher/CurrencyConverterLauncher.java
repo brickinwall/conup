@@ -1,7 +1,5 @@
 package com.tuscanyscatours.launcher;
 
-
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,9 +9,14 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 import com.tuscanyscatours.currencyconverter.CurrencyConverter;
@@ -41,9 +44,20 @@ public class CurrencyConverterLauncher {
 		
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
+//        nodeMgr.loadConupConf("CurrencyConverter", "oldVersion");
+//        CompLifecycleManager.getInstance("CurrencyConverter").setNode(node);
+//        CommServerManager.getInstance().start("CurrencyConverter");
+        
         nodeMgr.loadConupConf("CurrencyConverter", "oldVersion");
-        CompLifecycleManager.getInstance("CurrencyConverter").setNode(node);
-        CommServerManager.getInstance().start("CurrencyConverter");
+		ComponentObject currencyCompObj = nodeMgr.getComponentObject("CurrencyConverter");
+		CompLifecycleManagerImpl currencyCompLifecycleManager = new CompLifecycleManagerImpl(currencyCompObj);
+		currencyCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("CurrencyConverter", currencyCompLifecycleManager);
+		TxDepMonitor currencyTxDepMonitor = new TxDepMonitorImpl(currencyCompObj);
+		nodeMgr.setTxDepMonitor("CurrencyConverter", currencyTxDepMonitor);
+		TxLifecycleManager currencyTxLifecycleMgr = new TxLifecycleManagerImpl(currencyCompObj);
+		nodeMgr.setTxLifecycleManager("CurrencyConverter", currencyTxLifecycleMgr);
+		CommServerManager.getInstance().start("CurrencyConverter");
         
 //        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetting();
 //        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetupIsDone();

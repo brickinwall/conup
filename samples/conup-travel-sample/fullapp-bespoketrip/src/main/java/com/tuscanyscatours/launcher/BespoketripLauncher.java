@@ -13,9 +13,14 @@ import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.hotel.HotelSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class BespoketripLauncher {
@@ -40,15 +45,40 @@ public class BespoketripLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("HotelPartner", "oldVersion");
-		CompLifecycleManager.getInstance("HotelPartner").setNode(node);
+		
+		ComponentObject compObj = nodeMgr.getComponentObject("HotelPartner");
+		CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+		compLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("HotelPartner", compLifecycleManager);
+		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+		nodeMgr.setTxDepMonitor("HotelPartner", txDepMonitor);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		nodeMgr.setTxLifecycleManager("HotelPartner", txLifecycleMgr);
+		
 		CommServerManager.getInstance().start("HotelPartner");
 
 		nodeMgr.loadConupConf("FlightPartner", "oldVersion");
-		CompLifecycleManager.getInstance("FlightPartner").setNode(node);
+		ComponentObject flightCompObj = nodeMgr.getComponentObject("FlightPartner");
+		CompLifecycleManagerImpl flightCompLifecycleManager = new CompLifecycleManagerImpl(flightCompObj);
+		flightCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("FlightPartner", flightCompLifecycleManager);
+		TxDepMonitor flightTxDepMonitor = new TxDepMonitorImpl(flightCompObj);
+		nodeMgr.setTxDepMonitor("FlightPartner", flightTxDepMonitor);
+		TxLifecycleManager flightTxLifecycleMgr = new TxLifecycleManagerImpl(flightCompObj);
+		nodeMgr.setTxLifecycleManager("FlightPartner", flightTxLifecycleMgr);
+		
 		CommServerManager.getInstance().start("FlightPartner");
 		
 		nodeMgr.loadConupConf("CarPartner", "oldVersion");
-		CompLifecycleManager.getInstance("CarPartner").setNode(node);
+		ComponentObject carCompObj = nodeMgr.getComponentObject("CarPartner");
+		CompLifecycleManagerImpl carCompLifecycleManager = new CompLifecycleManagerImpl(carCompObj);
+		carCompLifecycleManager.setNode(node);
+		nodeMgr.setCompLifecycleManager("CarPartner", carCompLifecycleManager);
+		TxDepMonitor carTxDepMonitor = new TxDepMonitorImpl(carCompObj);
+		nodeMgr.setTxDepMonitor("CarPartner", carTxDepMonitor);
+		TxLifecycleManager carTxLifecycleMgr = new TxLifecycleManagerImpl(carCompObj);
+		nodeMgr.setTxLifecycleManager("CarPartner", carTxLifecycleMgr);
+		
 		CommServerManager.getInstance().start("CarPartner");
 
 //		nodeMgr.getDynamicDepManager("HotelPartner").ondemandSetting();
