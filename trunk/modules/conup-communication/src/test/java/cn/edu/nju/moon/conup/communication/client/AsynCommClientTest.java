@@ -18,9 +18,6 @@ import org.junit.Test;
 import cn.edu.nju.moon.conup.communication.model.RequestObject;
 import cn.edu.nju.moon.conup.communication.model.ResponseObject;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
-import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
  * @author rgc
