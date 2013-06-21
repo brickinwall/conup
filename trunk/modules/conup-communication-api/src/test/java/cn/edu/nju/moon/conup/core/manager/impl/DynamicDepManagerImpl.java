@@ -238,11 +238,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return null;
 	}
 
-	@Override
-	public Map<String, TransactionContext> getFakeTxs() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public Map<String, TransactionContext> getFakeTxs() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp,
@@ -268,6 +268,12 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public TxLifecycleManager getTxLifecycleMgr() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

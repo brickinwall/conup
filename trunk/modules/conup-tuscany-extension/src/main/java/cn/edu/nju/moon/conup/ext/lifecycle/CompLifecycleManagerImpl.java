@@ -13,7 +13,6 @@ import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
 
-import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
@@ -81,7 +80,7 @@ public class CompLifecycleManagerImpl implements CompLifecycleManager {
 
 	public CompLifecycleManagerImpl(ComponentObject compObj){
 		setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
-		setDepMgr(NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier()));
+//		setDepMgr(NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier()));
 		this.compObj = compObj;
 	}
 	
