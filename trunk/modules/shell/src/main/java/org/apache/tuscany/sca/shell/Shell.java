@@ -96,6 +96,7 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -213,6 +214,10 @@ public class Shell {
 							
 							TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 							nodeMgr.setTxLifecycleManager(componentName, txLifecycleMgr);
+							
+							DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+							depMgr.setTxLifecycleMgr(txLifecycleMgr);
+							compLifecycleMgr.setDepMgr(depMgr);
 							
 							((CompLifecycleManagerImpl)compLifecycleMgr).setNode(node);
 						    CommServerManager.getInstance().start(componentName);
