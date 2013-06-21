@@ -24,10 +24,12 @@ import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 /**
  * It's used to monitor transaction status, maintain transaction context 
@@ -63,9 +65,13 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		/*
 		 * set eventType, futureC, pastC 
 		 */
-		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
+//		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		TxLifecycleManager txLifecycleMgr = nodeMgr.getTxLifecycleManager(compObject.getIdentifier());
+		TransactionRegistry txRegistry = txLifecycleMgr.getTxRegistry();
+		
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
-		TransactionContext txContext = TX_IDS.get(curTxID);
+		TransactionContext txContext = txRegistry.getTransactionContext(curTxID);
 		txContext.setEventType(et);
 		
 		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()));
@@ -86,7 +92,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		// when be notified that a tx ends, remove it from TX_IDS.
 		if(et.equals(TxEventType.TransactionEnd)){
 //			TX_IDS.remove(txContext.getHostComponent());
-			TX_IDS.remove(curTxID);
+//			TX_IDS.remove(curTxID);
+			txRegistry.removeTransactionContext(curTxID);
 			
 			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
 			interceptorCache.removeTxCtx(getThreadID());

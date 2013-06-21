@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.spi.tx;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
+
 public interface TxLifecycleManager {
 
 	/**
@@ -17,7 +19,7 @@ public interface TxLifecycleManager {
 	/**
 	 * @param id the transaction id that needs to be destroyed
 	 */
-	public void destroyID(String id);
+	public void destroyID(String txId);
 
 	/**
 	 * @return total transactions that are running
@@ -85,4 +87,9 @@ public interface TxLifecycleManager {
 	 */
 	public String getCompIdentifier();
 
+	/**
+	 * get current component's txRegistry
+	 * @return
+	 */
+	public TransactionRegistry getTxRegistry();
 }

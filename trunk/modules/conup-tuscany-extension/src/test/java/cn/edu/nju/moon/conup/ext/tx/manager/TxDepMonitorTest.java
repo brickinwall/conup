@@ -18,7 +18,9 @@ import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 /**
  * @author rgc
  */
@@ -79,14 +81,20 @@ public class TxDepMonitorTest {
 		nodeMgr.addComponentObject("AuthComponent", compObject);
 		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(compObject);
 		nodeMgr.addComponentObject(hostCompName, compObject);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObject);
+		nodeMgr.setTxLifecycleManager("AuthComponent", txLifecycleMgr);
 //		DynamicDepManager ddm = nodeMgr.getDynamicDepManager("AuthComponent");
 		
 //		CompLifecycleManagerImpl compLifecycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance("AuthComponent");
 		compLifecycleMgr.setNode(node);
 //		ddm.setCompStatus(CompStatus.NORMAL);
-		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
 		
-		TX_IDS.put(curTxID, tc);
+		
+//		Map<String, TransactionContext> TX_IDS = TxLifecycleManagerImpl.TX_IDS;
+//		
+//		TX_IDS.put(curTxID, tc);
+		TransactionRegistry txRegistry = txLifecycleMgr.getTxRegistry();
+		txRegistry.addTransactionContext(curTxID, tc);
 		
 		String states = "_E";
 		String nexts = "_E";
