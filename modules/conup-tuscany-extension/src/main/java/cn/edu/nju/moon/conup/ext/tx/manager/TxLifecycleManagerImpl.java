@@ -12,6 +12,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -24,11 +25,12 @@ import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 public class TxLifecycleManagerImpl implements TxLifecycleManager {
 	
 	private static final Logger LOGGER = Logger.getLogger(TxLifecycleManagerImpl.class.getName());
-	/**
-	 * TX_IDS takes transactionID and TransactionContext as key and value respectively.
-	 */
-	public static Map<String, TransactionContext> TX_IDS = new ConcurrentHashMap<String, TransactionContext>();
-	
+//	/**
+//	 * TX_IDS takes transactionID and TransactionContext as key and value respectively.
+//	 */
+//	public static Map<String, TransactionContext> TX_IDS = new ConcurrentHashMap<String, TransactionContext>();
+	/** transactions hosted by current component */
+	private TransactionRegistry txRegistry = new TransactionRegistry();
 	/**
 	 * maintained by trace interceptor and TxLifecycleManager
 	 * key : threadID
@@ -37,16 +39,11 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 	 */
 //	private Map<String, String> associateTx = new ConcurrentHashMap<String, String>();
 	
-//	private String compIdentifier = null;
 	private ComponentObject compObject = null;
 	
 	public TxLifecycleManagerImpl(ComponentObject compObject){
 		this.compObject = compObject;
 	}
-	
-//	public TxLifecycleManagerImpl(String compIdentifier){
-//		this.compIdentifier = compIdentifier;
-//	}
 	
 	@Override
 	public String createID(){
@@ -117,7 +114,8 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		txContext.setRootComponent(rootComponent);
 		txContext.setParentTx(parentTx);
 		txContext.setRootTx(rootTx);
-		TX_IDS.put(txID, txContext);
+//		TX_IDS.put(txID, txContext);
+		txRegistry.addTransactionContext(txID, txContext);
 		return txID;
 	}
 	
@@ -129,13 +127,15 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 	}
 	
 	@Override
-	public void destroyID(String id){
-		TX_IDS.remove(id);
+	public void destroyID(String txId){
+//		TX_IDS.remove(id);
+		txRegistry.removeTransactionContext(txId);
 	}
 	
 	@Override
 	public int getTxs(){
-		return TX_IDS.size();
+//		return TX_IDS.size();
+		return txRegistry.getTransactionContexts().size();
 	}
 
 	/**
@@ -250,6 +250,11 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 	@Override
 	public String getCompIdentifier() {
 		return compObject.getIdentifier();
+	}
+
+	@Override
+	public TransactionRegistry getTxRegistry() {
+		return txRegistry;
 	}
 
 	private String getThreadID() {

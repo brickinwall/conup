@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
@@ -20,6 +22,7 @@ public class TxLifecycleManagerTest {
 	TxLifecycleManagerImpl txLifecycleMgr = null;
 	ComponentObject compObj = null;
 	NodeManager nodeMgr = null;
+	TransactionRegistry txRegistry = null;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -40,13 +43,20 @@ public class TxLifecycleManagerTest {
 		nodeMgr.addComponentObject(compObj.getIdentifier(), compObj);
 		
 		txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		txRegistry = txLifecycleMgr.getTxRegistry();
+		
 		if(txLifecycleMgr.getTxs() != 0){
-			Map<String, TransactionContext> txCtxs = txLifecycleMgr.TX_IDS;
-			Iterator<Entry<String, TransactionContext>> iterator = txCtxs.entrySet().iterator();
-			while(iterator.hasNext()){
-				String key = iterator.next().getKey();
-				txLifecycleMgr.destroyID(key);
+//			Map<String, TransactionContext> txCtxs = txRegistry.getAllTxIds();
+			Set<String> allTxIds = txRegistry.getAllTxIds();
+			for(String txId : allTxIds){
+				txRegistry.removeTransactionContext(txId);
 			}
+			
+//			Iterator<Entry<String, TransactionContext>> iterator = txCtxs.entrySet().iterator();
+//			while(iterator.hasNext()){
+//				String key = iterator.next().getKey();
+//				txLifecycleMgr.destroyID(key);
+//			}
 		}
 		
 	}
@@ -90,17 +100,18 @@ public class TxLifecycleManagerTest {
 	@Test
 	public void testDestroyID() {
 		String currentTxID = UUID.randomUUID().toString();
-		txLifecycleMgr.TX_IDS.put(currentTxID, new TransactionContext());
-		
+//		txLifecycleMgr.TX_IDS.put(currentTxID, new TransactionContext());
+		txRegistry.addTransactionContext(currentTxID, new TransactionContext());
 		
 		txLifecycleMgr.destroyID(currentTxID);
-		assertTrue(!txLifecycleMgr.TX_IDS.containsKey(currentTxID));
+		assertTrue(!txRegistry.contains(currentTxID));
 	}
 
 	@Test
 	public void testGetTxs() {
 		String currentTxID = UUID.randomUUID().toString();
-		txLifecycleMgr.TX_IDS.put(currentTxID, new TransactionContext());
+//		txLifecycleMgr.TX_IDS.put(currentTxID, new TransactionContext());
+		txRegistry.addTransactionContext(currentTxID, new TransactionContext());
 		
 		assertEquals(1, txLifecycleMgr.getTxs());
 	}
