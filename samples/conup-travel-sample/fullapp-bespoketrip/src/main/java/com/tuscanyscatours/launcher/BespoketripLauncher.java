@@ -18,6 +18,7 @@ import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -55,6 +56,10 @@ public class BespoketripLauncher {
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager("HotelPartner", txLifecycleMgr);
 		
+		DynamicDepManager hotelDepMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+		hotelDepMgr.setTxLifecycleMgr(txLifecycleMgr);
+		compLifecycleManager.setDepMgr(hotelDepMgr);
+		
 		CommServerManager.getInstance().start("HotelPartner");
 
 		nodeMgr.loadConupConf("FlightPartner", "oldVersion");
@@ -67,6 +72,10 @@ public class BespoketripLauncher {
 		TxLifecycleManager flightTxLifecycleMgr = new TxLifecycleManagerImpl(flightCompObj);
 		nodeMgr.setTxLifecycleManager("FlightPartner", flightTxLifecycleMgr);
 		
+		DynamicDepManager flightDepMgr = NodeManager.getInstance().getDynamicDepManager(flightCompObj.getIdentifier());
+		flightDepMgr.setTxLifecycleMgr(flightTxLifecycleMgr);
+		compLifecycleManager.setDepMgr(flightDepMgr);
+		
 		CommServerManager.getInstance().start("FlightPartner");
 		
 		nodeMgr.loadConupConf("CarPartner", "oldVersion");
@@ -78,6 +87,10 @@ public class BespoketripLauncher {
 		nodeMgr.setTxDepMonitor("CarPartner", carTxDepMonitor);
 		TxLifecycleManager carTxLifecycleMgr = new TxLifecycleManagerImpl(carCompObj);
 		nodeMgr.setTxLifecycleManager("CarPartner", carTxLifecycleMgr);
+		
+		DynamicDepManager carDepMgr = NodeManager.getInstance().getDynamicDepManager(carCompObj.getIdentifier());
+		carDepMgr.setTxLifecycleMgr(carTxLifecycleMgr);
+		compLifecycleManager.setDepMgr(carDepMgr);
 		
 		CommServerManager.getInstance().start("CarPartner");
 

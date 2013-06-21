@@ -58,6 +58,10 @@ public class LaunchAuth {
 		nodeMgr.setTxDepMonitor("AuthComponent", txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager("AuthComponent", txLifecycleMgr);
+		
+		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+		depMgr.setTxLifecycleMgr(txLifecycleMgr);
+		compLifecycleManager.setDepMgr(depMgr);
         
 		CommServerManager.getInstance().start("AuthComponent");
         //access

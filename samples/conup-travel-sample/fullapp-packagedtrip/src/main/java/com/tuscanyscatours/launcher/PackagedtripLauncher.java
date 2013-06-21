@@ -16,6 +16,7 @@ import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -54,6 +55,11 @@ public class PackagedtripLauncher {
 		nodeMgr.setTxDepMonitor("TripPartner", triPartnerTxDepMonitor);
 		TxLifecycleManager triPartnerTxLifecycleMgr = new TxLifecycleManagerImpl(triPartnerCompObj);
 		nodeMgr.setTxLifecycleManager("TripPartner", triPartnerTxLifecycleMgr);
+		
+		DynamicDepManager tripPartnerDepMgr = NodeManager.getInstance().getDynamicDepManager(triPartnerCompObj.getIdentifier());
+		tripPartnerDepMgr.setTxLifecycleMgr(triPartnerTxLifecycleMgr);
+		triPartnerCompLifecycleManager.setDepMgr(tripPartnerDepMgr);
+		
 		CommServerManager.getInstance().start("TripPartner");
 		
 //		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetting();

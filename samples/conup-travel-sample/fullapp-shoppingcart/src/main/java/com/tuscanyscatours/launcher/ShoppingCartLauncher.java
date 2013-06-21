@@ -19,6 +19,7 @@ import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -59,6 +60,11 @@ public class ShoppingCartLauncher {
 		nodeMgr.setTxDepMonitor("ShoppingCart", shoppingCartTxDepMonitor);
 		TxLifecycleManager shoppingCartTxLifecycleMgr = new TxLifecycleManagerImpl(shoppingCartCompObj);
 		nodeMgr.setTxLifecycleManager("ShoppingCart", shoppingCartTxLifecycleMgr);
+		
+		DynamicDepManager shoppingcartDepMgr = NodeManager.getInstance().getDynamicDepManager(shoppingCartCompObj.getIdentifier());
+		shoppingcartDepMgr.setTxLifecycleMgr(shoppingCartTxLifecycleMgr);
+		shoppingCartCompLifecycleManager.setDepMgr(shoppingcartDepMgr);
+		
 		CommServerManager.getInstance().start("ShoppingCart");
 		
 //		nodeMgr.loadConupConf("CartStore", "oldVersion");
@@ -74,6 +80,11 @@ public class ShoppingCartLauncher {
 		nodeMgr.setTxDepMonitor("CartStore", cartStoreTxDepMonitor);
 		TxLifecycleManager cartStoreTxLifecycleMgr = new TxLifecycleManagerImpl(cartStoreCompObj);
 		nodeMgr.setTxLifecycleManager("CartStore", cartStoreTxLifecycleMgr);
+		
+		DynamicDepManager cartStoreDepMgr = NodeManager.getInstance().getDynamicDepManager(cartStoreCompObj.getIdentifier());
+		cartStoreDepMgr.setTxLifecycleMgr(shoppingCartTxLifecycleMgr);
+		cartStoreCompLifecycleManager.setDepMgr(cartStoreDepMgr);
+		
 		CommServerManager.getInstance().start("CartStore");
 		
 //		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetting();

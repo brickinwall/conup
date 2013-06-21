@@ -66,6 +66,10 @@ public class LaunchDB {
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager("DBComponent", txLifecycleMgr);
 		
+		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+		depMgr.setTxLifecycleMgr(txLifecycleMgr);
+		compLifecycleManager.setDepMgr(depMgr);
+		
 		CommServerManager.getInstance().start("DBComponent");
 
 		// send ondemand request
