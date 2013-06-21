@@ -1,27 +1,18 @@
-package cn.edu.nju.moon.conup.core;
+package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
-
-
 public class TransactionRegistry  {
-//	private static TransactionRegistry transactionRegistry = new TransactionRegistry();
 	/** take tx_id as key*/
 	private Map<String, TransactionContext> txContexts;
 	
-//	private TransactionRegistry(){
-//		txContexts = new ConcurrentHashMap<String, TransactionContext>();
-//	}
 	public TransactionRegistry(){
 		txContexts = new ConcurrentHashMap<String, TransactionContext>();
 	}
-	
-//	public static TransactionRegistry getInstance(){
-//		return transactionRegistry;
-//	}
 	
 	public TransactionContext getTransactionContext(String transactionID) {
 		return txContexts.get(transactionID);
@@ -63,5 +54,9 @@ public class TransactionRegistry  {
 	public void updateTransactionContext(String transactionID, TransactionContext transactionContext){
 		txContexts.remove(transactionID);
 		txContexts.put(transactionID, transactionContext);
+	}
+	
+	public Set<String> getAllTxIds(){
+		return txContexts.keySet();
 	}
 }
