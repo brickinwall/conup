@@ -14,6 +14,7 @@ import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -57,6 +58,11 @@ public class CurrencyConverterLauncher {
 		nodeMgr.setTxDepMonitor("CurrencyConverter", currencyTxDepMonitor);
 		TxLifecycleManager currencyTxLifecycleMgr = new TxLifecycleManagerImpl(currencyCompObj);
 		nodeMgr.setTxLifecycleManager("CurrencyConverter", currencyTxLifecycleMgr);
+		
+		DynamicDepManager currencyDepMgr = NodeManager.getInstance().getDynamicDepManager(currencyCompObj.getIdentifier());
+		currencyDepMgr.setTxLifecycleMgr(currencyTxLifecycleMgr);
+		currencyCompLifecycleManager.setDepMgr(currencyDepMgr);
+		
 		CommServerManager.getInstance().start("CurrencyConverter");
         
 //        nodeMgr.getDynamicDepManager("CurrencyConverter").ondemandSetting();

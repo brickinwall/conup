@@ -60,6 +60,10 @@ public class LaunchProc {
 		nodeMgr.setTxDepMonitor("ProcComponent", txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager("ProcComponent", txLifecycleMgr);
+		
+		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+		depMgr.setTxLifecycleMgr(txLifecycleMgr);
+		compLifecycleManager.setDepMgr(depMgr);
         
         CommServerManager.getInstance().start("ProcComponent");
         

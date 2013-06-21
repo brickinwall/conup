@@ -15,6 +15,7 @@ import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -56,6 +57,11 @@ public class PaymentLauncher {
 		nodeMgr.setTxDepMonitor("Payment", paymentTxDepMonitor);
 		TxLifecycleManager paymentTxLifecycleMgr = new TxLifecycleManagerImpl(paymentCompObj);
 		nodeMgr.setTxLifecycleManager("Payment", paymentTxLifecycleMgr);
+		
+		DynamicDepManager paymentDepMgr = NodeManager.getInstance().getDynamicDepManager(paymentCompObj.getIdentifier());
+		paymentDepMgr.setTxLifecycleMgr(paymentTxLifecycleMgr);
+		paymentCompLifecycleManager.setDepMgr(paymentDepMgr);
+		
 		CommServerManager.getInstance().start("Payment");
         
 //        nodeMgr.loadConupConf("CustomerRegistry", "oldVersion");
@@ -71,6 +77,11 @@ public class PaymentLauncher {
 		nodeMgr.setTxDepMonitor("CustomerRegistry", customerRegistryTxDepMonitor);
 		TxLifecycleManager customerRegistryTxLifecycleMgr = new TxLifecycleManagerImpl(customerRegistryCompObj);
 		nodeMgr.setTxLifecycleManager("CustomerRegistry", customerRegistryTxLifecycleMgr);
+		
+		DynamicDepManager customerRegistryDepMgr = NodeManager.getInstance().getDynamicDepManager(customerRegistryCompObj.getIdentifier());
+		customerRegistryDepMgr.setTxLifecycleMgr(customerRegistryTxLifecycleMgr);
+		customerRegistryCompLifecycleManager.setDepMgr(customerRegistryDepMgr);
+		
 		CommServerManager.getInstance().start("CustomerRegistry");
         
 //        nodeMgr.loadConupConf("EmailGateway", "oldVersion");
@@ -86,6 +97,11 @@ public class PaymentLauncher {
 		nodeMgr.setTxDepMonitor("EmailGateway", emailGatewayTxDepMonitor);
 		TxLifecycleManager emailGatewayTxLifecycleMgr = new TxLifecycleManagerImpl(emailGatewayCompObj);
 		nodeMgr.setTxLifecycleManager("EmailGateway", emailGatewayTxLifecycleMgr);
+		
+		DynamicDepManager emailGatewayDepMgr = NodeManager.getInstance().getDynamicDepManager(emailGatewayCompObj.getIdentifier());
+		emailGatewayDepMgr.setTxLifecycleMgr(emailGatewayTxLifecycleMgr);
+		emailGatewayCompLifecycleManager.setDepMgr(emailGatewayDepMgr);
+		
 		CommServerManager.getInstance().start("EmailGateway");
         
 //        nodeMgr.loadConupConf("CreditCardPayment", "oldVersion");
