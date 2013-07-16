@@ -8,13 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.tuscany.sca.assembly.ComponentReference;
 import org.apache.tuscany.sca.assembly.Endpoint;
-import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointReferenceImpl;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.runtime.DomainRegistry;
 
 import cn.edu.nju.moon.conup.comm.api.server.CommServer;
 import cn.edu.nju.moon.conup.comm.api.utils.CompCommAddress;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 
 /**
  * @author rgc
@@ -77,7 +76,7 @@ public class CommServerManager {
 		if (!compAddresses.containsKey(compIdentifier)) {
 			compAddresses.put(compIdentifier, ip + ":" + port);
 			if (!commServers.containsKey(ip + ":" + port)) {
-				CommServer cs = new CommServer();
+				CommServer cs = new CommServer(compIdentifier);
 				commServers.put(ip + ":" + port, cs);
 			} else{
 				return true;
@@ -114,7 +113,7 @@ public class CommServerManager {
 	 * @param targetCompIdentifier
 	 * @return target component's ip address and port: "ip:10.0.2.15,port:18080";
 	 */
-	public CompCommAddress getInfos(String srcComp, String targetComp) {
+	public static CompCommAddress getInfos(String srcComp, String targetComp) {
 
 		synchronized (compNameToAddressInfo) {
 			if(compNameToAddressInfo.size() == 0){
