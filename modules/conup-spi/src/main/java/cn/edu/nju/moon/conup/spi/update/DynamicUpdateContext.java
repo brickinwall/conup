@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.spi.complifecycle;
+package cn.edu.nju.moon.conup.spi.update;
 
 import java.util.Set;
 
