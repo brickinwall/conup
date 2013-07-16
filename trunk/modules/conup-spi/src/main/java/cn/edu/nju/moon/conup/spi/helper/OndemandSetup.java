@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.helper;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 
 
 /**
@@ -44,6 +45,13 @@ public interface OndemandSetup {
 	 * @param ondemandHelper
 	 */
 	public void setOndemandHelper(OndemandSetupHelper ondemandHelper);
+	
+	/**
+	 * set a TxDepRegistry to OndemandSetup, although this parameter is not useful for Quiescence
+	 * OndemandSetup and TxDepRegistry is 1-1 with ComponentObject
+	 * @param txDepMonitor
+	 */
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
 	
 	public void onDemandIsDone();
 	

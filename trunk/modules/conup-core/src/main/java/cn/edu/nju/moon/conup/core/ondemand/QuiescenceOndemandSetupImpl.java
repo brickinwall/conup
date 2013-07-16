@@ -20,9 +20,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -425,5 +425,11 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	
 	private boolean onDemandSetUp(){
 		return true;
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
+		// TODO Auto-generated method stub
+		
 	}
 }

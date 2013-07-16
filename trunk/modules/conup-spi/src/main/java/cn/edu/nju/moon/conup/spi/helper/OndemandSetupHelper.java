@@ -2,6 +2,7 @@ package cn.edu.nju.moon.conup.spi.helper;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 
 /**
  * An OndemandSetupHelper may be invoked by tuscany-extension module
@@ -10,7 +11,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * @author Jiang Wang<jiang.wang88@gmail.com>
  *
  */
-public interface OndemandSetupHelper {
+public interface OndemandSetupHelper extends Observer{
 	
 	/**
 	 * invoke OndemandSetup and begin on-demand setup
@@ -42,6 +43,11 @@ public interface OndemandSetupHelper {
 	 * @param ondemandSetup
 	 */
 	public void setOndemand(OndemandSetup ondemandSetup);
+	
+	/**
+	 * @returnOndemandSetup
+	 */
+	public OndemandSetup getOndemand();
 	
 	/**
 	 * @param depMgr

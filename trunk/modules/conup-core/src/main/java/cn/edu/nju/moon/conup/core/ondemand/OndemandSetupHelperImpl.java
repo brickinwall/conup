@@ -3,9 +3,12 @@ package cn.edu.nju.moon.conup.core.ondemand;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -106,6 +109,20 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	
 	public void onDemandIsDone(){
 		ondemandSetup.onDemandIsDone();
+	}
+
+	@Override
+	public OndemandSetup getOndemand() {
+		return this.ondemandSetup;
+	}
+
+	@Override
+	public void update(Subject subject, Object arg) {
+		RequestObject reqObj = (RequestObject) arg;
+		if(reqObj.getMsgType().equals(MsgType.ONDEMAND_MSG)){
+			boolean ondemandResult = ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
+			subject.setResult("ondemandResult:" + ondemandResult);
+		}
 	}
 	
 }

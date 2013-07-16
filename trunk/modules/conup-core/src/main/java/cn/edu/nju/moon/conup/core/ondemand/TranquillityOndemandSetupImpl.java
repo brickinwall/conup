@@ -21,6 +21,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -47,16 +48,12 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 * inner map's key is parentComponentName
 	 */
 	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
-//	public static Map<String, Boolean> OndemandRequestStatus = new HashMap<String, Boolean>();
-//	public static Map<String, Boolean> ConfirmOndemandStatus = new HashMap<String, Boolean>();
-
-	public static Logger getLogger() {
-		return LOGGER;
-	}
 
 	private OndemandSetupHelper ondemandHelper;
 
 	private boolean isOndemandDone;
+
+	private TxDepRegistry txDepRegistry = null;
 
 	@Override
 	public boolean ondemand() {
@@ -684,10 +681,13 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		while (txIterator.hasNext()) {
 			ctx = txIterator.next().getValue();
 			if (ctx.getCurrentTx().equals(txID)) {
-				if (ctx.getFutureComponents() != null
-						|| ctx.getFutureComponents().size() != 0) {
+//				if (ctx.getFutureComponents() != null
+//						|| ctx.getFutureComponents().size() != 0) {
+				if (txDepRegistry.getLocalDep(txID).getFutureComponents() != null
+						|| txDepRegistry.getLocalDep(txID).getFutureComponents().size() != 0) {
 					rootTx = ctx.getCurrentTx();
-					for (String comp : ctx.getFutureComponents()) {
+//					for (String comp : ctx.getFutureComponents()) {
+					for (String comp : txDepRegistry.getLocalDep(txID).getFutureComponents()) {
 						if (targetRef.contains(comp)) {
 							futureC.add(comp);
 						}
@@ -744,10 +744,12 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		while (txIterator.hasNext()) {
 			ctx = txIterator.next().getValue();
 			if (ctx.getCurrentTx().equals(txID)) {
-				if (ctx.getPastComponents() != null
-						|| ctx.getPastComponents().size() != 0) {
+//				if (ctx.getPastComponents() != null
+//						|| ctx.getPastComponents().size() != 0) {
+				if (txDepRegistry.getLocalDep(txID).getPastComponents() != null
+						|| txDepRegistry.getLocalDep(txID).getPastComponents().size() != 0) {	
 					rootTx = ctx.getCurrentTx();
-					for (String comp : ctx.getPastComponents()) {
+					for (String comp : txDepRegistry.getLocalDep(txID).getPastComponents()) {
 						if (targetRef.contains(comp)) {
 							pastC.add(comp);
 						}
@@ -810,6 +812,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		ConfirmOndemandStatus.remove(hostComp);
 //		OndemandRequestStatus.clear();
 //		ConfirmOndemandStatus.clear();
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
+		this.txDepRegistry  = txDepRegistry;
 	}
 
 }
