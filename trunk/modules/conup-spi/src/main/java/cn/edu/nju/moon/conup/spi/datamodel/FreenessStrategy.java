@@ -28,7 +28,7 @@ public interface FreenessStrategy {
 //	public void achieveFreeness(String rootTxID, String rootComp, String parentComp, 
 //			String curTxID, String hostComp, FreenessCallback fcb);
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp, 
-			String curTxID, String hostComp, FreenessCallback fcb);
+			String curTxID, String hostComp);
 	
 	/**
 	 * Each freeness strategy implementation should have a unique type identifier.

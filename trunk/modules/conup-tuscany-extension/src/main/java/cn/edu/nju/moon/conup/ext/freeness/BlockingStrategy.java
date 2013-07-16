@@ -3,13 +3,11 @@ package cn.edu.nju.moon.conup.ext.freeness;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * Implementation of blocking strategy for achieving freeness
@@ -23,15 +21,8 @@ public class BlockingStrategy implements FreenessStrategy {
 	
 	@Override
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
-			String curTxID, String hostComp, FreenessCallback fcb) {
+			String curTxID, String hostComp) {
 		return null;
-//		while(isInterceptRequiredForFree(rootTxID, hostComp)){
-//			try {
-//				Thread.sleep(200);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
 	}
 
 	@Override
@@ -41,12 +32,14 @@ public class BlockingStrategy implements FreenessStrategy {
 
 	@Override
 	public boolean isInterceptRequiredForFree(String rootTx, String compIdentifier, TransactionContext txCtx, boolean isUpdateReqRCVD) {
-		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(compIdentifier);
-		CompLifecycleManager compLcMgr;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		DynamicDepManager depManager = nodeMgr.getDynamicDepManager(compIdentifier);
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+//		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
 		if( isUpdateReqRCVD ){
-			compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
-			algorithmOldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
+//			compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
+			algorithmOldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		} else{
 			algorithmOldVersionRootTxs = null;
 		}
@@ -54,7 +47,7 @@ public class BlockingStrategy implements FreenessStrategy {
 		boolean isBlock = depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, txCtx, isUpdateReqRCVD);
 		
 		if(isBlock){
-			LOGGER.fine(txCtx.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
+			LOGGER.info(txCtx.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 		}
 		
 		return isBlock;
