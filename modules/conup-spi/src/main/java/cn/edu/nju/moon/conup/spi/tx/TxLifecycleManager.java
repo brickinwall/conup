@@ -1,5 +1,10 @@
 package cn.edu.nju.moon.conup.spi.tx;
 
+import java.util.List;
+
+import org.apache.tuscany.sca.invocation.Message;
+
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 
 public interface TxLifecycleManager {
@@ -65,6 +70,17 @@ public interface TxLifecycleManager {
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
 	/**
+	 * the host component is going to init a sub-transaction for another component.
+	 * However, the sub-transaction has not truely been started.
+	 * 
+	 * @param hostComp
+	 * @param fakeSubTx
+	 * @param txCtxInCache
+	 * @return
+	 */
+	public boolean initLocalSubTx(String hostComp, String fakeSubTx, TransactionContext txCtxInCache);
+	
+	/**
 	 * 
 	 * @param hostComp
 	 * @param fakeSubTx
@@ -92,4 +108,28 @@ public interface TxLifecycleManager {
 	 * @return
 	 */
 	public TransactionRegistry getTxRegistry();
+	
+	/**
+	 * 
+	 * @param msg
+	 * @param transactionTag
+	 * @param msgBody
+	 * @param hostComponent
+	 * @return
+	 */
+	public Message traceServicePhase(Message msg, String transactionTag,
+			List<Object> msgBody, String hostComponent);
+
+	/**
+	 * 
+	 * @param msg
+	 * @param transactionTag
+	 * @param msgBody
+	 * @param hostComponent
+	 * @param serviceName 
+	 * @param txDepMonitor 
+	 * @return
+	 */
+	public Message traceReferencePhase(Message msg, String transactionTag,
+			List<Object> msgBody, String hostComponent, String serviceName, TxDepMonitor txDepMonitor);
 }
