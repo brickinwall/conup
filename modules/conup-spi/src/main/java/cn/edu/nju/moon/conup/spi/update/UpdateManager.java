@@ -1,6 +1,10 @@
 package cn.edu.nju.moon.conup.spi.update;
 
+import org.apache.tuscany.sca.invocation.Message;
+
+import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
+import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
@@ -35,5 +39,10 @@ public interface UpdateManager {
 	void setDynamicUpdateContext(DynamicUpdateContext updateCtx);
 
 	public void setOndemandSetupHelper(OndemandSetupHelper ondemandSetupHelper);
+
+	public Message checkRemoteUpdate(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg);
+
+	public void checkUpdate(Interceptor interceptor);
 	
 }

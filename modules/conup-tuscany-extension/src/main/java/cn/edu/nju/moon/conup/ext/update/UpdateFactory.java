@@ -4,10 +4,10 @@ package cn.edu.nju.moon.conup.ext.update;
 import cn.edu.nju.moon.conup.ext.freeness.BlockingStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.ConcurrentVersionStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.WaitingStrategy;
-import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
-import cn.edu.nju.moon.conup.spi.complifecycle.Transformer;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
+import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.update.Transformer;
 
 
 /**
@@ -49,6 +49,7 @@ public class UpdateFactory {
 	 * @param compImplType 
 	 * @return
 	 */
+	@Deprecated
 	public static FreenessCallback createFreenessCallback(String compImplType){
 		return new JavaPojoFreenessCallback();
 	}

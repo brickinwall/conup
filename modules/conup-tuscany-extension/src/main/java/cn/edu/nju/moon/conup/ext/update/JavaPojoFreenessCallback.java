@@ -2,7 +2,7 @@ package cn.edu.nju.moon.conup.ext.update;
 
 import org.apache.tuscany.sca.implementation.java.context.ReflectiveInstanceFactory;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 
 /**
@@ -16,6 +16,7 @@ import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
  * @author JiangWang<jiang.wang88@gmail.com>
  *
  */
+@Deprecated
 public class JavaPojoFreenessCallback implements FreenessCallback {
 
 	@Override
@@ -25,15 +26,16 @@ public class JavaPojoFreenessCallback implements FreenessCallback {
 		Class<?> compClass;
 		
 		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifer);
-		instanceFactory = compLcMgr.getInstanceFactory();
-		compClass = compLcMgr.getUpdateCtx().getNewVerClass();
-		try {
-			instanceFactory.setCtr(compClass.getConstructor());
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+//		instanceFactory = compLcMgr.getInstanceFactory();
+//		instanceFactory = compLcMgr.getCompUpdator();
+//		compClass = compLcMgr.getUpdateCtx().getNewVerClass();
+//		try {
+//			instanceFactory.setCtr(compClass.getConstructor());
+//		} catch (SecurityException e) {
+//			e.printStackTrace();
+//		} catch (NoSuchMethodException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override
@@ -43,15 +45,15 @@ public class JavaPojoFreenessCallback implements FreenessCallback {
 		Class<?> compClass;
 		
 		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifer);
-		instanceFactory = compLcMgr.getInstanceFactory();
-		compClass = compLcMgr.getUpdateCtx().getOldVerClass();
-		try {
-			instanceFactory.setCtr(compClass.getConstructor());
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}		
+//		instanceFactory = compLcMgr.getInstanceFactory();
+//		compClass = compLcMgr.getUpdateCtx().getOldVerClass();
+//		try {
+//			instanceFactory.setCtr(compClass.getConstructor());
+//		} catch (SecurityException e) {
+//			e.printStackTrace();
+//		} catch (NoSuchMethodException e) {
+//			e.printStackTrace();
+//		}		
 	}
 	
 	@Override

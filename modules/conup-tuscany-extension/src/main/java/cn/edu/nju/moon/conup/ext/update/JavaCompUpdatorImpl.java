@@ -26,13 +26,13 @@ import org.apache.tuscany.sca.implementation.java.invocation.JavaImplementationP
 import org.apache.tuscany.sca.provider.ImplementationProvider;
 import org.apache.tuscany.sca.runtime.RuntimeComponent;
 
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.datamodel.POJODynamicUpdateContext;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
-import cn.edu.nju.moon.conup.spi.complifecycle.DynamicUpdateContext;
-import cn.edu.nju.moon.conup.spi.complifecycle.Transformer;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.update.DynamicUpdateContext;
+import cn.edu.nju.moon.conup.spi.update.Transformer;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 
 /**
@@ -51,6 +51,8 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	private boolean isUpdated = false;
 	
+	private ReflectiveInstanceFactory instanceFactory;
+	
 	public static Logger getLogger() {
 		return LOGGER;
 	}
@@ -59,13 +61,10 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	public boolean initUpdator(String baseDir, String classPath,
 			String contributionURI, String compositeURI, String compIdentifier) {
-		CompLifecycleManagerImpl compLcMgr;
-//		NodeManager nodeMgr;
-//		DynamicDepManager depMgr;
-		
-//		nodeMgr = NodeManager.getInstance();
-//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
-		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
+		NodeManager nodeMgr = NodeManager.getInstance();
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		CompLifecycleManagerImpl compLcMgr = (CompLifecycleManagerImpl) nodeMgr.getCompLifecycleManager(compIdentifier);
+//		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
 		
 //		Set<String> oldVersionRootTxIds = depMgr.getOldVersionRootTxs();
 		if(tuscanyNode == null){
@@ -98,15 +97,16 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 
 				Class<?> newClass = loadClass(baseDir,
 						new String[] { classPath });
-				DynamicUpdateContext updateCtx = compLcMgr.getUpdateCtx();
+				DynamicUpdateContext updateCtx = updateMgr.getUpdateCtx();
 				if(updateCtx == null){
 					updateCtx = new POJODynamicUpdateContext();
-					compLcMgr.setDynamicUpdateContext(updateCtx);
+					updateMgr.setDynamicUpdateContext(updateCtx);
 				}
 				updateCtx.setOldVerClass(originalClass);
 				updateCtx.setNewVerClass(newClass);
 				updateCtx.setLoaded(true);
-				compLcMgr.setInstanceFactory(instanceFactory);
+				this.instanceFactory = instanceFactory;
+//				compLcMgr.setInstanceFactory(instanceFactory);
 				
 				//test
 //				String str = "oldRootTxs:\n";
@@ -127,13 +127,15 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	@Override
 	public boolean executeUpdate(String compIdentifier) {
-		CompLifecycleManagerImpl compLcMgr;
-		ReflectiveInstanceFactory instanceFactory;
+//		CompLifecycleManagerImpl compLcMgr;
+//		ReflectiveInstanceFactory instanceFactory;
 		Class<?> compClass;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 		
-		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
-		instanceFactory = compLcMgr.getInstanceFactory();
-		compClass = compLcMgr.getUpdateCtx().getNewVerClass();
+//		compLcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
+//		instanceFactory = compLcMgr.getInstanceFactory();
+		compClass = updateMgr.getUpdateCtx().getNewVerClass();
 		try {
 //			try {
 //				Field oldFiled = compLcMgr.getUpdateCtx().getOldVerClass().getDeclaredField("version");
@@ -225,16 +227,14 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 
 	@Override
 	public boolean cleanUpdate(String compIdentifier) {
-//		NodeManager nodeMgr;
-//		DynamicDepManager depMgr;
-		CompLifecycleManagerImpl lcMgr;
+//		CompLifecycleManagerImpl lcMgr;
+//		lcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
+		NodeManager nodeMgr = NodeManager.getInstance();
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 		
-//		nodeMgr = NodeManager.getInstance();
-//		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
-		lcMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
-		
-		lcMgr.setDynamicUpdateContext(null);
-		lcMgr.setInstanceFactory(null);
+		updateMgr.setDynamicUpdateContext(null);
+		this.instanceFactory = null;
+//		lcMgr.setInstanceFactory(null);
 //		depMgr.dynamicUpdateIsDone();
 		
 		return true;
@@ -246,7 +246,6 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 			DynamicUpdateClassLoader cl = new DynamicUpdateClassLoader(baseDir, classNames);
 			c = cl.loadClass(classNames[0]);
 			LOGGER.fine("load class: " + c);
-//			LOGGER.fine("c: " + c);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -258,19 +257,25 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	@Override
 	public boolean finalizeOld(String compIdentifier, Class<?> oldVersion,
 			Class<?> newVersion, Transformer transfomer) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public boolean initNewVersion(String compName, Class<?> newVersion) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public String getCompImplType() {
 		return IMPL_TYPE;
+	}
+	
+	public ReflectiveInstanceFactory getInstanceFactory() {
+		return instanceFactory;
+	}
+
+	public void setInstanceFactory(ReflectiveInstanceFactory instanceFactory) {
+		this.instanceFactory = instanceFactory;
 	}
 
 }
