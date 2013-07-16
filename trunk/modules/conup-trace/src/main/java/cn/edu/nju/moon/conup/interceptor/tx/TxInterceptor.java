@@ -121,4 +121,19 @@ public class TxInterceptor implements Interceptor {
 		return null;
 		
 	}
+
+
+	@Override
+	public void freeze(Object obj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void defreeze(Object obj) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
