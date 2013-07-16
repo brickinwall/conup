@@ -21,8 +21,10 @@ import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 //import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
@@ -568,14 +570,24 @@ public class QuiescenceImpl implements Algorithm {
 		}
 	}
 
-	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		return true;
-	}
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		return true;
+//	}
 
 	@Override
 	public void setDynamicDepMgr(DynamicDepManager depMgr) {
 		this.depMgr = depMgr;
+	}
+
+	@Override
+	public boolean initLocalSubTx(TransactionContext txContext) {
+		
+		return true;
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry){
 	}
 
 }
