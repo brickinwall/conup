@@ -24,6 +24,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
@@ -45,6 +46,8 @@ public class VersionConsistencyImpl implements Algorithm {
 	public static Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
 	
 	private DynamicDepManager depMgr = null;
+	
+	private TxDepRegistry txDepRegistry = null;
 	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
 	
@@ -243,7 +246,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
-		Set<String> futureComponents = txContext.getFutureComponents();
+//		Set<String> futureComponents = txContext.getFutureComponents();
+		Set<String> futureComponents = txDepRegistry.getLocalDep(currentTx).getFutureComponents();
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
 			
@@ -351,7 +355,8 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 			assert rootTx != null;
 			if(rootTx.equals(currentTx) && (isSetupDone.get(rootTx) == null || !isSetupDone.get(rootTx))){
-				Set<String> fDeps = txContext.getFutureComponents();
+//				Set<String> fDeps = txContext.getFutureComponents();
+				Set<String> fDeps = txDepRegistry.getLocalDep(currentTx).getFutureComponents();
 				Iterator<String> depIterator = fDeps.iterator();
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				while(depIterator.hasNext()){
@@ -752,7 +757,8 @@ public class VersionConsistencyImpl implements Algorithm {
 					if(T.isFakeTx())
 						continue;
 					
-					Set<String> fDeps = T.getFutureComponents();
+//					Set<String> fDeps = T.getFutureComponents();
+					Set<String> fDeps = txDepRegistry.getLocalDep(T.getCurrentTx()).getFutureComponents();
 					for(String fdep : fDeps){
 						if(fdep.equals(dep.getTargetCompObjIdentifer()) && T.getRootTx().equals(rootTx)){
 							willNotUseFlag = false;
@@ -909,13 +915,13 @@ public class VersionConsistencyImpl implements Algorithm {
 		for(Dependence dep : allInDeps){
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.fine("inDepsStr:" + inDepsStr);
+		LOGGER.info("inDepsStr:" + inDepsStr);
 		String outDepsStr = "";
 		
 		for(String dep : oldRootTx){
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.fine("oldRootTx:" + outDepsStr);
+		LOGGER.info("oldRootTx:" + outDepsStr);
 		
 		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
 //		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
@@ -1058,18 +1064,60 @@ public class VersionConsistencyImpl implements Algorithm {
 		}
 	}
 
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		
+//		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
+//		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
+//		
+//		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+//		synchronized (ondemandMonitor) {
+////			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
+//			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
+//				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
+//				LOGGER.fine(lfe.toString());
+//				if(!rtInDeps.contains(lfe)){
+//					rtInDeps.add(lfe);
+//				}
+//				if (!rtOutDeps.contains(lfe)) {
+//					rtOutDeps.add(lfe);
+//				}
+//				
+//				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
+//				LOGGER.fine(lpe.toString());
+//				if(!rtInDeps.contains(lpe)){
+//					rtInDeps.add(lpe);
+//				}
+//				if (!rtOutDeps.contains(lpe)) {
+//					rtOutDeps.add(lpe);
+//				}
+//				
+//				// ACK_SUBTX_INIT
+//				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, rootTx, ConsistencyOperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
+//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
+//				depNotifyService.synPost(hostComp, parentComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
+//				
+//			}
+//		}
+//		
+//		return true;
+//	}
+
 	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		
+	public boolean initLocalSubTx(TransactionContext txContext) {
+		String hostComp = txContext.getHostComponent();
+		String fakeSubTx = txContext.getCurrentTx();
+		String rootTx = txContext.getRootTx();
+		String parentTx = txContext.getParentTx();
+		String parentComp = txContext.getParentComponent();
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
 		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
-//			if( !depMgr.getCompStatus().equals(CompStatus.NORMAL) ){
 			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
 				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.fine(lfe.toString());
+				LOGGER.info(lfe.toString());
 				if(!rtInDeps.contains(lfe)){
 					rtInDeps.add(lfe);
 				}
@@ -1078,7 +1126,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 				
 				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.fine(lpe.toString());
+				LOGGER.info(lpe.toString());
 				if(!rtInDeps.contains(lpe)){
 					rtInDeps.add(lpe);
 				}
@@ -1100,6 +1148,11 @@ public class VersionConsistencyImpl implements Algorithm {
 	@Override
 	public void setDynamicDepMgr(DynamicDepManager depMgr) {
 		this.depMgr = depMgr;		
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry){
+		this.txDepRegistry = txDepRegistry;
 	}
 	
 }
