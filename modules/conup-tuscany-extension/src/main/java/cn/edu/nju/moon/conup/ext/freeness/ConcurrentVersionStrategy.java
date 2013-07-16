@@ -6,13 +6,13 @@ package cn.edu.nju.moon.conup.ext.freeness;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * Implementation of concurrent version strategy for achieving freeness
@@ -31,25 +31,23 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 
 	@Override
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
-			String curTxID, String hostComp, FreenessCallback fcb) {
+			String curTxID, String hostComp) {
 		NodeManager nodeMgr;
 		DynamicDepManager depMgr;
 		nodeMgr = NodeManager.getInstance();
 		depMgr = nodeMgr.getDynamicDepManager(hostComp);
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
 		
-//		Set<String> oldVersionRootTxs = depMgr.getOldVersionRootTxs();
-		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
-		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
-		algorithmOldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
+		algorithmOldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		synchronized(depMgr.getValidToFreeSyncMonitor()){
 			if((algorithmOldVersionRootTxs!=null) 
 					&& (algorithmOldVersionRootTxs.contains(rootTxID))){
 				LOGGER.fine(rootTxID + " is dispatched to old version");
-				return compLcMgr.getUpdateCtx().getOldVerClass();
+				return updateMgr.getUpdateCtx().getOldVerClass();
 			}else{
 				LOGGER.fine(rootTxID + " is dispatched to new version");
-				return compLcMgr.getUpdateCtx().getNewVerClass();
+				return updateMgr.getUpdateCtx().getNewVerClass();
 			}
 		}
 		
@@ -67,11 +65,14 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
-		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
-		CompLifecycleManager compLcMgr;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		DynamicDepManager depManager = nodeMgr.getDynamicDepManager(hostComp);
+//		CompLifecycleManager compLcMgr;
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
+		
 		Set<String> oldVersionRootTxs;
-		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
-		oldVersionRootTxs = compLcMgr.getUpdateCtx().getAlgorithmOldRootTxs();
+//		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
+		oldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		LOGGER.fine("oldVersionRootTxs.size()=" + oldVersionRootTxs.size());
 		LOGGER.fine("oldVersionRootTxs:\n" + oldVersionRootTxs);
 //		return oldVersionRootTxs.size()==0;

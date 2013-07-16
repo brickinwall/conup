@@ -2,7 +2,6 @@ package cn.edu.nju.moon.conup.ext.freeness;
 
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
@@ -17,7 +16,7 @@ public class WaitingStrategy implements FreenessStrategy {
 	
 	@Override
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
-			String curTxID, String hostComp, FreenessCallback fcb) {
+			String curTxID, String hostComp) {
 		return null;
 	}
 
