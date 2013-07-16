@@ -23,14 +23,14 @@ public class DepNotifyServiceImpl implements DepNotifyService{
 //			LOGGER.warning("src:" + srcIdentifier + " target:"
 //					+ targetIdentifier + " payload:" + payload);
 //		}
-		CompCommAddress ipAndPort = CommServerManager.getInstance().getInfos(srcIdentifier, targetIdentifier);
+		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
 		return new SynCommClient().sendMsg(ipAndPort.getIp(), ipAndPort.getPort(), srcIdentifier, targetIdentifier, proctocol, msgType, payload);
 	}
 
 	public void asynPost(String srcIdentifier, String targetIdentifier,
 			String proctocol, MsgType msgType, String payload) {
 		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
-		CompCommAddress ipAndPort = CommServerManager.getInstance().getInfos(srcIdentifier, targetIdentifier);
+		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
 		new AsynCommClient().sendMsg(ipAndPort.getIp(), ipAndPort.getPort(), srcIdentifier, targetIdentifier, proctocol, msgType, payload);
 	}
 
