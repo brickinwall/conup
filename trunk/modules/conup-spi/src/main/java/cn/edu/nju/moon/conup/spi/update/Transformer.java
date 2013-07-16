@@ -1,4 +1,4 @@
-package cn.edu.nju.moon.conup.spi.complifecycle;
+package cn.edu.nju.moon.conup.spi.update;
 
 /**
  * Because every component may have its own inner status, e.g., opened files, in order to make sure that 

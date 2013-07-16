@@ -1,17 +1,18 @@
-package cn.edu.nju.moon.conup.spi.complifecycle;
+package cn.edu.nju.moon.conup.spi.update;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 
-public interface CompLifecycleManager {
+public interface CompLifecycleManager extends Observer{
 
 	public DynamicDepManager getDepMgr();
 
 	public void setDepMgr(DynamicDepManager depMgr);
 
-	public ComponentUpdator getCompUpdator();
-
-	public void setCompUpdator(ComponentUpdator compUpdator);
+//	public ComponentUpdator getCompUpdator();
+//
+//	public void setCompUpdator(ComponentUpdator compUpdator);
 
 	/**
 	 * 
@@ -48,16 +49,16 @@ public interface CompLifecycleManager {
 	 * @param compIdentifier target component's identifier
 	 * @return
 	 */
-	public boolean update(String baseDir, String classFilePath,
-			String contributionURI, String compositeURI, String compIdentifier);
+//	public boolean update(String baseDir, String classFilePath,
+//			String contributionURI, String compositeURI, String compIdentifier);
 
-	public boolean attemptToUpdate();
+//	public boolean attemptToUpdate();
+//
+//	public boolean executeUpdate();
+//
+//	public boolean cleanupUpdate();
 
-	public boolean executeUpdate();
-
-	public boolean cleanupUpdate();
-
-	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx);
+//	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx);
 
 	public void setCompObject(ComponentObject compObj);
 
@@ -76,28 +77,28 @@ public interface CompLifecycleManager {
 	 * @param payload
 	 * @return
 	 */
-	public boolean remoteConf(String payload);
+//	public boolean remoteConf(String payload);
 
 	/**
 	 * if a component has received dynamic update request and is in the process of finishing update, return true.
 	 * @return
 	 */
-	public boolean isDynamicUpdateRqstRCVD();
+//	public boolean isDynamicUpdateRqstRCVD();
 
-	public boolean initOldRootTxs();
+//	public boolean initOldRootTxs();
 
-	/**
-	 * re-calculate the old root tx sets, no matter whether the sets are initiated.
-	 * @return
-	 */
-	public boolean reinitOldRootTxs();
+//	/**
+//	 * re-calculate the old root tx sets, no matter whether the sets are initiated.
+//	 * @return
+//	 */
+//	public boolean reinitOldRootTxs();
 
-	public DynamicUpdateContext getUpdateCtx();
+//	public DynamicUpdateContext getUpdateCtx();
 	
-	/**
-	 * check for freeness
-	 * move from TxDepMonitor
-	 */
-	public void checkFreeness(String hostComp);
+//	/**
+//	 * check for freeness
+//	 * move from TxDepMonitor
+//	 */
+//	public void checkFreeness(String hostComp);
 
 }
