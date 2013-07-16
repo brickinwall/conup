@@ -11,7 +11,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.pubsub.Observer;
+import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 
 /**
@@ -30,7 +31,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	private CompStatus compStatus = CompStatus.NORMAL;
 	
-	private Algorithm algorithm = null;
 	
 	@Override
 	public boolean manageTx(TransactionContext txContext) {
@@ -92,7 +92,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void setAlgorithm(Algorithm algorithm) {
-		this.algorithm = algorithm;
 	}
 
 	@Override
@@ -254,11 +253,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return false;
 	}
 
-	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 //	@Override
 //	public Map<String, TransactionContext> getFakeTxs() {
@@ -280,6 +279,48 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean initLocalSubTx(TransactionContext txContext) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Algorithm getAlgorithm() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerObserver(Observer o) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeObserver(Observer o) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notifyObservers(Object arg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(Subject subject, Object arg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setResult(String result) {
 		// TODO Auto-generated method stub
 		
 	}

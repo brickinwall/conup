@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
-import cn.edu.nju.moon.conup.spi.complifecycle.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>

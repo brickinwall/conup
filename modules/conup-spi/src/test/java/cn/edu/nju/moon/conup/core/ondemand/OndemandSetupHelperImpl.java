@@ -4,6 +4,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -68,6 +69,18 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 
 	@Override
 	public void onDemandIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public OndemandSetup getOndemand() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void update(Subject subject, Object arg) {
 		// TODO Auto-generated method stub
 		
 	}

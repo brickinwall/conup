@@ -26,6 +26,7 @@ import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.datamodel.POJODynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;

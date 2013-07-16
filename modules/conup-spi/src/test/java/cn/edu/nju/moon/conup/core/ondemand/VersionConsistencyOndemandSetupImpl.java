@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 
@@ -42,6 +43,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 	@Override
 	public void onDemandIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
 		
 	}
