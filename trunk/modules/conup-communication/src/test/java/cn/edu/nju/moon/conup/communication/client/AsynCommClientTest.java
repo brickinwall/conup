@@ -15,9 +15,9 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.edu.nju.moon.conup.communication.model.RequestObject;
-import cn.edu.nju.moon.conup.communication.model.ResponseObject;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
+import cn.edu.nju.moon.conup.spi.datamodel.ResponseObject;
 
 /**
  * @author rgc

@@ -13,10 +13,10 @@ import org.apache.mina.filter.logging.LogLevel;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
-import cn.edu.nju.moon.conup.communication.model.CommType;
-import cn.edu.nju.moon.conup.communication.model.RequestObject;
-import cn.edu.nju.moon.conup.communication.model.ResponseObject;
+import cn.edu.nju.moon.conup.spi.datamodel.CommType;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
+import cn.edu.nju.moon.conup.spi.datamodel.ResponseObject;
 
 /**
  * @author rgc
