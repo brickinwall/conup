@@ -1,15 +1,26 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.tuscany.sca.invocation.Message;
+
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
+import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
+import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
+import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
@@ -17,8 +28,13 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.pubsub.Observer;
+import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
+import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * For managing/maintaining transactions and dependences
@@ -27,6 +43,9 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
  */
 public class DynamicDepManagerImpl implements DynamicDepManager {
 	private Logger LOGGER = Logger.getLogger(DynamicDepManagerImpl.class.getName());
+	
+	private ArrayList<Observer> observers = new ArrayList<Observer>();
+	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 	private Algorithm algorithm = null;
 	private ComponentObject compObj;
 	private CompStatus compStatus = CompStatus.NORMAL;
@@ -47,6 +66,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	private Object validToFreeSyncMonitor = new Object();
 	
 	private Object updatingSyncMonitor = new Object();
+	
+	private Object freezeSyncMonitor = new Object();
 	
 	/**
 	 * semaphore which is used to synchronize the re
@@ -126,7 +147,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
-		LOGGER.fine("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compStatus.equals(CompStatus.VALID));
+		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compStatus.equals(CompStatus.VALID));
 		return compStatus.equals(CompStatus.VALID) && algReadyForUpdate;
 	}
 
@@ -176,8 +197,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.ONDEMAND))
 				System.out.println(compObj.getIdentifier() + "--> compStatus:" + compStatus);
 			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
-			if(compStatus.equals(CompStatus.NORMAL))	
+			if(compStatus.equals(CompStatus.NORMAL)){
 				this.compStatus = CompStatus.ONDEMAND;
+				bufferEventType = BufferEventType.ONDEMAND;
+				notifyObservers(bufferEventType);
+			}
 		}
 	}
 
@@ -243,21 +267,21 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void ondemandSetupIsDone() {
 		
 		//FOR TEST
-//		String inDepsStr = "";
-//		for (Dependence dep : inDepRegistry.getDependences()) {
-//			inDepsStr += "\n" + dep.toString();
-//		}
-//		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+		String inDepsStr = "";
+		for (Dependence dep : inDepRegistry.getDependences()) {
+			inDepsStr += "\n" + dep.toString();
+		}
+		LOGGER.info("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+		
+		String outDepsStr = "";
+		for (Dependence dep : outDepRegistry.getDependences()) {
+			outDepsStr += "\n" + dep.toString();
+		}
+		LOGGER.info("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
 //		
-//		String outDepsStr = "";
-//		for (Dependence dep : outDepRegistry.getDependences()) {
-//			outDepsStr += "\n" + dep.toString();
-//		}
-//		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
-//		
-//		Printer printer = new Printer();
-//		LOGGER.fine("ondemandSetupIsDone, Txs:");
-//		printer.printTxs(LOGGER, getTxs());
+		Printer printer = new Printer();
+		LOGGER.info("ondemandSetupIsDone, Txs:");
+		printer.printTxs(LOGGER, getTxs());
 		
 		synchronized (ondemandSyncMonitor) {
 			//FOR TEST
@@ -284,6 +308,23 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 				exeRecorder.ondemandIsDone();
 				
 				compStatus = CompStatus.VALID;
+				if(isUpdateRequestReceived){
+					bufferEventType = BufferEventType.VALIDTOFREE;
+//					CompLifecycleManager clMgr = NodeManager.getInstance().getCompLifecycleManager(compObj.getIdentifier());
+					UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
+					if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
+						updateMgr.initOldRootTxs();
+//						Printer printer = new Printer();
+						printer.printTxs(LOGGER, getTxs());
+						
+					}
+					
+				} else {
+					bufferEventType = BufferEventType.WAITFORREMOTEUPDATE;
+				}
+				notifyObservers(bufferEventType);
+//				System.out.println("in ddm:" + bufferEventType);
+				
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 				ondemandSetupHelper.resetIsOndemandRqstRcvd();
 				
@@ -325,6 +366,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			LOGGER.info("-----------" + "CompStatus: " + compStatus + " -> NORMAL" + ", dynamic update is done, now notify all...\n\n");
 			isUpdateRequestReceived = false;
 			compStatus = CompStatus.NORMAL;
+			bufferEventType = BufferEventType.NOTHING;
+			notifyObservers(bufferEventType);
+//			System.out.println("in ddm:" + bufferEventType);
+			
 			updatingSyncMonitor.notifyAll();
 			
 			algorithm.updateIsDone(compObj.getIdentifier());
@@ -366,6 +411,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.Free);
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.Free;
+				bufferEventType = BufferEventType.EXEUPDATE;
+				notifyObservers(bufferEventType);
+//				System.out.println("in ddm:" + bufferEventType);
+				
 				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
 				validToFreeSyncMonitor.notifyAll();
 			}
@@ -375,6 +424,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public Set<String> getStaticInDeps() {
 		return compObj.getStaticInDeps();
+	}
+
+	@Override
+	public Object getFreezeSyncMonitor() {
+		return freezeSyncMonitor;
 	}
 
 	@Override
@@ -412,6 +466,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
 			if(compStatus.equals(CompStatus.VALID)){
 				compStatus = CompStatus.NORMAL;
+				bufferEventType = BufferEventType.NOTHING;
+				notifyObservers(bufferEventType);
+//				System.out.println("in ddm:" + bufferEventType);
+				
 				String compIdentifier = compObj.getIdentifier();
 				LOGGER.info(compIdentifier + " remote update is done, CompStatus: " + compStatus + ", now notify all");
 				waitingRemoteCompUpdateDoneMonitor.notifyAll();
@@ -460,16 +518,23 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		this.txDepMonitor = txDepMonitor;
 //	}
 
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		return algorithm.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
+//	}
+
 	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		return algorithm.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
+	public boolean initLocalSubTx(TransactionContext txContext) {
+		return algorithm.initLocalSubTx(txContext);
 	}
 
 	@Override
 	public void dependenceChanged(String hostComp) {
 		if(isUpdateRequestReceived){
 //			txDepMonitor.checkFreeness(hostComp);
-			NodeManager.getInstance().getCompLifecycleManager(hostComp).checkFreeness(hostComp);
+//			NodeManager.getInstance().getCompLifecycleManager(hostComp).checkFreeness(hostComp);
+			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
+			updateMgr.checkFreeness(hostComp);
 		}
 	}
 	@Override
@@ -486,5 +551,129 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return txLifecycleMgr;
 	}
 
+	@Override
+	public Algorithm getAlgorithm() {
+		return this.algorithm;
+	}
+
+	@Override
+	public void registerObserver(Observer o) {
+		observers.add(o);
+	}
+
+	@Override
+	public void removeObserver(Observer o) {
+		observers.remove(o);
+	}
+
+	@Override
+	public void notifyObservers(Object arg) {
+		for(int i = 0; i < observers.size(); i++ ){
+			Observer observer = observers.get(i);
+			//System.out.println("in ddm:" + (BufferEventType)arg);
+			observer.update(this, arg);
+		}
+		System.out.println("observers.size():" + observers.size());
+	}
+
+	@Override
+	public void update(Subject subject, Object arg) {
+		RequestObject reqObj = (RequestObject) arg;
+		if(reqObj.getMsgType().equals(MsgType.DEPENDENCE_MSG)){
+			boolean result = manageDependence(reqObj.getProtocol(), reqObj.getPayload());
+			subject.setResult("manageDepResult:" + result);
+		}
+	}
+
+	@Override
+	public void setResult(String result) {
+		
+	}
+
+	@Override
+	public Message checkOndemand(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg) {
+		// waiting during on-demand setup
+		synchronized (ondemandSyncMonitor) {
+			if (isNormal()) {
+				// the invoked transaction is not a root transaction
+				if (txCtx.getRootTx() != null) {
+					assert txCtx.getParentTx() != null;
+					assert txCtx.getParentComponent() != null;
+					assert subTx != null;
+
+					txLifecycleMgr.initLocalSubTx(compObj.getIdentifier(),
+							subTx.toString(), txCtx.getRootTx(),
+							txCtx.getRootComponent(), txCtx.getParentTx(),
+							txCtx.getParentComponent());
+				}
+				return msg;
+			}
+			
+			if(isOndemandSetting()){
+				interceptor.freeze(ondemandSyncMonitor);
+			}
+
+//			try {
+//				if (isOndemandSetting()) {
+//					ondemandSyncMonitor.wait();
+//				}
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+		}
+		return null;
+		
+	}
+
+	@Override
+	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg, UpdateManager updateMgr) {
+		String hostComp = compObj.getIdentifier();
+		String freenessConf = getCompObject().getFreenessConf();
+		FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
+		synchronized (validToFreeSyncMonitor) {
+			if(getCompStatus().equals(CompStatus.VALID)
+				&& updateMgr.getUpdateCtx() != null && updateMgr.getUpdateCtx().isLoaded() ){
+				// calculate old version root txs
+				if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
+					updateMgr.initOldRootTxs();
+//					Printer printer = new Printer();
+//					printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
+				}
+				if (!freeness.isReadyForUpdate(hostComp)) {
+					Class<?> compClass = freeness.achieveFreeness(
+							txCtx.getRootTx(), txCtx.getRootComponent(),
+							txCtx.getParentComponent(),
+							txCtx.getCurrentTx(), hostComp);
+					if (compClass != null) {
+						addBufferMsgBody(msg, compClass);
+					}
+				}
+				if (freeness.isReadyForUpdate(hostComp)) {
+					achievedFree();
+				} else if (freeness.isInterceptRequiredForFree(
+						txCtx.getRootTx(), hostComp, txCtx, true)) {
+					interceptor.freeze(validToFreeSyncMonitor);
+//						validToFreeSyncMonitor.wait();
+				} else {
+				}
+			}
+		}
+		
+		return null;
+	}
 	
+	private void addBufferMsgBody(Message msg, Class<?> compClass) {
+		String COMP_CLASS_OBJ_IDENTIFIER = "COMP_CLASS_OBJ_IDENTIFIER";
+		String className = compClass.getName();
+		List<Object> originalMsgBody;
+		List<Object> copyOfMsgBody = new ArrayList<Object>();
+		originalMsgBody = Arrays.asList((Object [])msg.getBody());
+		copyOfMsgBody.addAll(originalMsgBody);
+		copyOfMsgBody.add(COMP_CLASS_OBJ_IDENTIFIER + ":" + className);
+		copyOfMsgBody.add(compClass);
+		msg.setBody((Object [])copyOfMsgBody.toArray());
+	}
+
 }

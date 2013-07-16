@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.exception.ConupMgrNotFoundException;
@@ -14,6 +13,8 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -58,6 +59,12 @@ public class NodeManager{
 	 */
 	private Map<ComponentObject, CompLifecycleManager> compLifecycleMgrs;
 	
+	/**
+	 * 	Each component has one UpdateManager 
+	 */
+	private Map<ComponentObject, UpdateManager> updateMgrs;
+	
+	
 	private NodeManager(){
 		compObjects = new ConcurrentHashMap<String, ComponentObject>();
 		depMgrs = new ConcurrentHashMap<ComponentObject, DynamicDepManager>();
@@ -65,6 +72,7 @@ public class NodeManager{
 		txLifecycleMgrs = new ConcurrentHashMap<ComponentObject, TxLifecycleManager>();
 		txDepMonitors = new ConcurrentHashMap<ComponentObject, TxDepMonitor>();
 		compLifecycleMgrs = new ConcurrentHashMap<ComponentObject, CompLifecycleManager>();
+		updateMgrs = new ConcurrentHashMap<ComponentObject, UpdateManager>();
 	}
 	
 	/**
@@ -114,6 +122,10 @@ public class NodeManager{
 				throw new ConupMgrNotFoundException("TxDepMonitor not found.");
 			} else{
 				txDepMonitor = txDepMonitors.get(compObj);
+				DynamicDepManager depMgr = depMgrs.get(compObj);
+				depMgr.getAlgorithm().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
+				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
+				ondemandHelpler.getOndemand().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
 			}
 		}
 		return txDepMonitor;
@@ -311,6 +323,39 @@ public class NodeManager{
 				txLifecycleMgrs.put(compObj, txLifecycleMgr);
 				return true;
 			} else{
+				return false;
+			}
+		}
+	}
+
+	public UpdateManager getUpdateManageer(String compIdentifier) {
+		ComponentObject compObj;
+		UpdateManager updateMgr;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !updateMgrs.containsKey(compObj) ){
+				throw new ConupMgrNotFoundException("UpdateManager not found.");
+			} else{
+				updateMgr = updateMgrs.get(compObj);
+				DynamicDepManager depMgr = depMgrs.get(compObj);
+				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
+				updateMgr.setDepMgr(depMgr);
+				updateMgr.setOndemandSetupHelper(ondemandHelpler);
+			}
+		}
+		return updateMgr;
+	}
+	
+	public boolean setUpdateManager(String compIdentifier,	UpdateManager updateMgr) {
+		ComponentObject compObj;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if (!updateMgrs.containsKey(compObj)) {
+				updateMgrs.put(compObj, updateMgr);
+				return true;
+			} else {
 				return false;
 			}
 		}
