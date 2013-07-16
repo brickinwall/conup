@@ -18,7 +18,12 @@ public class CommServer {
 	private static final Logger LOGGER = Logger.getLogger(CommServer.class
 			.getName());
 	IoAcceptor acceptor = null;
+	private String compIdentifier = null;
 	
+	public CommServer(String compIdentifier) {
+		this.compIdentifier = compIdentifier;
+	}
+
 	public boolean start(String ip, int port) {
 		acceptor = new NioSocketAcceptor();
 		
@@ -38,7 +43,7 @@ public class CommServer {
 		logFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
 		acceptor.getFilterChain().addLast("logger", logFilter);
 
-		acceptor.setHandler(new ServerIoHandler());
+		acceptor.setHandler(new ServerIoHandler(compIdentifier));
 
 		try {
 			acceptor.bind(new InetSocketAddress(ip, port));
