@@ -6,6 +6,7 @@ import java.util.Set;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
@@ -85,14 +86,26 @@ public class VersionConsistencyImpl implements Algorithm {
 		return false;
 	}
 
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+
 	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+	public void setDynamicDepMgr(DynamicDepManager depMgr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean initLocalSubTx(TransactionContext txContext) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void setDynamicDepMgr(DynamicDepManager depMgr) {
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
 		
 	}
