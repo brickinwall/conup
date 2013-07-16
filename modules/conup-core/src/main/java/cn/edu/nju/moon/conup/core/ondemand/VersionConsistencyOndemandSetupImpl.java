@@ -24,6 +24,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -66,6 +67,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private OndemandSetupHelper ondemandHelper;
 
 	private boolean isOndemandDone;
+
+	private TxDepRegistry txDepRegistry = null;
 	
 	@Override
 	public boolean ondemand() {
@@ -905,10 +908,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ctx = txIterator.next().getValue();
 				if (ctx.getRootTx().equals(txID) 
 						|| ctx.getCurrentTx().equals(txID)) {
-					if(ctx.getFutureComponents() != null
-							|| ctx.getFutureComponents().size()!=0){
+//					if(ctx.getFutureComponents() != null
+//							|| ctx.getFutureComponents().size()!=0){
+					if(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents() != null
+							|| txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents().size()!=0){
 						rootTx = ctx.getRootTx();
-						futureC.addAll(ctx.getFutureComponents());
+						futureC.addAll(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents());
 //					break;
 					}
 				}
@@ -960,10 +965,12 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			ctx = txIterator.next().getValue();
 			if (ctx.getRootTx().equals(txID) 
 				|| ctx.getCurrentTx().equals(txID)) {
-					if(ctx.getPastComponents() != null
-						|| ctx.getPastComponents().size()!=0){
+//					if(ctx.getPastComponents() != null
+//						|| ctx.getPastComponents().size()!=0){
+					if(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents() != null
+						|| txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents().size()!=0){
 						rootTx = ctx.getRootTx();
-						pastC.addAll(ctx.getPastComponents());
+						pastC.addAll(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents());
 //						break;
 					}
 //				}
@@ -1134,6 +1141,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		PerformanceRecorder.getInstance(hostComp).ondemandIsDone(System.nanoTime());
 //		OndemandRequestStatus.clear();
 //		ConfirmOndemandStatus.clear();
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
+		this.txDepRegistry  = txDepRegistry;
 	}
 	
 }
