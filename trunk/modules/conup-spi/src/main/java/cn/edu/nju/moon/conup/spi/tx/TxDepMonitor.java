@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.tx;
 
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 
 /**
@@ -16,6 +17,12 @@ public interface TxDepMonitor {
 	 * @return
 	 */
 	public boolean isLastUse(String currentTxID, String targetCompIdentifier, String hostComp);
+	
+	/**
+	 * every component has a TxDepRegistry which is stored in TxDepMonitor
+	 * @return txDepRegistry
+	 */
+	public TxDepRegistry getTxDepRegistry();
 	
 //	/**
 //	 * when a root tx ends, TxDepMonitor should be notified.

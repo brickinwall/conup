@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+
 /**
  * For recording:
  * <ul>
@@ -38,10 +41,10 @@ public class TransactionContext {
 	 * TransactionStart,TransactionEnd,	FirstRequestService,DependencesChanged
 	 */
 	private TxEventType eventType = null;
-	/** components that will never be used. */
-	private Set<String> pastComponents;
-	/** components that will be used later. */
-	private Set<String> futureComponents;
+//	/** components that will never be used. */
+//	private Set<String> pastComponents;
+//	/** components that will be used later. */
+//	private Set<String> futureComponents;
 	/** it's used to identify whether a sub-tx is a fake transaction */
 	private boolean isFakeTx = false;
 
@@ -145,21 +148,21 @@ public class TransactionContext {
 		this.hostComponent = hostComponent;
 	}
 
-	public Set<String> getPastComponents() {
-		return pastComponents;
-	}
-
-	public void setPastComponents(Set<String> pastComponents) {
-		this.pastComponents = pastComponents;
-	}
-
-	public Set<String> getFutureComponents() {
-		return futureComponents;
-	}
-
-	public void setFutureComponents(Set<String> futureComponents) {
-		this.futureComponents = futureComponents;
-	}
+//	public Set<String> getPastComponents() {
+//		return pastComponents;
+//	}
+//
+//	public void setPastComponents(Set<String> pastComponents) {
+//		this.pastComponents = pastComponents;
+//	}
+//
+//	public Set<String> getFutureComponents() {
+//		return futureComponents;
+//	}
+//
+//	public void setFutureComponents(Set<String> futureComponents) {
+//		this.futureComponents = futureComponents;
+//	}
 	
 	/**
 	 * @return key is txID, value is compIdentifier
@@ -210,11 +213,14 @@ public class TransactionContext {
 	public String toString() {
 		String result = null;
 		
+		TxDepMonitor txDepMonitor = NodeManager.getInstance().getTxDepMonitor(hostComponent);
+		TxDepRegistry txDepRegistry = txDepMonitor.getTxDepRegistry();
 		result = "root:" + rootComponent + " " + rootTx + ", " +
 				"parent:" + parentComponent + " " + parentTx +", " +
 				"current:" + hostComponent + " " + currentTx + " " + eventType + ", " +
+				"futureC:" + txDepRegistry.getLocalDep(currentTx).getFutureComponents() + 
+				"pastC:" + txDepRegistry.getLocalDep(currentTx).getPastComponents() +
 				"subTxs:";
-		
 		for (Entry<String, String> subHostComps : subTxHostComps.entrySet()) {
 			result += "\n" + subHostComps.getKey() + " " + subHostComps.getValue() + " " + subTxStatuses.get(subHostComps.getKey());
 		}
