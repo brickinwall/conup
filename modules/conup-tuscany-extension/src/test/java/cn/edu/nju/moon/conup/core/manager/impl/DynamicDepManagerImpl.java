@@ -3,10 +3,13 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tuscany.sca.invocation.Message;
+
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
@@ -14,6 +17,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -323,6 +327,26 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void setResult(String result) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Object getFreezeSyncMonitor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Message checkOndemand(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg, UpdateManager updateMgr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -3,21 +3,27 @@ package cn.edu.nju.moon.conup.spi.manager;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tuscany.sca.invocation.Message;
+
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
+import cn.edu.nju.moon.conup.spi.pubsub.Observer;
+import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * For managing/maintaining transactions and dependences
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface DynamicDepManager {
+public interface DynamicDepManager extends Subject, Observer{
 	
 	/**
 	 * maintain tx
@@ -103,6 +109,8 @@ public interface DynamicDepManager {
 	 * @param algorithmType
 	 */
 	public void setAlgorithm(Algorithm algorithm);
+	
+	public Algorithm getAlgorithm();
 	
 	/**
 	 * ondemand setup is executing
@@ -232,6 +240,8 @@ public interface DynamicDepManager {
 	 */
 	public Object getUpdatingSyncMonitor();
 	
+	public Object getFreezeSyncMonitor();
+
 	/**
 	 * 
 	 * @return  a synchronization monitor for suspending threads while waiting for the finishing of other remote component 
@@ -301,8 +311,15 @@ public interface DynamicDepManager {
 	 * @param parentTx
 	 * @param parentComp
 	 */
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 
+	/**
+	 * 
+	 * @param txContext
+	 * @return
+	 */
+	public boolean initLocalSubTx(TransactionContext txContext);
+	
 	/**
 	 * when dependency changed, we need to check whether ready for update
 	 * here we check when pastDepCreate, pastDepRemove two events
@@ -315,5 +332,10 @@ public interface DynamicDepManager {
 	 * @param txLifecycleMgr
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
+
+	public Message checkOndemand(TransactionContext txCtx, Object subTx, Interceptor interceptor, Message msg);
+
+	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
+			Interceptor interceptor, Message msg, UpdateManager updateMgr);
 	
 }
