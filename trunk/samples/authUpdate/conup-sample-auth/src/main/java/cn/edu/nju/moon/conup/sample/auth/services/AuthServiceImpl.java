@@ -41,6 +41,7 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //		exeRecorder.addAction(rootTx, "AuthComponent.getToken." + version);
 //
 //		return exeRecorder.getAction(rootTx);
+		System.out.println(version);
 		return exeProc + ", " + "AuthComponent.getToken." + version;
 	}
 
@@ -65,16 +66,18 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //			return false;
 //		}
 		
-		String threadID = getThreadID();
-		InterceptorCache interceptorCache = InterceptorCache.getInstance("AuthComponent");
-		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
-		String rootTx = txContextInCache.getRootTx();
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance("AuthComponent");
-		exeRecorder.addAction(rootTx, exeProc);
-		exeRecorder.addAction(rootTx, "AuthComponent.verify." + version);
-
-		return exeRecorder.getAction(rootTx);
+		return "true";
+		
+//		String threadID = getThreadID();
+//		InterceptorCache interceptorCache = InterceptorCache.getInstance("AuthComponent");
+//		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
+//		String rootTx = txContextInCache.getRootTx();
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance("AuthComponent");
+//		exeRecorder.addAction(rootTx, exeProc);
+//		exeRecorder.addAction(rootTx, "AuthComponent.verify." + version);
+//
+//		return exeRecorder.getAction(rootTx);
 	}
 
 	//	private void testUpdate() {

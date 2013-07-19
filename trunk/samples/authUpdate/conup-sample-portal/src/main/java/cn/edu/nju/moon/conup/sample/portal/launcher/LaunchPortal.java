@@ -11,15 +11,18 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class LaunchPortal {
@@ -40,27 +43,33 @@ public class LaunchPortal {
         
         LOGGER.fine("portal.composite ready for big business !!!");
         
+        String compIdentifier = "PortalComponent";
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
-        nodeMgr.loadConupConf("PortalComponent", "oldVersion");
-        ComponentObject compObj = nodeMgr.getComponentObject("PortalComponent");
+        nodeMgr.loadConupConf(compIdentifier, "oldVersion");
+        ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
 //        nodeMgr.getDynamicDepManager("PortalComponent").ondemandSetupIsDone();
         
 //        CompLifecycleManagerImpl.getInstance("PortalComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
 		compLifecycleManager.setNode(node);
-		nodeMgr.setCompLifecycleManager("PortalComponent", compLifecycleManager);
+		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
-		nodeMgr.setTxDepMonitor("PortalComponent", txDepMonitor);
+		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
-		nodeMgr.setTxLifecycleManager("PortalComponent", txLifecycleMgr);
+		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		compLifecycleManager.setDepMgr(depMgr);
 		
-        CommServerManager.getInstance().start("PortalComponent");
+		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		
+		CommServerManager.getInstance().start(compIdentifier);
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
+		serverIoHandler.registerUpdateManager(updateMgr);
         
         //launch DepRecorder
         DepRecorder depRecorder;
@@ -178,11 +187,11 @@ public class LaunchPortal {
 		System.out.println("	[usage] update AuthComponent VER_ONE");
 		System.out.println("	[behavior] update component 'AuthComponent' to VER_ONE");
 		System.out.println("update a component while requests ongoing, e.g., ");
-		System.out.println("	[usage] updateAt AuthComponent 200 50 35 VER_ONE");
+		System.out.println("	[usage] updateAt AuthComponent 100 50 35 VER_ONE");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
 				" Meanwhile, update component 'AuthComponent' to VER_ONE at 35th request");
 		
-		System.out.println("	[usage] updateAt AuthComponent 200 70 25 VER_ONE 65 VER_TWO");
+		System.out.println("	[usage] updateAt AuthComponent 100 100 25 VER_ONE 65 VER_TWO");
 		System.out.println("	[behavior] access 50 times, and the thread sleep 200ms before sending each request. " +
 				" Meanwhile, update component 'AuthComponent' to VER_ONE at 15th request and to VER_TWO at 35th request");
 		System.out.println("'help' shows supported commands.");

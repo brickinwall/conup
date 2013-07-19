@@ -22,16 +22,19 @@ public class DBServiceImpl implements DBService {
 //			e.printStackTrace();
 //		}
 //		result.add("hello tuscany...");
-		String threadID = getThreadID();
-		InterceptorCache interceptorCache = InterceptorCache.getInstance("DBComponent");
-		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
-		String rootTx = txContextInCache.getRootTx();
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance("DBComponent");
-		exeRecorder.addAction(rootTx, exeProc);
-		exeRecorder.addAction(rootTx, "DBComponent.dbOperation." + version);
-
-		return exeRecorder.getAction(rootTx);
+		
+		return "hello";
+		
+//		String threadID = getThreadID();
+//		InterceptorCache interceptorCache = InterceptorCache.getInstance("DBComponent");
+//		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
+//		String rootTx = txContextInCache.getRootTx();
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance("DBComponent");
+//		exeRecorder.addAction(rootTx, exeProc);
+//		exeRecorder.addAction(rootTx, "DBComponent.dbOperation." + version);
+//
+//		return exeRecorder.getAction(rootTx);
 	}
 	
 	private String getThreadID(){

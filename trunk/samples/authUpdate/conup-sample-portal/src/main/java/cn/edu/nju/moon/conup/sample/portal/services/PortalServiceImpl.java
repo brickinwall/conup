@@ -14,6 +14,7 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 public class PortalServiceImpl implements PortalService {
 	private TokenService tokenService;
 	private ProcService procService;
+//	private TxLifecycleManager _txLifecycleMgr;
 	
 	private String version = "version.1";
 
@@ -39,22 +40,27 @@ public class PortalServiceImpl implements PortalService {
 	@ConupTransaction
 	public String execute(String exeProc, String userName, String passwd) {
 		
-//		testUpdate();
-		String threadID = getThreadID();
-		InterceptorCache interceptorCache = InterceptorCache.getInstance("PortalComponent");
-		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
-		String rootTx = txContextInCache.getRootTx();
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance("PortalComponent");
+////		testUpdate();
+//		String threadID = getThreadID();
+//		InterceptorCache interceptorCache = InterceptorCache.getInstance("PortalComponent");
+//		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
+//		String rootTx = txContextInCache.getRootTx();
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance("PortalComponent");
+////		exeRecorder.addAction(rootTx, exeProc);
+////		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
+//		exeProc += "PortalComponent.execute." + version;
+//		exeProc = tokenService.getToken(exeProc, "");
+//		exeProc = procService.process(exeProc, "", "");
+//		
 //		exeRecorder.addAction(rootTx, exeProc);
-//		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
-		exeProc += "PortalComponent.execute." + version;
-		exeProc = tokenService.getToken(exeProc, "");
-		exeProc = procService.process(exeProc, "", "");
+//		
+//		return exeRecorder.getCompleteAction(rootTx);
+		tokenService.getToken("", "");
 		
-		exeRecorder.addAction(rootTx, exeProc);
+		procService.process(exeProc, "", "");
 		
-		return exeRecorder.getCompleteAction(rootTx);
+		return exeProc + " " + userName + " " + passwd;
 		
 //		String cred = userName + "," + passwd;
 //		String token = tokenService.getToken(exeProc, cred);
