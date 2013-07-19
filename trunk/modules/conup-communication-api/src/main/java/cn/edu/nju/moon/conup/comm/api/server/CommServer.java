@@ -18,10 +18,13 @@ public class CommServer {
 	private static final Logger LOGGER = Logger.getLogger(CommServer.class
 			.getName());
 	IoAcceptor acceptor = null;
-	private String compIdentifier = null;
+	private ServerIoHandler serverIOHandler = null;
 	
-	public CommServer(String compIdentifier) {
-		this.compIdentifier = compIdentifier;
+	public ServerIoHandler getServerIOHandler() {
+		return serverIOHandler;
+	}
+
+	public CommServer() {
 	}
 
 	public boolean start(String ip, int port) {
@@ -42,8 +45,8 @@ public class CommServer {
 		logFilter.setMessageSentLogLevel(LogLevel.DEBUG);
 		logFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
 		acceptor.getFilterChain().addLast("logger", logFilter);
-
-		acceptor.setHandler(new ServerIoHandler(compIdentifier));
+		serverIOHandler = new ServerIoHandler();
+		acceptor.setHandler(serverIOHandler);
 
 		try {
 			acceptor.bind(new InetSocketAddress(ip, port));
