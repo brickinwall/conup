@@ -26,8 +26,10 @@ import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.invocation.PhasedInterceptor;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
+import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.interceptor.buffer.BufferInterceptor;
 import cn.edu.nju.moon.conup.interceptor.tx.TxInterceptor;
+import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -401,9 +403,12 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				this.clMgr = nodeMgr.getCompLifecycleManager(hostComp);
 				this.txDepMonitor = nodeMgr.getTxDepMonitor(hostComp);
 				this.txLifecycleMgr = nodeMgr.getTxLifecycleManager(hostComp);
+				
+				String freenessConf = depMgr.getCompObject().getFreenessConf();
+				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				bufferInterceptor = new BufferInterceptor(subject, operation, phase, nodeMgr, depMgr, clMgr, txDepMonitor, txLifecycleMgr);
+				bufferInterceptor = new BufferInterceptor(subject, operation, phase, depMgr, txLifecycleMgr, freeness);
 				depMgr.registerObserver(bufferInterceptor);
 			} else {
 //				txInterceptor = new TxInterceptor(subject, operation, phase);
