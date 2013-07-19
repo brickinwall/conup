@@ -10,11 +10,11 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.sample.db.services.DBService;
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -22,6 +22,8 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 public class LaunchDB {
 	private static Logger LOGGER = Logger.getLogger(LaunchDB.class.getName());
@@ -51,28 +53,33 @@ public class LaunchDB {
 		// initiate NodeManager
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
-		nodeMgr.loadConupConf("DBComponent", "oldVersion");
+		String compIdentifier = "DBComponent";
+		nodeMgr.loadConupConf(compIdentifier, "oldVersion");
 		// LOGGER.fine(compObj.getStaticDeps() + "\n" +
 		// compObj.getStaticInDeps() + "\n" + compObj.getAlgorithmConf());
-		ComponentObject compObj = nodeMgr.getComponentObject("DBComponent");
+		ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
 		CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
 		compLifecycleManager.setNode(node);
-		nodeMgr.setCompLifecycleManager("DBComponent", compLifecycleManager);
+		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 
-//		nodeMgr.getDynamicDepManager("DBComponent").ondemandSetupIsDone();
+//		nodeMgr.getDynamicDepManager(compIdentifier).ondemandSetupIsDone();
 		
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
-		nodeMgr.setTxDepMonitor("DBComponent", txDepMonitor);
+		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
-		nodeMgr.setTxLifecycleManager("DBComponent", txLifecycleMgr);
+		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		compLifecycleManager.setDepMgr(depMgr);
 		
-		CommServerManager.getInstance().start("DBComponent");
-
-		// send ondemand request
+		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
+		
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		CommServerManager.getInstance().start(compIdentifier);
+		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
+		serverIoHandler.registerUpdateManager(updateMgr);
+ 		// send ondemand request
 		// sendOndemandRqst();
 
 		// access

@@ -9,17 +9,19 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.sample.proc.services.ProcService;
-import cn.edu.nju.moon.conup.spi.complifecycle.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 public class LaunchProc {
 	private static Logger LOGGER = Logger.getLogger(LaunchProc.class.getName());
@@ -44,28 +46,34 @@ public class LaunchProc {
         
         LOGGER.fine("proc.composite ready for big business !!!");
 
+        String compIdentifier = "ProcComponent";
         //initiate NodeManager
         NodeManager nodeMgr;
         nodeMgr = NodeManager.getInstance();
-        nodeMgr.loadConupConf("ProcComponent", "oldVersion");
-        ComponentObject compObj = nodeMgr.getComponentObject("ProcComponent");
+        nodeMgr.loadConupConf(compIdentifier, "oldVersion");
+        ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
 //        nodeMgr.getDynamicDepManager("ProcComponent").ondemandSetupIsDone();
 
 //        CompLifecycleManagerImpl.getInstance("ProcComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
 		compLifecycleManager.setNode(node);
-		nodeMgr.setCompLifecycleManager("ProcComponent", compLifecycleManager);
+		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
-		nodeMgr.setTxDepMonitor("ProcComponent", txDepMonitor);
+		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
-		nodeMgr.setTxLifecycleManager("ProcComponent", txLifecycleMgr);
+		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		compLifecycleManager.setDepMgr(depMgr);
         
-        CommServerManager.getInstance().start("ProcComponent");
+		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		
+		CommServerManager.getInstance().start(compIdentifier);
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
+		serverIoHandler.registerUpdateManager(updateMgr);
         
         //send ondemand request
 //        sendOndemandRqst();

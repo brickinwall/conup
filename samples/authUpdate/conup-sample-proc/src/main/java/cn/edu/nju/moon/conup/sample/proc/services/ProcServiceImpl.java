@@ -34,23 +34,25 @@ public class ProcServiceImpl implements ProcService {
 
 	@ConupTransaction
 	public String process(String exeProc, String token, String data) {
-		String threadID = getThreadID();
-		InterceptorCache interceptorCache = InterceptorCache.getInstance("ProcComponent");
-		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
-		String rootTx = txContextInCache.getRootTx();
-		ExecutionRecorder exeRecorder;
-		exeRecorder = ExecutionRecorder.getInstance("ProcComponent");
-//		exeRecorder.addAction(rootTx, exeProc);
-//		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
-		exeProc += "; ProcComponent.process." + version;
-		
+//		String threadID = getThreadID();
+//		InterceptorCache interceptorCache = InterceptorCache.getInstance("ProcComponent");
+//		TransactionContext txContextInCache = interceptorCache.getTxCtx(threadID);
+//		String rootTx = txContextInCache.getRootTx();
+//		ExecutionRecorder exeRecorder;
+//		exeRecorder = ExecutionRecorder.getInstance("ProcComponent");
+////		exeRecorder.addAction(rootTx, exeProc);
+////		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
+//		exeProc += "; ProcComponent.process." + version;
+//		
 		exeProc = verify.verify(exeProc, token);
-		
+//		
 		exeProc = db.dbOperation(exeProc);
+//		
+//		exeRecorder.addAction(rootTx, exeProc);
+//		
+//		return exeRecorder.getAction(rootTx);
 		
-		exeRecorder.addAction(rootTx, exeProc);
-		
-		return exeRecorder.getAction(rootTx);
+		return exeProc + " " + token + " " + data;
 		
 		//test dynamic update
 //		testUpdate();
