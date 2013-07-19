@@ -76,7 +76,7 @@ public class CommServerManager {
 		if (!compAddresses.containsKey(compIdentifier)) {
 			compAddresses.put(compIdentifier, ip + ":" + port);
 			if (!commServers.containsKey(ip + ":" + port)) {
-				CommServer cs = new CommServer(compIdentifier);
+				CommServer cs = new CommServer();
 				commServers.put(ip + ":" + port, cs);
 			} else{
 				return true;

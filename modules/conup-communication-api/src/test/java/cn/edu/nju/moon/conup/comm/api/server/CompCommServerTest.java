@@ -12,7 +12,7 @@ public class CompCommServerTest {
 	CommServer ccs = null;
 	@Before
 	public void setUp() throws Exception {
-		ccs = new CommServer("TestComp");
+		ccs = new CommServer();
 	}
 
 	@Test
