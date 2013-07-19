@@ -44,71 +44,245 @@ public class BufferInterceptor implements Interceptor, Observer {
 	private PolicySubject subject;
 	private Operation operation;
 	private String phase;
-	private NodeManager nodeMgr;
 	private DynamicDepManager depMgr;
-	private CompLifecycleManager clMgr;
-	private TxDepMonitor txDepMonitor;
 	private TxLifecycleManager txLifecycleMgr;
 	private UpdateManager updateMgr;
-	private Object freezeSyncMonitor;
+	private static Object freezeSyncMonitor = new Object();
+	private FreenessStrategy freeness = null;
 	
 	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 	private boolean freezeFlag = false;
 	
 	public BufferInterceptor(PolicySubject subject, Operation operation,
-			String phase, NodeManager nodeMgr, DynamicDepManager depMgr,
-			CompLifecycleManager clMgr, TxDepMonitor txDepMonitor, 
-			TxLifecycleManager txLifecycleMgr) {
+			String phase, DynamicDepManager depMgr,
+			TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
 		this.subject = subject;
 		this.operation = operation;
 		this.phase = phase;
-		this.nodeMgr = nodeMgr;
 		this.depMgr = depMgr;
-		freezeSyncMonitor = depMgr.getFreezeSyncMonitor();
-		this.clMgr = clMgr;
-		this.txDepMonitor = txDepMonitor;
 		this.txLifecycleMgr = txLifecycleMgr;
+		this.freeness = freeness;
 		
-		this.updateMgr = nodeMgr.getUpdateManageer(txLifecycleMgr.getCompIdentifier());
+//		this.updateMgr = nodeMgr.getUpdateManageer(txLifecycleMgr.getCompIdentifier());
 		// register to DDM
 //		observable.addObserver(this);
 		
 		init();
 	}
 	
+//	@Override
+//	public Message invoke(Message msg) {
+//		
+//		if (phase.equals(Phase.SERVICE_POLICY)) {
+//			synchronized (freezeSyncMonitor) {
+//				String hostComp;
+//				hostComp = getComponent().getName();
+//				String threadID;
+//				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
+//				threadID = getThreadID();
+//				TransactionContext txCtx = cache.getTxCtx(threadID);
+//				
+//				Map<String, Object> msgHeaders = msg.getHeaders();
+//				Object subTx = msgHeaders.get(SUB_TX);
+//				
+//				msg = depMgr.checkOndemand(txCtx, subTx, this, msg);
+//				if(msg != null)
+//					return msg;
+//				
+//				msg = updateMgr.checkRemoteUpdate(txCtx, subTx, this, msg);
+//				if(msg != null)
+//					return msg;
+//				
+//				msg = depMgr.checkValidToFree(txCtx, subTx, this, msg, updateMgr);
+//				
+//				updateMgr.checkUpdate(this);
+//				
+//			}
+//		}
+//		
+//		return msg;
+//	}
+	
 	@Override
 	public Message invoke(Message msg) {
-		
+		// here we only block message at service phase
 		if (phase.equals(Phase.SERVICE_POLICY)) {
-			synchronized (freezeSyncMonitor) {
-				String hostComp;
-				hostComp = getComponent().getName();
-				String threadID;
-				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
-				threadID = getThreadID();
-				TransactionContext txCtx = cache.getTxCtx(threadID);
-				
-				Map<String, Object> msgHeaders = msg.getHeaders();
-				Object subTx = msgHeaders.get(SUB_TX);
-				
-				msg = depMgr.checkOndemand(txCtx, subTx, this, msg);
-				if(msg != null)
-					return msg;
-				
-				msg = updateMgr.checkRemoteUpdate(txCtx, subTx, this, msg);
-				if(msg != null)
-					return msg;
-				
-				msg = depMgr.checkValidToFree(txCtx, subTx, this, msg, updateMgr);
-				
-				updateMgr.checkUpdate(this);
-				
+			String hostComp;
+			hostComp = getComponent().getName();
+			String threadID;
+			InterceptorCache cache = InterceptorCache.getInstance(hostComp);
+			threadID = getThreadID();
+			TransactionContext txCtx = cache.getTxCtx(threadID);
+			
+			Map<String, Object> msgHeaders = msg.getHeaders();
+			Object subTx = msgHeaders.get(SUB_TX);
+			System.out.println("in buffer interceptor invoke():" + bufferEventType);
+			synchronized (bufferEventType) {
+				switch(bufferEventType){
+				case ONDEMAND:
+					ondemandSetup(msg);
+					break;
+				case VALIDTOFREE:
+					validToFree(msg);
+					break;
+				case WAITFORREMOTEUPDATE:
+					waitRemoteUpdate(msg);
+					break;
+				case EXEUPDATE:
+					exeUpdate();
+//				break;
+				default:
+					break;
+				}
 			}
-		}
-		
+			
+			if(txCtx.getRootTx() != null){
+				assert txCtx.getParentTx() != null;
+				assert txCtx.getParentComponent() != null;
+				assert subTx != null;
+				txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
+			}
+			
+		}// END IF(SERVICE_POLICY)
 		return msg;
 	}
 	
+	// wait for remote target component finish update
+	private Message waitRemoteUpdate(Message msg) {
+		String hostComp = getComponent().getName();
+		String threadID = getThreadID();
+		InterceptorCache cache = InterceptorCache.getInstance(hostComp);
+		TransactionContext txCtx = cache.getTxCtx(threadID);
+
+		assert freeness != null;
+		assert txCtx != null;
+		
+		synchronized (freezeSyncMonitor) {
+			if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)) {
+				freeze();
+			}
+		}
+		return msg;
+		
+		// haven't received update request yet
+//		Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
+//		synchronized (waitingRemoteCompUpdateDoneMonitor) {
+//			if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)) {
+//				try {
+////					LOGGER.info("ThreadID="	+ getThreadID()	+ " " + depMgr.getCompObject().getIdentifier()
+////							+ depMgr.getCompStatus() + " thread suspended to wait for remote update done--------------------------");
+//					waitingRemoteCompUpdateDoneMonitor.wait();
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+////				LOGGER.info("ThreadID=" + getThreadID() + " " + depMgr.getCompObject().getIdentifier()
+////						+ depMgr.getCompStatus() + " thread suspended to recover from remote update done--------------------------");
+//			}
+//			// the invoked transaction is not a root transaction
+////			if (txCtx.getRootTx() != null) {
+////				assert txCtx.getParentTx() != null;
+////				assert txCtx.getParentComponent() != null;
+////				assert subTx != null;
+////				txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
+////			}
+//			return msg;
+//		}
+	}
+	
+	private void exeUpdate() {
+		freeze();
+	}
+
+	// try to be ready for update
+	private void validToFree(Message msg) {
+		String hostComp = getComponent().getName();
+		String threadID = getThreadID();
+		InterceptorCache cache = InterceptorCache.getInstance(hostComp);
+		TransactionContext txCtx = cache.getTxCtx(threadID);
+
+		Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
+		synchronized (validToFreeSyncMonitor) {
+			// calculate old version root txs
+			if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
+				updateMgr.initOldRootTxs();
+				Printer printer = new Printer();
+				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
+			}
+			if (!freeness.isReadyForUpdate(hostComp)) {
+				Class<?> compClass = freeness.achieveFreeness(
+						txCtx.getRootTx(), txCtx.getRootComponent(),
+						txCtx.getParentComponent(), txCtx.getCurrentTx(),
+						hostComp);
+				if (compClass != null) {
+					addBufferMsgBody(msg, compClass);
+				}
+			}
+			if (freeness.isReadyForUpdate(hostComp)) {
+				depMgr.achievedFree();
+			} else if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(),
+					hostComp, txCtx, true)) {
+				LOGGER.info("ThreadID="	+ getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:"	+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+				Printer printer = new Printer();
+				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
+
+				try {
+					validToFreeSyncMonitor.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				LOGGER.info("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.recover()");
+			} else {
+			}
+		}
+
+		// Map<String, Object> msgHeaders = msg.getHeaders();
+		// Object subTx = msgHeaders.get(SUB_TX);
+		// // the invoked transaction is not a root transaction
+		// if(txCtx.getRootTx() != null){
+		// assert txCtx.getParentTx() != null;
+		// assert txCtx.getParentComponent() != null;
+		// assert subTx != null;
+		// txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
+		// }
+	}
+		
+	private void ondemandSetup(Message msg) {
+		freeze();
+	}
+
+	private void addBufferMsgBody(Message msg, Class<?> compClass) {
+		String className = compClass.getName();
+		List<Object> originalMsgBody;
+		List<Object> copyOfMsgBody = new ArrayList<Object>();
+		originalMsgBody = Arrays.asList((Object [])msg.getBody());
+		copyOfMsgBody.addAll(originalMsgBody);
+		copyOfMsgBody.add(COMP_CLASS_OBJ_IDENTIFIER + ":" + className);
+		copyOfMsgBody.add(compClass);
+		msg.setBody((Object [])copyOfMsgBody.toArray());
+	}
+	
+	/**
+	 * block all incoming message by using freezeSyncMonitor 
+	 */
+	public void freeze(){
+		synchronized (freezeSyncMonitor) {
+			try {
+				freezeSyncMonitor.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * notify all blocked message by using freezeSyncMonitor
+	 */
+	public void defreeze(){
+		synchronized (freezeSyncMonitor) {
+			freezeSyncMonitor.notifyAll();
+		}
+	}
+
 	/**
 	 * block all incoming message
 	 */
@@ -157,7 +331,12 @@ public class BufferInterceptor implements Interceptor, Observer {
 
 	@Override
 	public void update(Subject subject, Object arg) {
-		this.bufferEventType = (BufferEventType) arg;
+		synchronized (bufferEventType) {
+			this.bufferEventType = (BufferEventType) arg;
+			if(bufferEventType.equals(BufferEventType.DEFREEZE)){
+				defreeze();
+			}
+		}
 //		System.out.println("in buffer interceptor update():" + bufferEventType);
 	}
 
