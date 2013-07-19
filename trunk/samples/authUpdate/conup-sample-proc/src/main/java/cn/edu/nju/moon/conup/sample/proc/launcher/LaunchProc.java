@@ -11,6 +11,7 @@ import org.oasisopen.sca.NoSuchServiceException;
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.UpdateManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.sample.proc.services.ProcService;
@@ -71,7 +72,8 @@ public class LaunchProc {
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
 		
 		CommServerManager.getInstance().start(compIdentifier);
-		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
+		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);
         
