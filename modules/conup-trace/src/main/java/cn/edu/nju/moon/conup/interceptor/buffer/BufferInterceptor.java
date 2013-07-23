@@ -9,25 +9,17 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
-import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Message;
 import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
-import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Observer;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
-import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 /**
@@ -36,13 +28,12 @@ import cn.edu.nju.moon.conup.spi.utils.Printer;
  *
  */
 //@SuppressWarnings("unused")
-public class BufferInterceptor implements Interceptor, Observer {
+public class BufferInterceptor implements Interceptor {
 	private final static Logger LOGGER = Logger.getLogger(BufferInterceptor.class.getName());
 	private static final String SUB_TX = "SUB_TX";
 	private static String COMP_CLASS_OBJ_IDENTIFIER = "COMP_CLASS_OBJ_IDENTIFIER";
 	
 	private PolicySubject subject;
-	private Operation operation;
 	private String phase;
 	private DynamicDepManager depMgr;
 	private TxLifecycleManager txLifecycleMgr;
@@ -51,21 +42,15 @@ public class BufferInterceptor implements Interceptor, Observer {
 	private FreenessStrategy freeness = null;
 	
 	private BufferEventType bufferEventType = BufferEventType.NOTHING;
-	private boolean freezeFlag = false;
+//	private boolean freezeFlag = false;
 	
-	public BufferInterceptor(PolicySubject subject, Operation operation,
-			String phase, DynamicDepManager depMgr,
+	public BufferInterceptor(PolicySubject subject, String phase, DynamicDepManager depMgr,
 			TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
 		this.subject = subject;
-		this.operation = operation;
 		this.phase = phase;
 		this.depMgr = depMgr;
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.freeness = freeness;
-		
-//		this.updateMgr = nodeMgr.getUpdateManageer(txLifecycleMgr.getCompIdentifier());
-		// register to DDM
-//		observable.addObserver(this);
 		
 		init();
 	}
@@ -130,7 +115,7 @@ public class BufferInterceptor implements Interceptor, Observer {
 					break;
 				case EXEUPDATE:
 					exeUpdate();
-//				break;
+					break;
 				default:
 					break;
 				}
@@ -164,29 +149,6 @@ public class BufferInterceptor implements Interceptor, Observer {
 		}
 		return msg;
 		
-		// haven't received update request yet
-//		Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
-//		synchronized (waitingRemoteCompUpdateDoneMonitor) {
-//			if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)) {
-//				try {
-////					LOGGER.info("ThreadID="	+ getThreadID()	+ " " + depMgr.getCompObject().getIdentifier()
-////							+ depMgr.getCompStatus() + " thread suspended to wait for remote update done--------------------------");
-//					waitingRemoteCompUpdateDoneMonitor.wait();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-////				LOGGER.info("ThreadID=" + getThreadID() + " " + depMgr.getCompObject().getIdentifier()
-////						+ depMgr.getCompStatus() + " thread suspended to recover from remote update done--------------------------");
-//			}
-//			// the invoked transaction is not a root transaction
-////			if (txCtx.getRootTx() != null) {
-////				assert txCtx.getParentTx() != null;
-////				assert txCtx.getParentComponent() != null;
-////				assert subTx != null;
-////				txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
-////			}
-//			return msg;
-//		}
 	}
 	
 	private void exeUpdate() {
@@ -205,8 +167,8 @@ public class BufferInterceptor implements Interceptor, Observer {
 			// calculate old version root txs
 			if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
 				updateMgr.initOldRootTxs();
-				Printer printer = new Printer();
-				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
+//				Printer printer = new Printer();
+//				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
 			}
 			if (!freeness.isReadyForUpdate(hostComp)) {
 				Class<?> compClass = freeness.achieveFreeness(
@@ -286,25 +248,25 @@ public class BufferInterceptor implements Interceptor, Observer {
 	/**
 	 * block all incoming message
 	 */
-	public void freeze(Object synMonitor){
-		synchronized (synMonitor) {
-			try {
-				synMonitor.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	public void freeze(Object synMonitor){
+//		synchronized (synMonitor) {
+//			try {
+//				synMonitor.wait();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 	
 
 	/**
 	 * notify all blocked message
 	 */
-	public void defreeze(Object synMonitor){
-		synchronized (synMonitor) {
-			synMonitor.notifyAll();
-		}
-	}
+//	public void defreeze(Object synMonitor){
+//		synchronized (synMonitor) {
+//			synMonitor.notifyAll();
+//		}
+//	}
 
 	private Component getComponent(){
 		if (subject instanceof Endpoint) {
@@ -330,14 +292,15 @@ public class BufferInterceptor implements Interceptor, Observer {
 	}
 
 	@Override
-	public void update(Subject subject, Object arg) {
+	public void update(Object arg) {
 		synchronized (bufferEventType) {
 			this.bufferEventType = (BufferEventType) arg;
-			if(bufferEventType.equals(BufferEventType.DEFREEZE)){
+			if(bufferEventType.equals(BufferEventType.NOTHING) ||
+					bufferEventType.equals(BufferEventType.VALIDTOFREE) ||
+					bufferEventType.equals(BufferEventType.WAITFORREMOTEUPDATE)){
 				defreeze();
 			}
 		}
-//		System.out.println("in buffer interceptor update():" + bufferEventType);
 	}
 
 

@@ -30,6 +30,7 @@ import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.interceptor.buffer.BufferInterceptor;
 import cn.edu.nju.moon.conup.interceptor.tx.TxInterceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -80,7 +81,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	
 	private NodeManager nodeMgr;
 	private DynamicDepManager depMgr;
-	private CompLifecycleManager clMgr;
 	private TxDepMonitor txDepMonitor;
 	private TxLifecycleManager txLifecycleMgr;
 
@@ -118,6 +118,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		if(phase.equals(Phase.SERVICE_POLICY) || phase.equals(Phase.REFERENCE_POLICY)){
 			msg = txInterceptor.invoke(msg);
 			msg = bufferInterceptor.invoke(msg);
+			
+			
 		}
 		
 		//test
@@ -400,7 +402,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				String hostComp = getComponent().getName();
 				this.nodeMgr = NodeManager.getInstance();
 				this.depMgr = nodeMgr.getDynamicDepManager(hostComp);
-				this.clMgr = nodeMgr.getCompLifecycleManager(hostComp);
 				this.txDepMonitor = nodeMgr.getTxDepMonitor(hostComp);
 				this.txLifecycleMgr = nodeMgr.getTxLifecycleManager(hostComp);
 				
@@ -408,8 +409,10 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				bufferInterceptor = new BufferInterceptor(subject, operation, phase, depMgr, txLifecycleMgr, freeness);
-				depMgr.registerObserver(bufferInterceptor);
+				bufferInterceptor = new BufferInterceptor(subject, phase, depMgr, txLifecycleMgr, freeness);
+				InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(hostComp);
+				interceptorStub.addInterceptor(bufferInterceptor);
+//				depMgr.registerObserver(bufferInterceptor);
 			} else {
 //				txInterceptor = new TxInterceptor(subject, operation, phase);
 //				bufferInterceptor = new BufferInterceptor(subject, operation, phase);
