@@ -23,7 +23,7 @@ import cn.edu.nju.moon.conup.spi.update.UpdateManager;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface DynamicDepManager extends Subject, Observer{
+public interface DynamicDepManager extends Observer{
 	
 	/**
 	 * maintain tx
@@ -333,9 +333,9 @@ public interface DynamicDepManager extends Subject, Observer{
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
 
-	public Message checkOndemand(TransactionContext txCtx, Object subTx, Interceptor interceptor, Message msg);
-
-	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg, UpdateManager updateMgr);
+//	public Message checkOndemand(TransactionContext txCtx, Object subTx, Interceptor interceptor, Message msg);
+//
+//	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
+//			Interceptor interceptor, Message msg, UpdateManager updateMgr);
 	
 }
