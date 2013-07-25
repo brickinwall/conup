@@ -15,7 +15,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
+import cn.edu.nju.moon.conup.spi.exception.ConupException;
 
 /**
  * @author rgc
@@ -39,7 +39,7 @@ public class XMLUtil {
 			e.printStackTrace();
 		} catch (IOException e) {
 			if(disPath == "" || disPath == null){
-				throw new ConupEnvException("TUSCANY_HOME environment is not set!");
+				throw new ConupException("TUSCANY_HOME environment is not set!");
 			} else{
 				e.printStackTrace();
 			}
@@ -118,7 +118,6 @@ public class XMLUtil {
 	}
 
 	public Set<String> getChildren(String compIdentifier) {
-//		Set<String> childrenComps = new HashSet<String>();
 		Set<String> childrenComps = new ConcurrentSkipListSet<String>();
 		try {
 			Element staticDeps = root.getChild("staticDeps");
