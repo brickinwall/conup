@@ -26,6 +26,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.POJONode;
 
 /**
  * http://json-rpc.org/wiki/specification
@@ -38,15 +39,21 @@ import org.codehaus.jackson.node.ObjectNode;
  * </ul> 
  */
 public class JsonRpc10Request extends JsonRpcRequest {
-
+	
     public JsonRpc10Request(String id, String method, Object[] params) {
         super(JsonNodeFactory.instance.textNode(id), method, params);
+    }
+    
+    public JsonRpc10Request(String id, String method, Object[] params, String obj) {
+        super(JsonNodeFactory.instance.textNode(id), method, params, obj);
     }
 
     public JsonRpc10Request(ObjectNode req) {
         super(req);
         method = req.get("method").getTextValue();
         id = req.get("id");
+        if(req.get("InvocationContext") != null)
+        	invocationCtx = req.get("InvocationContext").toString();
         JsonNode args = req.get("params");
         if (args instanceof ArrayNode) {
             // Positional parameters

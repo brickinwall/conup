@@ -27,7 +27,6 @@ import cn.edu.nju.moon.conup.spi.utils.Printer;
  * @author Guochao Ren<rgc.nju.cs@gmail.com>
  *
  */
-//@SuppressWarnings("unused")
 public class BufferInterceptor implements Interceptor {
 	private final static Logger LOGGER = Logger.getLogger(BufferInterceptor.class.getName());
 	private static final String SUB_TX = "SUB_TX";
@@ -42,7 +41,6 @@ public class BufferInterceptor implements Interceptor {
 	private FreenessStrategy freeness = null;
 	
 	private BufferEventType bufferEventType = BufferEventType.NOTHING;
-//	private boolean freezeFlag = false;
 	
 	public BufferInterceptor(PolicySubject subject, String phase, DynamicDepManager depMgr,
 			TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
@@ -54,39 +52,6 @@ public class BufferInterceptor implements Interceptor {
 		
 		init();
 	}
-	
-//	@Override
-//	public Message invoke(Message msg) {
-//		
-//		if (phase.equals(Phase.SERVICE_POLICY)) {
-//			synchronized (freezeSyncMonitor) {
-//				String hostComp;
-//				hostComp = getComponent().getName();
-//				String threadID;
-//				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
-//				threadID = getThreadID();
-//				TransactionContext txCtx = cache.getTxCtx(threadID);
-//				
-//				Map<String, Object> msgHeaders = msg.getHeaders();
-//				Object subTx = msgHeaders.get(SUB_TX);
-//				
-//				msg = depMgr.checkOndemand(txCtx, subTx, this, msg);
-//				if(msg != null)
-//					return msg;
-//				
-//				msg = updateMgr.checkRemoteUpdate(txCtx, subTx, this, msg);
-//				if(msg != null)
-//					return msg;
-//				
-//				msg = depMgr.checkValidToFree(txCtx, subTx, this, msg, updateMgr);
-//				
-//				updateMgr.checkUpdate(this);
-//				
-//			}
-//		}
-//		
-//		return msg;
-//	}
 	
 	@Override
 	public Message invoke(Message msg) {
@@ -302,7 +267,5 @@ public class BufferInterceptor implements Interceptor {
 			}
 		}
 	}
-
-
 
 }

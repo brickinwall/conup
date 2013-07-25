@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.assembly.Component;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
+import org.apache.tuscany.sca.binding.jsonrpc.protocol.JsonRpc10Request;
 import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Message;
 import org.apache.tuscany.sca.invocation.Phase;
@@ -62,33 +63,15 @@ public class TxInterceptor implements Interceptor {
 
 	@Override
 	public Message invoke(Message msg) {
-		// locate ROOT_PARENT_IDENTIFIER in message body
-		List<Object> msgBodyOriginal;
-		if (msg.getBody() == null) {
-			Object[] tmp = new Object[1];
-			tmp[0] = (Object) "";
-			msgBodyOriginal = Arrays.asList(tmp);
-		} else
-			msgBodyOriginal = Arrays.asList((Object[]) msg.getBody());
-
-		List<Object> msgBody = new ArrayList<Object>();
-		msgBody.addAll(msgBodyOriginal);
-//		String transactionTag = null;
 		InvocationContext invocationContext = null;
-		for (Object object : msgBody) {
-			if (object.toString().contains(TxInterceptor.ROOT_PARENT_IDENTIFIER)) {
-				invocationContext = (InvocationContext) object;
-				msgBody.remove(object);
-				break;
-			}
-		}
 		
+		invocationContext = getInvocationCtxFromMsgHeader(msg.getHeaders());
 		String hostComponent = getComponent().getName();
 		
 		if (phase.equals(Phase.SERVICE_POLICY)) {
-			msg = traceServicePhase(msg, invocationContext, msgBody, hostComponent);
+			msg = traceServicePhase(msg, invocationContext, hostComponent);
 		} else if (phase.equals(Phase.REFERENCE_POLICY)) {
-			msg = traceReferencePhase(msg, msgBody, hostComponent, getTargetServiceName(), txDepMonitor);
+			msg = traceReferencePhase(msg, hostComponent, getTargetServiceName(), txDepMonitor);
 		} // else if(reference.policy)
 
 //		if(phase.equals(Phase.REFERENCE_POLICY)
@@ -109,6 +92,18 @@ public class TxInterceptor implements Interceptor {
 		return msg;
 	}
 	
+	private InvocationContext getInvocationCtxFromMsgHeader(Map<String, Object> headers) {
+		InvocationContext invocationCtx = null;
+		Object object = headers.get("RequestMessage");
+		if(object instanceof JsonRpc10Request){
+			JsonRpc10Request jsonRpc10Request = (JsonRpc10Request)object;
+			String invocationCtxStr = jsonRpc10Request.getInvocationCtx();
+			invocationCtx = InvocationContext.getInvocationCtx(invocationCtxStr);
+		}
+		return invocationCtx;
+	}
+
+
 	private String getTargetServiceName(){
 		String serviceName = null;
 		serviceName = operation.getInterface().toString();	
@@ -131,7 +126,7 @@ public class TxInterceptor implements Interceptor {
 	}
 	
 	public Message traceServicePhase(Message msg, InvocationContext invocationContext,
-			List<Object> msgBody, String hostComponent) {
+			String hostComponent) {
 		
 		if(invocationContext ==null || invocationContext.toString().equals("")){
 			//an exception is preferred
@@ -139,7 +134,9 @@ public class TxInterceptor implements Interceptor {
 		}
 		
 		LOGGER.fine("trace SERVICE_POLICY : " + invocationContext);
-		
+		List<Object> originalMsgBody = Arrays.asList((Object [])msg.getBody());
+		List<Object> msgBody = new ArrayList<Object>();
+		msgBody.addAll(originalMsgBody);
 		Map<String, Object> headers = msg.getHeaders();
 		if(invocationContext != null)
 			headers.put(INVOCATION_CONTEXT, invocationContext);
@@ -152,41 +149,40 @@ public class TxInterceptor implements Interceptor {
 		return msg;
 	}
 
-	public Message traceReferencePhase(Message msg,	List<Object> msgBody, String hostComponent, String serviceName, TxDepMonitor txDepMonitor) {
+	public Message traceReferencePhase(Message msg, String hostComponent, String serviceName, TxDepMonitor txDepMonitor) {
 		InvocationContext invocationCtx = txLifecycleMgr.createInvocationCtx(hostComponent, serviceName ,txDepMonitor);
-		msgBody.add(invocationCtx);
-		msg.setBody((Object [])msgBody.toArray());
+		msg.getHeaders().put("InvocationContext", invocationCtx.toString());
 		LOGGER.fine("trace REFERENCE_POLICY : " + invocationCtx);
 		return msg;
 	}
 
-	/**
-	 * root and parent transaction id is stored in the format: VcTransactionRootAndParentIdentifier[ROOT_ID,PARENT_ID].
-	 * 
-	 * @return ROOT_ID,PARENT_ID
-	 * 
-	 * */
-	private String getTargetString(String raw){
-		if(raw == null){
-			return null;
-		}
-		if(raw.startsWith("\"")){
-			raw = raw.substring(1);
-		}
-		if(raw.endsWith("\"")){
-			raw = raw.substring(0, raw.length()-1);
-		}
-		int index = raw.indexOf(ROOT_PARENT_IDENTIFIER);
-		int head = raw.substring(index).indexOf("[")+1;
-//		LOGGER.fine(raw.substring(0, head));
-		int tail = raw.substring(index).indexOf("]");
-//		LOGGER.fine(raw.substring(head, tail));
-		return raw.substring(head, tail);
-	}
-	
-	private String getThreadID() {
-		return new Integer(Thread.currentThread().hashCode()).toString();
-	}
+//	/**
+//	 * root and parent transaction id is stored in the format: VcTransactionRootAndParentIdentifier[ROOT_ID,PARENT_ID].
+//	 * 
+//	 * @return ROOT_ID,PARENT_ID
+//	 * 
+//	 * */
+//	private String getTargetString(String raw){
+//		if(raw == null){
+//			return null;
+//		}
+//		if(raw.startsWith("\"")){
+//			raw = raw.substring(1);
+//		}
+//		if(raw.endsWith("\"")){
+//			raw = raw.substring(0, raw.length()-1);
+//		}
+//		int index = raw.indexOf(ROOT_PARENT_IDENTIFIER);
+//		int head = raw.substring(index).indexOf("[")+1;
+////		LOGGER.fine(raw.substring(0, head));
+//		int tail = raw.substring(index).indexOf("]");
+////		LOGGER.fine(raw.substring(head, tail));
+//		return raw.substring(head, tail);
+//	}
+//	
+//	private String getThreadID() {
+//		return new Integer(Thread.currentThread().hashCode()).toString();
+//	}
 
 
 	@Override

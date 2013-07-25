@@ -1,9 +1,6 @@
 package cn.edu.nju.moon.conup.spi.tx;
 
-import java.util.List;
-
-import org.apache.tuscany.sca.invocation.Message;
-
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 
@@ -108,28 +105,11 @@ public interface TxLifecycleManager {
 	 * @return
 	 */
 	public TransactionRegistry getTxRegistry();
-	
-	/**
-	 * 
-	 * @param msg
-	 * @param transactionTag
-	 * @param msgBody
-	 * @param hostComponent
-	 * @return
-	 */
-	public Message traceServicePhase(Message msg, String transactionTag,
-			List<Object> msgBody, String hostComponent);
 
-	/**
-	 * 
-	 * @param msg
-	 * @param transactionTag
-	 * @param msgBody
-	 * @param hostComponent
-	 * @param serviceName 
-	 * @param txDepMonitor 
-	 * @return
-	 */
-	public Message traceReferencePhase(Message msg, String transactionTag,
-			List<Object> msgBody, String hostComponent, String serviceName, TxDepMonitor txDepMonitor);
+	void resolveInvocationContext(InvocationContext invocationContext,
+			String hostComponent);
+
+	public InvocationContext createInvocationCtx(String hostComponent, String serviceName,
+			TxDepMonitor txDepMonitor);
+
 }
