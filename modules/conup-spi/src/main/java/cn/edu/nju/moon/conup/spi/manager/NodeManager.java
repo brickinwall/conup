@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.exception.ConupMgrNotFoundException;
 import cn.edu.nju.moon.conup.spi.factory.AlgorithmFactory;
 import cn.edu.nju.moon.conup.spi.factory.ManagerFactory;
@@ -64,6 +65,7 @@ public class NodeManager{
 	 */
 	private Map<ComponentObject, UpdateManager> updateMgrs;
 	
+	private Map<ComponentObject, InterceptorStub> interceptorStubs;
 	
 	private NodeManager(){
 		compObjects = new ConcurrentHashMap<String, ComponentObject>();
@@ -73,6 +75,7 @@ public class NodeManager{
 		txDepMonitors = new ConcurrentHashMap<ComponentObject, TxDepMonitor>();
 		compLifecycleMgrs = new ConcurrentHashMap<ComponentObject, CompLifecycleManager>();
 		updateMgrs = new ConcurrentHashMap<ComponentObject, UpdateManager>();
+		interceptorStubs = new ConcurrentHashMap<ComponentObject, InterceptorStub>();
 	}
 	
 	/**
@@ -358,6 +361,23 @@ public class NodeManager{
 			} else {
 				return false;
 			}
+		}
+	}
+	
+	public InterceptorStub getInterceptorStub(String compIdentifier){
+		ComponentObject compObj;
+		InterceptorStub interceptorStub;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !interceptorStubs.containsKey(compObj) ){
+				interceptorStub = new InterceptorStub();
+				interceptorStubs.put(compObj, interceptorStub);
+			} else{
+				interceptorStub = interceptorStubs.get(compObj);
+			}
+			return interceptorStub;
 		}
 	}
 	

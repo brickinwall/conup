@@ -295,51 +295,13 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void registerObserver(Observer o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeObserver(Observer o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyObservers(Object arg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void update(Subject subject, Object arg) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setResult(String result) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public Object getFreezeSyncMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Message checkOndemand(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg, UpdateManager updateMgr) {
 		// TODO Auto-generated method stub
 		return null;
 	}
