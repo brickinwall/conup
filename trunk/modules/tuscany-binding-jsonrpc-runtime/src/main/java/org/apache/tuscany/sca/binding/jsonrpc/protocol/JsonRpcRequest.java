@@ -41,6 +41,8 @@ public abstract class JsonRpcRequest {
     protected String method;
     protected JsonNode id;
     protected Object[] params;
+    // add for conup
+    protected String invocationCtx;
 
     protected ObjectNode jsonNode;
 
@@ -66,6 +68,26 @@ public abstract class JsonRpcRequest {
         }
         this.jsonNode = req;
     }
+    
+    public JsonRpcRequest(JsonNode id, String method, Object[] params, String obj) {
+        super();
+        this.id = id;
+        this.method = method;
+        this.params = params;
+        this.invocationCtx = obj;
+        ObjectNode req = JsonNodeFactory.instance.objectNode();
+        req.put("method", method);
+        req.put("id", id);
+        if (params != null) {
+            ArrayNode args = JsonNodeFactory.instance.arrayNode();
+            for (Object p : params) {
+                args.add(JsonNodeFactory.instance.POJONode(p));
+            }
+            req.put("params", args);
+        }
+        req.put("InvocationContext", invocationCtx);
+        this.jsonNode = req;
+    }
 
     public abstract void write(OutputStream os) throws Exception;
 
@@ -88,5 +110,9 @@ public abstract class JsonRpcRequest {
     public ObjectNode getJsonNode() {
         return jsonNode;
     }
+
+	public String getInvocationCtx() {
+		return invocationCtx;
+	}
 
 }

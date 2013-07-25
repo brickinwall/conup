@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -98,7 +99,11 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
                 if (JSONRPCBinding.VERSION_20.equals(((JSONRPCBinding)endpointReference.getBinding()).getVersion())) {
                     req = new JsonRpc20Request(requestId, msg.getOperation().getName(), params);
                 } else {
-                    req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params);
+                	if(msg.getHeaders().containsKey("InvocationContext")){
+                		req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params, msg.getHeaders().get("InvocationContext").toString());
+                	} else {
+                		req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params);
+                	}
                 }
                 final JsonRpcRequest json = req;
 
