@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comps>
+	<comp enabled="yes">
+		<ipAddress>10.0.2.15</ipAddress>
+		<port>18082</port>
+		<targetComp>AuthComponent</targetComp>
+		<contributionUri>conup-sample-auth</contributionUri>
+		<compsiteUri>auth.composite</compsiteUri>
+		<compImpl>cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl</compImpl>
+		<baseDir>/home/conup</baseDir>
+	</comp>
+	<comp enabled="no">
+		<ipAddress>10.0.2.15</ipAddress>
+		<port>18082</port>
+		<targetComp>AuthComponent</targetComp>
+		<contributionUri>conup-sample-auth</contributionUri>
+		<compsiteUri>auth.composite</compsiteUri>
+		<compImpl>cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl</compImpl>
+		<baseDir>/home/conup</baseDir>
+	</comp>
+	<comp enabled="no">
+		<ipAddress>10.0.2.15</ipAddress>
+		<port>18082</port>
+		<targetComp>AuthComponent</targetComp>
+		<contributionUri>conup-sample-auth</contributionUri>
+		<compsiteUri>auth.composite</compsiteUri>
+		<compImpl>cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl</compImpl>
+		<baseDir>/home/conup</baseDir>
+	</comp>
+	<comp enabled="no">
+		<ipAddress>10.0.2.15</ipAddress>
+		<port>18082</port>
+		<targetComp>AuthComponent</targetComp>
+		<contributionUri>conup-sample-auth</contributionUri>
+		<compsiteUri>auth.composite</compsiteUri>
+		<compImpl>cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl</compImpl>
+		<baseDir>/home/conup</baseDir>
+	</comp>
+</comps>
