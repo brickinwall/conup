@@ -16,9 +16,7 @@ import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 /**
@@ -35,7 +33,7 @@ public class TxInterceptor implements Interceptor {
 	 * it's used to identify a ended sub tx id in the response message
 	 */
 //	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
-	private static String ROOT_PARENT_IDENTIFIER = "InvocationContext";
+//	private static String ROOT_PARENT_IDENTIFIER = "InvocationContext";
 
 	private static String HOSTIDENTIFIER = "HostIdentifier";
 //	private static final String ROOT_TX = "ROOT_TX";
@@ -44,7 +42,7 @@ public class TxInterceptor implements Interceptor {
 //	private static final String PARENT_COMP = "PARENT_COMP";
 //	private static final String SUB_TX = "SUB_TX";
 //	private static final String SUB_COMP = "SUB_COMP";
-	private static final String INVOCATION_CONTEXT = "INVOCATION_CONTEXT";
+	public static final String INVOCATION_CONTEXT = "INVOCATION_CONTEXT";
 	
 	private PolicySubject subject;
 	private Operation operation;
@@ -138,8 +136,9 @@ public class TxInterceptor implements Interceptor {
 		List<Object> msgBody = new ArrayList<Object>();
 		msgBody.addAll(originalMsgBody);
 		Map<String, Object> headers = msg.getHeaders();
-		if(invocationContext != null)
+		if(invocationContext != null){
 			headers.put(INVOCATION_CONTEXT, invocationContext);
+		}
 		
 		txLifecycleMgr.resolveInvocationContext(invocationContext, hostComponent);
 		
@@ -154,6 +153,11 @@ public class TxInterceptor implements Interceptor {
 		msg.getHeaders().put("InvocationContext", invocationCtx.toString());
 		LOGGER.fine("trace REFERENCE_POLICY : " + invocationCtx);
 		return msg;
+	}
+	
+	@Override
+	public void update(Object arg) {
+		
 	}
 
 //	/**
@@ -183,11 +187,5 @@ public class TxInterceptor implements Interceptor {
 //	private String getThreadID() {
 //		return new Integer(Thread.currentThread().hashCode()).toString();
 //	}
-
-
-	@Override
-	public void update(Object arg) {
-		
-	}
 
 }

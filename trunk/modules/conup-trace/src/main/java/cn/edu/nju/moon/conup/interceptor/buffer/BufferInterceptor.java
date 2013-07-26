@@ -13,10 +13,12 @@ import org.apache.tuscany.sca.invocation.Message;
 import org.apache.tuscany.sca.invocation.Phase;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
+import cn.edu.nju.moon.conup.interceptor.tx.TxInterceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
@@ -29,7 +31,7 @@ import cn.edu.nju.moon.conup.spi.utils.Printer;
  */
 public class BufferInterceptor implements Interceptor {
 	private final static Logger LOGGER = Logger.getLogger(BufferInterceptor.class.getName());
-	private static final String SUB_TX = "SUB_TX";
+//	private static final String SUB_TX = "SUB_TX";
 	private static String COMP_CLASS_OBJ_IDENTIFIER = "COMP_CLASS_OBJ_IDENTIFIER";
 	
 	private PolicySubject subject;
@@ -65,7 +67,8 @@ public class BufferInterceptor implements Interceptor {
 			TransactionContext txCtx = cache.getTxCtx(threadID);
 			
 			Map<String, Object> msgHeaders = msg.getHeaders();
-			Object subTx = msgHeaders.get(SUB_TX);
+//			Object subTx = msgHeaders.get(SUB_TX);
+			String subTx = ((InvocationContext)msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT)).getSubTx();
 			System.out.println("in buffer interceptor invoke():" + bufferEventType);
 			synchronized (bufferEventType) {
 				switch(bufferEventType){

@@ -31,11 +31,11 @@ import cn.edu.nju.moon.conup.interceptor.buffer.BufferInterceptor;
 import cn.edu.nju.moon.conup.interceptor.tx.TxInterceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
 
 /**
  * 
@@ -118,8 +118,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		if(phase.equals(Phase.SERVICE_POLICY) || phase.equals(Phase.REFERENCE_POLICY)){
 			msg = txInterceptor.invoke(msg);
 			msg = bufferInterceptor.invoke(msg);
-			
-			
 		}
 		
 		//test
@@ -146,25 +144,25 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 */
 	private Message attachEndedTxToResAtServicePolicy(Message msg) {
 			String hostComp = null;
-			String rootTx = null;
-			String rootComp = null;
-			String parentTx = null;
-			String parentComp = null;
+//			String rootTx = null;
+//			String rootComp = null;
+//			String parentTx = null;
+//			String parentComp = null;
 			
-			//locate ROOT_PARENT_IDENTIFIER in message body
-			List<Object> msgBodyOriginal;
-			// return value is void
-			if (msg.getBody() == null) {
-				msgBodyOriginal = new ArrayList<Object>();
-			} else{
-				msgBodyOriginal = Arrays.asList(msg.getBody());
-			}
-			
-			List<Object> msgBody = new ArrayList<Object>();
-			msgBody.addAll(msgBodyOriginal);
+//			//locate ROOT_PARENT_IDENTIFIER in message body
+//			List<Object> msgBodyOriginal;
+//			// return value is void
+//			if (msg.getBody() == null) {
+//				msgBodyOriginal = new ArrayList<Object>();
+//			} else{
+//				msgBodyOriginal = Arrays.asList(msg.getBody());
+//			}
+//			
+//			List<Object> msgBody = new ArrayList<Object>();
+//			msgBody.addAll(msgBodyOriginal);
 			
 			if (phase.equals(Phase.SERVICE_POLICY)) {
-				Map<String, Object> msgHeader = msg.getHeaders();
+				Map<String, Object> msgHeaders = msg.getHeaders();
 				String subTx = null;
 				String subComp = null;
 				
@@ -172,50 +170,63 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				hostComp = getComponent().getName();
 				
 				// current tx is a root tx, no need to attach any information to its response 
-				if(msgHeader.get(SUB_TX) == null){
+				InvocationContext invocationCtx = (InvocationContext) msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT);
+				if(invocationCtx.getSubTx() == null){
+					msgHeaders.remove(TxInterceptor.INVOCATION_CONTEXT);
 					return msg;
 				}
+				subTx = invocationCtx.getSubTx();
+				subComp = invocationCtx.getSubComp();
+//				rootTx = invocationCtx.getRootTx();
+//				rootComp = invocationCtx.getRootComp();
+//				parentTx = invocationCtx.getParentTx();
+//				parentComp = invocationCtx.getParentComp();;
 				
-				subTx = msgHeader.get(SUB_TX).toString();
-				subComp = msgHeader.get(SUB_COMP).toString();
-				rootTx = (String) msgHeader.get(ROOT_TX);
-				rootComp = (String) msgHeader.get(ROOT_COMP);
-				parentTx = (String) msgHeader.get(PARENT_TX);
-				parentComp = (String) msgHeader.get(PARENT_COMP);
+//				if(msgHeader.get(SUB_TX) == null){
+//					return msg;
+//				}
+//				
+//				subTx = msgHeader.get(SUB_TX).toString();
+//				subComp = msgHeader.get(SUB_COMP).toString();
+//				rootTx = msgHeader.get(ROOT_TX).toString();
+//				rootComp = msgHeader.get(ROOT_COMP).toString();
+//				parentTx = msgHeader.get(PARENT_TX).toString();
+//				parentComp = msgHeader.get(PARENT_COMP).toString();
 				
 				assert subTx != null;
-				if( !hostComp.equals(subComp) ){
-					LOGGER.warning("hostComp: " + hostComp + " subComp: " + subComp);
-					assert hostComp.equals(subComp);
-				}
+				assert hostComp.equals(subComp);
+//				if( !hostComp.equals(subComp) ){
+//					LOGGER.warning("hostComp: " + hostComp + " subComp: " + subComp);
+//					assert hostComp.equals(subComp);
+//				}
 //				assert hostComp.equals(txCtx.getHostComponent());
 				
-//				NodeManager nodeMgr = NodeManager.getInstance();
-//				nodeMgr.getTxLifecycleManager(hostComp).endLocalSubTx(hostComp, subTx);
 				txLifecycleMgr.endLocalSubTx(hostComp, subTx);
 				
 				//generate info required to be attatched to the response msg body
-				StringBuffer endedSubTxTag = new StringBuffer();
-				endedSubTxTag.append(ENDED_SUB_TX_TAG);
-				endedSubTxTag.append("[");
-				endedSubTxTag.append(ROOT_TX + ":" + rootTx + ";");
-				endedSubTxTag.append(ROOT_COMP + ":" + rootComp + ";");
-				endedSubTxTag.append(PARENT_TX + ":" + parentTx + ";");
-				endedSubTxTag.append(PARENT_COMP + ":" + parentComp + ";");
-				endedSubTxTag.append(SUB_TX + ":" + subTx + ";");
-				endedSubTxTag.append(SUB_COMP + ":" + subComp );
-				endedSubTxTag.append("]");
+//				StringBuffer endedSubTxTag = new StringBuffer();
+//				endedSubTxTag.append(ENDED_SUB_TX_TAG);
+//				endedSubTxTag.append("[");
+//				endedSubTxTag.append(ROOT_TX + ":" + rootTx + ";");
+//				endedSubTxTag.append(ROOT_COMP + ":" + rootComp + ";");
+//				endedSubTxTag.append(PARENT_TX + ":" + parentTx + ";");
+//				endedSubTxTag.append(PARENT_COMP + ":" + parentComp + ";");
+//				endedSubTxTag.append(SUB_TX + ":" + subTx + ";");
+//				endedSubTxTag.append(SUB_COMP + ":" + subComp );
+//				endedSubTxTag.append("]");
 				
 				//reset the msg body
-				msgBody.add(endedSubTxTag.toString());
-				msg.setBody((Object [])msgBody.toArray());
+//				msgBody.add(endedSubTxTag.toString());
+//				msg.setBody((Object [])msgBody.toArray());
 				
-				msgHeader.remove(ROOT_TX);
-				msgHeader.remove(ROOT_COMP);
-				msgHeader.remove(PARENT_TX);
-				msgHeader.remove(PARENT_COMP);
-				msgHeader.remove(SUB_TX);
-				msgHeader.remove(SUB_COMP);
+				msgHeaders.remove(TxInterceptor.INVOCATION_CONTEXT);
+				
+//				msgHeader.remove(ROOT_TX);
+//				msgHeader.remove(ROOT_COMP);
+//				msgHeader.remove(PARENT_TX);
+//				msgHeader.remove(PARENT_COMP);
+//				msgHeader.remove(SUB_TX);
+//				msgHeader.remove(SUB_COMP);
 			} 
 			return msg;
 		}
@@ -232,57 +243,68 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		String subTx = null;
 		String subComp = null;
 		
-		List<Object> msgBodyOriginal;
-		if(msg.getBody() == null){
-			Object [] tmp = new Object[1];
-			tmp[0] = (Object)"";
-			msgBodyOriginal = Arrays.asList(tmp);
-		}
-		else{
-			if(msg.getBody().getClass().isArray())
-				msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
-			else
-				msgBodyOriginal = Arrays.asList(msg.getBody());
-		}
-		
-		List<Object> msgBody = new ArrayList<Object>();
-		msgBody.addAll(msgBodyOriginal);
-		String subContextTag = null;
-		for(Object object : msgBody){
-			
-			if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
-				subContextTag = object.toString();
-				msgBody.remove(object);
-				break;
-			}
-		}
-		if(subContextTag == null)
+		Map<String, Object> msgHeaders = msg.getHeaders();
+		InvocationContext invocationCtx = (InvocationContext) msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT);
+		if(invocationCtx == null || invocationCtx.getSubTx() == null){
 			return msg;
+		}
+		currentTx = invocationCtx.getParentTx();
+		hostComp = getComponent().getName();
+		rootTx = invocationCtx.getRootTx();
+		subTx = invocationCtx.getSubTx();
+		subComp = invocationCtx.getSubComp();
 		
-		LOGGER.fine("subContextTag:" + subContextTag + ", msgBody:" + msgBody);
+//		List<Object> msgBodyOriginal;
+//		if(msg.getBody() == null){
+//			Object [] tmp = new Object[1];
+//			tmp[0] = (Object)"";
+//			msgBodyOriginal = Arrays.asList(tmp);
+//		}
+//		else{
+//			if(msg.getBody().getClass().isArray())
+//				msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
+//			else
+//				msgBodyOriginal = Arrays.asList(msg.getBody());
+//		}
+//		
+//		List<Object> msgBody = new ArrayList<Object>();
+//		msgBody.addAll(msgBodyOriginal);
+//		String subContextTag = null;
+//		for(Object object : msgBody){
+//			
+//			if(object instanceof String && object.toString().contains("ENDED_SUB_TX_TAG")){
+//				subContextTag = object.toString();
+//				msgBody.remove(object);
+//				break;
+//			}
+//		}
+//		if(subContextTag == null)
+//			return msg;
+//		
+//		LOGGER.fine("subContextTag:" + subContextTag + ", msgBody:" + msgBody);
 		
 		// Here we need to pay attention, the body in this return message should be only one object, not an array.
 		// Because we have added ENDED_SUB_TX_TAG to the body in SERVICE.policy phase, and make the actual body become a list
 		// If this service's return value is void, then msgBody.size can be 0. So we do not need to return anything
-		if(msgBody.size() != 0)
-			msg.setBody(msgBody.get(0));
+//		if(msgBody.size() != 0)
+//			msg.setBody(msgBody.get(0));
 		
-		LOGGER.fine("attach REFERENCE_POLICY: " + subContextTag);
+//		LOGGER.fine("attach REFERENCE_POLICY: " + subContextTag);
 		
-		Map<String, String> endedSubTxProperty = parseEndedSubTxTag(subContextTag);
+//		Map<String, String> endedSubTxProperty = parseEndedSubTxTag(subContextTag);
 		
-		if(endedSubTxProperty.size() == 0){
-			LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
-		}
-		
-		rootTx = endedSubTxProperty.get(ROOT_TX);
-		currentTx = endedSubTxProperty.get(PARENT_TX);
-		hostComp = endedSubTxProperty.get(PARENT_COMP);
-		subTx = endedSubTxProperty.get(SUB_TX);
-		subComp = endedSubTxProperty.get(SUB_COMP);
+//		if(endedSubTxProperty.size() == 0){
+//			LOGGER.warning("invalid data in ENDED_SUB_TX_TAG");
+//		}
+//		
+//		rootTx = endedSubTxProperty.get(ROOT_TX);
+//		currentTx = endedSubTxProperty.get(PARENT_TX);
+//		hostComp = endedSubTxProperty.get(PARENT_COMP);
+//		subTx = endedSubTxProperty.get(SUB_TX);
+//		subComp = endedSubTxProperty.get(SUB_COMP);
 		
 		assert hostComp != null;
-		assert hostComp.equals(getComponent().getName());
+//		assert hostComp.equals(getComponent().getName());
 		
 		if( !subComp.equals(hostComp)){
 			
