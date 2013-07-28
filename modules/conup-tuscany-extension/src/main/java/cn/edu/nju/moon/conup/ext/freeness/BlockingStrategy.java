@@ -7,6 +7,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
@@ -18,7 +19,12 @@ public class BlockingStrategy implements FreenessStrategy {
 	private Logger LOGGER = Logger.getLogger(BlockingStrategy.class.getName());
 	/** represent blocking strategy */
 	public final static String BLOCKING = "BLOCKING_FOR_FREENESS";
+	private CompLifeCycleManager compLifeCycleMgr;
 	
+	public BlockingStrategy(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
+	}
+
 	@Override
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
 			String curTxID, String hostComp) {
@@ -35,10 +41,8 @@ public class BlockingStrategy implements FreenessStrategy {
 		NodeManager nodeMgr = NodeManager.getInstance();
 		DynamicDepManager depManager = nodeMgr.getDynamicDepManager(compIdentifier);
 		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
-//		CompLifecycleManager compLcMgr;
 		Set<String> algorithmOldVersionRootTxs;
 		if( isUpdateReqRCVD ){
-//			compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 			algorithmOldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		} else{
 			algorithmOldVersionRootTxs = null;
@@ -55,8 +59,7 @@ public class BlockingStrategy implements FreenessStrategy {
 
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
-		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
-		return depManager.isReadyForUpdate();
+		return compLifeCycleMgr.isReadyForUpdate();
 	}
 
 }

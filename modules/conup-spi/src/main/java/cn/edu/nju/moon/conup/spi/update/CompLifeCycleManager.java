@@ -12,9 +12,38 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  */
 public interface CompLifeCycleManager{
 
+	/**
+	 * the free condition has achieved, so need to set CompStatus to Free
+	 */
+	void achievedFree();
+
+	/**
+	 * update is finished, need to reset CompStatus to Normal
+	 */
+	void dynamicUpdateIsDone();
+
 	public abstract ComponentObject getCompObject();
 
+	public CompStatus getCompStatus();
+
 	public DynamicDepManager getDepMgr();
+
+	public Object getFreezeSyncMonitor();
+
+	/**
+	 * @return a synchronization monitor for suspending threads while executing ondemand setup
+	 */
+	public Object getOndemandSyncMonitor();
+
+	/**
+	 * @return a synchronization monitor for suspending threads while executing dynamic update
+	 */
+	public Object getUpdatingSyncMonitor();
+
+	/**
+	 * @return a synchronization monitor for suspending threads while the component trying to be free for dynamic update
+	 */
+	public Object getValidToFreeSyncMonitor();
 
 	/**
 	 * 
@@ -27,43 +56,9 @@ public interface CompLifeCycleManager{
 	public boolean install(String contributionURI,
 			String contributionURL);
 
-	/**
-	 * whethe the component is updated to new version?
-	 * ATTENTION: temporally, the parameter is of no use 
-	 * @param newVerId new version id of the component
-	 * @return
-	 */
-	public boolean isUpdatedTo(String newVerId);
-
-	public void setCompObject(ComponentObject compObj);
-
-	public void setDepMgr(DynamicDepManager depMgr);
-
-	/**
-	 * stop a contribution
-	 * @param contributionURI
-	 * @return
-	 */
-	public boolean stop(String contributionURI);
-
-	/**
-	 * 
-	 * @param contributionURI
-	 * @return
-	 */
-	public boolean uninstall(String contributionURI);
-
-	boolean isValid();
-
 	boolean isNormal();
 
 	boolean isOndemandSetting();
-
-	/**
-	 * ondemand setup is executing
-	 * set CompStatus to ONDEMAND
-	 */
-	void ondemandSetting();
 
 	/**
 	 * if CompStatus is Normal or ONDEMAND
@@ -72,32 +67,33 @@ public interface CompLifeCycleManager{
 	 */
 	boolean isOndemandSetupRequired();
 
+	public boolean isTargetComp();
+	
+	/**
+	 * whethe the component is updated to new version?
+	 * ATTENTION: temporally, the parameter is of no use 
+	 * @param newVerId new version id of the component
+	 * @return
+	 */
+	public boolean isUpdatedTo(String newVerId);
+
+	boolean isValid();
+
+	/**
+	 * ondemand setup is executing
+	 * set CompStatus to ONDEMAND
+	 */
+	void ondemandSetting();
+
 	/**
 	 * ondemand setup finished, need to change CompStatus to Valid
 	 */
 	void ondemandSetupIsDone();
-	
-	/**
-	 * update is finished, need to reset CompStatus to Normal
-	 */
-	void dynamicUpdateIsDone();
-
-	/**
-	 * the component is executing upate, need to set CompStatus to Updating
-	 */
-	void updating();
-
-	/**
-	 * the free condition has achieved, so need to set CompStatus to Free
-	 */
-	void achievedFree();
 
 	/**
 	 * remote update is finished, current CompStatus needs to set to Normal
 	 */
 	void remoteDynamicUpdateIsDone();
-
-	public CompStatus getCompStatus();
 
 	/**
 	 * if a component has received dynamic update request and is in the process of finishing update, return true.
@@ -105,22 +101,23 @@ public interface CompLifeCycleManager{
 	 */
 //	public boolean isDynamicUpdateRqstRCVD();
 	
-	/**
-	 * @return a synchronization monitor for suspending threads while executing ondemand setup
-	 */
-	public Object getOndemandSyncMonitor();
+	public void setCompObject(ComponentObject compObj);
 	
-	/**
-	 * @return a synchronization monitor for suspending threads while the component trying to be free for dynamic update
-	 */
-	public Object getValidToFreeSyncMonitor();
+	public void setDepMgr(DynamicDepManager depMgr);
 
 	/**
-	 * @return a synchronization monitor for suspending threads while executing dynamic update
+	 * stop a contribution
+	 * @param contributionURI
+	 * @return
 	 */
-	public Object getUpdatingSyncMonitor();
+	public boolean stop(String contributionURI);
 	
-	public Object getFreezeSyncMonitor();
+	/**
+	 * 
+	 * @param contributionURI
+	 * @return
+	 */
+	public boolean uninstall(String contributionURI);
 
 	/**
 	 * current component is target component
@@ -128,5 +125,10 @@ public interface CompLifeCycleManager{
 	 */
 	public void updateIsReceived();
 
-	public boolean isTargetComp();
+	/**
+	 * the component is executing upate, need to set CompStatus to Updating
+	 */
+	public void updating();
+
+	public boolean isReadyForUpdate();
 }

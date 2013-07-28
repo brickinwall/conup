@@ -19,25 +19,19 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
-import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
-import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
- * Component life cycle manager
- * 
- * @author JiangWang<jiang.wang88@gmail.com>
- *
+ * CompLifecycleManager: manage the component's lifecyle 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 10:56:13 PM
  */
 public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	private final static Logger LOGGER = Logger.getLogger(CompLifecycleManagerImpl.class.getName());
@@ -420,6 +414,11 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	@Override
 	public boolean isTargetComp() {
 		return isUpdateRequestReceived;
+	}
+
+	@Override
+	public boolean isReadyForUpdate() {
+		return isValid() && depMgr.isReadyForUpdate();
 	}
 	
 //	@Override

@@ -33,6 +33,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * 
@@ -45,28 +46,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	public static final QName policySetQName = new QName(TracePolicy.SCA11_NS, tracePolicy);
 	private final static Logger LOGGER = Logger.getLogger(TracePolicyInterceptor.class.getName());
 	
-	public static Logger getLogger() {
-		return LOGGER;
-	} 
-	
-	/** The identifier of root transaction in Message header. */
-//	private static String rootIdentifier = "RootVcTransaction";
-	/** The identifier of parent transaction in Message header. */
-//	private static String parentIdentifier = "ParentVcTransaction";
-//	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
-//	private static String HOSTIDENTIFIER = "HostIdentifier";
-//	private static String COMP_CLASS_OBJ_IDENTIFIER = "COMP_CLASS_OBJ_IDENTIFIER";
-	/**
-	 * it's used to identify a ended sub tx id in the response message
-	 */
-//	private static final String ENDED_SUB_TX_TAG = "ENDED_SUB_TX_TAG";
-//	private static final String ROOT_TX = "ROOT_TX";
-//	private static final String ROOT_COMP = "ROOT_COMP";
-//	private static final String PARENT_TX = "PARENT_TX";
-//	private static final String PARENT_COMP = "PARENT_COMP";
-//	private static final String SUB_TX = "SUB_TX";
-//	private static final String SUB_COMP = "SUB_COMP";
-
 	private Invoker next;
 	private Operation operation;
 	private List<TracePolicy> policies;
@@ -303,12 +282,13 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				this.depMgr = nodeMgr.getDynamicDepManager(hostComp);
 				this.txDepMonitor = nodeMgr.getTxDepMonitor(hostComp);
 				this.txLifecycleMgr = nodeMgr.getTxLifecycleManager(hostComp);
+				CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(hostComp);
 				
 				String freenessConf = depMgr.getCompObject().getFreenessConf();
-				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
+				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				bufferInterceptor = new BufferInterceptor(subject, phase, depMgr, txLifecycleMgr, freeness);
+				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness);
 				InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(hostComp);
 				interceptorStub.addInterceptor(bufferInterceptor);
 //				depMgr.registerObserver(bufferInterceptor);
@@ -348,25 +328,4 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		this.next = next;
 	}
 
-	private class ResponseWrapper implements Serializable{
-		private Object returnValue;
-		private Object endedSubTxInfo;
-		public ResponseWrapper(Object returnValue, Object endedSubTxInfo){
-			this.returnValue = returnValue;
-			this.endedSubTxInfo = endedSubTxInfo;
-		}
-		public Object getReturnValue() {
-			return returnValue;
-		}
-		public void setReturnValue(Object returnValue) {
-			this.returnValue = returnValue;
-		}
-		public Object getEndedSubTxInfo() {
-			return endedSubTxInfo;
-		}
-		public void setEndedSubTxInfo(Object endedSubTxInfo) {
-			this.endedSubTxInfo = endedSubTxInfo;
-		}
-		
-	}
 }

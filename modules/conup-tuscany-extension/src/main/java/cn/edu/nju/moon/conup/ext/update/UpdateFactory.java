@@ -4,6 +4,7 @@ import cn.edu.nju.moon.conup.ext.freeness.BlockingStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.ConcurrentVersionStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.WaitingStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.spi.update.Transformer;
 
@@ -48,13 +49,13 @@ public class UpdateFactory {
 	 * @param strategy freeness strategy
 	 * @return FreenessStrategy
 	 */
-	public static FreenessStrategy createFreenessStrategy(String strategy){
+	public static FreenessStrategy createFreenessStrategy(String strategy, CompLifeCycleManager compLifeCycleMgr){
 		if(strategy.equals(BlockingStrategy.BLOCKING)){
-			return new BlockingStrategy();
+			return new BlockingStrategy(compLifeCycleMgr);
 		} else if(strategy.equals(WaitingStrategy.WAITING)){
-			return new WaitingStrategy();
+			return new WaitingStrategy(compLifeCycleMgr);
 		} else if(strategy.equals(ConcurrentVersionStrategy.CONCURRENT_VERSION)){
-			return new ConcurrentVersionStrategy();
+			return new ConcurrentVersionStrategy(compLifeCycleMgr);
 		} else{
 			return null;
 		}

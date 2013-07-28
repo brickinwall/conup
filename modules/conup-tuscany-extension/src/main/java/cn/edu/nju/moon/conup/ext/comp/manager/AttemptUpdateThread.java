@@ -53,7 +53,7 @@ public class AttemptUpdateThread extends Thread {
 //					printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
 				}
 				String freenessConf = compLifeCycleMgr.getCompObject().getFreenessConf();
-				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
+				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 				if(freeness.isReadyForUpdate(compLifeCycleMgr.getCompObject().getIdentifier())){
 					compLifeCycleMgr.achievedFree();
 				} else{
