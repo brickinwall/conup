@@ -3,20 +3,15 @@ package cn.edu.nju.moon.conup.spi.manager;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tuscany.sca.invocation.Message;
-
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
-import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.pubsub.Observer;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.UpdateManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * For managing/maintaining transactions and dependences
@@ -67,20 +62,20 @@ public interface DynamicDepManager extends Observer{
 	 * iff when component status is ondemand or updating return true
 	 * @return
 	 */
-	public boolean isInterceptRequired();
+//	public boolean isInterceptRequired();
 	
 	/**
 	 * @return if the component status is NORMAL, return true
 	 */
-	public boolean isNormal();
-	
-	/**
-	 * return whether the component is valid, which means that whether the component's 
-	 * current status is exactly valid.
-	 * Notice that if current status is updating, it would return false.
-	 * @return 
-	 */
-	public boolean isValid();
+//	public boolean isNormal();
+//	
+//	/**
+//	 * return whether the component is valid, which means that whether the component's 
+//	 * current status is exactly valid.
+//	 * Notice that if current status is updating, it would return false.
+//	 * @return 
+//	 */
+//	public boolean isValid();
 	
 	/**
 	 * is component object ready?
@@ -116,18 +111,18 @@ public interface DynamicDepManager extends Observer{
 	 * ondemand setup is executing
 	 * @param compStatus
 	 */
-	public void ondemandSetting();
+//	public void ondemandSetting();
 
 	/**
 	 * @return if a component is in the process of the on-demand, return true. Otherwise, return false.
 	 */
-	public boolean isOndemandSetting();
+//	public boolean isOndemandSetting();
 	
 	/**
 	 * @return if a component needs on-demand setup or is in the process 
 	 * of the on-demand setup, return true.
 	 */
-	public boolean isOndemandSetupRequired();
+//	public boolean isOndemandSetupRequired();
 	
 	/**
 	 * 
@@ -152,24 +147,24 @@ public interface DynamicDepManager extends Observer{
 	/**
 	 * when on-demand setup is done, DynamicDepManager should get notified.
 	 */
-	public void ondemandSetupIsDone();
+//	public void ondemandSetupIsDone();
 	
 	/**
 	 * when dynamic update is done, DynamicDepManager should get notified.
 	 */
-	public void dynamicUpdateIsDone();
+//	public void dynamicUpdateIsDone();
 	
 	/**
 	 * in some concrete algorithm, e.g., Quiescence, some threads of a component may need to suspended because of
 	 * the remote update is excuting on other component, which means that the component should be notified by the 
 	 * remote component.
 	 */
-	public void remoteDynamicUpdateIsDone();
+//	public void remoteDynamicUpdateIsDone();
 	
 	/**
 	 * when a component is free, DynamicDepManager should get notified.
 	 */
-	public void achievedFree();
+//	public void achievedFree();
 	
 	/**
 	 * @return identifiers of the components that current component statically depends on
@@ -207,7 +202,7 @@ public interface DynamicDepManager extends Observer{
 	/**
 	 * when a component is ready for update, DynamicDepManager should be notified.
 	 */
-	public void updating();
+//	public void updating();
 	
 	/**
 	 * 
@@ -223,42 +218,42 @@ public interface DynamicDepManager extends Observer{
 	/**
 	 * @return component's current status
 	 */
-	public CompStatus getCompStatus();
+//	public CompStatus getCompStatus();
 	
-	/**
-	 * @return a synchronization monitor for suspending threads while executing ondemand setup
-	 */
-	public Object getOndemandSyncMonitor();
-	
-	/**
-	 * @return a synchronization monitor for suspending threads while the component trying to be free for dynamic update
-	 */
-	public Object getValidToFreeSyncMonitor();
-
-	/**
-	 * @return a synchronization monitor for suspending threads while executing dynamic update
-	 */
-	public Object getUpdatingSyncMonitor();
-	
-	public Object getFreezeSyncMonitor();
+//	/**
+//	 * @return a synchronization monitor for suspending threads while executing ondemand setup
+//	 */
+//	public Object getOndemandSyncMonitor();
+//	
+//	/**
+//	 * @return a synchronization monitor for suspending threads while the component trying to be free for dynamic update
+//	 */
+//	public Object getValidToFreeSyncMonitor();
+//
+//	/**
+//	 * @return a synchronization monitor for suspending threads while executing dynamic update
+//	 */
+//	public Object getUpdatingSyncMonitor();
+//	
+//	public Object getFreezeSyncMonitor();
 
 	/**
 	 * 
 	 * @return  a synchronization monitor for suspending threads while waiting for the finishing of other remote component 
 	 */
-	public Object getWaitingRemoteCompUpdateDoneMonitor();
+//	public Object getWaitingRemoteCompUpdateDoneMonitor();
 	
 	/**
 	 * if a component received dynamic update request
 	 * @return
 	 */
-	public boolean updateIsReceived();
+//	public boolean updateIsReceived();
 	
 	/**
 	 * is a target component for update? 
 	 * @return
 	 */
-	public boolean isUpdateRequiredComp();
+//	public boolean isUpdateRequiredComp();
 //	/**
 //	 * add a parent component
 //	 */
@@ -332,6 +327,20 @@ public interface DynamicDepManager extends Observer{
 	 * @param txLifecycleMgr
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
+
+	/**
+	 * clean up information used by Algorithms during the update process
+	 */
+	public void dynamicUpdateIsDone();
+
+	/**
+	 * when ondmenad is done, we need to notify algorithm to start to work
+	 */
+	public void ondemandSetupIsDone();
+
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager);
+	
+	public CompLifeCycleManager getCompLifeCycleMgr();
 
 //	public Message checkOndemand(TransactionContext txCtx, Object subTx, Interceptor interceptor, Message msg);
 //

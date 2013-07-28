@@ -5,6 +5,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.pubsub.Subject;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -50,12 +51,6 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 	}
 
 	@Override
-	public DynamicDepManager getDynamicDepManager() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean isOndemandDone() {
 		// TODO Auto-generated method stub
 		return false;
@@ -81,6 +76,12 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 
 	@Override
 	public void update(Subject subject, Object arg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager) {
 		// TODO Auto-generated method stub
 		
 	}

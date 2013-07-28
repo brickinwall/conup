@@ -26,7 +26,7 @@ public class Printer {
 			Dependence dependence = (Dependence) iterator.next();
 			result += dependence + "\n\t";
 		}
-		LOGGER.fine(result);
+		LOGGER.info(result);
 	}
 	
 	public void printDeps(Logger LOGGER, Set<Dependence> deps, String type){

@@ -2,8 +2,6 @@ package cn.edu.nju.moon.conup.ext.comp.manager;
 
 import java.util.logging.Logger;
 
-import org.apache.tuscany.sca.invocation.Message;
-
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
@@ -14,33 +12,36 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.spi.update.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
+/**
+ * UpdateManager is used to execute the real update operation which is delegated from CompLifeCycleManager
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * Jul 26, 2013 10:07:04 PM
+ */
 public class UpdateManagerImpl implements UpdateManager {
 	private static final Logger LOGGER = Logger.getLogger(UpdateManagerImpl.class.getName());
 	
-	private DynamicDepManager depMgr = null;
-	private OndemandSetupHelper ondemandSetupHelper = null;
-	private CompLifecycleManager compLifeCycleMgr = null;
-	/** DynamicUpdateContext */
-	private DynamicUpdateContext updateCtx = null;
-	
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	/** ComponentObject that represents current CompLifecycleManager*/
 	private ComponentObject compObj;
+	private ComponentUpdator compUpdator = null;
+	private DynamicDepManager depMgr = null;
+	
 	/** is updated? */
 	private boolean isUpdated = false;
+	private OndemandSetupHelper ondemandSetupHelper = null;
 	
-	private ComponentUpdator compUpdator = null;
+	/** DynamicUpdateContext */
+	private DynamicUpdateContext updateCtx = null;
 
 	public UpdateManagerImpl(ComponentObject compObj){
 		setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
@@ -49,9 +50,9 @@ public class UpdateManagerImpl implements UpdateManager {
 
 	@Override
 	public void attemptToUpdate() {
-		Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
-			if(depMgr.getCompStatus().equals(CompStatus.VALID) 
+			if(compLifeCycleMgr.isValid()
 				&& updateCtx != null && updateCtx.isLoaded()){
 				//calculate old version root txs
 				if(!updateCtx.isOldRootTxsInitiated()){
@@ -62,14 +63,14 @@ public class UpdateManagerImpl implements UpdateManager {
 				String freenessConf = compObj.getFreenessConf();
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
 				if(freeness.isReadyForUpdate(compObj.getIdentifier())){
-					depMgr.achievedFree();
+					compLifeCycleMgr.achievedFree();
 				}
 			}
 		}
 		
-		Object updatingSyncMonitor = depMgr.getUpdatingSyncMonitor();
+		Object updatingSyncMonitor = compLifeCycleMgr.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
-			if(depMgr.getCompStatus().equals(CompStatus.Free)){
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)){
 				executeUpdate();
 				cleanupUpdate();
 			}
@@ -79,13 +80,11 @@ public class UpdateManagerImpl implements UpdateManager {
 
 	@Override
 	public void checkFreeness(String hostComp) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
-		Object validToFreeSyncMonitor = dynamicDepMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			if(isDynamicUpdateRqstRCVD() && getUpdateCtx().isOldRootTxsInitiated()){
 
-				if (dynamicDepMgr.getCompStatus().equals(CompStatus.VALID)) {
+				if (compLifeCycleMgr.isValid()) {
 					attemptToUpdate();
 				}
 			}
@@ -93,7 +92,13 @@ public class UpdateManagerImpl implements UpdateManager {
 	}
 
 	@Override
-	public boolean cleanupUpdate() {
+	public void checkUpdate(Interceptor interceptor) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cleanupUpdate() {
 		String compIdentifier;
 		
 		compIdentifier = compObj.getIdentifier();
@@ -122,28 +127,26 @@ public class UpdateManagerImpl implements UpdateManager {
 		depMgr.dynamicUpdateIsDone();
 		PerformanceRecorder.getInstance(compIdentifier).updateIsDone(System.nanoTime());
 		
-		return true;
 	}
 
 	@Override
-	public boolean executeUpdate() {
+	public void executeUpdate() {
 		String compIdentifier;
 		//duplicated update
 		synchronized (this) {
 			if(isUpdated){
 				LOGGER.warning("Dupulicated executeUpdate request, return directly");
-				return true;
+				return;
 			}
 			isUpdated = true;
 			compIdentifier = compObj.getIdentifier();
 			
-			depMgr.updating();
+			compLifeCycleMgr.updating();
 		}
 		
 		//update
 		compUpdator.executeUpdate(compIdentifier);
 		
-		return true;
 	}
 
 	public ComponentUpdator getCompUpdator() {
@@ -178,14 +181,12 @@ public class UpdateManagerImpl implements UpdateManager {
 	public boolean isDynamicUpdateRqstRCVD() {
 		return updateCtx!=null && updateCtx.isLoaded();
 	}
-
+	
 	private String manageDep(RequestObject reqObj) {
 		boolean manageResult = depMgr.manageDependence(reqObj.getProtocol(), reqObj.getPayload());
 		return "manageDepResult:" + manageResult;
 	}
-	
-	
-	
+
 	private String manageOndemand(RequestObject reqObj) {
 		boolean ondemandResult = false;
 		ondemandResult = ondemandSetupHelper.ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
@@ -217,9 +218,9 @@ public class UpdateManagerImpl implements UpdateManager {
 			
 			return "updateResult:" + result;
 		}
-
+	
 	@Override
-	public String process(RequestObject reqObj) {
+	public String processMsg(RequestObject reqObj) {
 		MsgType msgType = reqObj.getMsgType();
 		
 		if(msgType.equals(MsgType.DEPENDENCE_MSG)){
@@ -237,11 +238,6 @@ public class UpdateManagerImpl implements UpdateManager {
 		
 		return null;
 	}
-	
-	@Override
-	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx) {
-		this.updateCtx = updateCtx;
-	}
 
 	public void setCompUpdator(ComponentUpdator compUpdator) {
 		this.compUpdator = compUpdator;
@@ -253,10 +249,15 @@ public class UpdateManagerImpl implements UpdateManager {
 	}
 
 	@Override
+	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx) {
+		this.updateCtx = updateCtx;
+	}
+	
+	@Override
 	public void setOndemandSetupHelper(OndemandSetupHelper ondemandSetupHelper) {
 		this.ondemandSetupHelper = ondemandSetupHelper;
 	}
-	
+
 	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
 		NodeManager nodeMgr = NodeManager.getInstance();
 		assert compObj.getIdentifier().equals(compIdentifier);
@@ -275,61 +276,35 @@ public class UpdateManagerImpl implements UpdateManager {
 			
 			//initiate updator
 			compUpdator.initUpdator(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier);
-			depMgr.updateIsReceived();
+//			depMgr.updateIsReceived();
+			compLifeCycleMgr.updateIsReceived();
 		}
 		
 		//on-demand setup
-		if(depMgr.isNormal() ){
+		if(compLifeCycleMgr.isNormal() ){
 			OndemandSetupHelper ondemandHelper;
 			ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 			ondemandHelper.ondemandSetup();
 		}
 		
 		AttemptUpdateThread attemptUpdaterThread;
-		attemptUpdaterThread = new AttemptUpdateThread(this, depMgr);
+		attemptUpdaterThread = new AttemptUpdateThread(this, compLifeCycleMgr);
 		attemptUpdaterThread.start();
 
 		return true;
 	}
 
 	@Override
-	public Message checkRemoteUpdate(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg) {
-		TxLifecycleManager txLifecycleMgr = depMgr.getTxLifecycleMgr();
-		String hostComp = compObj.getIdentifier();
-		String freenessConf = depMgr.getCompObject().getFreenessConf();
-		FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
-		Object waitingRemoteCompUpdateDoneMonitor = depMgr.getWaitingRemoteCompUpdateDoneMonitor();
-		synchronized (waitingRemoteCompUpdateDoneMonitor) {
-			if (getUpdateCtx() == null || getUpdateCtx().isLoaded() == false) {
-				if( freeness.isInterceptRequiredForFree(txCtx.getRootTx(), hostComp, txCtx, false)){
-					interceptor.freeze(waitingRemoteCompUpdateDoneMonitor);
-//					try {
-//						waitingRemoteCompUpdateDoneMonitor.wait();
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-				}
-				// the invoked transaction is not a root transaction
-				if(txCtx.getRootTx() != null){
-					assert txCtx.getParentTx() != null;
-					assert txCtx.getParentComponent() != null;
-					assert subTx != null;
-					txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
-							txCtx.getRootTx(), txCtx.getRootComponent(),
-							txCtx.getParentTx(), txCtx.getParentComponent());
-				}
-				return msg;
+	public void removeAlgorithmOldRootTx(String rootTxId) {
+		if(isDynamicUpdateRqstRCVD() && getUpdateCtx().isOldRootTxsInitiated()){
+			getUpdateCtx().removeAlgorithmOldRootTx(rootTxId);
+
+			LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
+
+			if (compLifeCycleMgr.isValid()) {
+				attemptToUpdate();
 			}
 		}
-		
-		return null;
-	}
-
-	@Override
-	public void checkUpdate(Interceptor interceptor) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

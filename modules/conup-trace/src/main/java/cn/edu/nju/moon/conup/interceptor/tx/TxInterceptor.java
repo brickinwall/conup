@@ -160,32 +160,4 @@ public class TxInterceptor implements Interceptor {
 		
 	}
 
-//	/**
-//	 * root and parent transaction id is stored in the format: VcTransactionRootAndParentIdentifier[ROOT_ID,PARENT_ID].
-//	 * 
-//	 * @return ROOT_ID,PARENT_ID
-//	 * 
-//	 * */
-//	private String getTargetString(String raw){
-//		if(raw == null){
-//			return null;
-//		}
-//		if(raw.startsWith("\"")){
-//			raw = raw.substring(1);
-//		}
-//		if(raw.endsWith("\"")){
-//			raw = raw.substring(0, raw.length()-1);
-//		}
-//		int index = raw.indexOf(ROOT_PARENT_IDENTIFIER);
-//		int head = raw.substring(index).indexOf("[")+1;
-////		LOGGER.fine(raw.substring(0, head));
-//		int tail = raw.substring(index).indexOf("]");
-////		LOGGER.fine(raw.substring(head, tail));
-//		return raw.substring(head, tail);
-//	}
-//	
-//	private String getThreadID() {
-//		return new Integer(Thread.currentThread().hashCode()).toString();
-//	}
-
 }

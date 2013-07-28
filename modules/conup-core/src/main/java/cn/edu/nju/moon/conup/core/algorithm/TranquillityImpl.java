@@ -38,6 +38,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 //import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 
 /**
@@ -62,11 +63,13 @@ public class TranquillityImpl implements Algorithm {
 	
 	private TxDepRegistry txDepRegistry = null;
 	
+	private CompLifeCycleManager compLifeCycleMgr = null;
+	
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 		
 		LOGGER.fine("TranquillityImpl.manageDependence(...)");
-		CompStatus compStatus = depMgr.getCompStatus();
+		CompStatus compStatus = compLifeCycleMgr.getCompStatus();
 		
 		assert depMgr != null;
 		
@@ -175,9 +178,9 @@ public class TranquillityImpl implements Algorithm {
 			hostComp = txCtx.getHostComponent();
 //			rootTx = txCtx.getParentTx();
 			
-			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				if( depMgr.isNormal()){
+				if( compLifeCycleMgr.isNormal()){
 					//TODO need to think more about rootTxEnd
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
 //					txCtx.getTxDepMonitor().rootTxEnd(hostComp, txCtx.getRootTx());
@@ -191,7 +194,7 @@ public class TranquillityImpl implements Algorithm {
 					return;
 				} else{
 					try {
-						if (depMgr.isOndemandSetting()) {
+						if (compLifeCycleMgr.isOndemandSetting()) {
 							LOGGER.fine("----------------suspend thread due to ondemandSyncMonitor.wait()------------");
 							ondemandSyncMonitor.wait();
 						}
@@ -386,10 +389,10 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private void doOndemand(TransactionContext txContext) {
 		// sleep until current status become valid
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				if (depMgr.isOndemandSetting()) {
+				if (compLifeCycleMgr.isOndemandSetting()) {
 					System.out
 							.println("----------------ondemandSyncMonitor.wait();tranquillity algorithm------------");
 					ondemandSyncMonitor.wait();
@@ -551,7 +554,7 @@ public class TranquillityImpl implements Algorithm {
 	private boolean doNotifySubTxEnd(String srcComp, String targetComp, String rootTx, String parentTx, String subTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTx + " rootTx:" + rootTx);
 		
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			LOGGER.fine("doNotifySubTxEnd rootTx:" + parentTx + " srcComp:" + srcComp + " targetComp:" +targetComp);
 			//maintain tx
@@ -565,7 +568,7 @@ public class TranquillityImpl implements Algorithm {
 			subTxStatuses.put(subTx, TxEventType.TransactionEnd);
 //			txCtx.getPastComponents().add(srcComp);
 			
-			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(compLifeCycleMgr.isNormal())
 				return true;
 			
 			Scope scope = depMgr.getScope();
@@ -614,7 +617,7 @@ public class TranquillityImpl implements Algorithm {
 	 */
 	private boolean doAckSubTxInit(String srcComp, String targetComp, String rootTx, String parentTxID, String subTxID) {
 		
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
 			TransactionContext txCtx;
@@ -625,7 +628,7 @@ public class TranquillityImpl implements Algorithm {
 			subTxHostComps.put(subTxID, srcComp);
 			subTxStatuses.put(subTxID, TxEventType.TransactionStart);
 			
-			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(compLifeCycleMgr.isNormal())
 				return true;
 			
 			return removeFutureEdges(targetComp, rootTx, parentTxID, subTxID);
@@ -666,7 +669,7 @@ public class TranquillityImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
 		
-		depMgr.remoteDynamicUpdateIsDone();
+		compLifeCycleMgr.remoteDynamicUpdateIsDone();
 		
 		return true;
 	}
@@ -891,7 +894,7 @@ public class TranquillityImpl implements Algorithm {
 			String parentTx, String subTx) {
 		if(subTxStatus.equals(TxEventType.TransactionStart)){
 
-			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				Map<String, TransactionContext> allTxs = depMgr.getTxs();
 				TransactionContext txCtx;
@@ -961,9 +964,9 @@ public class TranquillityImpl implements Algorithm {
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
-		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
-			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
+			if(compLifeCycleMgr.isOndemandSetting()){
 				Dependence lfe = new Dependence(FUTURE_DEP, parentTx, hostComp, hostComp, null, null);
 				if(!rtInDeps.contains(lfe)){
 					rtInDeps.add(lfe);

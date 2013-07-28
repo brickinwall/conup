@@ -4,8 +4,8 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
- * @author rgc
- * @version Dec 12, 2012 8:09:07 PM
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 26, 2013 10:43:16 PM
  */
 public class OndemandSetupThread extends Thread {
 	private String compIdentifier = null;

@@ -31,6 +31,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -65,6 +66,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 	
 	private OndemandSetupHelper ondemandHelper;
+	private CompLifeCycleManager compLifeCycleMgr = null;
+	private DynamicDepManager depMgr = null;
 
 	private boolean isOndemandDone;
 
@@ -74,20 +77,19 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	public boolean ondemand() {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
-		ondemandHelper.getDynamicDepManager().setScope(scope);
+		depMgr.setScope(scope);
 		
 		PerformanceRecorder.getInstance(hostComp).ondemandRqstReceived(System.nanoTime());
 		
-		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
-		if(ddm.getRuntimeInDeps().size() != 0){
-			ddm.getRuntimeInDeps().clear();
+		if(depMgr.getRuntimeInDeps().size() != 0){
+			depMgr.getRuntimeInDeps().clear();
 		}
-		if(ddm.getRuntimeDeps().size() != 0){
-			ddm.getRuntimeDeps().clear();
+		if(depMgr.getRuntimeDeps().size() != 0){
+			depMgr.getRuntimeDeps().clear();
 		}
 		assert scope != null;
-		assert ddm.getRuntimeInDeps().size() == 0;
-		assert ddm.getRuntimeDeps().size() == 0;
+		assert depMgr.getRuntimeInDeps().size() == 0;
+		assert depMgr.getRuntimeDeps().size() == 0;
 		
 		return reqOndemandSetup(hostComp, hostComp);
 	}
@@ -105,7 +107,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			String scopeString = payloadResolver.getParameter(ConsistencyPayload.SCOPE);
 			if(scopeString != null && !scopeString.equals("") && !scopeString.equals("null")){
 				Scope scope = Scope.inverse(scopeString);
-				ondemandHelper.getDynamicDepManager().setScope(scope);
+				depMgr.setScope(scope);
 			}
 //			if(ondemandHelper.getDynamicDepManager().getScope() == null){
 //				Scope scope = calcScope();
@@ -175,7 +177,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		hostComp = currentComp;
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 		
 		//calculate target(sub) components
 		if(scope == null)
@@ -184,7 +186,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		//calculate parent components
-		parentComps = ondemandHelper.getDynamicDepManager().getStaticInDeps();
+		parentComps = depMgr.getStaticInDeps();
 		
 		//init OndemandRequestStatus
 		Map<String, Boolean> reqStatus;
@@ -239,8 +241,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		DynamicDepManager depMgr = ondemandHelper.getDynamicDepManager();
-		if(depMgr.isValid()){
+//		DynamicDepManager depMgr = ondemandHelper.getDynamicDepManager();
+		if(compLifeCycleMgr.isValid()){
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -267,12 +269,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
 				isConfirmedAll = isConfirmedAll && (Boolean) entry.getValue();
 			}
-			if (isConfirmedAll
-					&& depMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
+			if (isConfirmedAll	&& compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 				// change current componentStatus to 'valid'
 				LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
 						+ ", and confirmed All, trying to change mode to valid");
-				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+				//TODO
+//				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+				compLifeCycleMgr.ondemandSetupIsDone();
 				// send confirmOndemandSetup(...)
 				sendConfirmOndemandSetup(currentComp);
 			}
@@ -282,13 +285,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 
 	private boolean onDemandSetUp() {
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
 		Map<String, TransactionContext> txs;
 		Set<String> targetRef;
 		Scope scope;
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		txs = depMgr.getTxs();
@@ -301,9 +302,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		String curComp = ondemandHelper.getCompObject().getIdentifier();
 		
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 		if(scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager().getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(curComp));
 		
@@ -468,7 +469,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 */
 	private boolean notifyFutureOndemand(Dependence dep) {
 		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
 		
@@ -477,7 +477,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Set<String> targetRef;
 		Scope scope;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		
@@ -519,7 +518,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 */
 	private boolean notifyPastOndemand(Dependence dep) {
 		LOGGER.fine("notifyPastOndemand(Dependence dep) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
 		
@@ -528,7 +526,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Set<String> targetRef;
 		Scope scope;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		
@@ -569,7 +566,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	 */
 	private boolean notifySubFutureOndemand(Dependence dep) {
 		LOGGER.fine("notifySubFutureOndemand(Dependence dep) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
 		String curComp;
@@ -580,7 +576,6 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Set<Dependence> fDeps = new HashSet<Dependence>();
 		Set<Dependence> sDeps = new HashSet<Dependence>();
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		
 		curComp = dep.getTargetCompObjIdentifer();
@@ -639,10 +634,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 	private boolean notifySubPastOndemand(Dependence dep) {
 		LOGGER.fine("notifySubPastOndemand(Dependence dep) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtOutDeps;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		
 		String curComp;
@@ -732,35 +725,31 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		synchronized (this) {
 			// if received all
-			if (isReceivedAll && ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.NORMAL)) {
+			if (isReceivedAll && compLifeCycleMgr.isNormal()) {
 				LOGGER.fine("Received reqOndemandSetup(...) from "
 						+ requestSrcComp);
 				LOGGER.fine("Received all reqOndemandSetup(...)");
 				LOGGER.fine("trying to change mode to ondemand");
 
-				DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
-				if (ddm.getRuntimeInDeps().size() != 0) {
-					ddm.getRuntimeInDeps().clear();
+				if (depMgr.getRuntimeInDeps().size() != 0) {
+					depMgr.getRuntimeInDeps().clear();
 				}
-				if (ddm.getRuntimeDeps().size() != 0) {
-					ddm.getRuntimeDeps().clear();
+				if (depMgr.getRuntimeDeps().size() != 0) {
+					depMgr.getRuntimeDeps().clear();
 				}
-				assert ddm.getRuntimeInDeps().size() == 0;
-				assert ddm.getRuntimeDeps().size() == 0;
+				assert depMgr.getRuntimeInDeps().size() == 0;
+				assert depMgr.getRuntimeDeps().size() == 0;
 
 				// change current componentStatus to 'ondemand'
-				ondemandHelper.getDynamicDepManager().ondemandSetting();
+				compLifeCycleMgr.ondemandSetting();
 				// send reqOndemandSetup(...) to parent components
 				sendReqOndemandSetup(parentComponents, currentComp);
 				// onDemandSetUp
-				Object ondemandSyncMonitor = ondemandHelper
-						.getDynamicDepManager().getOndemandSyncMonitor();
+				Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 				synchronized (ondemandSyncMonitor) {
-					if (ondemandHelper.getDynamicDepManager().getCompStatus()
-							.equals(CompStatus.ONDEMAND)) {
+					if (compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 						// FOR TEST
-						Map<String, TransactionContext> allTxs = ondemandHelper
-								.getDynamicDepManager().getTxs();
+						Map<String, TransactionContext> allTxs = depMgr.getTxs();
 						Iterator<Entry<String, TransactionContext>> txIterator = allTxs
 								.entrySet().iterator();
 						String txStr = "";
@@ -781,7 +770,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 						.get(currentComp);
 				if (confirmStatus == null) {
 					System.out.println("currentComp: " + currentComp + ", requestSrcComp:" + requestSrcComp + ", compStatus:"
-							+ ondemandHelper.getDynamicDepManager().getCompStatus() + ", confirmStatus:" + confirmStatus);
+							+ compLifeCycleMgr.getCompStatus() + ", confirmStatus:" + confirmStatus);
 				}
 				assert confirmStatus != null;
 				for (Entry<String, Boolean> entry : confirmStatus.entrySet()) {
@@ -798,7 +787,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine(confirmOndemandStatusStr);
 
 				if (isConfirmedAll) {
-					if (ondemandHelper.getDynamicDepManager().isValid()) {
+					if (compLifeCycleMgr.isValid()) {
 						LOGGER.fine("Confirmed all, and component status is valid");
 						return;
 					}
@@ -806,7 +795,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 					LOGGER.fine("trying to change mode to valid");
 
 					// change current componentStatus to 'valid'
-					ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+//					ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+					compLifeCycleMgr.ondemandSetupIsDone();
 					// send confirmOndemandSetup(...)
 					sendConfirmOndemandSetup(currentComp);
 				}
@@ -835,7 +825,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			payload = ConsistencyPayload.OPERATION_TYPE + ":" + ConsistencyOperationType.REQ_ONDEMAND_SETUP + "," +
 					ConsistencyPayload.SRC_COMPONENT + ":" + hostComp + "," +
 					ConsistencyPayload.TARGET_COMPONENT + ":" + parent + "," +
-					ConsistencyPayload.SCOPE + ":" + ondemandHelper.getDynamicDepManager().getScope().toString();
+					ConsistencyPayload.SCOPE + ":" + depMgr.getScope().toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -847,10 +837,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Scope scope;
 		
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 		
 		if(scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager().getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
@@ -891,10 +881,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private Set<Dependence> getFDeps(String curComp, String txID){
 		Set<Dependence> result = new ConcurrentSkipListSet<Dependence>();
 		Set<String> futureC = new HashSet<String>();
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 		
 		String rootTx = null;
@@ -949,10 +937,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Set<Dependence> result = new HashSet<Dependence>();
 		Set<String> pastC = new HashSet<String>();
 		
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 		
 		String rootTx = null;
@@ -999,10 +985,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		Set<Dependence> result = new HashSet<Dependence>();
 		Set<String> ongoingC = new HashSet<String>();
 		
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 		
 		String rootTx = null;
@@ -1054,10 +1038,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	}
 	
 	private String getHostSubTx(String rootTx){
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 		
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 		
 //		Printer printer = new Printer();
@@ -1146,6 +1128,16 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	@Override
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		this.txDepRegistry  = txDepRegistry;
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
+	}
+
+	@Override
+	public void setDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
 	}
 	
 }

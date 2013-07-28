@@ -1,6 +1,3 @@
-/**
- * 
- */
 package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import java.util.Collection;
@@ -31,8 +28,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
@@ -98,10 +94,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
 			interceptorCache.removeTxCtx(getThreadID());
 			
-//			CompLifecycleManager compLcMgr;
-//			compLcMgr = CompLifecycleManagerImpl.getInstance(txContext.getHostComponent());
+			CompLifeCycleManager compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(txContext.getHostComponent());
 			UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
-			if(dynamicDepMgr.getCompStatus().equals(CompStatus.VALID) 
+			if(compLifeCycleMgr.isValid()
 					&& updateMgr.isDynamicUpdateRqstRCVD()){
 				updateMgr.attemptToUpdate();
 			}

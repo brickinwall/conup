@@ -1,9 +1,4 @@
-/**
- * 
- */
 package cn.edu.nju.moon.conup.spi.datamodel;
-
-import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 
 /**
  * An abstract description of the strategies for achieving freeness, 
@@ -15,9 +10,9 @@ import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 public interface FreenessStrategy {
 	/**
 	 * This method is an abstract operation for different freeness strategy.
-	 * For BLOCKING, it's supposed to decide whether a request should be blocked.
-	 * For WAITING, it will check whether a component is ready for update.
-	 * FOr CONCURRENT_VERSION, it will create a dispatcher.
+	 * For BLOCKING, it does nothing
+	 * For WAITING, it does nothing
+	 * FOr CONCURRENT_VERSION, it will return which version implementation should be returned
 	 * 
 	 * @param rootTxID root transaction id
 	 * @param rootComp root component object identifier
@@ -25,8 +20,6 @@ public interface FreenessStrategy {
 	 * @param curTxID current transaction id
 	 * @param hostComp host component object identifier
 	 */
-//	public void achieveFreeness(String rootTxID, String rootComp, String parentComp, 
-//			String curTxID, String hostComp, FreenessCallback fcb);
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp, 
 			String curTxID, String hostComp);
 	

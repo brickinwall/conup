@@ -30,6 +30,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -47,6 +48,8 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	private DynamicDepManager depMgr = null;
 	
+	private CompLifeCycleManager compLifeCycleMgr = null;
+	
 	private TxDepRegistry txDepRegistry = null;
 	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
@@ -54,8 +57,9 @@ public class VersionConsistencyImpl implements Algorithm {
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 		LOGGER.fine("VersionConsistencyImpl.manageDependence(...)");
-		CompStatus compStatus = depMgr.getCompStatus();
+		CompStatus compStatus = compLifeCycleMgr.getCompStatus();
 		
+		assert compLifeCycleMgr != null;
 		assert depMgr != null;
 		assert compStatus != null;
 		
@@ -88,7 +92,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	@Override
 	public boolean manageDependence(String payload) {
-		if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+		if(compLifeCycleMgr.isNormal())
 			return true;
 
 		boolean manageDepResult = false;
@@ -178,9 +182,9 @@ public class VersionConsistencyImpl implements Algorithm {
 			hostComp = txCtx.getHostComponent();
 			rootTx = txCtx.getRootTx();
 			
-			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				if( depMgr.isNormal()){
+				if( compLifeCycleMgr.isNormal()){
 //					Printer printer = new Printer();
 //					LOGGER.fine("TxS before notified TransactionEnd:");
 //					printer.printTxs(LOGGER, depMgr.getTxs());
@@ -196,7 +200,7 @@ public class VersionConsistencyImpl implements Algorithm {
 					return;
 				} else{
 					try {
-						if (depMgr.isOndemandSetting()) {
+						if (compLifeCycleMgr.isOndemandSetting()) {
 							LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
 							ondemandSyncMonitor.wait();
 						}
@@ -381,10 +385,10 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private void doOndemand(TransactionContext txContext) {
 		// sleep until current status become valid
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				if (depMgr.isOndemandSetting()) {
+				if (compLifeCycleMgr.isOndemandSetting()) {
 					LOGGER.fine("----------------ondemandSyncMonitor.wait();consistency algorithm------------");
 					ondemandSyncMonitor.wait();
 				}
@@ -503,7 +507,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	private boolean doNotifySubTxEnd(String srcComp, String targetComp, String rootTx, String parentTx, String subTx) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTx + " rootTx:" + rootTx);
 		
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			//maintain tx
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
@@ -515,7 +519,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			subTxHostComps.put(subTx, srcComp);
 			subTxStatuses.put(subTx, TxEventType.TransactionEnd);
 			
-			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(compLifeCycleMgr.isNormal())
 				return true;
 			
 			Scope scope = depMgr.getScope();
@@ -548,7 +552,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	private boolean doAckSubTxInit(String srcComp, String targetComp, String rootTx, String parentTxID, String subTxID) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTxID + " rootTx:" + rootTx);
 		
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
 			TransactionContext txCtx;
@@ -559,7 +563,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			subTxHostComps.put(subTxID, srcComp);
 			subTxStatuses.put(subTxID, TxEventType.TransactionStart);
 			
-			if(depMgr.getCompStatus().equals(CompStatus.NORMAL))
+			if(compLifeCycleMgr.isNormal())
 				return true;
 			
 			return removeFutureEdges(targetComp, rootTx, parentTxID, subTxID);
@@ -643,7 +647,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
 		
-		depMgr.remoteDynamicUpdateIsDone();
+		compLifeCycleMgr.remoteDynamicUpdateIsDone();
 		
 		return true;
 	}
@@ -1042,7 +1046,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			String parentTx, String subTx) {
 		if (subTxStatus.equals(TxEventType.TransactionStart)) {
 
-			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				Map<String, TransactionContext> allTxs = depMgr.getTxs();
 				TransactionContext txCtx;
@@ -1113,9 +1117,9 @@ public class VersionConsistencyImpl implements Algorithm {
 		Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
 		
-		Object ondemandMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
-			if( depMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
+			if( compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
 				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
 				LOGGER.info(lfe.toString());
 				if(!rtInDeps.contains(lfe)){

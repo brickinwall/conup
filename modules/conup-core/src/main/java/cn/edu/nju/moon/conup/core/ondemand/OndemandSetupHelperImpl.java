@@ -9,6 +9,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.pubsub.Subject;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -20,7 +21,7 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	public static Logger getLogger() {
 		return LOGGER;
 	}
-	
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	private DynamicDepManager depMgr = null;
 	private OndemandSetup ondemandSetup = null;
 	private ComponentObject compObj;
@@ -87,12 +88,13 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	@Override
 	public void setDynamicDepManager(DynamicDepManager depMgr) {
 		this.depMgr = depMgr;
+		ondemandSetup.setDepMgr(depMgr);
 	}
 
-	@Override
-	public DynamicDepManager getDynamicDepManager() {
-		return depMgr;
-	}
+//	@Override
+//	public DynamicDepManager getDynamicDepManager() {
+//		return depMgr;
+//	}
 	
 	public boolean isOndemandRqstRcvd() {
 		return isOndemandRqstRcvd;
@@ -123,6 +125,12 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 			boolean ondemandResult = ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
 			subject.setResult("ondemandResult:" + ondemandResult);
 		}
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
+		ondemandSetup.setCompLifeCycleMgr(compLifeCycleMgr);
 	}
 	
 }

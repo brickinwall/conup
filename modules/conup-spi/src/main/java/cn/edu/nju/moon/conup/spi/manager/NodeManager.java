@@ -14,7 +14,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
@@ -58,7 +58,7 @@ public class NodeManager{
 	/**
 	 * 	Each component has one CompLifecycleManager
 	 */
-	private Map<ComponentObject, CompLifecycleManager> compLifecycleMgrs;
+	private Map<ComponentObject, CompLifeCycleManager> compLifecycleMgrs;
 	
 	/**
 	 * 	Each component has one UpdateManager 
@@ -73,7 +73,7 @@ public class NodeManager{
 		ondemandHelpers = new ConcurrentHashMap<ComponentObject, OndemandSetupHelper>();
 		txLifecycleMgrs = new ConcurrentHashMap<ComponentObject, TxLifecycleManager>();
 		txDepMonitors = new ConcurrentHashMap<ComponentObject, TxDepMonitor>();
-		compLifecycleMgrs = new ConcurrentHashMap<ComponentObject, CompLifecycleManager>();
+		compLifecycleMgrs = new ConcurrentHashMap<ComponentObject, CompLifeCycleManager>();
 		updateMgrs = new ConcurrentHashMap<ComponentObject, UpdateManager>();
 		interceptorStubs = new ConcurrentHashMap<ComponentObject, InterceptorStub>();
 	}
@@ -92,9 +92,9 @@ public class NodeManager{
 	 * @return corresponding CompLifecycleManager of the specified compIdentifier, 
 	 * 		   if the compIdentifier is invalid, return null
 	 */
-	public CompLifecycleManager getCompLifecycleManager(String compIdentifier){
+	public CompLifeCycleManager getCompLifecycleManager(String compIdentifier){
 		ComponentObject compObj;
-		CompLifecycleManager compLifecycleMgr;
+		CompLifeCycleManager compLifecycleMgr;
 		synchronized (this) {
 			compObj = getComponentObject(compIdentifier);
 			if(compObj == null)
@@ -212,6 +212,8 @@ public class NodeManager{
 				ondemandSetup = new AlgorithmFactory().createOndemandSetup(compObj.getAlgorithmConf());
 				helper.setOndemand(ondemandSetup);
 				helper.setDynamicDepManager(getDynamicDepManager(compIdentifier));
+				helper.setCompLifeCycleMgr(getCompLifecycleManager(compIdentifier));
+//				ondemandSetup.setCompLifeCycleMgr(getCompLifecycleManager(compIdentifier));
 			} else{
 				helper = ondemandHelpers.get(compObj);
 			}
@@ -292,7 +294,7 @@ public class NodeManager{
 		return true;
 	}
 
-	public boolean setCompLifecycleManager(String compIdentifier, CompLifecycleManager compLifecycleMgr){
+	public boolean setCompLifecycleManager(String compIdentifier, CompLifeCycleManager compLifecycleMgr){
 		ComponentObject compObj;
 		synchronized (this) {
 			compObj = getComponentObject(compIdentifier);
