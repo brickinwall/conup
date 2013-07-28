@@ -9,7 +9,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
-import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
@@ -18,59 +17,19 @@ import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
  * @author Jiang Wang <jiang.wang88@gmail.com>
  *
  */
-public interface DynamicDepManager extends Observer{
+public interface DynamicDepManager{
 	
 	/**
-	 * maintain tx
-	 * @param txContext
-	 * @return
+	 * when dependency changed, we need to check whether ready for update
+	 * here we check when pastDepCreate, pastDepRemove two events
+	 * @param hostComp
 	 */
-	public boolean manageTx(TransactionContext txContext);
+	public void dependenceChanged(String hostComp);
 	
 	/**
-	 * maintain dependences, e.g., dependences
-	 * @param txContext
-	 * @return
+	 * clean up information used by Algorithms during the update process
 	 */
-	public boolean manageDependence(TransactionContext txContext);
-	
-	/**
-	 * received dependences notification from peer component
-	 * @param targetComp target component's name
-	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
-	 * @param msgType XML, JSON, etc.
-	 * @param payload
-	 * @return
-	 */
-	public boolean manageDependence(String proctocol, String payload);
-	
-	/**
-	 * is component object ready?
-	 * @param compName
-	 * @return 
-	 */
-	public boolean isReadyForUpdate();
-	
-	/**
-	 * @return the Scope
-	 */
-	public Scope getScope();
-	
-	/**
-	 * @return corresponding component object of the mgr
-	 */
-	public ComponentObject getCompObject();
-	
-	/**
-	 * @param compObj ComponentObject
-	 */
-	public void setCompObject(ComponentObject compObj);
-	
-	/**
-	 * 
-	 * @param algorithmType
-	 */
-	public void setAlgorithm(Algorithm algorithm);
+	public void dynamicUpdateIsDone();
 	
 	public Algorithm getAlgorithm();
 	
@@ -80,19 +39,12 @@ public interface DynamicDepManager extends Observer{
 	 */
 	public Set<String> getAlgorithmOldVersionRootTxs();
 	
-	/**
-	 * 
-	 * @param oldRootTxs it takes parentTx and rootTx as the the key and value respectively
-	 * @return
-	 */
-	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs);
-	
-	public void setScope(Scope scope);
+	public CompLifeCycleManager getCompLifeCycleMgr();
 	
 	/**
-	 * @return identifiers of the components that current component statically depends on
+	 * @return corresponding component object of the mgr
 	 */
-	public Set<String> getStaticDeps();
+	public ComponentObject getCompObject();
 	
 	/**
 	 * @return Dependences that current component depends on
@@ -105,16 +57,38 @@ public interface DynamicDepManager extends Observer{
 	public Set<Dependence> getRuntimeInDeps();
 	
 	/**
-	 * @return transactions that are running on the component
+	 * @return the Scope
 	 */
-	public Map<String, TransactionContext> getTxs();
+	public Scope getScope();
+	
+	/**
+	 * @return identifiers of the components that current component statically depends on
+	 */
+	public Set<String> getStaticDeps();
 	
 	/**
 	 * 
 	 * @return current component's parent components
 	 */
 	public Set<String> getStaticInDeps();
-
+	
+	/**
+	 * @return TxLifecycleManager
+	 */
+	public TxLifecycleManager getTxLifecycleMgr();
+	
+	/**
+	 * @return transactions that are running on the component
+	 */
+	public Map<String, TransactionContext> getTxs();
+	
+	/**
+	 * 
+	 * @param txContext
+	 * @return
+	 */
+	public boolean initLocalSubTx(TransactionContext txContext);
+	
 	/**
 	 * 
 	 * @param algorithmOldVersionRootTxs old root tx calculated by the concrete algorithm
@@ -127,13 +101,35 @@ public interface DynamicDepManager extends Observer{
 			TransactionContext txContext, boolean isUpdateReqRCVD);
 
 	/**
-	 * With the given parentTx and rootTx, each algorithm should return the 'root transaction' 
-	 * in the meaning of concrete algorithm.
-	 * @param parentTx
-	 * @param rootTx
+	 * is component object ready?
+	 * @param compName
+	 * @return 
+	 */
+	public boolean isReadyForUpdate();
+
+	/**
+	 * received dependences notification from peer component
+	 * @param targetComp target component's name
+	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
+	 * @param msgType XML, JSON, etc.
+	 * @param payload
 	 * @return
 	 */
-	public String getAlgorithmRoot(String parentTx, String rootTx);
+	public boolean manageDependence(String proctocol, String payload);
+	
+	/**
+	 * maintain dependences, e.g., dependences
+	 * @param txContext
+	 * @return
+	 */
+	public boolean manageDependence(TransactionContext txContext);
+	
+	/**
+	 * maintain tx
+	 * @param txContext
+	 * @return
+	 */
+	public boolean manageTx(TransactionContext txContext);
 	
 	/**
 	 * @param subTxStatus sub tx status, i.e., TransactionStart and TransactionEnd
@@ -147,42 +143,29 @@ public interface DynamicDepManager extends Observer{
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 	
 	/**
-	 * @return TxLifecycleManager
+	 * when ondmenad is done, we need to notify algorithm to start to work
 	 */
-	public TxLifecycleManager getTxLifecycleMgr();
+	public void ondemandSetupIsDone();
 	
 	/**
 	 * 
-	 * @param txContext
-	 * @return
+	 * @param algorithmType
 	 */
-	public boolean initLocalSubTx(TransactionContext txContext);
-	
+	public void setAlgorithm(Algorithm algorithm);
+
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager);
+
 	/**
-	 * when dependency changed, we need to check whether ready for update
-	 * here we check when pastDepCreate, pastDepRemove two events
-	 * @param hostComp
+	 * @param compObj ComponentObject
 	 */
-	public void dependenceChanged(String hostComp);
+	public void setCompObject(ComponentObject compObj);
+
+	public void setScope(Scope scope);
 	
 	/**
 	 * 
 	 * @param txLifecycleMgr
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
-
-	/**
-	 * clean up information used by Algorithms during the update process
-	 */
-	public void dynamicUpdateIsDone();
-
-	/**
-	 * when ondmenad is done, we need to notify algorithm to start to work
-	 */
-	public void ondemandSetupIsDone();
-
-	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager);
-	
-	public CompLifeCycleManager getCompLifeCycleMgr();
 
 }

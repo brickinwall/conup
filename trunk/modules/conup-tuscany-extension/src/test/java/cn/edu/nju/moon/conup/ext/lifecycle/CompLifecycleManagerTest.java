@@ -1,39 +1,25 @@
 package cn.edu.nju.moon.conup.ext.lifecycle;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
-import org.apache.tuscany.sca.assembly.Component;
-import org.apache.tuscany.sca.assembly.Composite;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.contribution.processor.ContributionReadException;
-import org.apache.tuscany.sca.impl.DeployedComposite;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.monitor.ValidationException;
 import org.apache.tuscany.sca.runtime.ActivationException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
-import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.ext.datamodel.POJODynamicUpdateContext;
 import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;
-import cn.edu.nju.moon.conup.sample.auth.services.TokenService;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.Scope;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**

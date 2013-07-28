@@ -119,15 +119,6 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	}
 
 	@Override
-	public void update(Subject subject, Object arg) {
-		RequestObject reqObj = (RequestObject) arg;
-		if(reqObj.getMsgType().equals(MsgType.ONDEMAND_MSG)){
-			boolean ondemandResult = ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
-			subject.setResult("ondemandResult:" + ondemandResult);
-		}
-	}
-
-	@Override
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
 		this.compLifeCycleMgr = compLifeCycleMgr;
 		ondemandSetup.setCompLifeCycleMgr(compLifeCycleMgr);

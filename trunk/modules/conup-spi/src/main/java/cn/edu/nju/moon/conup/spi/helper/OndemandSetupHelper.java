@@ -12,7 +12,7 @@ import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
  * @author Jiang Wang<jiang.wang88@gmail.com>
  *
  */
-public interface OndemandSetupHelper extends Observer{
+public interface OndemandSetupHelper{
 	
 	/**
 	 * invoke OndemandSetup and begin on-demand setup

@@ -16,12 +16,12 @@ import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
- *
+ * 
  */
 public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	private ComponentObject compObj;
-	
+
 	@Override
 	public boolean manageTx(TransactionContext txContext) {
 		// TODO Auto-generated method stub
@@ -70,12 +70,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public Set<String> getAlgorithmOldVersionRootTxs() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -131,24 +125,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isBlockRequiredForFree(
 			Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext,
-			boolean isUpdateReqRCVD) {
+			TransactionContext txContext, boolean isUpdateReqRCVD) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-
-	@Override
-	public String getAlgorithmRoot(String parentTx, String rootTx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-//	@Override
-//	public Map<String, TransactionContext> getFakeTxs() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp,
@@ -157,17 +137,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return false;
 	}
 
-//	@Override
-//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx,
-//			String rootComp, String parentTx, String parentComp) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-
 	@Override
 	public void dependenceChanged(String hostComp) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -179,7 +152,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -195,15 +168,9 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void update(Subject subject, Object arg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

@@ -33,18 +33,6 @@ public interface Algorithm {
 	 */
 	public boolean manageDependence(String payload);
 	
-//	/**
-//	 * It's used by interceptor for deciding whether a request needs to be intercepted
-//	 * @return
-//	 */
-//	public boolean isInterceptRequired();
-//	
-//	/**
-//	 * is a component valid?
-//	 * @return 
-//	 */
-//	public boolean isValid();
-	
 	/**
 	 * is a component ready?
 	 * @return 
@@ -105,20 +93,6 @@ public interface Algorithm {
 	 */
 	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 
-	/**
-	 * the host component is going to init a sub-transaction by another component.
-	 * However, the sub-transaction has not truely been started.
-	 * during initLocalSubTx, if the component status become ondemand, in Tranquillity, Consistency algorithm
-	 * we need to make sure consistency, so we add future, past edge to itself
-	 * 
-	 * @param hostComp
-	 * @param fakeSubTx the fake tx id
-	 * @param rootTx
-	 * @param rootComp
-	 * @param parentTx
-	 * @param parentComp
-	 */
-//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	/**
 	 * the host component is going to init a sub-transaction by another component.
 	 * However, the sub-transaction has not truely been started.
