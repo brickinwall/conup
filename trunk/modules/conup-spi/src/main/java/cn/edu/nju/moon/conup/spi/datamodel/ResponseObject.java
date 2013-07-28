@@ -2,9 +2,10 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.io.Serializable;
 
-
 /**
- * @author rgc
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:04:01 PM
  */
 public class ResponseObject implements Serializable {
 

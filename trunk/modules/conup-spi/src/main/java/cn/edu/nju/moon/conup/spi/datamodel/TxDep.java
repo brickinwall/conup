@@ -2,6 +2,11 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.util.Set;
 
+/**
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:04:36 PM
+ */
 public class TxDep {
 	/** components that will never be used. */
 	private Set<String> pastComponents;

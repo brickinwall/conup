@@ -3,6 +3,11 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:04:41 PM
+ */
 public class TxDepRegistry {
 
 	/** take txId as key */

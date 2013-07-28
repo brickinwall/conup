@@ -4,7 +4,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-
+/**
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:03:27 PM
+ */
 public class InterceptorStub {
 	
 	private Set<Interceptor> interceptors;
