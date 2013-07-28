@@ -48,11 +48,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs){
-		return algorithm.convertToAlgorithmRootTxs(oldRootTxs);
-	}
-
-	@Override
 	public void dependenceChanged(String hostComp) {
 		if(compLifeCycleMgr.isTargetComp()){
 			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
@@ -73,11 +68,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public Set<String> getAlgorithmOldVersionRootTxs() {
 		return algorithm.getOldVersionRootTxs(inDepRegistry.getDependences());
-	}
-
-	@Override
-	public String getAlgorithmRoot(String parentTx, String rootTx) {
-		return algorithm.getAlgorithmRoot(parentTx, rootTx);
 	}
 
 	@Override
@@ -257,15 +247,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.txRegistry = txLifecycleMgr.getTxRegistry();
-	}
-
-	@Override
-	public void update(Subject subject, Object arg) {
-		RequestObject reqObj = (RequestObject) arg;
-		if(reqObj.getMsgType().equals(MsgType.DEPENDENCE_MSG)){
-			boolean result = manageDependence(reqObj.getProtocol(), reqObj.getPayload());
-			subject.setResult("manageDepResult:" + result);
-		}
 	}
 
 }

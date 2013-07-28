@@ -9,12 +9,12 @@ import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
- *
+ * 
  */
 public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 
 	private ComponentObject compObj;
-	
+
 	@Override
 	public boolean ondemandSetup() {
 		// TODO Auto-generated method stub
@@ -59,13 +59,13 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 	@Override
 	public void resetIsOndemandRqstRcvd() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onDemandIsDone() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -75,15 +75,9 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper {
 	}
 
 	@Override
-	public void update(Subject subject, Object arg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

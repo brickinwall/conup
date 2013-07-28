@@ -10,7 +10,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
  * @author Guochao Ren<rgc.nju.cs@gmail.com>
  * Jul 26, 2013 10:06:39 PM
  */
-public interface CompLifeCycleManager{
+public interface CompLifeCycleManager {
 
 	/**
 	 * the free condition has achieved, so need to set CompStatus to Free
