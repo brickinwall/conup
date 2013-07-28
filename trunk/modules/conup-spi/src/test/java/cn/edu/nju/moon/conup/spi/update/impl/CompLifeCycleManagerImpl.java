@@ -157,4 +157,10 @@ public class CompLifeCycleManagerImpl implements CompLifeCycleManager {
 		return false;
 	}
 
+	@Override
+	public boolean isReadyForUpdate() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

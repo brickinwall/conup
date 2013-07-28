@@ -4,6 +4,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * Implementation of waiting strategy for achieving freeness
@@ -13,7 +14,12 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 public class WaitingStrategy implements FreenessStrategy {
 	/** represent waiting strategy */
 	public final static String WAITING = "WAITING_FOR_FREENESS";
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	
+	public WaitingStrategy(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr  = compLifeCycleMgr;
+	}
+
 	@Override
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
 			String curTxID, String hostComp) {
@@ -27,15 +33,12 @@ public class WaitingStrategy implements FreenessStrategy {
 
 	@Override
 	public boolean isInterceptRequiredForFree(String rootTx, String compIdentifier, TransactionContext txCtx, boolean isUpdateRCVD) {
-//		if(NodeManager.getInstance().getDynamicDepManager(compIdentifier).isReadyForUpdate())
-//			return true;
 		return false;
 	}
 
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
-		DynamicDepManager depManager = NodeManager.getInstance().getDynamicDepManager(hostComp);
-		return depManager.isReadyForUpdate();
+		return compLifeCycleMgr.isReadyForUpdate();
 	}
 
 }

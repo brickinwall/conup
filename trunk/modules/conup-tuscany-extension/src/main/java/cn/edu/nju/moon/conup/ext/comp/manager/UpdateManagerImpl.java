@@ -61,7 +61,7 @@ public class UpdateManagerImpl implements UpdateManager {
 //					printer.printDeps(dynamicDepMgr.getRuntimeInDeps(), "inDeps:");
 				}
 				String freenessConf = compObj.getFreenessConf();
-				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf);
+				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 				if(freeness.isReadyForUpdate(compObj.getIdentifier())){
 					compLifeCycleMgr.achievedFree();
 				}

@@ -24,9 +24,11 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 	public final static String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
 	
 	private final static Logger LOGGER = Logger.getLogger(ConcurrentVersionStrategy.class.getName());
+
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	
-	public static Logger getLogger() {
-		return LOGGER;
+	public ConcurrentVersionStrategy(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr   = compLifeCycleMgr;
 	}
 
 	@Override
@@ -65,17 +67,13 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 	@Override
 	public boolean isReadyForUpdate(String hostComp) {
 		NodeManager nodeMgr = NodeManager.getInstance();
-		DynamicDepManager depManager = nodeMgr.getDynamicDepManager(hostComp);
-//		CompLifecycleManager compLcMgr;
 		UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
 		
 		Set<String> oldVersionRootTxs;
-//		compLcMgr = CompLifecycleManagerImpl.getInstance(hostComp);
 		oldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
 		LOGGER.fine("oldVersionRootTxs.size()=" + oldVersionRootTxs.size());
 		LOGGER.fine("oldVersionRootTxs:\n" + oldVersionRootTxs);
-//		return oldVersionRootTxs.size()==0;
-		return depManager.isReadyForUpdate() || oldVersionRootTxs.size()==0;
+		return compLifeCycleMgr.isReadyForUpdate() || oldVersionRootTxs.size()==0;
 	}
 
 }

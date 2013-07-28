@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
-import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
@@ -29,38 +28,151 @@ import cn.edu.nju.moon.conup.spi.utils.Printer;
  * 
  */
 public class DynamicDepManagerImpl implements DynamicDepManager {
-	private Logger LOGGER = Logger.getLogger(DynamicDepManagerImpl.class.getName());
-	
-//	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 	private Algorithm algorithm = null;
+	
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	private ComponentObject compObj;
-//	private CompStatus compStatus = CompStatus.NORMAL;
-	private Scope scope = null;
 	/** dependences by other components */
 	private DependenceRegistry inDepRegistry = new DependenceRegistry();
+	private Logger LOGGER = Logger.getLogger(DynamicDepManagerImpl.class.getName());
 	/** dependences to other components */
 	private DependenceRegistry outDepRegistry = new DependenceRegistry();
-//	/** used to identify whether received update request */
-//	private boolean isUpdateRequestReceived = false;
 	
-//	private Object ondemandSyncMonitor = new Object();
-//	
-//	private Object validToFreeSyncMonitor = new Object();
-//	
-//	private Object updatingSyncMonitor = new Object();
-//	
-//	private Object freezeSyncMonitor = new Object();
-//	
-//	/** semaphore which is used to synchronize the non-target component */
-//	private Object waitingRemoteCompUpdateDoneMonitor = new Object();
+	private Scope scope = null;
 	
 	private TxLifecycleManager txLifecycleMgr = null;
 	
 	private TransactionRegistry txRegistry = null;
-	
-	private CompLifeCycleManager compLifeCycleMgr = null;
 
 	public DynamicDepManagerImpl() {
+	}
+
+	@Override
+	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs){
+		return algorithm.convertToAlgorithmRootTxs(oldRootTxs);
+	}
+
+	@Override
+	public void dependenceChanged(String hostComp) {
+		if(compLifeCycleMgr.isTargetComp()){
+			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
+			updateMgr.checkFreeness(hostComp);
+		}
+	}
+	
+	@Override
+	public void dynamicUpdateIsDone() {
+		algorithm.updateIsDone(compObj.getIdentifier());
+	}
+	
+	@Override
+	public Algorithm getAlgorithm() {
+		return this.algorithm;
+	}
+
+	@Override
+	public Set<String> getAlgorithmOldVersionRootTxs() {
+		return algorithm.getOldVersionRootTxs(inDepRegistry.getDependences());
+	}
+
+	@Override
+	public String getAlgorithmRoot(String parentTx, String rootTx) {
+		return algorithm.getAlgorithmRoot(parentTx, rootTx);
+	}
+
+	@Override
+	public CompLifeCycleManager getCompLifeCycleMgr() {
+		return this.compLifeCycleMgr;
+	}
+
+	@Override
+	public ComponentObject getCompObject() {
+		return compObj;
+	}
+
+	public DependenceRegistry getInDepRegistry() {
+		return inDepRegistry;
+	}
+
+	public DependenceRegistry getOutDepRegistry() {
+		return outDepRegistry;
+	}
+
+	@Override
+	public Set<Dependence> getRuntimeDeps() {
+		return outDepRegistry.getDependences();
+	}
+
+	@Override
+	public Set<Dependence> getRuntimeInDeps() {
+		return inDepRegistry.getDependences();
+	}
+
+	@Override
+	public Scope getScope() {
+		return scope;
+	}
+	
+	@Override
+	public Set<String> getStaticDeps() {
+		return compObj.getStaticDeps();
+	}
+	
+	@Override
+	public Set<String> getStaticInDeps() {
+		return compObj.getStaticInDeps();
+	}
+
+	public TxLifecycleManager getTxLifecycleMgr() {
+		if(txLifecycleMgr == null){
+			txLifecycleMgr = NodeManager.getInstance().getTxLifecycleManager(compObj.getIdentifier());
+		}
+		assert txLifecycleMgr != null;
+		return txLifecycleMgr;
+	}
+
+	@Override
+	public Map<String, TransactionContext> getTxs() {
+		return txRegistry.getTransactionContexts();
+	}
+
+	@Override
+	public boolean initLocalSubTx(TransactionContext txContext) {
+		return algorithm.initLocalSubTx(txContext);
+	}
+
+	@Override
+	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
+			TransactionContext txContext, boolean isUpdateReqRCVD) {
+		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, txContext, isUpdateReqRCVD);
+	}
+	
+	@Override
+	public boolean isReadyForUpdate() {
+		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
+		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.isValid());
+		return algReadyForUpdate;
+	}
+
+	@Override
+	public boolean manageDependence(String proctocol, String payload) {
+		return algorithm.manageDependence(payload);
+	}
+	
+	/**
+	 * maintain dependences, e.g., arcs
+	 * @param txStatus
+	 * @param txID
+	 * @param futureC
+	 * @param pastC
+	 * @return
+	 */
+	@Override
+	public boolean manageDependence(TransactionContext txContext) {
+		LOGGER.fine("DynamicDepManagerImpl.manageDependence(...)");
+		
+		algorithm.manageDependence(txContext);
+		return true;
 	}
 
 	/**
@@ -85,166 +197,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return manageDependence(txContext);
 	}
 
-	/**
-	 * maintain dependences, e.g., arcs
-	 * @param txStatus
-	 * @param txID
-	 * @param futureC
-	 * @param pastC
-	 * @return
-	 */
 	@Override
-	public boolean manageDependence(TransactionContext txContext) {
-		LOGGER.fine("DynamicDepManagerImpl.manageDependence(...)");
-		
-		algorithm.manageDependence(txContext);
-		return true;
+	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
+			String parentTx, String subTx) {
+		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
 	}
-	
-//	@Override
-//	public boolean isInterceptRequired() {
-////		if(compStatus.equals(CompStatus.Free) || compStatus.equals(CompStatus.UPDATING)){
-//		if(compStatus.equals(CompStatus.UPDATING)){
-//			return true;
-//		}
-//		return false;
-//	}
-
-	@Override
-	public boolean manageDependence(String proctocol, String payload) {
-		return algorithm.manageDependence(payload);
-	}
-	
-//	@Override
-//	public boolean isNormal(){
-//		return compStatus.equals(CompStatus.NORMAL);
-//	}
-//
-//	@Override
-//	public boolean isValid() {
-//		return compStatus.equals(CompStatus.VALID);
-//	}
-
-	@Override
-	public boolean isReadyForUpdate() {
-		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
-		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.isValid());
-//		return compStatus.equals(CompStatus.VALID) && algReadyForUpdate;
-		return compLifeCycleMgr.isValid() && algReadyForUpdate;
-	}
-
-	@Override
-	public Scope getScope() {
-		return scope;
-	}
-
-	@Override
-	public ComponentObject getCompObject() {
-		return compObj;
-	}
-
-	public DependenceRegistry getInDepRegistry() {
-		return inDepRegistry;
-	}
-
-	public void setInDepRegistry(DependenceRegistry inDepRegistry) {
-		this.inDepRegistry = inDepRegistry;
-	}
-
-	public DependenceRegistry getOutDepRegistry() {
-		return outDepRegistry;
-	}
-
-	public void setOutDepRegistry(DependenceRegistry outDepRegistry) {
-		this.outDepRegistry = outDepRegistry;
-	}
-
-	@Override
-	public void setCompObject(ComponentObject compObj) {
-		this.compObj = compObj;
-	}
-
-	@Override
-	public void setAlgorithm(Algorithm algorithm) {
-		this.algorithm = algorithm;
-	}
-
-//	@Override
-//	public CompStatus getCompStatus() {
-//		return compStatus;
-//	}
-
-//	public void ondemandSetting() {
-//		synchronized (ondemandSyncMonitor) {
-//			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.ONDEMAND))
-//				System.out.println(compObj.getIdentifier() + "--> compStatus:" + compStatus);
-//			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
-//			if(compStatus.equals(CompStatus.NORMAL)){
-//				this.compStatus = CompStatus.ONDEMAND;
-//				bufferEventType = BufferEventType.ONDEMAND;
-//				notifyInterceptors(bufferEventType);
-////				notifyObservers(bufferEventType);
-//			}
-//		}
-//	}
-
-//	@Override
-//	public boolean isOndemandSetting() {
-//		synchronized (ondemandSyncMonitor) {
-//			return compStatus.equals(CompStatus.ONDEMAND);
-//		}
-//	}
-
-	@Override
-	public Set<String> getAlgorithmOldVersionRootTxs() {
-		return algorithm.getOldVersionRootTxs(inDepRegistry.getDependences());
-	}
-	
-	@Override
-	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs){
-		return algorithm.convertToAlgorithmRootTxs(oldRootTxs);
-	}
-	
-	@Override
-	public void setScope(Scope scope) {
-		this.scope = scope;
-	}
-
-	@Override
-	public Set<String> getStaticDeps() {
-		return compObj.getStaticDeps();
-	}
-
-	@Override
-	public Set<Dependence> getRuntimeDeps() {
-		return outDepRegistry.getDependences();
-	}
-
-	@Override
-	public Set<Dependence> getRuntimeInDeps() {
-		return inDepRegistry.getDependences();
-	}
-
-	@Override
-	public Map<String, TransactionContext> getTxs() {
-		return txRegistry.getTransactionContexts();
-	}
-	
-	/**
-	 * 
-	 * @return transactions that are launched by another component, 
-	 * and its's tx id is also generated by that component
-	 */
-//	@Override
-//	public Map<String, TransactionContext> getFakeTxs(){
-//		return fakeTxRegistry.getTransactionContexts();
-//	}
-
-//	@Override
-//	public boolean isOndemandSetupRequired() {
-//		return compStatus.equals(CompStatus.NORMAL) 
-//				|| compStatus.equals(CompStatus.ONDEMAND);
-//	}
 
 	@Override
 	public void ondemandSetupIsDone() {
@@ -268,212 +225,39 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 				
 		algorithm.initiate(compObj.getIdentifier());
 	}
-
-	@Override
-	public void dynamicUpdateIsDone() {
-		algorithm.updateIsDone(compObj.getIdentifier());
-	}
 	
-//	@Override
-//	public void updating(){
-//		LOGGER.fine("Executing dynamic update for component '" + compObj.getIdentifier() + "'");
-//		compStatus = CompStatus.UPDATING;
-//	}
-	
-//	@Override
-//	public void achievedFree(){
-//		//FOR TEST
-//		ExecutionRecorder exeRecorder;
-//		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
-//		exeRecorder.achievedFree();
-//		
-////		String inDepsStr = "";
-////		for (Dependence dep : inDepRegistry.getDependences()) {
-////			inDepsStr += "\n" + dep.toString();
-////		}
-////		LOGGER.fine("achievedFree, inDepsStr:" + inDepsStr);
-////		
-////		String outDepsStr = "";
-////		for (Dependence dep : outDepRegistry.getDependences()) {
-////			outDepsStr += "\n" + dep.toString();
-////		}
-////		LOGGER.fine("achievedFree, outDepsStr:" + outDepsStr);
-////		
-////		Printer printer = new Printer();
-////		LOGGER.fine("achievedFree, Txs:");
-////		printer.printTxs(LOGGER, getTxs());
-//		
-//		synchronized (validToFreeSyncMonitor) {
-//			LOGGER.fine("compStatus: " + compStatus);
-//			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.Free);
-//			if(compStatus.equals(CompStatus.VALID)){
-//				compStatus = CompStatus.Free;
-//				bufferEventType = BufferEventType.EXEUPDATE;
-//				notifyInterceptors(bufferEventType);
-////				notifyObservers(bufferEventType);
-////				System.out.println("in ddm:" + bufferEventType);
-//				
-//				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
-//				validToFreeSyncMonitor.notifyAll();
-//			}
-//		}
-//	}
-
 	@Override
-	public Set<String> getStaticInDeps() {
-		return compObj.getStaticInDeps();
-	}
-
-//	@Override
-//	public Object getFreezeSyncMonitor() {
-//		return freezeSyncMonitor;
-//	}
-//
-//	@Override
-//	public Object getOndemandSyncMonitor() {
-//		return ondemandSyncMonitor;
-//	}
-//	
-//	public Object getValidToFreeSyncMonitor() {
-//		return validToFreeSyncMonitor;
-//	}
-//
-//	public Object getUpdatingSyncMonitor() {
-//		return updatingSyncMonitor;
-//	}
-
-	@Override
-	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD) {
-		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, txContext, isUpdateReqRCVD);
-	}
-
-//	@Override
-//	public Object getWaitingRemoteCompUpdateDoneMonitor() {
-//		return waitingRemoteCompUpdateDoneMonitor;
-//	}
-
-//	@Override
-//	public void remoteDynamicUpdateIsDone() {
-//		synchronized (waitingRemoteCompUpdateDoneMonitor) {
-////			compStatus = CompStatus.VALID;
-//			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.VALID);
-////			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.VALID)){
-////				LOGGER.warning("CompStatus is supposed to be NORMAL or VALID, but it's " + compStatus);
-////			}
-////			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
-//			if(compStatus.equals(CompStatus.VALID)){
-//				compStatus = CompStatus.NORMAL;
-//				bufferEventType = BufferEventType.NOTHING;
-//				notifyInterceptors(bufferEventType);
-////				notifyObservers(bufferEventType);
-////				System.out.println("in ddm:" + bufferEventType);
-//				
-//				String compIdentifier = compObj.getIdentifier();
-//				LOGGER.info(compIdentifier + " remote update is done, CompStatus: " + compStatus + ", now notify all");
-//				waitingRemoteCompUpdateDoneMonitor.notifyAll();
-//				
-//				// add for experiments
-//				// record update cost time
-//				if(compIdentifier.equals("Coordination"))
-//					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
-//			}
-//		}
-//	}
-
-//	@Override
-//	public boolean updateIsReceived() {
-//		LOGGER.info("Received dynamic update request.");
-//		isUpdateRequestReceived = true;
-////		algorithm.initiate(compObj.getIdentifier());
-//		return true;
-//	}
-
-//	@Override
-//	public boolean isUpdateRequiredComp() {
-//		return isUpdateRequestReceived;
-//	}
-
-	@Override
-	public String getAlgorithmRoot(String parentTx, String rootTx) {
-		return algorithm.getAlgorithmRoot(parentTx, rootTx);
+	public void setAlgorithm(Algorithm algorithm) {
+		this.algorithm = algorithm;
 	}
 
 	@Override
-	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
-			String parentTx, String subTx) {
-		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
 	}
-	
-//	public TxDepMonitor getTxDepMonitor() {
-////		return txDepMonitor;
-//		if(txDepMonitor == null)
-//			return null;
-////		return txDepMonitor.newInstance();
-//		return NodeManager.getInstance().getTxDepMonitor(compObj.getIdentifier());
-//	}
-//
-//	public void setTxDepMonitor(TxDepMonitor txDepMonitor) {
-//		this.txDepMonitor = txDepMonitor;
-//	}
-
-//	@Override
-//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-//		return algorithm.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
-//	}
-
 	@Override
-	public boolean initLocalSubTx(TransactionContext txContext) {
-		return algorithm.initLocalSubTx(txContext);
+	public void setCompObject(ComponentObject compObj) {
+		this.compObj = compObj;
+	}
+
+	public void setInDepRegistry(DependenceRegistry inDepRegistry) {
+		this.inDepRegistry = inDepRegistry;
+	}
+
+	public void setOutDepRegistry(DependenceRegistry outDepRegistry) {
+		this.outDepRegistry = outDepRegistry;
 	}
 
 	@Override
-	public void dependenceChanged(String hostComp) {
-		if(compLifeCycleMgr.isTargetComp()){
-//			txDepMonitor.checkFreeness(hostComp);
-//			NodeManager.getInstance().getCompLifecycleManager(hostComp).checkFreeness(hostComp);
-			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
-			updateMgr.checkFreeness(hostComp);
-		}
+	public void setScope(Scope scope) {
+		this.scope = scope;
 	}
+
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.txRegistry = txLifecycleMgr.getTxRegistry();
 	}
-
-	public TxLifecycleManager getTxLifecycleMgr() {
-		if(txLifecycleMgr == null){
-			txLifecycleMgr = NodeManager.getInstance().getTxLifecycleManager(compObj.getIdentifier());
-		}
-		assert txLifecycleMgr != null;
-		return txLifecycleMgr;
-	}
-
-	@Override
-	public Algorithm getAlgorithm() {
-		return this.algorithm;
-	}
-
-//	@Override
-//	public void registerObserver(Observer o) {
-//		observers.add(o);
-//	}
-//
-//	@Override
-//	public void removeObserver(Observer o) {
-//		observers.remove(o);
-//	}
-//
-//	@Override
-//	public void notifyObservers(Object arg) {
-//		for(int i = 0; i < observers.size(); i++ ){
-//			Observer observer = observers.get(i);
-//			//System.out.println("in ddm:" + (BufferEventType)arg);
-//			observer.update(this, arg);
-//		}
-//		System.out.println("observers.size():" + observers.size());
-//	}
 
 	@Override
 	public void update(Subject subject, Object arg) {
@@ -483,25 +267,5 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 			subject.setResult("manageDepResult:" + result);
 		}
 	}
-
-	@Override
-	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
-		this.compLifeCycleMgr = compLifeCycleMgr;
-	}
-
-	@Override
-	public CompLifeCycleManager getCompLifeCycleMgr() {
-		return this.compLifeCycleMgr;
-	}
-
-//	@Override
-//	public void setResult(String result) {
-//		
-//	}
-
-//	private void notifyInterceptors(BufferEventType eventType){
-//		InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(compObj.getIdentifier());
-//		interceptorStub.notifyInterceptors(eventType);
-//	}
 
 }
