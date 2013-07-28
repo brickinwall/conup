@@ -27,7 +27,7 @@ public class ServerIoHandler extends IoHandlerAdapter{
 
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		RequestObject reqObj = (RequestObject) message;
-		result = updateManager.process(reqObj);
+		result = updateManager.processMsg(reqObj);
 		ResponseObject responseObj = new ResponseObject();
 		responseObj.setProtocol(reqObj.getProtocol());
 		responseObj.setSrcIdentifier(reqObj.getTargetIdentifier());

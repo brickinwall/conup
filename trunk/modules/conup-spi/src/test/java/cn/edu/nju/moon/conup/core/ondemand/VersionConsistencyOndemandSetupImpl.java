@@ -3,6 +3,8 @@ package cn.edu.nju.moon.conup.core.ondemand;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -49,6 +51,18 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 	@Override
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDepMgr(DynamicDepManager depMgr) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -23,6 +23,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -32,6 +34,9 @@ import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	private Logger LOGGER = Logger.getLogger(QuiescenceOndemandSetupImpl.class.getName());
 	private OndemandSetupHelper ondemandHelper;
+	
+	private CompLifeCycleManager compLifeCycleMgr = null;
+	private DynamicDepManager depMgr = null;
 
 	/**
 	 * components who send ondemand request to current component, when current component finish ondemand
@@ -56,7 +61,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	public boolean ondemand() {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
-		ondemandHelper.getDynamicDepManager().setScope(scope);
+		depMgr.setScope(scope);
 		
 //		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
 		assert scope != null;
@@ -77,7 +82,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			String scopeString = payloadResolver.getParameter(QuiescencePayload.SCOPE);
 			if(scopeString != null && !scopeString.equals("") && !scopeString.equals("null")){
 				Scope scope = Scope.inverse(scopeString);
-				ondemandHelper.getDynamicDepManager().setScope(scope);
+				depMgr.setScope(scope);
 			}
 			reqOndemandSetup(curComp, srcComp);
 		} else if(operation.equals(QuiescenceOperationType.CONFIRM_ONDEMAND_SETUP)){
@@ -133,7 +138,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		
 		hostComp = currentComp;
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 		
 		//calculate target(sub) components
 		if(scope == null)
@@ -142,7 +147,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		//calculate parent components
-		parentComps = ondemandHelper.getDynamicDepManager().getStaticInDeps();
+		parentComps = depMgr.getStaticInDeps();
 		
 		//init OndemandRequestStatus
 		Map<String, Boolean> reqStatus;
@@ -197,7 +202,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	private boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		if(ondemandHelper.getDynamicDepManager().isValid()){
+		if(compLifeCycleMgr.isValid()){
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -227,7 +232,9 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			//change current componentStatus to 'valid'
 			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp + 
 					", and confirmed All, trying to change mode to valid");
-			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+			//TODO
+//			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+			compLifeCycleMgr.ondemandSetupIsDone();
 			//send confirmOndemandSetup(...)
 			sendConfirmOndemandSetup(currentComp);
 		}
@@ -266,16 +273,18 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine("Received all reqOndemandSetup(...)");
 			LOGGER.fine("trying to change mode to ondemand");
 			
+			
+			
 			//change current componentStatus to 'ondemand'
-			ondemandHelper.getDynamicDepManager().ondemandSetting();
+			compLifeCycleMgr.ondemandSetting();
 			//send reqOndemandSetup(...) to parent components
 			sendReqOndemandSetup(parentComponents, currentComp);
 			//onDemandSetUp
-			Object ondemandSyncMonitor = ondemandHelper.getDynamicDepManager().getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				if(ondemandHelper.getDynamicDepManager().getCompStatus().equals(CompStatus.ONDEMAND)){
+				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
 					//FOR TEST
-					Map<String, TransactionContext> allTxs = ondemandHelper.getDynamicDepManager().getTxs();
+					Map<String, TransactionContext> allTxs = depMgr.getTxs();
 					Iterator<Entry<String, TransactionContext>> txIterator = allTxs.entrySet().iterator();
 					String txStr = "";
 					while(txIterator.hasNext()){
@@ -304,7 +313,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine(confirmOndemandStatusStr);
 			
 			if(isConfirmedAll){
-				if(ondemandHelper.getDynamicDepManager().isValid()){
+				if(compLifeCycleMgr.isValid()){
 					LOGGER.fine("Confirmed all, and component status is valid");
 					return;
 				}
@@ -312,7 +321,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine("trying to change mode to valid");
 				
 				//change current componentStatus to 'valid'
-				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+				compLifeCycleMgr.ondemandSetupIsDone();
 				//send confirmOndemandSetup(...)
 				sendConfirmOndemandSetup(currentComp);
 			}
@@ -340,7 +349,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			payload = QuiescencePayload.OPERATION_TYPE + ":" + QuiescenceOperationType.REQ_ONDEMAND_SETUP + "," +
 					QuiescencePayload.SRC_COMPONENT + ":" + hostComp + "," +
 					QuiescencePayload.TARGET_COMPONENT + ":" + parent + "," +
-					QuiescencePayload.SCOPE + ":" + ondemandHelper.getDynamicDepManager().getScope().toString();
+					QuiescencePayload.SCOPE + ":" + depMgr.getScope().toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -352,10 +361,10 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		Scope scope;
 		
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 		
 		if(scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager().getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
@@ -431,5 +440,15 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
+	}
+
+	@Override
+	public void setDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
 	}
 }

@@ -14,7 +14,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
-import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
+import cn.edu.nju.moon.conup.spi.exception.ConupException;
 
 /**
  * @author rgc

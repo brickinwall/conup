@@ -1,6 +1,8 @@
 package cn.edu.nju.moon.conup.spi.helper;
 
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 
 /**
@@ -54,5 +56,9 @@ public interface OndemandSetup {
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
 	
 	public void onDemandIsDone();
+
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr);
+
+	public void setDepMgr(DynamicDepManager depMgr);
 	
 }

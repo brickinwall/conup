@@ -8,13 +8,31 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 
 public interface UpdateManager {
 
+	/**
+	 * this method is invoked on target component
+	 * there are 3 scenario where we call this method: 
+	 * 1.when a tx finished; 
+	 * 2.when a root tx finished;
+	 * 3.when the CompStatus is VALID and a new request come in.(this need to be discussed) 
+	 */
 	public void attemptToUpdate();
 
-	void checkFreeness(String hostComp);
+	/**
+	 * this method is used when some events have happened which will make the CompStatus becomes Free
+	 * these events are: PastCreate(sub tx finished); PastRemove(root tx finished) 
+	 * @param hostComp
+	 */
+	public void checkFreeness(String hostComp);
 	
-	public boolean cleanupUpdate();
+	/**
+	 * do some clean works and also notify update is done
+	 */
+	public void cleanupUpdate();
 	
-	public boolean executeUpdate();
+	/**
+	 * invoke specific ComponentUpdator to execute update
+	 */
+	public void executeUpdate();
 
 	public ComponentUpdator getCompUpdator();
 
@@ -24,11 +42,23 @@ public interface UpdateManager {
 
 	public DynamicUpdateContext getUpdateCtx();
 
+	/**
+	 * record all these old root tx id(definition in VC paper)
+	 */
 	public void initOldRootTxs();
 
+	/**
+	 * whether current component is target component
+	 * @return
+	 */
 	public boolean isDynamicUpdateRqstRCVD();
 
-	public String process(RequestObject reqObj);
+	/**
+	 * process message come from communication module
+	 * @param reqObj
+	 * @return
+	 */
+	public String processMsg(RequestObject reqObj);
 	
 	public void setCompUpdator(ComponentUpdator compUpdator);
 
@@ -38,9 +68,8 @@ public interface UpdateManager {
 
 	public void setOndemandSetupHelper(OndemandSetupHelper ondemandSetupHelper);
 
-//	public Message checkRemoteUpdate(TransactionContext txCtx, Object subTx,
-//			Interceptor interceptor, Message msg);
-
 	public void checkUpdate(Interceptor interceptor);
+
+	public void removeAlgorithmOldRootTx(String rootTxId);
 	
 }

@@ -24,7 +24,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 //import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
@@ -40,7 +40,10 @@ public class QuiescenceImpl implements Algorithm {
 	public final static String ALGORITHM_TYPE = "QUIESCENCE_ALGORITHM";
 	/** Has the component received passive request from sub-component */
 	private boolean isPassivateRCVD = false;
+	
 	private DynamicDepManager depMgr = null;
+	
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	
 	private Set<String> REQS = new ConcurrentSkipListSet<String>();
 	
@@ -60,7 +63,7 @@ public class QuiescenceImpl implements Algorithm {
 	@Override
 	public void manageDependence(TransactionContext txContext) {
 //		initDynamicDepMgr(txContext.getHostComponent());
-		CompStatus compStatus = depMgr.getCompStatus();
+		CompStatus compStatus = compLifeCycleMgr.getCompStatus();
 		switch (compStatus) {
 		case NORMAL:
 			doNormal(txContext);
@@ -88,16 +91,16 @@ public class QuiescenceImpl implements Algorithm {
 		QuiescenceOperationType operationType;
 		String srcComp;
 		String hostComp;
-		String rootTx;
-		String parentTx;
-		String subTx;
+//		String rootTx;
+//		String parentTx;
+//		String subTx;
 		
 		payloadResolver = new QuiescencePayloadResolver(payload);
 		operationType = payloadResolver.getOperation();
 		srcComp = payloadResolver.getParameter(QuiescencePayload.SRC_COMPONENT);
 		hostComp = payloadResolver.getParameter(QuiescencePayload.TARGET_COMPONENT);
 		
-		Printer printer = new Printer();
+//		Printer printer = new Printer();
 		
 		assert srcComp!=null;
 		assert hostComp!=null;
@@ -153,10 +156,10 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private void doOndemand(TransactionContext txContext) {
 		// sleep until current status become valid
-		Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				if (depMgr.isOndemandSetting()) {
+				if (compLifeCycleMgr.isOndemandSetting()) {
 					LOGGER.fine("----------------ondemandSyncMonitor.wait();Quiescence algorithm------------");
 					ondemandSyncMonitor.wait();
 				}
@@ -179,9 +182,9 @@ public class QuiescenceImpl implements Algorithm {
 			rootTx = txCtx.getRootTx();
 			if(rootTx.equals(txCtx.getCurrentTx()))
 				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
-			Object ondemandSyncMonitor = depMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				if( depMgr.isNormal()){
+				if( compLifeCycleMgr.isNormal()){
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
 //					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
@@ -190,7 +193,7 @@ public class QuiescenceImpl implements Algorithm {
 					return;
 				} else{
 					try {
-						if (depMgr.isOndemandSetting()) {
+						if (compLifeCycleMgr.isOndemandSetting()) {
 							LOGGER.fine("----------------ondemandSyncMonitor.wait();quiesence algorithm------------");
 							ondemandSyncMonitor.wait();
 							doValid(txCtx);
@@ -248,10 +251,10 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	private void doFree(TransactionContext txContext) {
-		Object updatingMonitor = depMgr.getUpdatingSyncMonitor();
+		Object updatingMonitor = compLifeCycleMgr.getUpdatingSyncMonitor();
 		synchronized (updatingMonitor) {
 			try {
-				if (depMgr.getCompStatus().equals(CompStatus.Free)) {
+				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)) {
 					updatingMonitor.wait();
 				}
 			} catch (InterruptedException e) {
@@ -399,9 +402,9 @@ public class QuiescenceImpl implements Algorithm {
 					ackPassivate(hostComp, reqComp);
 				}
 				
-				if(depMgr.isUpdateRequiredComp()){
+				if(compLifeCycleMgr.isTargetComp()){
 					LOGGER.info("**** QUIESCENCE has achieved for component: " + hostComp + "***********");
-					depMgr.achievedFree();
+					compLifeCycleMgr.achievedFree();
 				}
 			}
 		}
@@ -458,7 +461,7 @@ public class QuiescenceImpl implements Algorithm {
 		isPassivateRCVD = false;
 		PASSIVATED = false;
 		
-		depMgr.remoteDynamicUpdateIsDone();
+		compLifeCycleMgr.remoteDynamicUpdateIsDone();
 		return true;
 	}
 
@@ -474,7 +477,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public boolean isReadyForUpdate(String compIdentifier) {
-		return depMgr.getCompStatus().equals(CompStatus.Free);
+		return compLifeCycleMgr.getCompStatus().equals(CompStatus.Free);
 	}
 
 	@Override

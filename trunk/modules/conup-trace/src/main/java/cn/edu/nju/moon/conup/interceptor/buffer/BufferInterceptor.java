@@ -22,6 +22,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 /**
@@ -39,6 +40,7 @@ public class BufferInterceptor implements Interceptor {
 	private DynamicDepManager depMgr;
 	private TxLifecycleManager txLifecycleMgr;
 	private UpdateManager updateMgr;
+	private CompLifeCycleManager compLifeCycleMgr = null;
 	private static Object freezeSyncMonitor = new Object();
 	private FreenessStrategy freeness = null;
 	
@@ -130,7 +132,7 @@ public class BufferInterceptor implements Interceptor {
 		InterceptorCache cache = InterceptorCache.getInstance(hostComp);
 		TransactionContext txCtx = cache.getTxCtx(threadID);
 
-		Object validToFreeSyncMonitor = depMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			// calculate old version root txs
 			if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
@@ -148,10 +150,10 @@ public class BufferInterceptor implements Interceptor {
 				}
 			}
 			if (freeness.isReadyForUpdate(hostComp)) {
-				depMgr.achievedFree();
+				compLifeCycleMgr.achievedFree();
 			} else if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(),
 					hostComp, txCtx, true)) {
-				LOGGER.info("ThreadID="	+ getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:"	+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
+				LOGGER.info("ThreadID="	+ getThreadID() + "compStatus=" + compLifeCycleMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:"	+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 				Printer printer = new Printer();
 				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
 
@@ -160,7 +162,7 @@ public class BufferInterceptor implements Interceptor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				LOGGER.info("ThreadID=" + getThreadID() + "compStatus=" + depMgr.getCompStatus() + "----------------validToFreeSyncMonitor.recover()");
+				LOGGER.info("ThreadID=" + getThreadID() + "compStatus=" + compLifeCycleMgr.getCompStatus() + "----------------validToFreeSyncMonitor.recover()");
 			} else {
 			}
 		}

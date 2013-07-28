@@ -1,14 +1,11 @@
 package cn.edu.nju.moon.conup.ext.update;
 
-
 import cn.edu.nju.moon.conup.ext.freeness.BlockingStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.ConcurrentVersionStrategy;
 import cn.edu.nju.moon.conup.ext.freeness.WaitingStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.helper.FreenessCallback;
 import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.spi.update.Transformer;
-
 
 /**
  * There are many different implementation type for a component, different implementation may have different
@@ -42,16 +39,6 @@ public class UpdateFactory {
 	public static Transformer createTransformer(){
 		
 		return null;
-	}
-	
-	/**
-	 * 
-	 * @param compImplType 
-	 * @return
-	 */
-	@Deprecated
-	public static FreenessCallback createFreenessCallback(String compImplType){
-		return new JavaPojoFreenessCallback();
 	}
 	
 	/**

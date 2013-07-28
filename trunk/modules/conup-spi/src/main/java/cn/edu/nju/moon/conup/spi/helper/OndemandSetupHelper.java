@@ -3,6 +3,7 @@ package cn.edu.nju.moon.conup.spi.helper;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.pubsub.Observer;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * An OndemandSetupHelper may be invoked by tuscany-extension module
@@ -57,7 +58,7 @@ public interface OndemandSetupHelper extends Observer{
 	/**
 	 * @return
 	 */
-	public DynamicDepManager getDynamicDepManager();
+//	public DynamicDepManager getDynamicDepManager();
 	
 	/**
 	 * @return whether ondemnad setup is done
@@ -73,4 +74,6 @@ public interface OndemandSetupHelper extends Observer{
 	 * do cleanup works when ondemand is done
 	 */
 	public void onDemandIsDone();
+
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager);
 }

@@ -11,7 +11,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
@@ -33,14 +33,13 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 	public Class<?> achieveFreeness(String rootTxID, String rootComp, String parentComp,
 			String curTxID, String hostComp) {
 		NodeManager nodeMgr;
-		DynamicDepManager depMgr;
 		nodeMgr = NodeManager.getInstance();
-		depMgr = nodeMgr.getDynamicDepManager(hostComp);
+		CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(hostComp);
 		UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
 		
 		Set<String> algorithmOldVersionRootTxs;
 		algorithmOldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-		synchronized(depMgr.getValidToFreeSyncMonitor()){
+		synchronized(compLifeCycleMgr.getValidToFreeSyncMonitor()){
 			if((algorithmOldVersionRootTxs!=null) 
 					&& (algorithmOldVersionRootTxs.contains(rootTxID))){
 				LOGGER.fine(rootTxID + " is dispatched to old version");

@@ -11,6 +11,8 @@ import org.junit.Test;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.test.SpiTestConvention;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.impl.CompLifeCycleManagerImpl;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -42,6 +44,7 @@ public class NodeManagerTest {
 		freenessConf = CONCURRENT_VERSION;
 		compObj = new ComponentObject(compIdentifier, compVer, algorithmConf, 
 				freenessConf, null, null, SpiTestConvention.JAVA_POJO_IMPL_TYPE);
+		
 	
 	}
 
@@ -66,6 +69,10 @@ public class NodeManagerTest {
 
 	@Test
 	public void testGetOndemandSetupHelper() {
+		nodeMgr.addComponentObject(compObj.getIdentifier(), compObj);
+		CompLifeCycleManager compLifeCycleMgr = new CompLifeCycleManagerImpl();
+		nodeMgr.setCompLifecycleManager(compObj.getIdentifier(), compLifeCycleMgr);
+		
 		OndemandSetupHelper helper;
 		if(nodeMgr.getComponentObject("AuthComponent") != null)
 			nodeMgr.removeCompObject(compObj);

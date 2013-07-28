@@ -3,21 +3,16 @@ package cn.edu.nju.moon.conup.core.manager.impl;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tuscany.sca.invocation.Message;
-
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
-import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.UpdateManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -41,24 +36,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean manageDependence(String proctocol, String payload) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isInterceptRequired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isNormal() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isValid() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -92,24 +69,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void ondemandSetting() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isOndemandSetting() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isOndemandSetupRequired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public Set<String> getAlgorithmOldVersionRootTxs() {
 		// TODO Auto-generated method stub
 		return null;
@@ -135,18 +94,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void dynamicUpdateIsDone() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void remoteDynamicUpdateIsDone() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void achievedFree() {
 		// TODO Auto-generated method stub
 
 	}
@@ -182,58 +129,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void updating() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean isBlockRequiredForFree(
 			Set<String> algorithmOldVersionRootTxs,
 			TransactionContext txContext,
 			boolean isUpdateReqRCVD) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public CompStatus getCompStatus() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getOndemandSyncMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getValidToFreeSyncMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getUpdatingSyncMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getWaitingRemoteCompUpdateDoneMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean updateIsReceived() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isUpdateRequiredComp() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -295,53 +194,22 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void registerObserver(Observer o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeObserver(Observer o) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyObservers(Object arg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void update(Subject subject, Object arg) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setResult(String result) {
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public Object getFreezeSyncMonitor() {
+	public CompLifeCycleManager getCompLifeCycleMgr() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public Message checkOndemand(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Message checkValidToFree(TransactionContext txCtx, Object subTx,
-			Interceptor interceptor, Message msg, UpdateManager updateMgr) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

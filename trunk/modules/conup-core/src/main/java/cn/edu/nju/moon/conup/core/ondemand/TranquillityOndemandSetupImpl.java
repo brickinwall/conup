@@ -28,6 +28,7 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
@@ -50,6 +51,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	public static Map<String, Map<String, Boolean>> ConfirmOndemandStatus = new HashMap<String, Map<String, Boolean>>();
 
 	private OndemandSetupHelper ondemandHelper;
+	private CompLifeCycleManager compLifeCycleMgr = null;
+	private DynamicDepManager depMgr = null;
 
 	private boolean isOndemandDone;
 
@@ -59,22 +62,21 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	public boolean ondemand() {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
 		Scope scope = calcScope();
-		ondemandHelper.getDynamicDepManager().setScope(scope);
+		depMgr.setScope(scope);
 		
-		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
-		if(ddm.getRuntimeInDeps().size() != 0){
-			ddm.getRuntimeInDeps().clear();
+		if(depMgr.getRuntimeInDeps().size() != 0){
+			depMgr.getRuntimeInDeps().clear();
 		}
-		if(ddm.getRuntimeDeps().size() != 0){
-			ddm.getRuntimeDeps().clear();
+		if(depMgr.getRuntimeDeps().size() != 0){
+			depMgr.getRuntimeDeps().clear();
 		}
 		LOGGER.fine("ondemand()....");
 		Printer printer = new Printer();
-		printer.printTxs(LOGGER, ddm.getTxs());
+		printer.printTxs(LOGGER, depMgr.getTxs());
 		
 		assert scope != null;
-		assert ddm.getRuntimeInDeps().size() == 0;
-		assert ddm.getRuntimeDeps().size() == 0;
+		assert depMgr.getRuntimeInDeps().size() == 0;
+		assert depMgr.getRuntimeDeps().size() == 0;
 		
 		return reqOndemandSetup(hostComp, hostComp);
 	}
@@ -94,11 +96,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			if (scopeString != null && !scopeString.equals("")
 					&& !scopeString.equals("null")) {
 				Scope scope = Scope.inverse(scopeString);
-				ondemandHelper.getDynamicDepManager().setScope(scope);
+				depMgr.setScope(scope);
 			}
-			if (ondemandHelper.getDynamicDepManager().getScope() == null) {
+			if (depMgr.getScope() == null) {
 				Scope scope = calcScope();
-				ondemandHelper.getDynamicDepManager().setScope(scope);
+				depMgr.setScope(scope);
 			}
 			reqOndemandSetup(curComp, srcComp);
 		} else if (operation.equals(TranquillityOperationType.CONFIRM_ONDEMAND_SETUP)) {
@@ -115,8 +117,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			notifyPastOndemand(dep);
 		}
 		
-		assert ondemandHelper.getDynamicDepManager().getScope() != null;
-		LOGGER.fine("Scope:\n\t" + ondemandHelper.getDynamicDepManager().getScope());
+		assert depMgr.getScope() != null;
+		LOGGER.fine("Scope:\n\t" + depMgr.getScope());
 		return true;
 	}
 
@@ -157,11 +159,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		hostComp = currentComp;
 		
 		//change component status to ONDEMAND
-		ondemandHelper.getDynamicDepManager().ondemandSetting();
+		compLifeCycleMgr.ondemandSetting();
 
 		//in this case, it means that current component is the target component for dynamic update
 		if (currentComp.equals(requestSrcComp)) {
-			scope = ondemandHelper.getDynamicDepManager().getScope();
+			scope = depMgr.getScope();
 			if (scope == null) {
 				parentComps.addAll(ondemandHelper.getCompObject().getStaticInDeps());
 			} else {
@@ -190,9 +192,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		//onDemandSetUp
-		Object ondemandSyncMonitor = ondemandHelper.getDynamicDepManager().getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
-			if(ondemandHelper.getDynamicDepManager().isOndemandSetting()){
+			if(compLifeCycleMgr.isOndemandSetting()){
 				LOGGER.fine("synchronizing for method onDemandSetUp() in TranquillityOndemandSetupImpl..");
 				onDemandSetUp(currentComp, requestSrcComp);
 			}
@@ -213,7 +215,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		if (isConfirmedAll) {
-			if (ondemandHelper.getDynamicDepManager().isValid()) {
+			if (compLifeCycleMgr.isValid()) {
 				LOGGER.fine("Confirmed all, and component status is valid");
 				return true;
 			}
@@ -225,7 +227,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 //			printer.printDeps(ondemandHelper.getDynamicDepManager().getRuntimeDeps(), "out");
 			
 			// change current componentStatus to 'valid'
-			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+			//TODO dd
+//			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+			compLifeCycleMgr.ondemandSetupIsDone();
 			// send confirmOndemandSetup(...)
 			if(!currentComp.equals(requestSrcComp))
 				sendConfirmOndemandSetup(currentComp, requestSrcComp);
@@ -263,13 +267,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		String hostComp;
 	
 		hostComp = ondemandHelper.getCompObject().getIdentifier();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 	
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
 		Map<String, TransactionContext> txs;
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		txs = depMgr.getTxs();
@@ -410,19 +412,16 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	
 		hostComp = ondemandHelper.getCompObject().getIdentifier();
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 	
 		if (scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager()
-					.getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 	
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 		Set<Dependence> rtOutDeps;
 		Map<String, TransactionContext> txs;
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 		rtOutDeps = depMgr.getRuntimeDeps();
 		txs = depMgr.getTxs();
@@ -528,7 +527,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	public boolean confirmOndemandSetup(String parentComp, String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		if (ondemandHelper.getDynamicDepManager().isValid()) {
+		if (compLifeCycleMgr.isValid()) {
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -560,7 +559,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			// change current componentStatus to 'valid'
 			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
 					+ ", and confirmed All, trying to change mode to valid");
-			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
+			// TODO
+			compLifeCycleMgr.ondemandSetupIsDone();
+//			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
 			// send confirmOndemandSetup(...) no need to send confirm!!(because ondemand only concerns two components)
 //			sendConfirmOndemandSetup(currentComp);
 		}
@@ -577,10 +578,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	public boolean notifyFutureOndemand(Dependence dep) {
 		LOGGER.fine("notifyFutureOndemand(Dependence dep) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 
 		// add to in dependence registry
@@ -596,10 +595,8 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	public boolean notifyPastOndemand(Dependence dep) {
 		LOGGER.fine("notifyPastOndemand(Arc arc) with " + dep.toString());
-		DynamicDepManager depMgr;
 		Set<Dependence> rtInDeps;
 
-		depMgr = ondemandHelper.getDynamicDepManager();
 		rtInDeps = depMgr.getRuntimeInDeps();
 
 		rtInDeps.add(dep);
@@ -656,20 +653,17 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 		hostComp = ondemandHelper.getCompObject().getIdentifier();
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 
 		if (scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager()
-					.getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 
 		Set<Dependence> result = new HashSet<Dependence>();
 		Set<String> futureC = new HashSet<String>();
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 
 		String rootTx = null;
@@ -718,21 +712,18 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 
 		hostComp = ondemandHelper.getCompObject().getIdentifier();
 		targetRef = new HashSet<String>();
-		scope = ondemandHelper.getDynamicDepManager().getScope();
+		scope = depMgr.getScope();
 
 		if (scope == null)
-			targetRef.addAll(ondemandHelper.getDynamicDepManager()
-					.getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 
 		Set<Dependence> result = new HashSet<Dependence>();
 		Set<String> pastC = new HashSet<String>();
 
-		DynamicDepManager depMgr;
 		Map<String, TransactionContext> txs;
 
-		depMgr = ondemandHelper.getDynamicDepManager();
 		txs = depMgr.getTxs();
 
 		String rootTx = null;
@@ -817,6 +808,16 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	@Override
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		this.txDepRegistry  = txDepRegistry;
+	}
+
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
+	}
+
+	@Override
+	public void setDepMgr(DynamicDepManager depMgr) {
+		this.depMgr = depMgr;
 	}
 
 }

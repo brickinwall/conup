@@ -2,7 +2,6 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
