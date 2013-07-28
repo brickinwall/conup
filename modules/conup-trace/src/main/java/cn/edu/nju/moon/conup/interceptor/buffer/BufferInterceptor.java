@@ -37,7 +37,6 @@ public class BufferInterceptor implements Interceptor {
 	
 	private PolicySubject subject;
 	private String phase;
-	private DynamicDepManager depMgr;
 	private TxLifecycleManager txLifecycleMgr;
 	private UpdateManager updateMgr;
 	private CompLifeCycleManager compLifeCycleMgr = null;
@@ -46,11 +45,9 @@ public class BufferInterceptor implements Interceptor {
 	
 	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 	
-	public BufferInterceptor(PolicySubject subject, String phase, DynamicDepManager depMgr,
-			TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
+	public BufferInterceptor(PolicySubject subject, String phase, TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
 		this.subject = subject;
 		this.phase = phase;
-		this.depMgr = depMgr;
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.freeness = freeness;
 		
@@ -154,8 +151,8 @@ public class BufferInterceptor implements Interceptor {
 			} else if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(),
 					hostComp, txCtx, true)) {
 				LOGGER.info("ThreadID="	+ getThreadID() + "compStatus=" + compLifeCycleMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:"	+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
-				Printer printer = new Printer();
-				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
+//				Printer printer = new Printer();
+//				printer.printDeps(depMgr.getRuntimeInDeps(), "inDeps:");
 
 				try {
 					validToFreeSyncMonitor.wait();

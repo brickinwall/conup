@@ -6,6 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 
+/**
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:04:20 PM
+ */
 public class TransactionRegistry  {
 	/** take tx_id as key*/
 	private Map<String, TransactionContext> txContexts;

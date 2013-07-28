@@ -29,19 +29,8 @@ import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 public class TxInterceptor implements Interceptor {
 
 	private final static Logger LOGGER = Logger.getLogger(TxInterceptor.class.getName());
-	/**
-	 * it's used to identify a ended sub tx id in the response message
-	 */
-//	private static String ROOT_PARENT_IDENTIFIER = "VcTransactionRootAndParentIdentifier";
-//	private static String ROOT_PARENT_IDENTIFIER = "InvocationContext";
 
 	private static String HOSTIDENTIFIER = "HostIdentifier";
-//	private static final String ROOT_TX = "ROOT_TX";
-//	private static final String ROOT_COMP = "ROOT_COMP";
-//	private static final String PARENT_TX = "PARENT_TX";
-//	private static final String PARENT_COMP = "PARENT_COMP";
-//	private static final String SUB_TX = "SUB_TX";
-//	private static final String SUB_COMP = "SUB_COMP";
 	public static final String INVOCATION_CONTEXT = "INVOCATION_CONTEXT";
 	
 	private PolicySubject subject;

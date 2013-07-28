@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * 
+ * @author Guochao Ren<rgc.nju.cs@gmail.com>
+ * @version Created time: Jul 28, 2013 11:04:09 PM
+ */
 public class Scope {
 	
 	private Map<String, Set<String>> parentComponents;
