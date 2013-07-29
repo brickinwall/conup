@@ -8,6 +8,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.pubsub.Subject;
@@ -162,21 +163,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public Algorithm getAlgorithm() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifecycleManager) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public CompLifeCycleManager getCompLifeCycleMgr() {
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 }

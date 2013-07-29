@@ -94,9 +94,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
 			interceptorCache.removeTxCtx(getThreadID());
 			
-			CompLifeCycleManager compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(txContext.getHostComponent());
+			CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 			UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
-			if(compLifeCycleMgr.isValid()
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)
 					&& updateMgr.isDynamicUpdateRqstRCVD()){
 				updateMgr.attemptToUpdate();
 			}
@@ -154,8 +154,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
-				Node node = compLifeCycleMgr.getNode();
+//				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
+//				Node node = compLifeCycleMgr.getNode();
+				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 				for(Endpoint ep : endpoints){
@@ -205,8 +206,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	public String convertServiceToComponent(String service, String hostComp){
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
-				Node node = compLifeCycleMgr.getNode();
+//				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
+//				Node node = compLifeCycleMgr.getNode();
+				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 				for(Endpoint ep : endpoints){

@@ -24,7 +24,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -202,7 +204,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	private boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		if(compLifeCycleMgr.isValid()){
+		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)){
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -234,7 +236,10 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 					", and confirmed All, trying to change mode to valid");
 			//TODO
 //			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-			compLifeCycleMgr.ondemandSetupIsDone();
+			
+//			compLifeCycleMgr.ondemandSetupIsDone();
+			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+			updateMgr.ondemandSetupIsDone();
 			//send confirmOndemandSetup(...)
 			sendConfirmOndemandSetup(currentComp);
 		}
@@ -273,14 +278,14 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine("Received all reqOndemandSetup(...)");
 			LOGGER.fine("trying to change mode to ondemand");
 			
-			
-			
 			//change current componentStatus to 'ondemand'
-			compLifeCycleMgr.ondemandSetting();
+//			compLifeCycleMgr.ondemandSetting();
+			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+			updateMgr.ondemandSetting();
 			//send reqOndemandSetup(...) to parent components
 			sendReqOndemandSetup(parentComponents, currentComp);
 			//onDemandSetUp
-			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
 					//FOR TEST
@@ -313,7 +318,7 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine(confirmOndemandStatusStr);
 			
 			if(isConfirmedAll){
-				if(compLifeCycleMgr.isValid()){
+				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)){
 					LOGGER.fine("Confirmed all, and component status is valid");
 					return;
 				}
@@ -321,7 +326,9 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine("trying to change mode to valid");
 				
 				//change current componentStatus to 'valid'
-				compLifeCycleMgr.ondemandSetupIsDone();
+//				compLifeCycleMgr.ondemandSetupIsDone();
+//				UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+				updateMgr.ondemandSetupIsDone();
 				//send confirmOndemandSetup(...)
 				sendConfirmOndemandSetup(currentComp);
 			}

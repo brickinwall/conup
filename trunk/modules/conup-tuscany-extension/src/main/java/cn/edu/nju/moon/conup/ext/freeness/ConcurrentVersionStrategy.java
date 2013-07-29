@@ -41,7 +41,7 @@ public class ConcurrentVersionStrategy implements FreenessStrategy {
 		
 		Set<String> algorithmOldVersionRootTxs;
 		algorithmOldVersionRootTxs = updateMgr.getUpdateCtx().getAlgorithmOldRootTxs();
-		synchronized(compLifeCycleMgr.getValidToFreeSyncMonitor()){
+		synchronized(compLifeCycleMgr.getCompObject().getValidToFreeSyncMonitor()){
 			if((algorithmOldVersionRootTxs!=null) 
 					&& (algorithmOldVersionRootTxs.contains(rootTxID))){
 				LOGGER.fine(rootTxID + " is dispatched to old version");

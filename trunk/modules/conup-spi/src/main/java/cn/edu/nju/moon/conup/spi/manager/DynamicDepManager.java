@@ -8,6 +8,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
@@ -31,15 +32,11 @@ public interface DynamicDepManager{
 	 */
 	public void dynamicUpdateIsDone();
 	
-	public Algorithm getAlgorithm();
-	
 	/**
 	 * 
 	 * @return root transactions that should be responded with old version component
 	 */
 	public Set<String> getAlgorithmOldVersionRootTxs();
-	
-	public CompLifeCycleManager getCompLifeCycleMgr();
 	
 	/**
 	 * @return corresponding component object of the mgr
@@ -167,5 +164,7 @@ public interface DynamicDepManager{
 	 * @param txLifecycleMgr
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
+
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
 
 }
