@@ -11,7 +11,7 @@ import org.oasisopen.sca.NoSuchServiceException;
 
 import com.tuscanyscatours.payment.Payment;
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -51,7 +51,8 @@ public class PaymentLauncher {
         nodeMgr.loadConupConf("Payment", "oldVersion");
 		ComponentObject paymentCompObj = nodeMgr.getComponentObject("Payment");
 		CompLifecycleManagerImpl paymentCompLifecycleManager = new CompLifecycleManagerImpl(paymentCompObj);
-		paymentCompLifecycleManager.setNode(node);
+//		paymentCompLifecycleManager.setNode(node);
+		nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager("Payment", paymentCompLifecycleManager);
 		TxDepMonitor paymentTxDepMonitor = new TxDepMonitorImpl(paymentCompObj);
 		nodeMgr.setTxDepMonitor("Payment", paymentTxDepMonitor);
@@ -60,7 +61,7 @@ public class PaymentLauncher {
 		
 		DynamicDepManager paymentDepMgr = NodeManager.getInstance().getDynamicDepManager(paymentCompObj.getIdentifier());
 		paymentDepMgr.setTxLifecycleMgr(paymentTxLifecycleMgr);
-		paymentCompLifecycleManager.setDepMgr(paymentDepMgr);
+//		paymentCompLifecycleManager.setDepMgr(paymentDepMgr);
 		
 		CommServerManager.getInstance().start("Payment");
         
@@ -71,7 +72,7 @@ public class PaymentLauncher {
         nodeMgr.loadConupConf("CustomerRegistry", "oldVersion");
 		ComponentObject customerRegistryCompObj = nodeMgr.getComponentObject("CustomerRegistry");
 		CompLifecycleManagerImpl customerRegistryCompLifecycleManager = new CompLifecycleManagerImpl(customerRegistryCompObj);
-		customerRegistryCompLifecycleManager.setNode(node);
+//		customerRegistryCompLifecycleManager.setNode(node);
 		nodeMgr.setCompLifecycleManager("CustomerRegistry", customerRegistryCompLifecycleManager);
 		TxDepMonitor customerRegistryTxDepMonitor = new TxDepMonitorImpl(customerRegistryCompObj);
 		nodeMgr.setTxDepMonitor("CustomerRegistry", customerRegistryTxDepMonitor);
@@ -80,7 +81,7 @@ public class PaymentLauncher {
 		
 		DynamicDepManager customerRegistryDepMgr = NodeManager.getInstance().getDynamicDepManager(customerRegistryCompObj.getIdentifier());
 		customerRegistryDepMgr.setTxLifecycleMgr(customerRegistryTxLifecycleMgr);
-		customerRegistryCompLifecycleManager.setDepMgr(customerRegistryDepMgr);
+//		customerRegistryCompLifecycleManager.setDepMgr(customerRegistryDepMgr);
 		
 		CommServerManager.getInstance().start("CustomerRegistry");
         
@@ -91,7 +92,7 @@ public class PaymentLauncher {
         nodeMgr.loadConupConf("EmailGateway", "oldVersion");
 		ComponentObject emailGatewayCompObj = nodeMgr.getComponentObject("EmailGateway");
 		CompLifecycleManagerImpl emailGatewayCompLifecycleManager = new CompLifecycleManagerImpl(emailGatewayCompObj);
-		emailGatewayCompLifecycleManager.setNode(node);
+//		emailGatewayCompLifecycleManager.setNode(node);
 		nodeMgr.setCompLifecycleManager("EmailGateway", emailGatewayCompLifecycleManager);
 		TxDepMonitor emailGatewayTxDepMonitor = new TxDepMonitorImpl(emailGatewayCompObj);
 		nodeMgr.setTxDepMonitor("EmailGateway", emailGatewayTxDepMonitor);
@@ -100,7 +101,7 @@ public class PaymentLauncher {
 		
 		DynamicDepManager emailGatewayDepMgr = NodeManager.getInstance().getDynamicDepManager(emailGatewayCompObj.getIdentifier());
 		emailGatewayDepMgr.setTxLifecycleMgr(emailGatewayTxLifecycleMgr);
-		emailGatewayCompLifecycleManager.setDepMgr(emailGatewayDepMgr);
+//		emailGatewayCompLifecycleManager.setDepMgr(emailGatewayDepMgr);
 		
 		CommServerManager.getInstance().start("EmailGateway");
         
@@ -111,7 +112,7 @@ public class PaymentLauncher {
         nodeMgr.loadConupConf("CreditCardPayment", "oldVersion");
 		ComponentObject creditCardPaymentCompObj = nodeMgr.getComponentObject("CreditCardPayment");
 		CompLifecycleManagerImpl creditCardPaymentCompLifecycleManager = new CompLifecycleManagerImpl(creditCardPaymentCompObj);
-		creditCardPaymentCompLifecycleManager.setNode(node);
+//		creditCardPaymentCompLifecycleManager.setNode(node);
 		nodeMgr.setCompLifecycleManager("CreditCardPayment", creditCardPaymentCompLifecycleManager);
 		TxDepMonitor creditCardPaymentTxDepMonitor = new TxDepMonitorImpl(creditCardPaymentCompObj);
 		nodeMgr.setTxDepMonitor("CreditCardPayment", creditCardPaymentTxDepMonitor);

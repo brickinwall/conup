@@ -9,7 +9,7 @@ import org.apache.tuscany.sca.node.ContributionLocationHelper;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
@@ -52,7 +52,8 @@ public class CurrencyConverterLauncher {
         nodeMgr.loadConupConf("CurrencyConverter", "oldVersion");
 		ComponentObject currencyCompObj = nodeMgr.getComponentObject("CurrencyConverter");
 		CompLifecycleManagerImpl currencyCompLifecycleManager = new CompLifecycleManagerImpl(currencyCompObj);
-		currencyCompLifecycleManager.setNode(node);
+//		currencyCompLifecycleManager.setNode(node);
+		nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager("CurrencyConverter", currencyCompLifecycleManager);
 		TxDepMonitor currencyTxDepMonitor = new TxDepMonitorImpl(currencyCompObj);
 		nodeMgr.setTxDepMonitor("CurrencyConverter", currencyTxDepMonitor);
@@ -61,7 +62,7 @@ public class CurrencyConverterLauncher {
 		
 		DynamicDepManager currencyDepMgr = NodeManager.getInstance().getDynamicDepManager(currencyCompObj.getIdentifier());
 		currencyDepMgr.setTxLifecycleMgr(currencyTxLifecycleMgr);
-		currencyCompLifecycleManager.setDepMgr(currencyDepMgr);
+//		currencyCompLifecycleManager.setDepMgr(currencyDepMgr);
 		
 		CommServerManager.getInstance().start("CurrencyConverter");
         

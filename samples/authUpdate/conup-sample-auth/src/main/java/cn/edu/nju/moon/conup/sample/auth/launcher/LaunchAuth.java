@@ -23,7 +23,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 
@@ -56,16 +56,20 @@ public class LaunchAuth {
 //        CompLifecycleManagerImpl.getInstance("AuthComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
-		compLifecycleManager.setNode(node);
-		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
-		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+//        compLifecycleManager.setNode(node);
+        nodeMgr.setTuscanyNode(node);
+        nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
+
+        TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
 		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		
+		
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
-		compLifecycleManager.setDepMgr(depMgr);
+		depMgr.setCompLifeCycleMgr(compLifecycleManager);
+//		compLifecycleManager.setDepMgr(depMgr);
 		
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
         
@@ -124,13 +128,13 @@ public class LaunchAuth {
 	}
 	
 	public static void sendOndemandRqst() {
-		CompLifecycleManager compLcMgr;
+		CompLifeCycleManager compLcMgr;
 		NodeManager nodeMgr;
 		DynamicDepManager depMgr;
 		OndemandSetupHelper ondemandHelper;
 		String compIdentifier = "AuthComponent";
-		compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 		nodeMgr = NodeManager.getInstance();
+		compLcMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 		ondemandHelper.ondemandSetup();
