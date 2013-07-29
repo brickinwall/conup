@@ -39,13 +39,17 @@ import org.codehaus.jackson.node.POJONode;
  * </ul> 
  */
 public class JsonRpc10Request extends JsonRpcRequest {
+    // add for conup
+    protected String invocationCtx;
 	
     public JsonRpc10Request(String id, String method, Object[] params) {
         super(JsonNodeFactory.instance.textNode(id), method, params);
     }
     
     public JsonRpc10Request(String id, String method, Object[] params, String obj) {
-        super(JsonNodeFactory.instance.textNode(id), method, params, obj);
+        super(JsonNodeFactory.instance.textNode(id), method, params);
+        this.invocationCtx = obj;
+        jsonNode.put("InvocationContext", invocationCtx);
     }
 
     public JsonRpc10Request(ObjectNode req) {
@@ -73,5 +77,9 @@ public class JsonRpc10Request extends JsonRpcRequest {
         JacksonHelper.MAPPER.writeValue(os, getJsonNode());
 
     }
+    
+    public String getInvocationCtx() {
+		return this.invocationCtx;
+	}
 
 }
