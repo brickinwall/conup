@@ -21,7 +21,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 public class LaunchProc {
@@ -58,7 +58,8 @@ public class LaunchProc {
 //        CompLifecycleManagerImpl.getInstance("ProcComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
-		compLifecycleManager.setNode(node);
+//		compLifecycleManager.setNode(node);
+        nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
 		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
@@ -67,7 +68,7 @@ public class LaunchProc {
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
-		compLifecycleManager.setDepMgr(depMgr);
+//		compLifecycleManager.setDepMgr(depMgr);
         
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
 		
@@ -129,13 +130,13 @@ public class LaunchProc {
 	}
 	
 	public static void sendOndemandRqst(){
-		CompLifecycleManager compLcMgr;
+		CompLifeCycleManager compLcMgr;
 		NodeManager nodeMgr;
 		DynamicDepManager depMgr;
 		OndemandSetupHelper ondemandHelper;
 		String compIdentifier = "ProcComponent";
-		compLcMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
 		nodeMgr = NodeManager.getInstance();
+		compLcMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 		ondemandHelper.ondemandSetup();
