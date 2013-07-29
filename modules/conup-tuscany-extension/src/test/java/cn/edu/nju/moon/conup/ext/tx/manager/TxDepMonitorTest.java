@@ -86,7 +86,8 @@ public class TxDepMonitorTest {
 //		DynamicDepManager ddm = nodeMgr.getDynamicDepManager("AuthComponent");
 		
 //		CompLifecycleManagerImpl compLifecycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance("AuthComponent");
-		compLifecycleMgr.setNode(node);
+//		compLifecycleMgr.setNode(node);
+		nodeMgr.setTuscanyNode(node);
 //		ddm.setCompStatus(CompStatus.NORMAL);
 		
 		

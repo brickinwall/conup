@@ -32,6 +32,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -242,7 +243,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
 //		DynamicDepManager depMgr = ondemandHelper.getDynamicDepManager();
-		if(compLifeCycleMgr.isValid()){
+		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)){
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -275,7 +276,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 						+ ", and confirmed All, trying to change mode to valid");
 				//TODO
 //				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-				compLifeCycleMgr.ondemandSetupIsDone();
+//				compLifeCycleMgr.ondemandSetupIsDone();
+				UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+				updateMgr.ondemandSetupIsDone();
 				// send confirmOndemandSetup(...)
 				sendConfirmOndemandSetup(currentComp);
 			}
@@ -725,7 +728,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}
 		synchronized (this) {
 			// if received all
-			if (isReceivedAll && compLifeCycleMgr.isNormal()) {
+			if (isReceivedAll && compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)) {
 				LOGGER.fine("Received reqOndemandSetup(...) from "
 						+ requestSrcComp);
 				LOGGER.fine("Received all reqOndemandSetup(...)");
@@ -741,11 +744,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				assert depMgr.getRuntimeDeps().size() == 0;
 
 				// change current componentStatus to 'ondemand'
-				compLifeCycleMgr.ondemandSetting();
+//				compLifeCycleMgr.ondemandSetting();
+				UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+				updateMgr.ondemandSetting();
 				// send reqOndemandSetup(...) to parent components
 				sendReqOndemandSetup(parentComponents, currentComp);
 				// onDemandSetUp
-				Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+				Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 				synchronized (ondemandSyncMonitor) {
 					if (compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 						// FOR TEST
@@ -787,7 +792,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				LOGGER.fine(confirmOndemandStatusStr);
 
 				if (isConfirmedAll) {
-					if (compLifeCycleMgr.isValid()) {
+					if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
 						LOGGER.fine("Confirmed all, and component status is valid");
 						return;
 					}
@@ -796,7 +801,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 
 					// change current componentStatus to 'valid'
 //					ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-					compLifeCycleMgr.ondemandSetupIsDone();
+//					compLifeCycleMgr.ondemandSetupIsDone();
+//					UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+					updateMgr.ondemandSetupIsDone();
 					// send confirmOndemandSetup(...)
 					sendConfirmOndemandSetup(currentComp);
 				}

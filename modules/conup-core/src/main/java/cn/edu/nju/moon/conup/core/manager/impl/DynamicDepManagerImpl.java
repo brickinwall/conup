@@ -6,17 +6,16 @@ import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
+import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
-import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
-import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
+import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
@@ -49,7 +48,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void dependenceChanged(String hostComp) {
-		if(compLifeCycleMgr.isTargetComp()){
+		if(compObj.isTargetComp()){
 			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
 			updateMgr.checkFreeness(hostComp);
 		}
@@ -61,18 +60,8 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 	
 	@Override
-	public Algorithm getAlgorithm() {
-		return this.algorithm;
-	}
-
-	@Override
 	public Set<String> getAlgorithmOldVersionRootTxs() {
 		return algorithm.getOldVersionRootTxs(inDepRegistry.getDependences());
-	}
-
-	@Override
-	public CompLifeCycleManager getCompLifeCycleMgr() {
-		return this.compLifeCycleMgr;
 	}
 
 	@Override
@@ -140,7 +129,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
-		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.isValid());
+		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID));
 		return algReadyForUpdate;
 	}
 
@@ -247,6 +236,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.txRegistry = txLifecycleMgr.getTxRegistry();
+	}
+
+	@Override
+	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
+		algorithm.setTxDepRegistry(txDepRegistry);
 	}
 
 }

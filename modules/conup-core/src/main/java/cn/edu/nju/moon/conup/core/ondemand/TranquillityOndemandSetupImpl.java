@@ -29,6 +29,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
@@ -159,7 +160,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		hostComp = currentComp;
 		
 		//change component status to ONDEMAND
-		compLifeCycleMgr.ondemandSetting();
+//		compLifeCycleMgr.ondemandSetting();
+		UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+		updateMgr.ondemandSetting();
 
 		//in this case, it means that current component is the target component for dynamic update
 		if (currentComp.equals(requestSrcComp)) {
@@ -192,9 +195,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		//onDemandSetUp
-		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
-			if(compLifeCycleMgr.isOndemandSetting()){
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)){
 				LOGGER.fine("synchronizing for method onDemandSetUp() in TranquillityOndemandSetupImpl..");
 				onDemandSetUp(currentComp, requestSrcComp);
 			}
@@ -215,7 +218,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		}
 
 		if (isConfirmedAll) {
-			if (compLifeCycleMgr.isValid()) {
+			if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
 				LOGGER.fine("Confirmed all, and component status is valid");
 				return true;
 			}
@@ -229,7 +232,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			// change current componentStatus to 'valid'
 			//TODO dd
 //			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
-			compLifeCycleMgr.ondemandSetupIsDone();
+//			compLifeCycleMgr.ondemandSetupIsDone();
+//			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+			updateMgr.ondemandSetupIsDone();
 			// send confirmOndemandSetup(...)
 			if(!currentComp.equals(requestSrcComp))
 				sendConfirmOndemandSetup(currentComp, requestSrcComp);
@@ -527,7 +532,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	 */
 	public boolean confirmOndemandSetup(String parentComp, String currentComp) {
 		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
-		if (compLifeCycleMgr.isValid()) {
+		if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
 			LOGGER.fine("**** component status is valid, and return");
 			return true;
 		}
@@ -560,7 +565,9 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
 					+ ", and confirmed All, trying to change mode to valid");
 			// TODO
-			compLifeCycleMgr.ondemandSetupIsDone();
+			UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(currentComp);
+			updateMgr.ondemandSetupIsDone();
+//			compLifeCycleMgr.ondemandSetupIsDone();
 //			ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
 			// send confirmOndemandSetup(...) no need to send confirm!!(because ondemand only concerns two components)
 //			sendConfirmOndemandSetup(currentComp);

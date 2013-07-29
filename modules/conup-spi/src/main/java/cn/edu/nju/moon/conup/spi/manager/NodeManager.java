@@ -67,6 +67,8 @@ public class NodeManager{
 	
 	private Map<ComponentObject, InterceptorStub> interceptorStubs;
 	
+	private Object tuscanyNode;
+	
 	private NodeManager(){
 		compObjects = new ConcurrentHashMap<String, ComponentObject>();
 		depMgrs = new ConcurrentHashMap<ComponentObject, DynamicDepManager>();
@@ -86,6 +88,14 @@ public class NodeManager{
 		return nodeManager;
 	}
 	
+	public Object getTuscanyNode() {
+		return tuscanyNode;
+	}
+
+	public void setTuscanyNode(Object tuscanyNode) {
+		this.tuscanyNode = tuscanyNode;
+	}
+
 	/**
 	 * each component has only one CompLifecycleManager
 	 * @param compIdentifier component object identifier
@@ -126,7 +136,7 @@ public class NodeManager{
 			} else{
 				txDepMonitor = txDepMonitors.get(compObj);
 				DynamicDepManager depMgr = depMgrs.get(compObj);
-				depMgr.getAlgorithm().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
+				depMgr.setTxDepRegistry(txDepMonitor.getTxDepRegistry());
 				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
 				ondemandHelpler.getOndemand().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
 			}

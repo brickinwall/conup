@@ -5,11 +5,14 @@ import java.util.logging.Logger;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
+import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
+import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
+import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
@@ -42,6 +45,8 @@ public class UpdateManagerImpl implements UpdateManager {
 	
 	/** DynamicUpdateContext */
 	private DynamicUpdateContext updateCtx = null;
+	
+	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 
 	public UpdateManagerImpl(ComponentObject compObj){
 		setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
@@ -50,9 +55,9 @@ public class UpdateManagerImpl implements UpdateManager {
 
 	@Override
 	public void attemptToUpdate() {
-		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compObj.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
-			if(compLifeCycleMgr.isValid()
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)
 				&& updateCtx != null && updateCtx.isLoaded()){
 				//calculate old version root txs
 				if(!updateCtx.isOldRootTxsInitiated()){
@@ -63,12 +68,13 @@ public class UpdateManagerImpl implements UpdateManager {
 				String freenessConf = compObj.getFreenessConf();
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 				if(freeness.isReadyForUpdate(compObj.getIdentifier())){
-					compLifeCycleMgr.achievedFree();
+//					compLifeCycleMgr.achieveFree();
+					achieveFree();
 				}
 			}
 		}
 		
-		Object updatingSyncMonitor = compLifeCycleMgr.getUpdatingSyncMonitor();
+		Object updatingSyncMonitor = compObj.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
 			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)){
 				executeUpdate();
@@ -79,12 +85,37 @@ public class UpdateManagerImpl implements UpdateManager {
 	}
 
 	@Override
+	public void achieveFree() {
+		// FOR TEST
+		ExecutionRecorder exeRecorder;
+		exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+		exeRecorder.achievedFree();
+
+		Object validToFreeSyncMonitor = compObj.getValidToFreeSyncMonitor();
+		synchronized (validToFreeSyncMonitor) {
+			CompStatus compStatus = compLifeCycleMgr.getCompStatus();
+			LOGGER.fine("compStatus: " + compStatus);
+			assert compStatus.equals(CompStatus.VALID)
+					|| compStatus.equals(CompStatus.Free);
+			if (compStatus.equals(CompStatus.VALID)) {
+//				compStatus = CompStatus.Free;
+				compLifeCycleMgr.transitToFree();
+				bufferEventType = BufferEventType.EXEUPDATE;
+				notifyInterceptors(bufferEventType);
+
+				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
+				validToFreeSyncMonitor.notifyAll();
+			}
+		}		
+	}
+
+	@Override
 	public void checkFreeness(String hostComp) {
-		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compObj.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			if(isDynamicUpdateRqstRCVD() && getUpdateCtx().isOldRootTxsInitiated()){
 
-				if (compLifeCycleMgr.isValid()) {
+				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
 					attemptToUpdate();
 				}
 			}
@@ -141,7 +172,7 @@ public class UpdateManagerImpl implements UpdateManager {
 			isUpdated = true;
 			compIdentifier = compObj.getIdentifier();
 			
-			compLifeCycleMgr.updating();
+			compLifeCycleMgr.transitToUpdating();
 		}
 		
 		//update
@@ -277,11 +308,12 @@ public class UpdateManagerImpl implements UpdateManager {
 			//initiate updator
 			compUpdator.initUpdator(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier);
 //			depMgr.updateIsReceived();
-			compLifeCycleMgr.updateIsReceived();
+//			compLifeCycleMgr.updateIsReceived();
+			compObj.updateIsReceived();
 		}
 		
 		//on-demand setup
-		if(compLifeCycleMgr.isNormal() ){
+		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 			OndemandSetupHelper ondemandHelper;
 			ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 			ondemandHelper.ondemandSetup();
@@ -301,10 +333,148 @@ public class UpdateManagerImpl implements UpdateManager {
 
 			LOGGER.fine("removeOldRootTx(ALG&&BUFFER) txID:" + rootTxId);
 
-			if (compLifeCycleMgr.isValid()) {
+			if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
 				attemptToUpdate();
 			}
 		}
 	}
 
+	@Override
+	public boolean isUpdatedTo(String newVerId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void dynamicUpdateIsDone() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean uninstall(String contributionURI) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean install(String contributionURI, String contributionURL) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void ondemandSetupIsDone() {
+		Object ondemandSyncMonitor = compObj.getOndemandSyncMonitor();
+		CompStatus compStatus = compLifeCycleMgr.getCompStatus();
+		synchronized (ondemandSyncMonitor) {
+			//FOR TEST
+//			ExecutionRecorder exeRecorder;
+//			exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+//			exeRecorder.ondemandIsDone();
+//			
+//			compStatus = CompStatus.VALID;
+//			OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+//			ondemandSetupHelper.resetIsOndemandRqstRcvd();
+//			
+//			LOGGER.info("--------------ondemand setup is done, now notify all...------\n\t compStatus:" + compStatus);
+//			ondemandSetupHelper.onDemandIsDone();
+//			ondemandSyncMonitor.notifyAll();
+//			if(isUpdateRequestReceived){
+//				algorithm.initiate(compObj.getIdentifier());
+//			}
+			
+			assert compStatus.equals(CompStatus.ONDEMAND) || compStatus.equals(CompStatus.VALID);
+			if(compStatus.equals(CompStatus.ONDEMAND)){
+				//FOR TEST
+				ExecutionRecorder exeRecorder;
+				exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
+				exeRecorder.ondemandIsDone();
+				
+//				compStatus = CompStatus.VALID;
+				compLifeCycleMgr.transitToValid();
+//				if(isUpdateRequestReceived){
+				if(compObj.isTargetComp()){
+					bufferEventType = BufferEventType.VALIDTOFREE;
+//					CompLifecycleManager clMgr = NodeManager.getInstance().getCompLifecycleManager(compObj.getIdentifier());
+//					UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
+					if (!getUpdateCtx().isOldRootTxsInitiated()) {
+						initOldRootTxs();
+//						Printer printer = new Printer();
+//						printer.printTxs(LOGGER, getTxs());
+						
+					}
+					
+				} else {
+					bufferEventType = BufferEventType.WAITFORREMOTEUPDATE;
+				}
+				notifyInterceptors(bufferEventType);
+//				System.out.println("in ddm:" + bufferEventType);
+				
+				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
+				ondemandSetupHelper.onDemandIsDone();
+				ondemandSyncMonitor.notifyAll();
+				LOGGER.info("-------------- " + compObj.getIdentifier() + "ondemand setup is done, now notify all...------\n\n");
+				
+//				if(isUpdateRequestReceived){
+				if(compObj.isTargetComp()){
+					depMgr.ondemandSetupIsDone();
+				}
+			}
+		}
+	}
+
+	private void notifyInterceptors(BufferEventType eventType){
+		InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(compObj.getIdentifier());
+		interceptorStub.notifyInterceptors(eventType);
+	}
+
+	@Override
+	public void remoteDynamicUpdateIsDone() {
+		Object waitingRemoteCompUpdateDoneMonitor = compObj.getWaitingRemoteCompUpdateDoneMonitor();
+		synchronized (waitingRemoteCompUpdateDoneMonitor) {
+			CompStatus compStatus = compLifeCycleMgr.getCompStatus();
+			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.VALID);
+//			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.VALID)){
+//				LOGGER.warning("CompStatus is supposed to be NORMAL or VALID, but it's " + compStatus);
+//			}
+//			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
+			if(compStatus.equals(CompStatus.VALID)){
+//				compStatus = CompStatus.NORMAL;
+				compLifeCycleMgr.transitToNormal();
+				//TODO updateManager
+				bufferEventType = BufferEventType.NOTHING;
+				notifyInterceptors(bufferEventType);
+//				notifyObservers(bufferEventType);
+//				System.out.println("in ddm:" + bufferEventType);
+				
+				String compIdentifier = compObj.getIdentifier();
+				LOGGER.info(compIdentifier + " remote update is done, CompStatus: " + compStatus + ", now notify all");
+				waitingRemoteCompUpdateDoneMonitor.notifyAll();
+				
+				// add for experiments
+				// record update cost time
+				if(compIdentifier.equals("Coordination"))
+					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
+			}
+		}
+	}
+
+	@Override
+	public void ondemandSetting() {
+		Object ondemandSyncMonitor = compObj.getOndemandSyncMonitor();
+		synchronized (ondemandSyncMonitor) {
+			CompStatus compStatus = compLifeCycleMgr.getCompStatus();
+//			if(!compStatus.equals(CompStatus.NORMAL) && !compStatus.equals(CompStatus.ONDEMAND))
+//				System.out.println(compObj.getIdentifier() + "--> compStatus:" + compStatus);
+			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
+			if(compStatus.equals(CompStatus.NORMAL)){
+//				this.compStatus = CompStatus.ONDEMAND;
+				compLifeCycleMgr.transitToOndemand();
+				bufferEventType = BufferEventType.ONDEMAND;
+				notifyInterceptors(bufferEventType);
+//				notifyObservers(bufferEventType);
+			}
+		}
+	}
 }

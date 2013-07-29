@@ -28,6 +28,48 @@ public class ComponentObject {
 	/** implementation type of the component */
 	private String implType = null;
 	
+	/** used to identify whether received update request */
+	private boolean isTargetComp = false;
+	
+	private Object ondemandSyncMonitor = new Object();
+	
+	private Object validToFreeSyncMonitor = new Object();
+	
+	private Object updatingSyncMonitor = new Object();
+	
+	/** semaphore which is used to synchronize the non-target component */
+	private Object waitingRemoteCompUpdateDoneMonitor = new Object();
+	
+	private Object freezeSyncMonitor = new Object();
+	
+	public Object getOndemandSyncMonitor() {
+		return ondemandSyncMonitor;
+	}
+
+	public Object getValidToFreeSyncMonitor() {
+		return validToFreeSyncMonitor;
+	}
+
+	public Object getUpdatingSyncMonitor() {
+		return updatingSyncMonitor;
+	}
+
+	public Object getWaitingRemoteCompUpdateDoneMonitor() {
+		return waitingRemoteCompUpdateDoneMonitor;
+	}
+
+	public Object getFreezeSyncMonitor() {
+		return freezeSyncMonitor;
+	}
+
+	public void updateIsReceived() {
+		isTargetComp = true;
+	}
+
+	public boolean isTargetComp() {
+		return isTargetComp;
+	}
+	
 	public Set<String> getStaticInDeps() {
 		return staticInDeps;
 	}
@@ -127,6 +169,10 @@ public class ComponentObject {
 
 	public void setStaticDeps(Set<String> staticDeps) {
 		this.staticDeps = staticDeps;
+	}
+
+	public void updateIsDone() {
+		this.isTargetComp = false;
 	}
 
 	

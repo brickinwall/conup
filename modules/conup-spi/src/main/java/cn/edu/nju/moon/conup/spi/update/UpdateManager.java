@@ -72,4 +72,22 @@ public interface UpdateManager {
 
 	public void removeAlgorithmOldRootTx(String rootTxId);
 	
+	public boolean isUpdatedTo(String newVerId);
+	
+	public void dynamicUpdateIsDone();
+	
+	public boolean uninstall(String contributionURI);
+	
+	public boolean install(String contributionURI, String contributionURL);
+
+	/**
+	 * ondemand setup finished, need to change CompStatus and notify interceptors
+	 */
+	public void ondemandSetupIsDone();
+
+	void achieveFree();
+
+	public void remoteDynamicUpdateIsDone();
+
+	public void ondemandSetting();
 }

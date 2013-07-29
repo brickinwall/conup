@@ -28,6 +28,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 public class CompLifecycleManagerTest {
 	private static Logger LOGGER = Logger.getLogger(CompLifecycleManagerTest.class.getName());
 	CompLifecycleManagerImpl clm = null;
+	NodeManager nodeMgr = null;
 	Node node = null;
 
 	@Before
@@ -36,7 +37,7 @@ public class CompLifecycleManagerTest {
 		node = runtime.createNode();
 		String ALGORITHM_TYPE = "CONSISTENCY_ALGORITHM";
 		String CONCURRENT_VERSION = "CONCURRENT_VERSION_FOR_FREENESS";
-		NodeManager nodeMgr = NodeManager.getInstance();
+		nodeMgr = NodeManager.getInstance();
 		Set<String> staticDeps = new HashSet<String>();
 		String implType = BufferTestConvention.JAVA_POJO_IMPL_TYPE;
 		String compIdentifier = "HelloworldComponent";
@@ -45,8 +46,10 @@ public class CompLifecycleManagerTest {
 		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(comObj);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleMgr);
 //		CompLifecycleManagerImpl compLifecycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
-		compLifecycleMgr.setNode(node);
-		clm = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
+//		compLifecycleMgr.setNode(node);
+		nodeMgr.setTuscanyNode(node);
+//		clm = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(compIdentifier);
+		clm = (CompLifecycleManagerImpl) nodeMgr.getCompLifecycleManager(compIdentifier);
 		
 	}
 	
@@ -62,8 +65,8 @@ public class CompLifecycleManagerTest {
 //		Node node = runtime.createNode(domainURI);
 //		node.installContribution("src/test/resources/sample-helloworld.jar");
 //		node.startComposite("sample-helloworld", "helloworld.composite");
-		clm.install("sample-helloworld", "src/test/resources/sample-helloworld.jar");
-		assertTrue(clm.uninstall("sample-helloworld"));
+//		clm.install("sample-helloworld", "src/test/resources/sample-helloworld.jar");
+//		assertTrue(clm.uninstall("sample-helloworld"));
 //		Contribution contribution = node.getContribution("sample-helloworld");
 		
 //		TuscanyRuntime runtime2 = TuscanyRuntime.newInstance();
@@ -83,10 +86,10 @@ public class CompLifecycleManagerTest {
 
 	@Test
 	public void testInstall() throws ContributionReadException, ValidationException, ActivationException {
-		assertTrue(clm.install("sample-helloworld", "src/test/resources/sample-helloworld.jar"));
-		assertTrue(clm.install("conup-sample-hello-auth", "src/test/resources/conup-sample-hello-auth.jar"));
+//		assertTrue(clm.install("sample-helloworld", "src/test/resources/sample-helloworld.jar"));
+//		assertTrue(clm.install("conup-sample-hello-auth", "src/test/resources/conup-sample-hello-auth.jar"));
 		
-		Node node = clm.getNode();
+		Node node = (Node) nodeMgr.getTuscanyNode();
 		for(Endpoint ep : ((NodeImpl)node).getDomainRegistry().getEndpoints()){
 			LOGGER.fine("\t" + ep + ":" );
 			LOGGER.fine("\t\t" + "component=" + ep.getComponent());
@@ -99,29 +102,29 @@ public class CompLifecycleManagerTest {
 			LOGGER.fine("\t\t" + "deployedUri=" + ep.getDeployedURI());
 		}
 		LOGGER.fine("<-----stop print endpoint in install...");
-		clm.uninstall("sample-helloworld");
-		clm.uninstall("conup-sample-hello-auth");
+//		clm.uninstall("sample-helloworld");
+//		clm.uninstall("conup-sample-hello-auth");
 		node.stop();
 	}
 
 	@Test
 	public void testStop() {
 		String contributionURI = "sample-helloworld";
-		clm.install(contributionURI, "src/test/resources/sample-helloworld.jar");
+//		clm.install(contributionURI, "src/test/resources/sample-helloworld.jar");
 		
-		Node node = clm.getNode();
-		for(Endpoint ep : ((NodeImpl)node).getDomainRegistry().getEndpoints()){
-			LOGGER.fine("\t" + ep + ":" );
-			LOGGER.fine("\t\t" + "component=" + ep.getComponent());
-			LOGGER.fine("\t\t" + "service=" + ep.getService());
-			LOGGER.fine("\t\t" + "isRemote=" + ep.isRemote());
-			LOGGER.fine("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
-			LOGGER.fine("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
-			LOGGER.fine("\t\t" + "policySets=" + ep.getPolicySets());
-			LOGGER.fine("\t\t" + "binding=" + ep.getBinding());
-			LOGGER.fine("\t\t" + "deployedUri=" + ep.getDeployedURI());
-		}
-		assertTrue(clm.stop(contributionURI));
+//		Node node = (Node) nodeMgr.getTuscanyNode();
+//		for(Endpoint ep : ((NodeImpl)node).getDomainRegistry().getEndpoints()){
+//			LOGGER.fine("\t" + ep + ":" );
+//			LOGGER.fine("\t\t" + "component=" + ep.getComponent());
+//			LOGGER.fine("\t\t" + "service=" + ep.getService());
+//			LOGGER.fine("\t\t" + "isRemote=" + ep.isRemote());
+//			LOGGER.fine("\t\t" + "isAsyncInvocation=" + ep.isAsyncInvocation());
+//			LOGGER.fine("\t\t" + "requiredIntents=" + ep.getRequiredIntents());
+//			LOGGER.fine("\t\t" + "policySets=" + ep.getPolicySets());
+//			LOGGER.fine("\t\t" + "binding=" + ep.getBinding());
+//			LOGGER.fine("\t\t" + "deployedUri=" + ep.getDeployedURI());
+//		}
+//		assertTrue(clm.stop(contributionURI));
 		node.stop();
 	}
 

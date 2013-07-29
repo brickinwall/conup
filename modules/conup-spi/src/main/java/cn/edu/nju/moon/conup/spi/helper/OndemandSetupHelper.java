@@ -68,7 +68,7 @@ public interface OndemandSetupHelper{
 	/**
 	 * reset isOndemandRqstRcvd to false
 	 */
-	public void resetIsOndemandRqstRcvd();
+//	public void resetIsOndemandRqstRcvd();
 	
 	/**
 	 * do cleanup works when ondemand is done

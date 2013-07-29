@@ -3,8 +3,10 @@ package cn.edu.nju.moon.conup.ext.comp.manager;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
+import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
@@ -27,7 +29,7 @@ public class AttemptUpdateThread extends Thread {
 	
 	public void run(){
 		//waiting while on-demand setup
-		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
 				LOGGER.fine("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
@@ -41,11 +43,11 @@ public class AttemptUpdateThread extends Thread {
 		}
 		
 		//calculate old version root txs
-		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getCompObject().getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			DynamicUpdateContext updateCtx;
 			updateCtx = updateManager.getUpdateCtx();
-			if(compLifeCycleMgr.isValid()
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)
 					&& updateManager.isDynamicUpdateRqstRCVD()){
 				if(!updateCtx.isOldRootTxsInitiated()){
 					updateManager.initOldRootTxs();
@@ -55,7 +57,8 @@ public class AttemptUpdateThread extends Thread {
 				String freenessConf = compLifeCycleMgr.getCompObject().getFreenessConf();
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 				if(freeness.isReadyForUpdate(compLifeCycleMgr.getCompObject().getIdentifier())){
-					compLifeCycleMgr.achievedFree();
+//					compLifeCycleMgr.achieveFree();
+					updateManager.achieveFree();
 				} else{
 					try {
 						LOGGER.fine("not ready for update yet, suspend AttemptUpdateThread------------------");

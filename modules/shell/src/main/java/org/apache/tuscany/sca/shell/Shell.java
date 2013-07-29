@@ -100,7 +100,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
-import cn.edu.nju.moon.conup.spi.update.CompLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
  * A little SCA command shell.
@@ -204,7 +204,7 @@ public class Shell {
 							ComponentObject compObj = nodeMgr.getComponentObject(componentName);
 							
 							// create CompLifecycleManager, TxDepMonitor, TxLifecycleMgr
-							CompLifecycleManager compLifecycleMgr = new CompLifecycleManagerImpl(compObj);
+							CompLifeCycleManager compLifecycleMgr = new CompLifecycleManagerImpl(compObj);
 //							compLifecycleMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
 //							compLifecycleMgr.setCompObject(compObj);
 //							compLifecycleMgr.setDepMgr(nodeMgr.getDynamicDepManager(componentName));
@@ -218,11 +218,12 @@ public class Shell {
 							
 							DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 							depMgr.setTxLifecycleMgr(txLifecycleMgr);
-							compLifecycleMgr.setDepMgr(depMgr);
+//							compLifecycleMgr.setDepMgr(depMgr);
 							
 							OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
 							
-							((CompLifecycleManagerImpl)compLifecycleMgr).setNode(node);
+//							((CompLifecycleManagerImpl)compLifecycleMgr).setNode(node);
+							nodeMgr.setTuscanyNode(node);
 						    CommServerManager.getInstance().start(componentName);
 						}
 					}

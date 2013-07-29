@@ -134,7 +134,7 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 //		DynamicDepManager dynamicDepMgr = nodeManager.getDynamicDepManager(hostComp);
 		compLifeCycleMgr = nodeManager.getCompLifecycleManager(hostComp);
 		
-		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getCompObject().getValidToFreeSyncMonitor();
 		LOGGER.fine("txID:" + rootTxId + " hostComp:" + hostComp + " compStatus:" + compLifeCycleMgr.getCompStatus());
 		synchronized (validToFreeSyncMonitor) {
 			updateMgr.removeAlgorithmOldRootTx(rootTxId);
@@ -256,7 +256,7 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
 		CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(hostComp);
 		
-		Object ondemandMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+		Object ondemandMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
 			depMgr.getTxs().remove(fakeSubTx);
 		}

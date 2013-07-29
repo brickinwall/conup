@@ -52,7 +52,8 @@ public class CommInfosTest {
 		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(comObj);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleMgr);
 //		CompLifecycleManagerImpl compLifecycleMgr = CompLifecycleManagerImpl.getInstance(compIdentifier);
-		compLifecycleMgr.setNode(node);
+//		compLifecycleMgr.setNode(node);
+		nodeMgr.setTuscanyNode(node);
 	}
 
 	@Test

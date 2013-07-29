@@ -129,7 +129,7 @@ public class BufferInterceptor implements Interceptor {
 		InterceptorCache cache = InterceptorCache.getInstance(hostComp);
 		TransactionContext txCtx = cache.getTxCtx(threadID);
 
-		Object validToFreeSyncMonitor = compLifeCycleMgr.getValidToFreeSyncMonitor();
+		Object validToFreeSyncMonitor = compLifeCycleMgr.getCompObject().getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			// calculate old version root txs
 			if (!updateMgr.getUpdateCtx().isOldRootTxsInitiated()) {
@@ -147,7 +147,8 @@ public class BufferInterceptor implements Interceptor {
 				}
 			}
 			if (freeness.isReadyForUpdate(hostComp)) {
-				compLifeCycleMgr.achievedFree();
+//				compLifeCycleMgr.achieveFree();
+				updateMgr.achieveFree();
 			} else if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(),
 					hostComp, txCtx, true)) {
 				LOGGER.info("ThreadID="	+ getThreadID() + "compStatus=" + compLifeCycleMgr.getCompStatus() + "----------------validToFreeSyncMonitor.wait();buffer------------root:"	+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());

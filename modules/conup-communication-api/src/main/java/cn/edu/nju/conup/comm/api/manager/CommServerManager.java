@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.assembly.ComponentReference;
 import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.impl.NodeImpl;
@@ -13,7 +14,7 @@ import org.apache.tuscany.sca.runtime.DomainRegistry;
 
 import cn.edu.nju.moon.conup.comm.api.server.CommServer;
 import cn.edu.nju.moon.conup.comm.api.utils.CompCommAddress;
-import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**
  * @author rgc
@@ -117,9 +118,10 @@ public class CommServerManager {
 
 		synchronized (compNameToAddressInfo) {
 			if(compNameToAddressInfo.size() == 0){
-				CompLifecycleManagerImpl compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(srcComp);
-				NodeImpl node = (NodeImpl) compLifeCycleMgr.getNode();
-				DomainRegistry domainRegistry = node.getDomainRegistry();
+//				CompLifecycleManagerImpl compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(srcComp);
+//				NodeImpl node = (NodeImpl) compLifeCycleMgr.getNode();
+				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
+				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
 				for(Endpoint ep : endpoints){
 					String compName = ep.getComponent().getName();
@@ -150,10 +152,10 @@ public class CommServerManager {
 	 * @return
 	 */
 	public CompCommAddress getInfos(String hostComponentIdentifier) {
-		CompLifecycleManagerImpl compLifecycleMgr = CompLifecycleManagerImpl.getInstance(hostComponentIdentifier);
-		
-		NodeImpl node = (NodeImpl) compLifecycleMgr.getNode();
-		DomainRegistry domainRegistry = node.getDomainRegistry();
+//		CompLifecycleManagerImpl compLifecycleMgr = CompLifecycleManagerImpl.getInstance(hostComponentIdentifier);
+//		NodeImpl node = (NodeImpl) compLifecycleMgr.getNode();
+		Node node = (Node) NodeManager.getInstance().getTuscanyNode();
+		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 		Collection<Endpoint> endpoints = domainRegistry.getEndpoints();
 		
 		String ip = null;

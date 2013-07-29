@@ -68,7 +68,8 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 		
 //		Set<String> oldVersionRootTxIds = depMgr.getOldVersionRootTxs();
 		if(tuscanyNode == null){
-			tuscanyNode = compLcMgr.getNode();
+//			tuscanyNode = compLcMgr.getNode();
+			tuscanyNode = (Node) nodeMgr.getTuscanyNode();
 		}
 		Map<String, DeployedComposite> startedComposites = ((NodeImpl)tuscanyNode).getStartedComposites();
 		DeployedComposite dc = startedComposites.get(contributionURI + "/" + compositeURI);

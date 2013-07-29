@@ -24,7 +24,9 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 //import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
@@ -156,10 +158,10 @@ public class QuiescenceImpl implements Algorithm {
 	 */
 	private void doOndemand(TransactionContext txContext) {
 		// sleep until current status become valid
-		Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+		Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			try {
-				if (compLifeCycleMgr.isOndemandSetting()) {
+				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 					LOGGER.fine("----------------ondemandSyncMonitor.wait();Quiescence algorithm------------");
 					ondemandSyncMonitor.wait();
 				}
@@ -182,9 +184,9 @@ public class QuiescenceImpl implements Algorithm {
 			rootTx = txCtx.getRootTx();
 			if(rootTx.equals(txCtx.getCurrentTx()))
 				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
-			Object ondemandSyncMonitor = compLifeCycleMgr.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
-				if( compLifeCycleMgr.isNormal()){
+				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
 //					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
@@ -193,7 +195,7 @@ public class QuiescenceImpl implements Algorithm {
 					return;
 				} else{
 					try {
-						if (compLifeCycleMgr.isOndemandSetting()) {
+						if (compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 							LOGGER.fine("----------------ondemandSyncMonitor.wait();quiesence algorithm------------");
 							ondemandSyncMonitor.wait();
 							doValid(txCtx);
@@ -251,7 +253,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	private void doFree(TransactionContext txContext) {
-		Object updatingMonitor = compLifeCycleMgr.getUpdatingSyncMonitor();
+		Object updatingMonitor = compLifeCycleMgr.getCompObject().getUpdatingSyncMonitor();
 		synchronized (updatingMonitor) {
 			try {
 				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)) {
@@ -402,9 +404,12 @@ public class QuiescenceImpl implements Algorithm {
 					ackPassivate(hostComp, reqComp);
 				}
 				
-				if(compLifeCycleMgr.isTargetComp()){
+				if(compLifeCycleMgr.getCompObject().isTargetComp()){
 					LOGGER.info("**** QUIESCENCE has achieved for component: " + hostComp + "***********");
-					compLifeCycleMgr.achievedFree();
+//					compLifeCycleMgr.achieveFree();
+					assert hostComp.equals(compLifeCycleMgr.getCompObject().getIdentifier());
+					UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(hostComp);
+					updateMgr.achieveFree();
 				}
 			}
 		}
@@ -461,7 +466,9 @@ public class QuiescenceImpl implements Algorithm {
 		isPassivateRCVD = false;
 		PASSIVATED = false;
 		
-		compLifeCycleMgr.remoteDynamicUpdateIsDone();
+//		compLifeCycleMgr.remoteDynamicUpdateIsDone();
+		UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(hostComp);
+		updateMgr.remoteDynamicUpdateIsDone();
 		return true;
 	}
 
