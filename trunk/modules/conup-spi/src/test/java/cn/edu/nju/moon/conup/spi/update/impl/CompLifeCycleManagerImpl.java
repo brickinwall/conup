@@ -26,12 +26,6 @@ public class CompLifeCycleManagerImpl implements CompLifeCycleManager {
 	}
 
 	@Override
-	public boolean isOndemandSetupRequired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public CompStatus getCompStatus() {
 		// TODO Auto-generated method stub
 		return null;

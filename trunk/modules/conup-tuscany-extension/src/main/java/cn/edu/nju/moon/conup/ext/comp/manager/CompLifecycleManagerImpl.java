@@ -1,17 +1,13 @@
 package cn.edu.nju.moon.conup.ext.comp.manager;
 
-import org.apache.tuscany.sca.Node;
-
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
-import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -34,42 +30,9 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 		return compStatus;
 	}
 
-	@Override
-	public void transitToNormal(){
-		synchronized (compStatus) {
-			// only when CompStatus is valid or updating, it can be transitToNormal
-			if(compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.UPDATING)){
-				compStatus = CompStatus.NORMAL;
-			}
-		}
-	}
-
-	@Override
-	public boolean isOndemandSetupRequired() {
-		return compStatus.equals(CompStatus.NORMAL) 
-				|| compStatus.equals(CompStatus.ONDEMAND);
-	}
-	
-	@Override
-	public void transitToUpdating(){
-		assert compStatus.equals(CompStatus.Free);
-		compStatus = CompStatus.UPDATING;
-	}
-	
-	@Override
-	public void transitToFree(){
-		assert compStatus.equals(CompStatus.VALID);
-		compStatus = CompStatus.Free;
-	}
-	
 	public CompLifecycleManagerImpl(ComponentObject compObj){
 		this.compObj = compObj;
 	}
-	
-	public static Logger getLogger() {
-		return LOGGER;
-	}
-	
 	
 	@Override
 	public boolean stop(String contributionURI){
@@ -116,13 +79,35 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	}
 
 	@Override
-	public void transitToValid() {
-		this.compStatus = CompStatus.VALID;
+	public void transitToNormal(){
+		synchronized (compStatus) {
+			// only when CompStatus is valid or updating, it can be transitToNormal
+			if(compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.UPDATING)){
+				compStatus = CompStatus.NORMAL;
+			}
+		}
 	}
 
 	@Override
 	public void transitToOndemand() {
 		this.compStatus = CompStatus.ONDEMAND;
+	}
+
+	@Override
+	public void transitToValid() {
+		this.compStatus = CompStatus.VALID;
+	}
+
+	@Override
+	public void transitToUpdating(){
+		assert compStatus.equals(CompStatus.Free);
+		compStatus = CompStatus.UPDATING;
+	}
+
+	@Override
+	public void transitToFree(){
+		assert compStatus.equals(CompStatus.VALID);
+		compStatus = CompStatus.Free;
 	}
 
 }
