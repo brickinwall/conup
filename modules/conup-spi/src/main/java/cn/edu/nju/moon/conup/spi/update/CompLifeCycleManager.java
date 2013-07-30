@@ -20,7 +20,7 @@ public interface CompLifeCycleManager {
 	 * return true meands need to wait for ondemand finished
 	 * @return
 	 */
-	boolean isOndemandSetupRequired();
+//	boolean isOndemandSetupRequired();
 
 	/**
 	 * whethe the component is updated to new version?

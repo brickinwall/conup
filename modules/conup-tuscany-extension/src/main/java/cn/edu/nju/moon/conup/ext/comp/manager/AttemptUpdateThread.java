@@ -33,7 +33,9 @@ public class AttemptUpdateThread extends Thread {
 		synchronized (ondemandSyncMonitor) {
 			try {
 				LOGGER.fine("in compLifeCycleMg, before depMgr.isOndemandSetupRequired()");
-				if (compLifeCycleMgr.isOndemandSetupRequired()) {
+//				if (compLifeCycleMgr.isOndemandSetupRequired()) {
+				CompStatus compStatus = compLifeCycleMgr.getCompStatus();
+				if(compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND)){
 					LOGGER.fine("----------------in compLifeCycleMg, ondemandSyncMonitor.wait();compLifeCycleMg------------");
 					ondemandSyncMonitor.wait();
 				}
