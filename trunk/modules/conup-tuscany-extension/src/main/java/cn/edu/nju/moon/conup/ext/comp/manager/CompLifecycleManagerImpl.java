@@ -75,7 +75,7 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
-		return compStatus.equals(CompStatus.VALID) && depMgr.isReadyForUpdate();
+		return compStatus.equals(CompStatus.Free) || (compStatus.equals(CompStatus.VALID) && depMgr.isReadyForUpdate());
 	}
 
 	@Override
