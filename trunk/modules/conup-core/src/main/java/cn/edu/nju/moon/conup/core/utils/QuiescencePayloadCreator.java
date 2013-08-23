@@ -1,5 +1,8 @@
 package cn.edu.nju.moon.conup.core.utils;
 
+import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+
 /**
  * @author rgc
  * @version Dec 18, 2012 4:24:19 PM
@@ -13,12 +16,12 @@ public class QuiescencePayloadCreator {
 	 * @param operation
 	 * @return
 	 */
-	public static String createPayload(String srcComp, String targetComp, QuiescenceOperationType operation){
+	public static String createPayload(String srcComp, String targetComp, OperationType operation){
 		String result = null;
 		
-		result = QuiescencePayload.SRC_COMPONENT + ":" + srcComp + "," +
-				QuiescencePayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				QuiescencePayload.OPERATION_TYPE + ":" + operation + "," ;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation + "," ;
 		
 		return result;
 	}
@@ -35,29 +38,29 @@ public class QuiescencePayloadCreator {
 	 * @return
 	 */
 	public static String createPayload(String srcComp, String targetComp, String rootTx,
-			QuiescenceOperationType operation, String parentTxID, String subTxID){
+			OperationType operation, String parentTxID, String subTxID){
 		String result = null;
 		
-		result = QuiescencePayload.SRC_COMPONENT + ":" + srcComp + "," +
-				QuiescencePayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				QuiescencePayload.ROOT_TX + ":" + rootTx + "," +
-				QuiescencePayload.OPERATION_TYPE + ":" + operation + "," +
-				QuiescencePayload.PARENT_TX + ":" + parentTxID + "," +
-				QuiescencePayload.SUB_TX + ":" + subTxID;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation + "," +
+				PayloadType.PARENT_TX + ":" + parentTxID + "," +
+				PayloadType.SUB_TX + ":" + subTxID;
 		
 		return result;
 	}
 
 	public static String createRootTxEndPayload(String srcComp,
 			String targetComp, String rootTx,
-			QuiescenceOperationType operation) {
+			OperationType operation) {
 		
 		String result = null;
 		
-		result = QuiescencePayload.SRC_COMPONENT + ":" + srcComp + "," +
-				QuiescencePayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				QuiescencePayload.ROOT_TX + ":" + rootTx + "," +
-				QuiescencePayload.OPERATION_TYPE + ":" + operation;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation;
 		
 		return result;
 	}

@@ -1,25 +1,25 @@
-package cn.edu.nju.moon.conup.core.utils;
+package cn.edu.nju.moon.conup.spi.utils;
 
-/**
- * @author rgc
- * @version Nov 24, 2012 10:32:37 AM
- */
-public enum ConsistencyOperationType {
-	//Tx event type
-	/** 
-	 * if a root tx ends while the component status is normal, root component should recursively 
-	 * notify its sub components to make sure each component's txRegistry is correct.
-	 */
-//	NORMAL_ROOT_TX_END,
-	//dep event type
+public enum OperationType {
+	
+	//tx operations
+	ACK_SUBTX_INIT,
+	NOTIFY_SUBTX_END,
+	NOTIFY_ROOT_TX_END,
+	NOTIFY_START_REMOTE_SUB_TX,
+	
+	/** Quiescence Operation type*/
+	/** request a component to passivate itself */
+	REQ_PASSIVATE,
+	/** ACK passivate */
+	ACK_PASSIVATE,
+
 	NOTIFY_FUTURE_CREATE,
 	ACK_FUTURE_CREATE,
 	NOTIFY_FUTURE_REMOVE,
-	ACK_SUBTX_INIT,
 //	NOTIFY_SUBTX_END,
 	NOTIFY_PAST_CREATE,
 	NOTIFY_PAST_REMOVE,
-	NOTIFY_START_REMOTE_SUB_TX,	//
 	//ondemand event type
 	REQ_ONDEMAND_SETUP,
 	CONFIRM_ONDEMAND_SETUP,
@@ -31,6 +31,7 @@ public enum ConsistencyOperationType {
 	ACK_PAST_ONDEMAND,
 	ACK_SUB_FUTURE_ONDEMAND,
 	ACK_SUB_PAST_ONDEMAND,
+		
 	
 	/** notify that a remote update is done */
 	NOTIFY_REMOTE_UPDATE_DONE,

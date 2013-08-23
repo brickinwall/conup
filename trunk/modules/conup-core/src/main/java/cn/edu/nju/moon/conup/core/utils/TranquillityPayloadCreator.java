@@ -1,6 +1,8 @@
 package cn.edu.nju.moon.conup.core.utils;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
+import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.PayloadType;
 
 /**
  * @author rgc
@@ -19,15 +21,15 @@ public class TranquillityPayloadCreator {
 	 * @return
 	 */
 	public static String createPayload(String srcComp, String targetComp, String rootTx,
-			TranquillityOperationType operation, String parentTxID, String subTxID){
+			OperationType operation, String parentTxID, String subTxID){
 		String result = null;
 		
-		result = TranquillityPayload.SRC_COMPONENT + ":" + srcComp + "," +
-				TranquillityPayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				TranquillityPayload.ROOT_TX + ":" + rootTx + "," +
-				TranquillityPayload.OPERATION_TYPE + ":" + operation + "," +
-				TranquillityPayload.PARENT_TX + ":" + parentTxID + "," +
-				TranquillityPayload.SUB_TX + ":" + subTxID;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation + "," +
+				PayloadType.PARENT_TX + ":" + parentTxID + "," +
+				PayloadType.SUB_TX + ":" + subTxID;
 		
 		return result;
 	}
@@ -41,49 +43,49 @@ public class TranquillityPayloadCreator {
 	 * @return
 	 */
 	public static String createPayload(String srcComp, String targetComp, String rootTx,
-			TranquillityOperationType operation){
+			OperationType operation){
 		String result = null;
 		
-		result = TranquillityPayload.SRC_COMPONENT + ":" + srcComp + "," +
-				TranquillityPayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				TranquillityPayload.ROOT_TX + ":" + rootTx + "," +
-				TranquillityPayload.OPERATION_TYPE + ":" + operation;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation;
 		
 		return result;
 	}
 	
 	public static String createPayload(String srcComp, String targetComp, String rootTx,
-			TranquillityOperationType operation, Scope scope){
+			OperationType operation, Scope scope){
 		String result = null;
 		
-		result = TranquillityPayload.SRC_COMPONENT + ":" + srcComp + "," +
-				TranquillityPayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				TranquillityPayload.ROOT_TX + ":" + rootTx + "," +
-				TranquillityPayload.OPERATION_TYPE + ":" + operation + "," +
-				TranquillityPayload.SCOPE + ":" + scope.toString();
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation + "," +
+				PayloadType.SCOPE + ":" + scope.toString();
 		
 		return result;
 	}
 	
 	public static String createNormalRootTxEndPayload(String srcComp, String targetComp, String rootTx,
-			TranquillityOperationType operation){
+			OperationType operation){
 		String result = null;
 		
-		result = TranquillityPayload.SRC_COMPONENT + ":" + srcComp + "," +
-				TranquillityPayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				TranquillityPayload.ROOT_TX + ":" + rootTx + "," +
-				TranquillityPayload.OPERATION_TYPE + ":" + operation;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.ROOT_TX + ":" + rootTx + "," +
+				PayloadType.OPERATION_TYPE + ":" + operation;
 		
 		return result;
 				
 	}
 	
-	public static String createRemoteUpdateIsDonePayload(String srcComp, String targetComp, TranquillityOperationType opType){
+	public static String createRemoteUpdateIsDonePayload(String srcComp, String targetComp, OperationType opType){
 		String result = null;
 		
-		result = ConsistencyPayload.SRC_COMPONENT + ":" + srcComp + "," +
-				ConsistencyPayload.TARGET_COMPONENT + ":" + targetComp + "," +
-				ConsistencyPayload.OPERATION_TYPE + ":" + opType + "," ;
+		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
+				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
+				PayloadType.OPERATION_TYPE + ":" + opType + "," ;
 		
 		return result;
 	}
