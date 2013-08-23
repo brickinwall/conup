@@ -52,11 +52,8 @@ public class LaunchAuth {
         nodeMgr = NodeManager.getInstance();
         nodeMgr.loadConupConf(compIdentifier, "oldVersion");
         ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
-//        nodeMgr.getDynamicDepManager("AuthComponent").ondemandSetupIsDone();
-//        CompLifecycleManagerImpl.getInstance("AuthComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
-//        compLifecycleManager.setNode(node);
         nodeMgr.setTuscanyNode(node);
         nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 
@@ -69,12 +66,12 @@ public class LaunchAuth {
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		depMgr.setCompLifeCycleMgr(compLifecycleManager);
-//		compLifecycleManager.setDepMgr(depMgr);
 		
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
         
 		CommServerManager.getInstance().start(compIdentifier);
 		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
+		updateMgr.setCompLifeCycleMgr(compLifecycleManager);
 		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);
@@ -115,7 +112,7 @@ public class LaunchAuth {
 				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
-				String baseDir = "/home/nju/deploy/sample/update";
+				String baseDir = "/home/artemis/Tuscany/deploy/auth2";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";

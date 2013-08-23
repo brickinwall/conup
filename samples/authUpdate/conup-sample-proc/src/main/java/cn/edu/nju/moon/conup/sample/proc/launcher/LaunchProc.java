@@ -75,6 +75,7 @@ public class LaunchProc {
 		
 		CommServerManager.getInstance().start(compIdentifier);
 		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
+		updateMgr.setCompLifeCycleMgr(compLifecycleManager);
 		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);

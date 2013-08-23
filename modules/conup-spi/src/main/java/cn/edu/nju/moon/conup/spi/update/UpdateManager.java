@@ -64,7 +64,7 @@ public interface UpdateManager {
 
 	public void setDepMgr(DynamicDepManager depMgr);
 
-	void setDynamicUpdateContext(DynamicUpdateContext updateCtx);
+	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx);
 
 	public void setOndemandSetupHelper(OndemandSetupHelper ondemandSetupHelper);
 
@@ -90,4 +90,6 @@ public interface UpdateManager {
 	public void remoteDynamicUpdateIsDone();
 
 	public void ondemandSetting();
+
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr);
 }
