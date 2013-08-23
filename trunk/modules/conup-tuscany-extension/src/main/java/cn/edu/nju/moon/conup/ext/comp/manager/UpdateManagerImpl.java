@@ -34,6 +34,7 @@ public class UpdateManagerImpl implements UpdateManager {
 	private static final Logger LOGGER = Logger.getLogger(UpdateManagerImpl.class.getName());
 	
 	private CompLifeCycleManager compLifeCycleMgr = null;
+
 	/** ComponentObject that represents current CompLifecycleManager*/
 	private ComponentObject compObj;
 	private ComponentUpdator compUpdator = null;
@@ -154,6 +155,13 @@ public class UpdateManagerImpl implements UpdateManager {
 //		LOGGER.fine("in CompLcMgr, when cleanupUpdate is done:" + inDepsStr);
 		
 //		}
+		Object updatingSyncMonitor = compObj.getUpdatingSyncMonitor();
+		synchronized (updatingSyncMonitor) {
+			compLifeCycleMgr.transitToNormal();
+			bufferEventType = BufferEventType.NOTHING;
+			notifyInterceptors(bufferEventType);
+			updatingSyncMonitor.notifyAll();
+		}
 		
 		depMgr.dynamicUpdateIsDone();
 		PerformanceRecorder.getInstance(compIdentifier).updateIsDone(System.nanoTime());
@@ -282,6 +290,11 @@ public class UpdateManagerImpl implements UpdateManager {
 	@Override
 	public void setDynamicUpdateContext(DynamicUpdateContext updateCtx) {
 		this.updateCtx = updateCtx;
+	}
+	
+	@Override
+	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr) {
+		this.compLifeCycleMgr = compLifeCycleMgr;
 	}
 	
 	@Override
