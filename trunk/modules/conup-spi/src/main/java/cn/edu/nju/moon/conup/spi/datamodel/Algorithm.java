@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.utils.OperationType;
 
 
 /**
@@ -22,7 +24,7 @@ public interface Algorithm {
 	 * 	@param txContext 
 	 * 
 	 * */
-	public void manageDependence(TransactionContext txContext);
+	public void manageDependence(TransactionContext txContext, DynamicDepManager depMgr, CompLifeCycleManager compLifeCycleMgr);
 	
 	/**
 	 * received dependences notification from peer component
@@ -31,13 +33,26 @@ public interface Algorithm {
 	 * @param payload(:msgType XML, JSON, etc.)
 	 * @return
 	 */
-	public boolean manageDependence(String payload);
-	
+//	public boolean manageDependence(String payload);
+
+	/**
+	 * 
+	 * @param dep
+	 * @param operationType
+	 * @param depMgr
+	 * @param compLifeCycleMgr 
+	 * @param extraParams
+	 * @return
+	 */
+	public boolean manageDependence(OperationType operationType, Map<String, String> params, 
+			DynamicDepManager depMgr,
+			CompLifeCycleManager compLifeCycleMgr);
+
 	/**
 	 * is a component ready?
 	 * @return 
 	 */
-	public boolean isReadyForUpdate(String compIdentifier);
+	public boolean readyForUpdate(String compIdentifier, DynamicDepManager depMgr);
 	
 	/**
 	 * @param all the dependences depended by other components
@@ -68,18 +83,19 @@ public interface Algorithm {
 	 * @param hostComp
 	 * @return
 	 */
-	public boolean updateIsDone(String hostComp);
+	boolean updateIsDone(String hostComp, DynamicDepManager depMgr);
+//	public boolean updateIsDone(String hostComp);
 
-	/**
-	 * when necessary, algorithm may need to be notified to execute related initiation.
-	 * @param identifier
-	 */
-	public void initiate(String identifier);
+//	/**
+//	 * when necessary, algorithm may need to be notified to execute related initiation.
+//	 * @param identifier
+//	 */
+//	public void initiate(String identifier);
 
-	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs);
+//	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs);
 
 	
-	public String getAlgorithmRoot(String parentTx, String rootTx);
+//	public String getAlgorithmRoot(String parentTx, String rootTx);
 	
 	/**
 	 * when a sub transaction started or ended, parent component should get notified.
@@ -91,7 +107,7 @@ public interface Algorithm {
 	 * @param subTx 
 	 * @return
 	 */
-	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
+//	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 
 	/**
 	 * the host component is going to init a sub-transaction by another component.
@@ -100,20 +116,42 @@ public interface Algorithm {
 	 * we need to make sure consistency, so we add future, past edge to itself
 	 * 
 	 * @param txContext
+	 * @param dynamicDepManagerImpl 
 	 */
-	public boolean initLocalSubTx(TransactionContext txContext);
+	public boolean initLocalSubTx(TransactionContext txContext,
+			CompLifeCycleManager compLifeCycleMgr,
+			DynamicDepManager depMgr);
+
+	/**
+	 * 
+	 * @param subTxStatus
+	 * @param invocationCtx
+	 * @param compLifeCycleMgr
+	 * @param depMgr
+	 * @return
+	 */
+	public boolean notifySubTxStatus(TxEventType subTxStatus,
+			InvocationContext invocationCtx,
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr);
+
+	/**
+	 * when necessary, algorithm may need to be notified to execute related initiation.
+	 * @param hostComp
+	 * @param depMgr
+	 */
+	public void initiate(String hostComp, DynamicDepManager depMgr);
 
 	/**
 	 * set a depMgr to algorithm, although this parameter is not useful for Quiescence
 	 * Algorithm and depMgr is 1-1 with ComponentObject
 	 * @param depMgr
 	 */
-	public void setDynamicDepMgr(DynamicDepManager depMgr);
+//	public void setDynamicDepMgr(DynamicDepManager depMgr);
 	
 	/**
 	 * set a TxDepRegistry to algorithm, although this parameter is not useful for Quiescence
 	 * Algorithm and TxDepRegistry is 1-1 with ComponentObject
 	 * @param txDepMonitor
 	 */
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
+//	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
 }

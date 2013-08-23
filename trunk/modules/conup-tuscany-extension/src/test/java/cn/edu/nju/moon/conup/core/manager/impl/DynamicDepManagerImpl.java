@@ -6,6 +6,7 @@ import java.util.Set;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
@@ -24,18 +25,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean manageTx(TransactionContext txContext) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean manageDependence(TransactionContext txContext) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean manageDependence(String proctocol, String payload) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -128,13 +117,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return false;
 	}
 
-	@Override
-	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp,
-			String curComp, String rootTx, String parentTx, String subTx) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	// @Override
 	// public boolean initLocalSubTx(String hostComp, String fakeSubTx, String
 	// rootTx, String rootComp, String parentTx, String parentComp) {
@@ -181,7 +163,21 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public boolean manageDependence(String payload) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean notifySubTxStatus(TxEventType transactionstart,
+			InvocationContext invocationCtx,
+			CompLifeCycleManager compLifeCycleMgr) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

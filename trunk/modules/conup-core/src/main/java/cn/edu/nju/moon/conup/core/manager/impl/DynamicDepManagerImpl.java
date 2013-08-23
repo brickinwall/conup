@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -9,6 +10,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
@@ -19,6 +21,9 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
+import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.PayloadType;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
@@ -56,7 +61,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	@Override
 	public void dynamicUpdateIsDone() {
-		algorithm.updateIsDone(compObj.getIdentifier());
+		algorithm.updateIsDone(compObj.getIdentifier(), this);
 	}
 	
 	@Override
@@ -117,7 +122,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean initLocalSubTx(TransactionContext txContext) {
-		return algorithm.initLocalSubTx(txContext);
+		return algorithm.initLocalSubTx(txContext, compLifeCycleMgr, this);
 	}
 
 	@Override
@@ -128,14 +133,19 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	@Override
 	public boolean isReadyForUpdate() {
-		boolean algReadyForUpdate = algorithm.isReadyForUpdate(compObj.getIdentifier());
+		boolean algReadyForUpdate = algorithm.readyForUpdate(compObj.getIdentifier(), this);
 		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID));
 		return algReadyForUpdate;
 	}
 
 	@Override
-	public boolean manageDependence(String proctocol, String payload) {
-		return algorithm.manageDependence(payload);
+	public boolean manageDependence(String payload) {
+		PayloadResolver plResolver;
+		plResolver = new PayloadResolver(payload);
+		OperationType operationType = plResolver.getOperation();
+		Map<String, String> params = getParamFromPayload(plResolver);
+		
+		return algorithm.manageDependence(operationType, params, this, compLifeCycleMgr);
 	}
 	
 	/**
@@ -146,11 +156,10 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	 * @param pastC
 	 * @return
 	 */
-	@Override
-	public boolean manageDependence(TransactionContext txContext) {
+	private boolean manageDependence(TransactionContext txContext) {
 		LOGGER.fine("DynamicDepManagerImpl.manageDependence(...)");
 		
-		algorithm.manageDependence(txContext);
+		algorithm.manageDependence(txContext, this, compLifeCycleMgr);
 		return true;
 	}
 
@@ -177,12 +186,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
-			String parentTx, String subTx) {
-		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
-	}
-
-	@Override
 	public void ondemandSetupIsDone() {
 		
 		//FOR TEST
@@ -202,7 +205,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		LOGGER.fine("ondemandSetupIsDone, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 				
-		algorithm.initiate(compObj.getIdentifier());
+		algorithm.initiate(compObj.getIdentifier(), this);
 	}
 	
 	@Override
@@ -238,9 +241,32 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		this.txRegistry = txLifecycleMgr.getTxRegistry();
 	}
 
+	
+
 	@Override
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
-		algorithm.setTxDepRegistry(txDepRegistry);
+//		algorithm.setTxDepRegistry(txDepRegistry);
+	}
+	
+	private Map<String, String> getParamFromPayload(PayloadResolver plResolver) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("srcComp", plResolver.getParameter(PayloadType.SRC_COMPONENT));
+		params.put("targetComp", plResolver.getParameter(PayloadType.TARGET_COMPONENT));
+		params.put("rootTx", plResolver.getParameter(PayloadType.ROOT_TX));
+		params.put("parentTx", plResolver.getParameter(PayloadType.PARENT_TX));
+		params.put("subTx", plResolver.getParameter(PayloadType.SUB_TX));
+		return params;
 	}
 
+//	@Override
+//	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
+//			String parentTx, String subTx) {
+//		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
+//	}
+
+	@Override
+	public boolean notifySubTxStatus(TxEventType subTxStatus,
+			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr) {
+		return algorithm.notifySubTxStatus(subTxStatus, invocationCtx, compLifeCycleMgr, this);
+	}
 }

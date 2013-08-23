@@ -6,6 +6,7 @@ import java.util.Set;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
+import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
@@ -108,18 +109,11 @@ public interface DynamicDepManager{
 	 * received dependences notification from peer component
 	 * @param targetComp target component's name
 	 * @param proctocol the protocol type can be CONSISTENCY, QUIESCENCE and TRANQUILLITY
-	 * @param msgType XML, JSON, etc.
 	 * @param payload
 	 * @return
 	 */
-	public boolean manageDependence(String proctocol, String payload);
-	
-	/**
-	 * maintain dependences, e.g., dependences
-	 * @param txContext
-	 * @return
-	 */
-	public boolean manageDependence(TransactionContext txContext);
+	public boolean manageDependence(String payload);
+//	public boolean manageDependence(String proctocol, String payload);
 	
 	/**
 	 * maintain tx
@@ -137,7 +131,7 @@ public interface DynamicDepManager{
 	 * @param subTx
 	 * @return
 	 */
-	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
+//	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 	
 	/**
 	 * when ondmenad is done, we need to notify algorithm to start to work
@@ -166,5 +160,8 @@ public interface DynamicDepManager{
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
 
 	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
+
+	public boolean notifySubTxStatus(TxEventType transactionstart,
+			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr);
 
 }

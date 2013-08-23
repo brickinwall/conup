@@ -175,6 +175,7 @@ public class Dependence implements Comparable<Dependence> {
 //				+ getTargetService();
 	}
 
+	//TODO
 	@Override
 	public int compareTo(Dependence anotherArc) {
 		String current = this.rootTx + this.srcCompObjIdentifier
