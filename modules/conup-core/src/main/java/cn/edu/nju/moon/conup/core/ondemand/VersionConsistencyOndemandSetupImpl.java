@@ -13,9 +13,6 @@ import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.comm.api.peer.services.impl.OndemandDynDepSetupServiceImpl;
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
-import cn.edu.nju.moon.conup.core.utils.ConsistencyOndemandPayloadResolver;
-import cn.edu.nju.moon.conup.core.utils.ConsistencyOperationType;
-import cn.edu.nju.moon.conup.core.utils.ConsistencyPayload;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
@@ -33,6 +30,9 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
+import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.PayloadType;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 
@@ -97,15 +97,15 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	
 	@Override
 	public boolean ondemandSetup(String srcComp, String proctocol, String payload) {
-		ConsistencyOndemandPayloadResolver payloadResolver;
-		ConsistencyOperationType  operation;
+		PayloadResolver payloadResolver;
+		OperationType  operation;
 		String curComp;//current component
 		
-		payloadResolver = new ConsistencyOndemandPayloadResolver(payload);
+		payloadResolver = new PayloadResolver(payload);
 		operation = payloadResolver.getOperation();
-		curComp = payloadResolver.getParameter(ConsistencyPayload.TARGET_COMPONENT);
-		if(operation.equals(ConsistencyOperationType.REQ_ONDEMAND_SETUP)){
-			String scopeString = payloadResolver.getParameter(ConsistencyPayload.SCOPE);
+		curComp = payloadResolver.getParameter(PayloadType.TARGET_COMPONENT);
+		if(operation.equals(OperationType.REQ_ONDEMAND_SETUP)){
+			String scopeString = payloadResolver.getParameter(PayloadType.SCOPE);
 			if(scopeString != null && !scopeString.equals("") && !scopeString.equals("null")){
 				Scope scope = Scope.inverse(scopeString);
 				depMgr.setScope(scope);
@@ -115,26 +115,26 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 //				ondemandHelper.getDynamicDepManager().setScope(scope);
 //			}
 			reqOndemandSetup(curComp, srcComp);
-		} else if(operation.equals(ConsistencyOperationType.CONFIRM_ONDEMAND_SETUP)){
+		} else if(operation.equals(OperationType.CONFIRM_ONDEMAND_SETUP)){
 			confirmOndemandSetup(srcComp, curComp);
-		} else if(operation.equals(ConsistencyOperationType.NOTIFY_FUTURE_ONDEMAND)){
+		} else if(operation.equals(OperationType.NOTIFY_FUTURE_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-					payloadResolver.getParameter(ConsistencyPayload.ROOT_TX), 
+					payloadResolver.getParameter(PayloadType.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifyFutureOndemand(dep);
-		} else if(operation.equals(ConsistencyOperationType.NOTIFY_PAST_ONDEMAND)){
+		} else if(operation.equals(OperationType.NOTIFY_PAST_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-					payloadResolver.getParameter(ConsistencyPayload.ROOT_TX), 
+					payloadResolver.getParameter(PayloadType.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifyPastOndemand(dep);
-		} else if(operation.equals(ConsistencyOperationType.NOTIFY_SUB_FUTURE_ONDEMAND)){
+		} else if(operation.equals(OperationType.NOTIFY_SUB_FUTURE_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-					payloadResolver.getParameter(ConsistencyPayload.ROOT_TX), 
+					payloadResolver.getParameter(PayloadType.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifySubFutureOndemand(dep);
-		} else if(operation.equals(ConsistencyOperationType.NOTIFY_SUB_PAST_ONDEMAND)){
+		} else if(operation.equals(OperationType.NOTIFY_SUB_PAST_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-					payloadResolver.getParameter(ConsistencyPayload.ROOT_TX), 
+					payloadResolver.getParameter(PayloadType.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifySubPastOndemand(dep);
 		}
@@ -403,7 +403,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									ConsistencyOperationType.NOTIFY_FUTURE_ONDEMAND));
+									OperationType.NOTIFY_FUTURE_ONDEMAND));
 				}
 			}
 			
@@ -424,7 +424,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									ConsistencyOperationType.NOTIFY_PAST_ONDEMAND));
+									OperationType.NOTIFY_PAST_ONDEMAND));
 				}
 			}
 			
@@ -443,7 +443,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									ConsistencyOperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
+									OperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
 				}
 				
 				dep.setType(VersionConsistencyImpl.PAST_DEP);
@@ -455,7 +455,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									ConsistencyOperationType.NOTIFY_SUB_PAST_ONDEMAND));
+									OperationType.NOTIFY_SUB_PAST_ONDEMAND));
 				}
 				
 			}
@@ -507,7 +507,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, subComp, 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, subComp, rootTx, 
-								ConsistencyOperationType.NOTIFY_FUTURE_ONDEMAND));
+								OperationType.NOTIFY_FUTURE_ONDEMAND));
 			}
 		}//END FOR
 		
@@ -555,7 +555,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, subComp, 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, subComp, rootTx, 
-								ConsistencyOperationType.NOTIFY_PAST_ONDEMAND));
+								OperationType.NOTIFY_PAST_ONDEMAND));
 			}
 		}//END FOR
 		
@@ -609,7 +609,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(), 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								ConsistencyOperationType.NOTIFY_FUTURE_ONDEMAND));
+								OperationType.NOTIFY_FUTURE_ONDEMAND));
 				
 			}
 		}
@@ -628,7 +628,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(),
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								ConsistencyOperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
+								OperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
 			}
 		}
 		
@@ -676,7 +676,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(), 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								ConsistencyOperationType.NOTIFY_PAST_ONDEMAND));
+								OperationType.NOTIFY_PAST_ONDEMAND));
 				
 			}
 		}
@@ -695,7 +695,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(),
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								ConsistencyOperationType.NOTIFY_SUB_PAST_ONDEMAND));
+								OperationType.NOTIFY_SUB_PAST_ONDEMAND));
 			}
 		}
 
@@ -829,10 +829,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		String payload;
 
 		for(String parent : parentComps){
-			payload = ConsistencyPayload.OPERATION_TYPE + ":" + ConsistencyOperationType.REQ_ONDEMAND_SETUP + "," +
-					ConsistencyPayload.SRC_COMPONENT + ":" + hostComp + "," +
-					ConsistencyPayload.TARGET_COMPONENT + ":" + parent + "," +
-					ConsistencyPayload.SCOPE + ":" + depMgr.getScope().toString();
+			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.REQ_ONDEMAND_SETUP + "," +
+					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
+					PayloadType.TARGET_COMPONENT + ":" + parent + "," +
+					PayloadType.SCOPE + ":" + depMgr.getScope().toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -862,9 +862,9 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
 		String payload;
 		for(String subComp : targetRef){
-			payload = ConsistencyPayload.OPERATION_TYPE + ":" + ConsistencyOperationType.CONFIRM_ONDEMAND_SETUP + "," +
-					ConsistencyPayload.SRC_COMPONENT + ":" + hostComp + "," +
-					ConsistencyPayload.TARGET_COMPONENT + ":" + subComp;
+			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.CONFIRM_ONDEMAND_SETUP + "," +
+					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
+					PayloadType.TARGET_COMPONENT + ":" + subComp;
 			ondemandComm.asynPost(hostComp, subComp, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		

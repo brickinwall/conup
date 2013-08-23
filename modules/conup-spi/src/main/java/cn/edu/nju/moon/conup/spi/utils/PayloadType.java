@@ -1,9 +1,9 @@
-package cn.edu.nju.moon.conup.core.utils;
+package cn.edu.nju.moon.conup.spi.utils;
 /**
  * @author rgc
- * @version Dec 18, 2012 4:22:39 PM
+ * @version Nov 24, 2012 2:57:50 PM
  */
-public enum QuiescencePayload {
+public enum PayloadType {
 	SRC_COMPONENT,
 	TARGET_COMPONENT,
 	ROOT_TX,
