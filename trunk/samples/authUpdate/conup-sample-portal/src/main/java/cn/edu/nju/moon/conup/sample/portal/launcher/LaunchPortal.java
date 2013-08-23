@@ -51,10 +51,7 @@ public class LaunchPortal {
         ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
 //        nodeMgr.getDynamicDepManager("PortalComponent").ondemandSetupIsDone();
         
-//        CompLifecycleManagerImpl.getInstance("PortalComponent").setNode(node);
-        
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
-//		compLifecycleManager.setNode(node);
         nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
@@ -64,6 +61,7 @@ public class LaunchPortal {
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
+		depMgr.setCompLifeCycleMgr(compLifecycleManager);
 //		compLifecycleManager.setDepMgr(depMgr);
 		
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
