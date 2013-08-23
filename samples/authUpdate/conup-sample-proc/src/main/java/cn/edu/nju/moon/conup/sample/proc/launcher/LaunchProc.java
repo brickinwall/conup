@@ -68,6 +68,7 @@ public class LaunchProc {
 		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
+		depMgr.setCompLifeCycleMgr(compLifecycleManager);
 //		compLifecycleManager.setDepMgr(depMgr);
         
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
