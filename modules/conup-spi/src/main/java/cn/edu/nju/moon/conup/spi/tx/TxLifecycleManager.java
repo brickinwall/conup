@@ -37,8 +37,8 @@ public interface TxLifecycleManager {
 	 * @param subTx
 	 * @return
 	 */
-	public boolean startRemoteSubTx(String subComp, String curComp, String rootTx,
-			String parentTx, String subTx);
+//	public boolean startRemoteSubTx(String subComp, String curComp, String rootTx,
+//			String parentTx, String subTx);
 	
 	/**
 	 * a sub-transaction just ended and returned from a remote component 
@@ -49,8 +49,8 @@ public interface TxLifecycleManager {
 	 * @param subTx
 	 * @return
 	 */
-	public boolean endRemoteSubTx(String subComp, String curComp, String rootTx,
-			String parentTx, String subTx);
+//	public boolean endRemoteSubTx(String subComp, String curComp, String rootTx,
+//			String parentTx, String subTx);
 	
 	/**
 	 * the host component is going to init a sub-transaction for another component.
@@ -64,7 +64,7 @@ public interface TxLifecycleManager {
 	 * @param parentComp
 	 * @return
 	 */
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp);
 	
 	/**
 	 * the host component is going to init a sub-transaction for another component.
@@ -111,5 +111,12 @@ public interface TxLifecycleManager {
 
 	public InvocationContext createInvocationCtx(String hostComponent, String serviceName,
 			TxDepMonitor txDepMonitor);
+
+	/**
+	 * a sub-transaction just ended and returned from a remote component
+	 * @param invocationCtx
+	 * @return
+	 */
+	public boolean endRemoteSubTx(InvocationContext invocationCtx);
 
 }

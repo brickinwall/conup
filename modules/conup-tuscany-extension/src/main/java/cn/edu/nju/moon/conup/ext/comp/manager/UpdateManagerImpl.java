@@ -214,7 +214,7 @@ public class UpdateManagerImpl implements UpdateManager {
 	}
 	
 	private String manageDep(RequestObject reqObj) {
-		boolean manageResult = depMgr.manageDependence(reqObj.getProtocol(), reqObj.getPayload());
+		boolean manageResult = depMgr.manageDependence(reqObj.getPayload());
 		return "manageDepResult:" + manageResult;
 	}
 

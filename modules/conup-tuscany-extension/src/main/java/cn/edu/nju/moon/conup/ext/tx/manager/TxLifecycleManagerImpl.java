@@ -169,53 +169,35 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		LOGGER.fine("In TxDepMonitorImpl, removed rootTxId " + rootTxId);
 	}
 	
-	@Override
-	public boolean startRemoteSubTx(String subComp, String curComp,
-			String rootTx, String parentTx, String subTx) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
-		
-		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, 
-				subComp, curComp, rootTx, parentTx, subTx);
-	}
+	
 
-	@Override
-	public boolean endRemoteSubTx(String subComp, String curComp,
-			String rootTx, String parentTx, String subTx) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
-		
-		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
-				subComp, curComp, rootTx, parentTx, subTx);
-	}
-
-	@Override
-	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-		NodeManager nodeManager = NodeManager.getInstance();
-		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
-		TxDepMonitor txDepMonitor = nodeManager.getTxDepMonitor(hostComp);
-		TxDepRegistry txDepRegistry = txDepMonitor.getTxDepRegistry();
-		TransactionContext subTxCtx;
-		
-		subTxCtx = new TransactionContext();
-		subTxCtx.setFakeTx(true);
-		subTxCtx.setCurrentTx(fakeSubTx);
-		subTxCtx.setHostComponent(hostComp);
-		subTxCtx.setEventType(TxEventType.TransactionStart);
-//		subTxCtx.setFutureComponents(new HashSet<String>());
-//		subTxCtx.setPastComponents(new HashSet<String>());
-		TxDep txDep = new TxDep(new HashSet<String>(), new HashSet<String>());
-		txDepRegistry.addLocalDep(fakeSubTx, txDep);
-		subTxCtx.setParentComponent(parentComp);
-		subTxCtx.setParentTx(parentTx);
-		subTxCtx.setRootTx(rootTx);
-		subTxCtx.setRootComponent(rootComp);
-		
-		depMgr.getTxs().put(fakeSubTx, subTxCtx);
-		
-		return depMgr.initLocalSubTx(subTxCtx);
-//		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
-	}
+//	@Override
+//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+//		TxDepMonitor txDepMonitor = nodeManager.getTxDepMonitor(hostComp);
+//		TxDepRegistry txDepRegistry = txDepMonitor.getTxDepRegistry();
+//		TransactionContext subTxCtx;
+//		
+//		subTxCtx = new TransactionContext();
+//		subTxCtx.setFakeTx(true);
+//		subTxCtx.setCurrentTx(fakeSubTx);
+//		subTxCtx.setHostComponent(hostComp);
+//		subTxCtx.setEventType(TxEventType.TransactionStart);
+////		subTxCtx.setFutureComponents(new HashSet<String>());
+////		subTxCtx.setPastComponents(new HashSet<String>());
+//		TxDep txDep = new TxDep(new HashSet<String>(), new HashSet<String>());
+//		txDepRegistry.addLocalDep(fakeSubTx, txDep);
+//		subTxCtx.setParentComponent(parentComp);
+//		subTxCtx.setParentTx(parentTx);
+//		subTxCtx.setRootTx(rootTx);
+//		subTxCtx.setRootComponent(rootComp);
+//		
+//		depMgr.getTxs().put(fakeSubTx, subTxCtx);
+//		
+//		return depMgr.initLocalSubTx(subTxCtx);
+////		return depMgr.initLocalSubTx(hostComp, fakeSubTx, rootTx, rootComp, parentTx, parentComp);
+//	}
 
 	@Override
 	public boolean initLocalSubTx(String hostComp, String fakeSubTx, TransactionContext txCtxInCache) {
@@ -322,9 +304,50 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 			assert subComp != null;
 			invocationCtx = new InvocationContext(rootTx, rootComp, parentTx, parentComponent, subTx, subComp);
 			
-			startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
+//			startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
+			startRemoteSubTx(invocationCtx);
 		}//else(dependency != null)
 		return invocationCtx;
 		
 	}
+
+	private boolean startRemoteSubTx(InvocationContext invocationCtx) {
+		// invocationCtx is going to send to sub component 
+		// so here parent component is host component
+		String hostComp = invocationCtx.getParentComp();
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		CompLifeCycleManager compLifeCycleMgr = nodeManager.getCompLifecycleManager(hostComp);
+		
+		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, invocationCtx, compLifeCycleMgr);
+	}
+
+//	@Override
+//	public boolean endRemoteSubTx(String subComp, String curComp,
+//			String rootTx, String parentTx, String subTx) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+//		
+//		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, 
+//				subComp, curComp, rootTx, parentTx, subTx);
+//	}
+
+	@Override
+	public boolean endRemoteSubTx(InvocationContext invocationCtx) {
+		String hostComp = invocationCtx.getParentComp();
+		NodeManager nodeManager = NodeManager.getInstance();
+		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
+		CompLifeCycleManager compLifeCycleMgr = nodeManager.getCompLifecycleManager(hostComp);
+		
+		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, invocationCtx, compLifeCycleMgr);
+	}
+
+//	public boolean startRemoteSubTx(String subComp, String curComp,
+//			String rootTx, String parentTx, String subTx) {
+//		NodeManager nodeManager = NodeManager.getInstance();
+//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(curComp);
+//		
+//		return depMgr.notifySubTxStatus(TxEventType.TransactionStart, 
+//				subComp, curComp, rootTx, parentTx, subTx);
+//	}
 }
