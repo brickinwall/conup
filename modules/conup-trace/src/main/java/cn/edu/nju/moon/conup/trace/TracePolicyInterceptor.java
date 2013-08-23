@@ -173,6 +173,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		subComp = invocationCtx.getSubComp();
 		
 		assert hostComp != null;
+		assert hostComp.equals(invocationCtx.getParentComp());
 		
 		if( !subComp.equals(hostComp)){
 			
@@ -183,7 +184,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //			printer.printTxs(LOGGER, depMgr.getTxs());
 			
 //			nodeMgr.getTxLifecycleManager(hostComp).endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
-			txLifecycleMgr.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+//			txLifecycleMgr.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
+			txLifecycleMgr.endRemoteSubTx(invocationCtx);
 			
 			LOGGER.fine("TxS after endRemoteSubTx:");
 //			printer.printTxs(LOGGER, depMgr.getTxs());
