@@ -43,13 +43,14 @@ public class BufferInterceptor implements Interceptor {
 	
 	private BufferEventType bufferEventType = BufferEventType.NOTHING;
 	
-	public BufferInterceptor(PolicySubject subject, String phase, TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness) {
+	public BufferInterceptor(PolicySubject subject, String phase, TxLifecycleManager txLifecycleMgr, FreenessStrategy freeness,
+			CompLifeCycleManager compLifeCycleMgr, UpdateManager updateMgr) {
 		this.subject = subject;
 		this.phase = phase;
 		this.txLifecycleMgr = txLifecycleMgr;
 		this.freeness = freeness;
-		
-		init();
+		this.compLifeCycleMgr = compLifeCycleMgr;
+		this.updateMgr = updateMgr;
 	}
 	
 	@Override
@@ -253,13 +254,11 @@ public class BufferInterceptor implements Interceptor {
 		return new Integer(Thread.currentThread().hashCode()).toString();
 	}
 
-	private void init() {
-
-	}
 
 	@Override
 	public void update(Object arg) {
-		synchronized (bufferEventType) {
+//		synchronized (freezeSyncMonitor) 
+		{
 			this.bufferEventType = (BufferEventType) arg;
 			if(bufferEventType.equals(BufferEventType.NOTHING) ||
 					bufferEventType.equals(BufferEventType.VALIDTOFREE) ||

@@ -34,6 +34,7 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * 
@@ -290,7 +291,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness);
+				UpdateManager updateManager = this.nodeMgr.getUpdateManageer(hostComp);
+				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness, compLifeCycleMgr, updateManager);
 				InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(hostComp);
 				interceptorStub.addInterceptor(bufferInterceptor);
 //				depMgr.registerObserver(bufferInterceptor);
