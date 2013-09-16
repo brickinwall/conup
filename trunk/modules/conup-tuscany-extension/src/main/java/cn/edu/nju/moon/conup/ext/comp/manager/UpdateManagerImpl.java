@@ -228,9 +228,10 @@ public class UpdateManagerImpl implements UpdateManager {
 
 	private String manageOndemand(RequestObject reqObj) {
 		boolean ondemandResult = false;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		setOndemandSetupHelper(nodeMgr.getOndemandSetupHelper(compObj.getIdentifier()));
 		ondemandResult = ondemandSetupHelper.ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
 		return "ondemandResult:" + ondemandResult;
-		
 	}
 
 	private String manageRemoteConf(RequestObject reqObj) {
@@ -324,7 +325,7 @@ public class UpdateManagerImpl implements UpdateManager {
 //			compLifeCycleMgr.updateIsReceived();
 			compObj.updateIsReceived();
 		}
-		
+		assert(ondemandSetupHelper != null);
 		//on-demand setup
 		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 			OndemandSetupHelper ondemandHelper;
@@ -405,6 +406,7 @@ public class UpdateManagerImpl implements UpdateManager {
 				exeRecorder.ondemandIsDone();
 				
 //				compStatus = CompStatus.VALID;
+				LOGGER.info(compObj.getIdentifier() + "   transitToValid()");
 				compLifeCycleMgr.transitToValid();
 //				if(isUpdateRequestReceived){
 				if(compObj.isTargetComp()){
@@ -421,7 +423,9 @@ public class UpdateManagerImpl implements UpdateManager {
 				} else {
 					bufferEventType = BufferEventType.WAITFORREMOTEUPDATE;
 				}
+				LOGGER.info("start notifyInterceptors");
 				notifyInterceptors(bufferEventType);
+				LOGGER.info("end notifyInterceptors");
 //				System.out.println("in ddm:" + bufferEventType);
 				
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
@@ -485,6 +489,7 @@ public class UpdateManagerImpl implements UpdateManager {
 //				this.compStatus = CompStatus.ONDEMAND;
 				compLifeCycleMgr.transitToOndemand();
 				bufferEventType = BufferEventType.ONDEMAND;
+				LOGGER.info("bufferEventType=" + bufferEventType);
 				notifyInterceptors(bufferEventType);
 //				notifyObservers(bufferEventType);
 			}
