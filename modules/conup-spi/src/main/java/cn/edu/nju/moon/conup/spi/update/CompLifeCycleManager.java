@@ -55,10 +55,18 @@ public interface CompLifeCycleManager {
 
 	public void transitToValid();
 
-	void transitToFree();
+	public void transitToFree();
 
 	/**
 	 * when comp is executing update, we need to change compStatus to Updating
 	 */
 	public void transitToUpdating();
+
+	public boolean isNormal();
+
+	public boolean isOndemandSetting();
+
+	public boolean isValid();
+
+	public boolean isFree();
 }
