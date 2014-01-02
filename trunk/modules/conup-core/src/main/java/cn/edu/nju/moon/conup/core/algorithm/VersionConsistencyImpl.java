@@ -31,6 +31,7 @@ import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -82,7 +83,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		case UPDATING:
 			doValid(txContext, depMgr, txDepRegsitry);
 			break;
-		case Free:
+		case FREE:
 			doValid(txContext, depMgr, txDepRegsitry);
 			break;
 		default:
@@ -106,6 +107,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		String rootTx = params.get("rootTx");
 		
 		assert operationType != null;
+		
+//		Printer printer = new Printer();
 		
 		switch(operationType){
 		case NOTIFY_FUTURE_CREATE:
@@ -165,6 +168,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			
 //			printer.printDeps(depMgr.getRuntimeInDeps(), "In" + ",after process NOTIFY_PAST_REMOVE:");
 //			printer.printDeps(depMgr.getRuntimeDeps(), "Out" + ",after process NOTIFY_PAST_REMOVE:");
+//			printer.printTxs(depMgr.getTxs());
 			break;
 		case NOTIFY_REMOTE_UPDATE_DONE:
 			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp, depMgr);
@@ -347,6 +351,11 @@ public class VersionConsistencyImpl implements Algorithm {
 			
 			//remove tx ctx from TxRegistry
 			depMgr.getTxs().remove(currentTx);
+//			System.out.println("currentTx:" + currentTx);
+//			Printer printer = new Printer();
+//			printer.printDeps(depMgr.getRuntimeInDeps(), "In" + ", current tx is ended");
+//			printer.printDeps(depMgr.getRuntimeDeps(), "Out" + ", current tx is ended");
+//			printer.printTxs(depMgr.getTxs());
 			
 		} else {
 			// up receiving FirstRequestService

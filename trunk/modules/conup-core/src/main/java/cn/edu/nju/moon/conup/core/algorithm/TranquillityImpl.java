@@ -82,7 +82,7 @@ public class TranquillityImpl implements Algorithm {
 		case UPDATING:
 			doValid(txContext, depMgr);
 			break;
-		case Free:
+		case FREE:
 			doValid(txContext, depMgr);
 			break;
 		default:			
