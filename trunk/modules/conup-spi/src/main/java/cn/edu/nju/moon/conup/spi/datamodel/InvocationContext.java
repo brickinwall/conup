@@ -70,7 +70,7 @@ public class InvocationContext implements Serializable {
 
 	@Override
 	public String toString() {
-		return "InvocationContext[" + rootTx + ":" + rootComp + 
+		return "INVOCATION_CONTEXT[" + rootTx + ":" + rootComp + 
 				"," + parentTx + ":" + parentComp + 
 				"," + subTx + ":" + subComp +
 				"]";
@@ -96,8 +96,8 @@ public class InvocationContext implements Serializable {
 		if(ctxString == null)
 			return null;
 		
-		if(!ctxString.contains("InvocationContext")){
-			throw new ConupException("Invalid InvocationContext String...");
+		if(!ctxString.contains("INVOCATION_CONTEXT")){
+			throw new ConupException("Invalid INVOCATION_CONTEXT String...");
 		} else {
 			
 			String target = getTargetString(ctxString);
@@ -138,7 +138,7 @@ public class InvocationContext implements Serializable {
 		if(raw.endsWith("\"")){
 			raw = raw.substring(0, raw.length()-1);
 		}
-		int index = raw.indexOf("InvocationContext");
+		int index = raw.indexOf("INVOCATION_CONTEXT");
 		int head = raw.substring(index).indexOf("[")+1;
 		int tail = raw.substring(index).indexOf("]");
 		return raw.substring(head, tail);
