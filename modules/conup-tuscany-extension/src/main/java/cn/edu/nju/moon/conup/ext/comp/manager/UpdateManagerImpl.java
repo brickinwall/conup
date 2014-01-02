@@ -11,7 +11,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
@@ -24,6 +23,7 @@ import cn.edu.nju.moon.conup.spi.update.ComponentUpdator;
 import cn.edu.nju.moon.conup.spi.update.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
+import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
  * UpdateManager is used to execute the real update operation which is delegated from CompLifeCycleManager
@@ -47,9 +47,10 @@ public class UpdateManagerImpl implements UpdateManager {
 	/** DynamicUpdateContext */
 	private DynamicUpdateContext updateCtx = null;
 	
-	private BufferEventType bufferEventType = BufferEventType.NOTHING;
-
-	public UpdateManagerImpl(ComponentObject compObj){
+	private BufferEventType bufferEventType = BufferEventType.NORMAL;
+	
+	@Override
+	public void initUpdateMgr(ComponentObject compObj) {
 		setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
 		this.compObj = compObj;
 	}
@@ -77,7 +78,7 @@ public class UpdateManagerImpl implements UpdateManager {
 		
 		Object updatingSyncMonitor = compObj.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
-			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)){
+			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.FREE)){
 				executeUpdate();
 				cleanupUpdate();
 			}
@@ -95,12 +96,13 @@ public class UpdateManagerImpl implements UpdateManager {
 		Object validToFreeSyncMonitor = compObj.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			CompStatus compStatus = compLifeCycleMgr.getCompStatus();
-			LOGGER.fine("compStatus: " + compStatus);
-			assert compStatus.equals(CompStatus.VALID)
-					|| compStatus.equals(CompStatus.Free);
+			LOGGER.info("compStatus: " + compStatus);
+			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.FREE);
 			if (compStatus.equals(CompStatus.VALID)) {
 //				compStatus = CompStatus.Free;
 				compLifeCycleMgr.transitToFree();
+				
+				// TODO
 				bufferEventType = BufferEventType.EXEUPDATE;
 				notifyInterceptors(bufferEventType);
 
@@ -121,12 +123,6 @@ public class UpdateManagerImpl implements UpdateManager {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void checkUpdate(Interceptor interceptor) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -158,7 +154,7 @@ public class UpdateManagerImpl implements UpdateManager {
 		Object updatingSyncMonitor = compObj.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
 			compLifeCycleMgr.transitToNormal();
-			bufferEventType = BufferEventType.NOTHING;
+			bufferEventType = BufferEventType.NORMAL;
 			notifyInterceptors(bufferEventType);
 			updatingSyncMonitor.notifyAll();
 		}
@@ -228,10 +224,9 @@ public class UpdateManagerImpl implements UpdateManager {
 
 	private String manageOndemand(RequestObject reqObj) {
 		boolean ondemandResult = false;
-		NodeManager nodeMgr = NodeManager.getInstance();
-		setOndemandSetupHelper(nodeMgr.getOndemandSetupHelper(compObj.getIdentifier()));
 		ondemandResult = ondemandSetupHelper.ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
 		return "ondemandResult:" + ondemandResult;
+		
 	}
 
 	private String manageRemoteConf(RequestObject reqObj) {
@@ -406,7 +401,6 @@ public class UpdateManagerImpl implements UpdateManager {
 				exeRecorder.ondemandIsDone();
 				
 //				compStatus = CompStatus.VALID;
-				LOGGER.info(compObj.getIdentifier() + "   transitToValid()");
 				compLifeCycleMgr.transitToValid();
 //				if(isUpdateRequestReceived){
 				if(compObj.isTargetComp()){
@@ -423,15 +417,16 @@ public class UpdateManagerImpl implements UpdateManager {
 				} else {
 					bufferEventType = BufferEventType.WAITFORREMOTEUPDATE;
 				}
-				LOGGER.info("start notifyInterceptors");
 				notifyInterceptors(bufferEventType);
-				LOGGER.info("end notifyInterceptors");
 //				System.out.println("in ddm:" + bufferEventType);
 				
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 				ondemandSetupHelper.onDemandIsDone();
 				ondemandSyncMonitor.notifyAll();
 				LOGGER.info("-------------- " + compObj.getIdentifier() + "ondemand setup is done, now notify all...------\n\n");
+				Printer printer = new Printer();
+				printer.printDeps(LOGGER, depMgr.getRuntimeInDeps(), "In");
+				printer.printDeps(LOGGER, depMgr.getRuntimeDeps(), "Out");
 				
 //				if(isUpdateRequestReceived){
 				if(compObj.isTargetComp()){
@@ -460,7 +455,7 @@ public class UpdateManagerImpl implements UpdateManager {
 //				compStatus = CompStatus.NORMAL;
 				compLifeCycleMgr.transitToNormal();
 				//TODO updateManager
-				bufferEventType = BufferEventType.NOTHING;
+				bufferEventType = BufferEventType.NORMAL;
 				notifyInterceptors(bufferEventType);
 //				notifyObservers(bufferEventType);
 //				System.out.println("in ddm:" + bufferEventType);
@@ -489,7 +484,6 @@ public class UpdateManagerImpl implements UpdateManager {
 //				this.compStatus = CompStatus.ONDEMAND;
 				compLifeCycleMgr.transitToOndemand();
 				bufferEventType = BufferEventType.ONDEMAND;
-				LOGGER.info("bufferEventType=" + bufferEventType);
 				notifyInterceptors(bufferEventType);
 //				notifyObservers(bufferEventType);
 			}
