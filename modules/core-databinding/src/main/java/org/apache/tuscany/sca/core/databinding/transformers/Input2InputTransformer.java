@@ -253,26 +253,9 @@ public class Input2InputTransformer extends BaseTransformer<Object[], Object[]> 
             // Assuming wrapper to wrapper conversion can be handled here as well
             Object[] newArgs = new Object[source.length];
             for (int i = 0; i < source.length; i++) {
-            	List<DataType> sourceDataType = sourceType.getLogical();
-            	List<DataType> targetDataType = targetType.getLogical();
-            	DataType tmpSourceType;
-            	DataType tmpTargetType;
-            	if(i >= sourceDataType.size()){
-            		tmpSourceType = null;
-            	} else{
-            		tmpSourceType = sourceDataType.get(i);
-            	}
-            	if(i >= targetDataType.size()){
-            		tmpTargetType = null;
-            	} else{
-            		tmpTargetType = targetDataType.get(i);
-            	}
-            	Object child =
-                        mediator.mediate(source[i], tmpSourceType, tmpTargetType, context
-                            .getMetadata());
-//                Object child =
-//                    mediator.mediate(source[i], sourceType.getLogical().get(i), targetType.getLogical().get(i), context
-//                        .getMetadata());
+                Object child =
+                    mediator.mediate(source[i], sourceType.getLogical().get(i), targetType.getLogical().get(i), context
+                        .getMetadata());
                 newArgs[i] = child;
             }
             return newArgs;
