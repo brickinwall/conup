@@ -45,7 +45,7 @@ public class TxLifecycleManagerTest {
 		txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		txRegistry = txLifecycleMgr.getTxRegistry();
 		
-		if(txLifecycleMgr.getTxs() != 0){
+		if(txLifecycleMgr.getTxs().size() != 0){
 //			Map<String, TransactionContext> txCtxs = txRegistry.getAllTxIds();
 			Set<String> allTxIds = txRegistry.getAllTxIds();
 			for(String txId : allTxIds){
@@ -113,7 +113,7 @@ public class TxLifecycleManagerTest {
 //		txLifecycleMgr.TX_IDS.put(currentTxID, new TransactionContext());
 		txRegistry.addTransactionContext(currentTxID, new TransactionContext());
 		
-		assertEquals(1, txLifecycleMgr.getTxs());
+		assertEquals(1, txLifecycleMgr.getTxs().size());
 	}
 
 }

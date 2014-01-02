@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -116,14 +117,13 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 	
 	@Override
 	public void destroyID(String txId){
-//		TX_IDS.remove(id);
 		txRegistry.removeTransactionContext(txId);
 	}
 	
 	@Override
-	public int getTxs(){
-//		return TX_IDS.size();
-		return txRegistry.getTransactionContexts().size();
+	public Map<String, TransactionContext> getTxs(){
+//		return txRegistry.getTransactionContexts().size();
+		return txRegistry.getTransactionContexts();
 	}
 
 	@Override
@@ -237,10 +237,13 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		NodeManager nodeMgr = NodeManager.getInstance();
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
 		CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(hostComp);
+		TxDepMonitor txDepMonitor = nodeMgr.getTxDepMonitor(hostComp);
+		TxDepRegistry txDepRegistry = txDepMonitor.getTxDepRegistry();
 		
 		Object ondemandMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
 			depMgr.getTxs().remove(fakeSubTx);
+			txDepRegistry.removeLocalDep(fakeSubTx);
 		}
 		return true;
 	}
@@ -340,6 +343,26 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		CompLifeCycleManager compLifeCycleMgr = nodeManager.getCompLifecycleManager(hostComp);
 		
 		return depMgr.notifySubTxStatus(TxEventType.TransactionEnd, invocationCtx, compLifeCycleMgr);
+	}
+
+	@Override
+	public void updateTxContext(String currentTxID, TransactionContext txContext) {
+		if (!txRegistry.contains(currentTxID)) {
+			txRegistry.addTransactionContext(currentTxID, txContext);
+		} else {
+			// if this tx id already in txRegistry, update it...
+			txRegistry.updateTransactionContext(currentTxID, txContext);
+		}		
+	}
+
+	@Override
+	public TransactionContext getTransactionContext(String curTxID) {
+		return txRegistry.getTransactionContext(curTxID);
+	}
+
+	@Override
+	public void removeTransactionContext(String curTxID) {
+		txRegistry.removeTransactionContext(curTxID);
 	}
 
 //	public boolean startRemoteSubTx(String subComp, String curComp,
