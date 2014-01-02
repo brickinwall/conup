@@ -67,4 +67,28 @@ public class CompLifeCycleManagerImpl implements CompLifeCycleManager {
 		
 	}
 
+	@Override
+	public boolean isNormal() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isOndemandSetting() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isValid() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isFree() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

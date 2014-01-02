@@ -75,7 +75,7 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
-		return compStatus.equals(CompStatus.Free) || (compStatus.equals(CompStatus.VALID) && depMgr.isReadyForUpdate());
+		return compStatus.equals(CompStatus.FREE) || (compStatus.equals(CompStatus.VALID) && depMgr.isReadyForUpdate());
 	}
 
 	@Override
@@ -100,14 +100,34 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 
 	@Override
 	public void transitToUpdating(){
-		assert compStatus.equals(CompStatus.Free);
+		assert compStatus.equals(CompStatus.FREE);
 		compStatus = CompStatus.UPDATING;
 	}
 
 	@Override
 	public void transitToFree(){
 		assert compStatus.equals(CompStatus.VALID);
-		compStatus = CompStatus.Free;
+		compStatus = CompStatus.FREE;
+	}
+
+	@Override
+	public boolean isNormal() {
+		return (compStatus == CompStatus.NORMAL) ? true : false;
+	}
+
+	@Override
+	public boolean isOndemandSetting() {
+		return (compStatus == CompStatus.ONDEMAND) ? true : false;
+	}
+
+	@Override
+	public boolean isValid() {
+		return (compStatus == CompStatus.VALID) ? true : false;
+	}
+
+	@Override
+	public boolean isFree() {
+		return (compStatus == CompStatus.FREE) ? true : false;
 	}
 
 }
