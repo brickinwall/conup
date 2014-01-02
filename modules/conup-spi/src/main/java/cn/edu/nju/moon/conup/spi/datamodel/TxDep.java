@@ -37,4 +37,19 @@ public class TxDep {
 	public void setFutureComponents(Set<String> futureComponents) {
 		this.futureComponents = futureComponents;
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer txDep = new StringBuffer();
+		txDep.append("FutureComponents:");
+		for(String str : futureComponents){
+			txDep.append(str).append(",");
+		}
+		
+		txDep.append("\nPastComponents:");
+		for(String str: pastComponents){
+			txDep.append(str).append(",");
+		}
+		return txDep.toString();
+	}
 }
