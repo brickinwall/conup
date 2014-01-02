@@ -14,13 +14,11 @@ import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.impl.NodeImpl;
 import org.apache.tuscany.sca.runtime.DomainRegistry;
 
-import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.ddm.LocalDynamicDependencesManager;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDep;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
@@ -44,12 +42,15 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	private static Map<String, String> serviceToComp = new ConcurrentHashMap<String, String>();
 	/** used to store the deps during the tx running*/
 	private TxDepRegistry txDepRegistry = new TxDepRegistry();
-	
-	//	private String compIdentifier = null;
-	private ComponentObject compObject = null;
+	private TxLifecycleManager txLifeCycleMgr = null;
+//	private ComponentObject compObject = null;
+	private String compIdentifier = null;
 	
 	public TxDepMonitorImpl(ComponentObject compObject){
-		this.compObject = compObject;
+//		this.compObject = compObject;
+		NodeManager nodeMgr = NodeManager.getInstance();
+		this.compIdentifier = compObject.getIdentifier();
+		this.txLifeCycleMgr = nodeMgr.getTxLifecycleManager(compIdentifier);
 	}
 	
 //	public TxDepMonitorImpl(String compIdentifier){
@@ -65,18 +66,20 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	public boolean notify(TxEventType et, String curTxID){
 		LOGGER.fine("--------TxDepMonitor.notify(" + et.toString() + "," + curTxID + ")--------------");
 		NodeManager nodeMgr = NodeManager.getInstance();
-		String compIdentifier = compObject.getIdentifier();
-		TxLifecycleManager txLifecycleMgr = nodeMgr.getTxLifecycleManager(compIdentifier);
-		TransactionRegistry txRegistry = txLifecycleMgr.getTxRegistry();
+//		String compIdentifier = compObject.getIdentifier();
+//		TxLifecycleManager txLifecycleMgr = nodeMgr.getTxLifecycleManager(compIdentifier);
+//		TransactionRegistry txRegistry = txLifecycleMgr.getTxRegistry();
 		
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
-		TransactionContext txContext = txRegistry.getTransactionContext(curTxID);
+//		TransactionContext txContext = txRegistry.getTransactionContext(curTxID);
+		TransactionContext txContext = txLifeCycleMgr.getTransactionContext(curTxID);
 		txContext.setEventType(et);
 		
 		/*
 		 * set eventType, futureC, pastC 
 		 */
 		TxDep txDep = new TxDep(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()), convertServiceToComponent(ddm.getPast(), txContext.getHostComponent()));
+//		System.out.println("txDep:" + txDep);
 		txDepRegistry.addLocalDep(curTxID, txDep);
 //		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()));
 //		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), txContext.getHostComponent()));
@@ -88,7 +91,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TxRegistry.
 		if(et.equals(TxEventType.TransactionEnd)){
-			txRegistry.removeTransactionContext(curTxID);
+//			txRegistry.removeTransactionContext(curTxID);
+			txLifeCycleMgr.removeTransactionContext(curTxID);
 			txDepRegistry.removeLocalDep(curTxID);
 			
 			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
