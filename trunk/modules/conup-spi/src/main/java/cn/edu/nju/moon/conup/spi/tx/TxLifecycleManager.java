@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.spi.tx;
 
+import java.util.Map;
+
 import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
@@ -26,7 +28,8 @@ public interface TxLifecycleManager {
 	/**
 	 * @return total transactions that are running
 	 */
-	public int getTxs();
+//	public int getTxs();
+	public Map<String, TransactionContext> getTxs();
 	
 	/**
 	 * the host component started a sub-transaction on a remote component
@@ -118,5 +121,11 @@ public interface TxLifecycleManager {
 	 * @return
 	 */
 	public boolean endRemoteSubTx(InvocationContext invocationCtx);
+
+	public void updateTxContext(String currentTxID, TransactionContext txContext);
+
+	public TransactionContext getTransactionContext(String curTxID);
+
+	public void removeTransactionContext(String curTxID);
 
 }
