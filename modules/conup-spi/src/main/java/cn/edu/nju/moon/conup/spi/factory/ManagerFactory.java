@@ -4,6 +4,7 @@ import java.util.ServiceLoader;
 
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * A factory for creating different managers. 
@@ -46,6 +47,18 @@ public class ManagerFactory {
 		ServiceLoader<OndemandSetupHelper> helpers = ServiceLoader.load(OndemandSetupHelper.class); 
 		for(OndemandSetupHelper helper : helpers){
 			return helper;
+		}
+		return null;
+	}
+
+	/**
+	 * @author Guochao Ren
+	 * @return an instance of UpdateManager
+	 */
+	public UpdateManager createUpdateManager() {
+		ServiceLoader<UpdateManager> updateMgrs = ServiceLoader.load(UpdateManager.class);
+		for(UpdateManager updateMgr : updateMgrs){
+			return updateMgr;
 		}
 		return null;
 	}
