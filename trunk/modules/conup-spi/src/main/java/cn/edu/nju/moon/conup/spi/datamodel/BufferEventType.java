@@ -5,7 +5,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
  * @version Created time: Jul 28, 2013 10:57:38 PM
  */
 public enum BufferEventType {
-	NOTHING,
+	NORMAL,
 	ONDEMAND,
 	VALIDTOFREE,
 	WAITFORREMOTEUPDATE,
