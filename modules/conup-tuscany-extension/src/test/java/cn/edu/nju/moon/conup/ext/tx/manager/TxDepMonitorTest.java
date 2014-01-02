@@ -33,6 +33,10 @@ public class TxDepMonitorTest {
 		String componentName = "AuthComponent";
 		nodeMgr.loadConupConf(componentName , "Version");
 		ComponentObject compObj = nodeMgr.getComponentObject(componentName);
+		
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+        nodeMgr.setTxLifecycleManager(componentName, txLifecycleMgr);
+        
 		txDepMonitor = new TxDepMonitorImpl(compObj);
 		TuscanyRuntime runtime = TuscanyRuntime.newInstance();
 		node = runtime.createNode();
