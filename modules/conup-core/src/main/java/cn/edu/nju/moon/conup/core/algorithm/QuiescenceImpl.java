@@ -68,7 +68,7 @@ public class QuiescenceImpl implements Algorithm {
 		case ONDEMAND:
 			doOndemand(txContext, compLifeCycleMgr, depMgr);
 			break;
-		case Free:
+		case FREE:
 			doFree(txContext, compLifeCycleMgr, depMgr);
 			break;
 		default:
@@ -241,7 +241,7 @@ public class QuiescenceImpl implements Algorithm {
 		Object updatingMonitor = compLifeCycleMgr.getCompObject().getUpdatingSyncMonitor();
 		synchronized (updatingMonitor) {
 			try {
-				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.Free)) {
+				if (compLifeCycleMgr.getCompStatus().equals(CompStatus.FREE)) {
 					updatingMonitor.wait();
 				}
 			} catch (InterruptedException e) {
@@ -553,7 +553,7 @@ public class QuiescenceImpl implements Algorithm {
 	public boolean readyForUpdate(String compIdentifier,
 			DynamicDepManager depMgr) {
 		CompLifeCycleManager compLifeCycleMgr = NodeManager.getInstance().getCompLifecycleManager(compIdentifier);
-		return compLifeCycleMgr.getCompStatus().equals(CompStatus.Free);
+		return compLifeCycleMgr.getCompStatus().equals(CompStatus.FREE);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ public enum CompStatus {
 	NORMAL,
 	ONDEMAND,
 	VALID,
-	Free,
+	FREE,
 	UPDATING;
 //	UPDATED;
 }
