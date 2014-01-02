@@ -136,7 +136,6 @@ public class NodeManager{
 			} else{
 				txDepMonitor = txDepMonitors.get(compObj);
 				DynamicDepManager depMgr = depMgrs.get(compObj);
-				depMgr.setTxDepRegistry(txDepMonitor.getTxDepRegistry());
 				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
 				ondemandHelpler.getOndemand().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
 			}
@@ -230,6 +229,35 @@ public class NodeManager{
 		return helper;
 	}
 	
+	public UpdateManager getUpdateManageer(String compIdentifier) {
+		ComponentObject compObj;
+		UpdateManager updateMgr;
+		synchronized (this) {
+			compObj = getComponentObject(compIdentifier);
+			if(compObj == null)
+				return null;
+			if( !updateMgrs.containsKey(compObj) ){
+				updateMgr = new ManagerFactory().createUpdateManager();
+				updateMgr.initUpdateMgr(compObj);
+				
+				updateMgrs.put(compObj, updateMgr);
+				
+				DynamicDepManager depMgr = depMgrs.get(compObj);
+				updateMgr.setDepMgr(depMgr);
+
+				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
+				updateMgr.setOndemandSetupHelper(ondemandHelpler);
+				
+				CompLifeCycleManager compLifeCycleMgr = compLifecycleMgrs.get(compObj);
+				updateMgr.setCompLifeCycleMgr(compLifeCycleMgr);
+				
+			} else{
+				updateMgr = updateMgrs.get(compObj);
+			}
+		}
+		return updateMgr;
+	}
+
 	/**
 	 * @param identifier the identifier of the component
 	 * @return
@@ -342,27 +370,8 @@ public class NodeManager{
 		}
 	}
 
-	public UpdateManager getUpdateManageer(String compIdentifier) {
-		ComponentObject compObj;
-		UpdateManager updateMgr;
-		synchronized (this) {
-			compObj = getComponentObject(compIdentifier);
-			if(compObj == null)
-				return null;
-			if( !updateMgrs.containsKey(compObj) ){
-				throw new ConupMgrNotFoundException("UpdateManager not found.");
-			} else{
-				updateMgr = updateMgrs.get(compObj);
-				DynamicDepManager depMgr = depMgrs.get(compObj);
-				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
-				updateMgr.setDepMgr(depMgr);
-				updateMgr.setOndemandSetupHelper(ondemandHelpler);
-			}
-		}
-		return updateMgr;
-	}
-	
-	public boolean setUpdateManager(String compIdentifier,	UpdateManager updateMgr) {
+	@Deprecated
+	private boolean setUpdateManager(String compIdentifier,	UpdateManager updateMgr) {
 		ComponentObject compObj;
 		synchronized (this) {
 			compObj = getComponentObject(compIdentifier);
