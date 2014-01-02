@@ -161,12 +161,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean manageDependence(String payload) {
 		// TODO Auto-generated method stub
 		return false;

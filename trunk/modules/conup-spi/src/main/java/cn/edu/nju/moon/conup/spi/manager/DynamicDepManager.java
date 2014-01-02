@@ -159,8 +159,6 @@ public interface DynamicDepManager{
 	 */
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr);
 
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry);
-
 	public boolean notifySubTxStatus(TxEventType transactionstart,
 			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr);
 

@@ -13,7 +13,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -46,7 +45,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	private TxLifecycleManager txLifecycleMgr = null;
 	
-	private TransactionRegistry txRegistry = null;
+//	private TransactionRegistry txRegistry = null;
 
 	public DynamicDepManagerImpl() {
 	}
@@ -115,9 +114,11 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		return txLifecycleMgr;
 	}
 
+	
 	@Override
 	public Map<String, TransactionContext> getTxs() {
-		return txRegistry.getTransactionContexts();
+//		return txRegistry.getTransactionContexts();
+		return txLifecycleMgr.getTxs();
 	}
 
 	@Override
@@ -175,12 +176,15 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	public boolean manageTx(TransactionContext txContext) {
 		LOGGER.fine("DynamicDepManagerImpl.manageTx(...)");
 		String currentTxID = txContext.getCurrentTx();
-		if (!txRegistry.contains(currentTxID)) {
-			txRegistry.addTransactionContext(currentTxID, txContext);
-		} else {
-			// if this tx id already in txRegistry, update it...
-			txRegistry.updateTransactionContext(currentTxID, txContext);
-		}
+		
+		txLifecycleMgr.updateTxContext(currentTxID, txContext);
+		
+//		if (!txRegistry.contains(currentTxID)) {
+//			txRegistry.addTransactionContext(currentTxID, txContext);
+//		} else {
+//			// if this tx id already in txRegistry, update it...
+//			txRegistry.updateTransactionContext(currentTxID, txContext);
+//		}
 		
 		return manageDependence(txContext);
 	}
@@ -238,16 +242,9 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		this.txLifecycleMgr = txLifecycleMgr;
-		this.txRegistry = txLifecycleMgr.getTxRegistry();
+//		this.txRegistry = txLifecycleMgr.getTxRegistry();
 	}
 
-	
-
-	@Override
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
-//		algorithm.setTxDepRegistry(txDepRegistry);
-	}
-	
 	private Map<String, String> getParamFromPayload(PayloadResolver plResolver) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("srcComp", plResolver.getParameter(PayloadType.SRC_COMPONENT));

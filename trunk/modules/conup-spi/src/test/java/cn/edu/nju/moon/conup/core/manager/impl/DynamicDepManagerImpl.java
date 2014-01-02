@@ -140,8 +140,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void setCompObject(ComponentObject compObj) {
-		// TODO Auto-generated method stub
-
+		this.compObj = compObj;
 	}
 
 	@Override
@@ -152,12 +151,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
 		// TODO Auto-generated method stub
 
 	}
