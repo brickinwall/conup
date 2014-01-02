@@ -22,7 +22,11 @@ public class TxDepRegistry {
 	}
 	
 	public void addLocalDep(String txId, TxDep txDep){
-		txDeps.put(txId, txDep);
+		if(!contains(txId))
+			txDeps.put(txId, txDep);
+		else{
+			updateLocalDep(txId, txDep);
+		}
 	}
 	
 	public void removeLocalDep(String txId){
@@ -34,7 +38,7 @@ public class TxDepRegistry {
 		return txDeps.containsKey(txId);
 	}
 	
-	public void updateLocalDep(String txId, TxDep txDep){
+	private void updateLocalDep(String txId, TxDep txDep){
 		txDeps.remove(txId);
 		txDeps.put(txId, txDep);
 	}
