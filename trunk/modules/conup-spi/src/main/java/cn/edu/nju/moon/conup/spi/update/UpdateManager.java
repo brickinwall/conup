@@ -1,6 +1,7 @@
 package cn.edu.nju.moon.conup.spi.update;
 
 
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -68,7 +69,7 @@ public interface UpdateManager {
 
 	public void setOndemandSetupHelper(OndemandSetupHelper ondemandSetupHelper);
 
-	public void checkUpdate(Interceptor interceptor);
+//	public void checkUpdate(Interceptor interceptor);
 
 	public void removeAlgorithmOldRootTx(String rootTxId);
 	
@@ -85,11 +86,13 @@ public interface UpdateManager {
 	 */
 	public void ondemandSetupIsDone();
 
-	void achieveFree();
+	public void achieveFree();
 
 	public void remoteDynamicUpdateIsDone();
 
 	public void ondemandSetting();
 
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr);
+
+	public void initUpdateMgr(ComponentObject compObj);
 }
