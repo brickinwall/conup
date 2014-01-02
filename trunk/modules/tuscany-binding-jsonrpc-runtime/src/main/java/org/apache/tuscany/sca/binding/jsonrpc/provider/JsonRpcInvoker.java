@@ -97,8 +97,8 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
                 if (JSONRPCBinding.VERSION_20.equals(((JSONRPCBinding)endpointReference.getBinding()).getVersion())) {
                     req = new JsonRpc20Request(requestId, msg.getOperation().getName(), params);
                 } else {
-                	if(msg.getHeaders().containsKey("InvocationContext")){
-                		req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params, msg.getHeaders().get("InvocationContext").toString());
+                	if(msg.getHeaders().containsKey("INVOCATION_CONTEXT")){
+                		req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params, msg.getHeaders().get("INVOCATION_CONTEXT").toString());
                 	} else {
                 		req = new JsonRpc10Request(requestId, msg.getOperation().getName(), params);
                 	}

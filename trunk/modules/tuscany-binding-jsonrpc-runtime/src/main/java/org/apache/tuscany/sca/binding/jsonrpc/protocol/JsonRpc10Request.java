@@ -49,15 +49,15 @@ public class JsonRpc10Request extends JsonRpcRequest {
     public JsonRpc10Request(String id, String method, Object[] params, String obj) {
         super(JsonNodeFactory.instance.textNode(id), method, params);
         this.invocationCtx = obj;
-        jsonNode.put("InvocationContext", invocationCtx);
+        jsonNode.put("INVOCATION_CONTEXT", invocationCtx);
     }
 
     public JsonRpc10Request(ObjectNode req) {
         super(req);
         method = req.get("method").getTextValue();
         id = req.get("id");
-        if(req.get("InvocationContext") != null)
-        	invocationCtx = req.get("InvocationContext").toString();
+        if(req.get("INVOCATION_CONTEXT") != null)
+        	invocationCtx = req.get("INVOCATION_CONTEXT").toString();
         JsonNode args = req.get("params");
         if (args instanceof ArrayNode) {
             // Positional parameters

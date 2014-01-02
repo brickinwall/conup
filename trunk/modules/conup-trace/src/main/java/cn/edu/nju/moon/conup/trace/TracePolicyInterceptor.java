@@ -1,6 +1,5 @@
 package cn.edu.nju.moon.conup.trace;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -163,7 +162,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		String subComp = null;
 		
 		Map<String, Object> msgHeaders = msg.getHeaders();
-		InvocationContext invocationCtx = (InvocationContext) msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT);
+		InvocationContext invocationCtx = InvocationContext.getInvocationCtx((String)msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT));
 		if(invocationCtx == null || invocationCtx.getSubTx() == null){
 			return msg;
 		}
@@ -291,8 +290,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				UpdateManager updateManager = this.nodeMgr.getUpdateManageer(hostComp);
-				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness, compLifeCycleMgr, updateManager);
+				UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
+				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness, compLifeCycleMgr, updateMgr);
 				InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(hostComp);
 				interceptorStub.addInterceptor(bufferInterceptor);
 //				depMgr.registerObserver(bufferInterceptor);

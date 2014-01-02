@@ -26,7 +26,7 @@ import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
  * @author Guochao Ren<rgc.nju.cs@gmail.com>
  *
  */
-public class TxInterceptor implements Interceptor {
+public class TxInterceptor extends Interceptor {
 
 	private final static Logger LOGGER = Logger.getLogger(TxInterceptor.class.getName());
 
@@ -139,14 +139,9 @@ public class TxInterceptor implements Interceptor {
 
 	public Message traceReferencePhase(Message msg, String hostComponent, String serviceName, TxDepMonitor txDepMonitor) {
 		InvocationContext invocationCtx = txLifecycleMgr.createInvocationCtx(hostComponent, serviceName ,txDepMonitor);
-		msg.getHeaders().put("InvocationContext", invocationCtx.toString());
+		msg.getHeaders().put(TxInterceptor.INVOCATION_CONTEXT, invocationCtx.toString());
 		LOGGER.fine("trace REFERENCE_POLICY : " + invocationCtx);
 		return msg;
 	}
 	
-	@Override
-	public void update(Object arg) {
-		
-	}
-
 }
