@@ -1,8 +1,9 @@
 package cn.edu.nju.moon.conup.spi.update;
 
+import java.util.ArrayList;
+import java.util.Map;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.Interceptor;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -95,4 +96,6 @@ public interface UpdateManager {
 	public void setCompLifeCycleMgr(CompLifeCycleManager compLifeCycleMgr);
 
 	public void initUpdateMgr(ComponentObject compObj);
+
+	public Map<String, ArrayList<String>> getCompsVisitLogs();
 }
