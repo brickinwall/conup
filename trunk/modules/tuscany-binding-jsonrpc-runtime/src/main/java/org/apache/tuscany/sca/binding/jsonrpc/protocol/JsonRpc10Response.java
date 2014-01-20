@@ -34,9 +34,13 @@ import org.codehaus.jackson.node.ObjectNode;
  * </ul> 
  */
 public class JsonRpc10Response extends JsonRpcResponse {
-
+	
     public JsonRpc10Response(JsonNode id, JsonNode result) {
         super(id, result);
+    }
+    
+    public JsonRpc10Response(JsonNode id, JsonNode result, String compVersion){
+    	super(id, result, compVersion);
     }
 
     public JsonRpc10Response(JsonNode id, Throwable t) {
