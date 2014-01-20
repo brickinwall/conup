@@ -1,5 +1,8 @@
 package cn.edu.nju.moon.conup.ext.comp.manager;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
@@ -48,6 +51,9 @@ public class UpdateManagerImpl implements UpdateManager {
 	private DynamicUpdateContext updateCtx = null;
 	
 	private BufferEventType bufferEventType = BufferEventType.NORMAL;
+	
+	/** key is rootTxId, value is the sub component visit log(including component name and version)**/
+	private Map<String, ArrayList<String>> compsVisitLogs = new ConcurrentHashMap<String, ArrayList<String>>();
 	
 	@Override
 	public void initUpdateMgr(ComponentObject compObj) {
@@ -201,6 +207,11 @@ public class UpdateManagerImpl implements UpdateManager {
 	@Override
 	public DynamicUpdateContext getUpdateCtx() {
 		return updateCtx;
+	}
+
+	@Override
+	public Map<String, ArrayList<String>> getCompsVisitLogs() {
+		return compsVisitLogs;
 	}
 
 	@Override
