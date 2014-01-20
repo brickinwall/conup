@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.trace;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -59,6 +60,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	private DynamicDepManager depMgr;
 	private TxDepMonitor txDepMonitor;
 	private TxLifecycleManager txLifecycleMgr;
+	private UpdateManager updateMgr;
 
 	public TracePolicyInterceptor(PolicySubject subject, String context,
 			Operation operation, List<TracePolicy> policies, String phase) {
@@ -85,7 +87,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * 
 	 * */
 	public Message invoke(Message msg) {
-		LOGGER.fine("operation =" + operation.toString());
+		LOGGER.fine("phase:" + phase + " operation:" + operation.toString());
 		
 //		if(isCallback(msg)){
 //			LOGGER.fine(operation.toString() + " is a Callback operation when interceptor phase is " + phase);
@@ -125,12 +127,36 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				Map<String, Object> msgHeaders = msg.getHeaders();
 				String subTx = null;
 				String subComp = null;
+				String rootTx = null;
 				
 				//get host component name
 				hostComp = getComponent().getName();
 				
 				// current tx is a root tx, no need to attach any information to its response 
 				InvocationContext invocationCtx = (InvocationContext) msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT);
+				rootTx = invocationCtx.getRootTx();
+				
+				Map<String, ArrayList<String>> compsVisitLogs = updateMgr.getCompsVisitLogs();
+				if(rootTx != null){
+					// current tx is a sub tx
+					
+					StringBuffer currentCompVisitLog = new StringBuffer(rootTx);
+					currentCompVisitLog.append("#").append(hostComp);
+					currentCompVisitLog.append(":").append((String)msgHeaders.get("COMP_VERSION"));
+					if(compsVisitLogs.get(rootTx) != null){
+						for(String log : compsVisitLogs.get(rootTx)){
+							currentCompVisitLog.append(",").append(log);
+						}
+					}
+					msgHeaders.put("COMP_VERSION", currentCompVisitLog.toString());
+					LOGGER.info("currentCompVisitLog:" + currentCompVisitLog);
+				} else{
+					// when rootTx is null, it means that current tx is root tx
+					// then we do not need to put the component visit log to the header
+					// because we do not need to send these informations to somebody
+				}
+				
+				
 				if(invocationCtx.getSubTx() == null){
 					msgHeaders.remove(TxInterceptor.INVOCATION_CONTEXT);
 					return msg;
@@ -163,18 +189,36 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		
 		Map<String, Object> msgHeaders = msg.getHeaders();
 		InvocationContext invocationCtx = InvocationContext.getInvocationCtx((String)msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT));
+
 		if(invocationCtx == null || invocationCtx.getSubTx() == null){
 			return msg;
 		}
-		currentTx = invocationCtx.getParentTx();
+
 		hostComp = getComponent().getName();
+		currentTx = invocationCtx.getParentTx();
 		rootTx = invocationCtx.getRootTx();
 		subTx = invocationCtx.getSubTx();
 		subComp = invocationCtx.getSubComp();
-		
 		assert hostComp != null;
 		assert hostComp.equals(invocationCtx.getParentComp());
+
+		String compVersion = (String)msgHeaders.get("COMP_VERSION");
+		LOGGER.info("COMP_VERSION:" + compVersion + "@attachEndedTxToResAtRefernecePolicy");
 		
+		// A -> B -> C
+		// here we 
+		Map<String, ArrayList<String>> compsVisitLogs = updateMgr.getCompsVisitLogs();
+		if(compsVisitLogs.get(rootTx) != null){
+			// TODO
+			checkConsistency(compsVisitLogs, compVersion.split("#")[0], compVersion.split("#")[1]);
+			compsVisitLogs.get(rootTx).add(compVersion.split("#")[1]);
+			
+		} else{
+			ArrayList<String> logs = new ArrayList<String>();
+			logs.add(compVersion.split("#")[1]);
+			compsVisitLogs.put(rootTx, logs);
+		}
+		LOGGER.info("currentCompVisitLog:" + compsVisitLogs.get(rootTx));
 		if( !subComp.equals(hostComp)){
 			
 //			NodeManager nodeMgr = NodeManager.getInstance();
@@ -191,6 +235,21 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //			printer.printTxs(LOGGER, depMgr.getTxs());
 		}
 		return msg;
+	}
+
+	private void checkConsistency(Map<String, ArrayList<String>> compsVisitLogs, String rootTxId, String subCompVisitLog) {
+		ArrayList<String> previousSubCompVisitLogs = compsVisitLogs.get(rootTxId);
+		String subCompName = subCompVisitLog.split(":")[0];
+		String subCompVersion = subCompVisitLog.split(":")[1];
+		for(String s : previousSubCompVisitLogs){
+			if(s.contains(subCompName)){
+				if(!s.split(":")[1].equals(subCompVersion)){
+					// Found inconsistency!
+				} else {
+					continue;
+				}
+			}
+		}
 	}
 
 	private boolean isCallback(Message msg){
@@ -290,7 +349,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 
 				txInterceptor = new TxInterceptor(subject, operation, phase, txDepMonitor, txLifecycleMgr);
-				UpdateManager updateMgr = nodeMgr.getUpdateManageer(hostComp);
+				this.updateMgr = nodeMgr.getUpdateManageer(hostComp);
 				bufferInterceptor = new BufferInterceptor(subject, phase, txLifecycleMgr, freeness, compLifeCycleMgr, updateMgr);
 				InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(hostComp);
 				interceptorStub.addInterceptor(bufferInterceptor);
