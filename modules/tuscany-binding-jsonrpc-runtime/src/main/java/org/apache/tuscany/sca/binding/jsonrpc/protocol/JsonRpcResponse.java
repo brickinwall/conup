@@ -28,6 +28,7 @@ import org.apache.tuscany.sca.databinding.json.jackson.JacksonHelper;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.TextNode;
 
 /**
  * When the method invocation completes, the service must reply with a response. The response is a single object serialized using JSON.
@@ -65,6 +66,18 @@ public abstract class JsonRpcResponse {
         response.put("id", id);
         response.put("result", result);
         // response.put("error", JsonNodeFactory.instance.nullNode());
+        this.jsonNode = response;
+    }
+    
+    // add for conup by rgc
+    // 2014-01-15 16:55
+    public JsonRpcResponse(JsonNode id, JsonNode result, String compVersion){
+    	super();
+    	ObjectNode response = JsonNodeFactory.instance.objectNode();
+        response.put("id", id);
+        response.put("result", result);
+        JsonNode compVersionJsonNode = new TextNode(compVersion);
+        response.put("COMP_VERSION", compVersionJsonNode);
         this.jsonNode = response;
     }
 

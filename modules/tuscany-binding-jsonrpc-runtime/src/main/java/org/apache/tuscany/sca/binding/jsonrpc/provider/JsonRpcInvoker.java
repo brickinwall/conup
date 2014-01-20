@@ -162,6 +162,14 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
                     String json = mapper.writeValueAsString(rawResult);
 
                     Object body = mapper.readValue(json, TypeFactory.type(genericReturnType));
+                    
+                    // add for conup by rgc
+                    // 2014-01-05 17:05
+                    JsonNode compVersionJsonNode = jsonResponse.get("COMP_VERSION");
+					if (compVersionJsonNode != null) {
+						msg.getHeaders().put("COMP_VERSION",
+								compVersionJsonNode.asText());
+					}
 
                     msg.setBody(body);
                 } else {

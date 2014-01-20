@@ -296,7 +296,20 @@ public class JsonRpcServlet extends HttpServlet {
                 } else {
                     // regular operation returning some value
                     result = responseMessage.getBody();
-                    JsonRpc10Response response = new JsonRpc10Response(request.getId(), (JsonNode)result);
+                    
+                    // add for conup
+                    JsonRpc10Response response = null;
+					if (responseMessage.getHeaders().get("COMP_VERSION") != null) {
+						response = new JsonRpc10Response(request.getId(),
+								(JsonNode) result, (String) responseMessage
+										.getHeaders().get("COMP_VERSION"));
+					} else {
+						response = new JsonRpc10Response(request.getId(),
+								(JsonNode) result);
+					}
+                    
+                    // original version
+                    //JsonRpc10Response response = new JsonRpc10Response(request.getId(), (JsonNode)result);
                     //get response to send to client
                     return response;
                 }
