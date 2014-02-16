@@ -3,6 +3,7 @@ package cn.edu.nju.moon.conup.spi.datamodel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -20,7 +21,9 @@ import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
  * </ul>
  * 
  * @author Jiang Wang <jiang.wang88@gmail.com>
- *
+ * Modified By: Guochao Ren <rgc.nju.cs@gmail.com>
+ * Modified Date: Feb 16, 2014 10:51:49 AM add getProxyRootTxId method
+ * 
  */
 public class TransactionContext {
 	
@@ -55,6 +58,16 @@ public class TransactionContext {
 	
 //	private TxDepMonitor txDepMonitor;
 	
+	private String invocationSequence;
+	
+	public String getInvocationSequence() {
+		return invocationSequence;
+	}
+
+	public void setInvocationSequence(String invocationSequence) {
+		this.invocationSequence = invocationSequence;
+	}
+
 	public TransactionContext(){
 		if(subTxHostComps == null)
 			subTxHostComps = new HashMap<String, String>();
@@ -62,6 +75,40 @@ public class TransactionContext {
 			subTxStatuses = new HashMap<String, TxEventType>();
 	}
 	
+	/**
+	 * get proxy root tx id in specified scope
+	 * @param scope
+	 * @return proxy root tx id
+	 */
+	public String getProxyRootTxId(Scope scope){
+		if(!scope.isSpecifiedScope()){
+			return rootTx;
+		} else {
+			return calcProxyRootTxId(rootTx, hostComponent, scope);
+		}
+	}
+	
+	private String calcProxyRootTxId(String rootTx, String hostComponent,
+			Scope scope) {
+		// 1. get invocation sequence
+		// invocation sequence example:
+		// PortalComponent:a358ab2d-cf1a-4e7e-857a-d89c2db40102>ProcComponent:d130a1f8-657c-4791-8fae-f1cda8d2dd53
+		
+		// 2. calc the proxy root tx id
+		Set<String> proxyRootComps = scope.getRootComp(hostComponent);
+		for(String proxyRootComp : proxyRootComps){
+			if(invocationSequence.contains(proxyRootComp)){
+				String[] enties = invocationSequence.split(">");
+				for(String entry : enties){
+					if(entry.contains(proxyRootComp)){
+						return entry.split(":")[1];
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @return root transaction ID
 	 */
