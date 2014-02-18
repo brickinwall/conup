@@ -1,6 +1,6 @@
 package cn.edu.nju.moon.conup.spi.utils;
 
-public enum OperationType {
+public enum DepOperationType {
 	
 	//tx operations
 	ACK_SUBTX_INIT,
