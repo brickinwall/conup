@@ -2,10 +2,10 @@ package cn.edu.nju.moon.conup.remote.services.impl;
 
 import cn.edu.nju.moon.conup.communication.client.AsynCommClient;
 import cn.edu.nju.moon.conup.communication.client.SynCommClient;
-import cn.edu.nju.moon.conup.remote.utils.TuscanyPayloadCreator;
+import cn.edu.nju.moon.conup.remote.model.UpdateContext;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
-import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
-
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 /**
  * @author rgc
@@ -13,57 +13,80 @@ import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
  */
 public class RemoteConfServiceImpl {
 
-//	String targetIdentifier, String baseDir,String classPath, String contributionURI, String compositeURI
-	
-	public boolean update(String ip, int port, String targetIdentifier, String proctocol, String baseDir, String classFilePath, String contributionUri, String compsiteUri) {
+	// String targetIdentifier, String baseDir,String classPath, String
+	// contributionURI, String compositeURI
+
+	public boolean update(UpdateContext updateContext) {
+		return true;
+	}
+
+	public boolean update(String ip, int port, String targetIdentifier,
+			String proctocol, String baseDir, String classFilePath,
+			String contributionUri, String compsiteUri) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
-		String payload = TuscanyPayloadCreator.createPayload(TuscanyOperationType.UPDATE, targetIdentifier, baseDir, classFilePath, contributionUri, compsiteUri);
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.UPDATE, targetIdentifier, baseDir,
+				classFilePath, contributionUri, compsiteUri);
 		SynCommClient asynCommClient = new SynCommClient();
-		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
+		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
+				msgType, payload);
 		return true;
 	}
 
-	public boolean ondemand(String ip, int port, String targetIdentifier, String proctocol) {
+	public boolean ondemand(String ip, int port, String targetIdentifier,
+			String proctocol) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
-		String payload = TuscanyPayloadCreator.createPayload(TuscanyOperationType.ONDEMAND, targetIdentifier);
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.ONDEMAND, targetIdentifier);
 		SynCommClient synCommClient = new SynCommClient();
-		synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
+		synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
+				msgType, payload);
 		return true;
 	}
 
-	public boolean isUpdated(String ip, int port, String targetIdentifier, String proctocol) {
+	public boolean isUpdated(String ip, int port, String targetIdentifier,
+			String proctocol) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
-		String payload = TuscanyPayloadCreator.createPayload(TuscanyOperationType.QUERY, targetIdentifier);
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.QUERY, targetIdentifier);
 		AsynCommClient asynCommClient = new AsynCommClient();
-		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
+		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
+				msgType, payload);
 		return true;
 	}
-	
-	public String getExecutionRecorder(String ip, int port, String targetIdentifier, String proctocol){
+
+	public String getExecutionRecorder(String ip, int port,
+			String targetIdentifier, String proctocol) {
 		MsgType msgType = MsgType.EXPERIMENT_MSG;
-		String payload = TuscanyPayloadCreator.createGetExecutionRecorderPayload(TuscanyOperationType.GET_EXECUTION_RECORDER, targetIdentifier);
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.GET_EXECUTION_RECORDER, targetIdentifier);
 		SynCommClient synCommClient = new SynCommClient();
-		return synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
-		
+		return synCommClient.sendMsg(ip, port, null, targetIdentifier,
+				proctocol, msgType, payload);
+
 	}
-	
-	public String getUpdateEndTime(String ip, int port, String targetIdentifier, String proctocol){
+
+	public String getUpdateEndTime(String ip, int port,
+			String targetIdentifier, String proctocol) {
 		MsgType msgType = MsgType.EXPERIMENT_MSG;
-		String payload = TuscanyPayloadCreator.createGetExecutionRecorderPayload(TuscanyOperationType.GET_UPDATE_ENDTIME, targetIdentifier);
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.GET_UPDATE_ENDTIME, targetIdentifier);
 		SynCommClient synCommClient = new SynCommClient();
-		return synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol, msgType, payload);
+		return synCommClient.sendMsg(ip, port, null, targetIdentifier,
+				proctocol, msgType, payload);
 	}
-	
+
 	public static void main(String[] args) {
-		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
 		String targetIdentifier = "AuthComponent";
 		int port = 18082;
 		String baseDir = "/home/nju/deploy/sample/update";
 		String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 		String contributionUri = "conup-sample-auth";
 		String compsiteUri = "auth.composite";
-		rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-//		rcs.ondemand("localhost", port , targetIdentifier, "CONSISTENCY");
+		rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir,
+				classFilePath, contributionUri, compsiteUri);
+		// rcs.ondemand("localhost", port , targetIdentifier, "CONSISTENCY");
 	}
 
 }
