@@ -38,6 +38,8 @@ import com.tuscanyscatours.payment.Payment;
 public class PaymentImpl implements Payment {
 	private static Logger LOGGER = Logger.getLogger(Payment.class.getName());
 	
+	private String COMP_VERSION= "Ver_0";
+	
 	@Property
 	protected float transactionFee = 0.01f;
 	
@@ -88,7 +90,7 @@ public class PaymentImpl implements Payment {
         } catch (CustomerNotFoundException ex) {
             return "Payment failed due to " + ex.getMessage();
         } catch (Throwable t) {
-        	System.out.println("error in makePaymentMember");
+        	System.out.println("error in makePaymentMember\n" + t.getMessage());
             return "Payment failed due to system error " + t.getMessage();
         }
     }

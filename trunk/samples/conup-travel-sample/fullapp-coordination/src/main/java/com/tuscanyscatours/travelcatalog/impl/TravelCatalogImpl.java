@@ -43,6 +43,9 @@ import com.tuscanyscatours.trip.impl.TripSearch;
  */
 @Service(TravelCatalogSearch.class)
 public class TravelCatalogImpl implements TravelCatalogSearch {
+	
+	private String COMP_VERSION= "Ver_0";
+	
 	private List<TripItem> searchResults = new ArrayList<TripItem>();
 	
 	@Property

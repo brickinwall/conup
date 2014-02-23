@@ -32,6 +32,8 @@ import com.tuscanyscatours.currencyconverter.CurrencyConverter;
  */
 @Service(CurrencyConverter.class)
 public class CurrencyConverterImpl implements CurrencyConverter {
+	
+	private String COMP_VERSION= "Ver_0";
 
     // currency index
     private Map<String, Integer> currencyIndex = new HashMap<String, Integer>();

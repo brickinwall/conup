@@ -36,6 +36,9 @@ import com.tuscanyscatours.tripbooking.TripBooking;
  */
 @Service(TripBooking.class)
 public class TripBookingImpl implements TripBooking {
+	
+	private String COMP_VERSION= "Ver_0";
+	
 //    @Reference
     protected HotelBook hotelBook;
 

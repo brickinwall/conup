@@ -38,7 +38,7 @@ import com.tuscanyscatours.common.TripLeg;
 public class CarImpl implements CarSearch, CarBook {
 	private Logger LOGGER = Logger.getLogger(CarImpl.class.getName());
 	/** it's used to identify component version */
-	private String COMP_VER = "Ver_0";
+	private String COMP_VERSION = "Ver_0";
     private List<CarInfo> cars = new ArrayList<CarInfo>();
 
     public CarImpl(){

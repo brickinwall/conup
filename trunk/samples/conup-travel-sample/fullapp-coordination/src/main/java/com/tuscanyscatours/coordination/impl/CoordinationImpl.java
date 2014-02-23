@@ -18,6 +18,9 @@ import com.tuscanyscatours.tripbooking.TripBooking;
 @Service(Coordination.class)
 public class CoordinationImpl implements Coordination {
 	private static Logger LOGGER = Logger.getLogger(CoordinationImpl.class.getName());
+	
+	private String COMP_VERSION= "Ver_0";
+	
 //	@Reference
 	protected TravelCatalogSearch travelCatalogSearch;
 	

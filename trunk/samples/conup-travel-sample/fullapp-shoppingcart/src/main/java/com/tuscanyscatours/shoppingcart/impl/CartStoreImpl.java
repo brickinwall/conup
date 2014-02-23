@@ -23,11 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.oasisopen.sca.RequestContext;
-import org.oasisopen.sca.annotation.Context;
-import org.oasisopen.sca.annotation.Destroy;
-import org.oasisopen.sca.annotation.Init;
-import org.oasisopen.sca.annotation.Scope;
 import org.oasisopen.sca.annotation.Service;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
@@ -42,6 +37,8 @@ import com.tuscanyscatours.shoppingcart.CartStore;
 //@Scope("CONVERSATION")
 @Service(CartStore.class)
 public class CartStoreImpl implements CartStore {
+	
+	private String COMP_VERSION= "Ver_0";
 
     //@ConversationID
 //    protected String cartId;

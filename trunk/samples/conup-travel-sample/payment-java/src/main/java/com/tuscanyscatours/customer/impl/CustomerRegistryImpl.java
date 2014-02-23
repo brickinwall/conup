@@ -40,6 +40,9 @@ import com.tuscanyscatours.payment.creditcard.ObjectFactory;
  */
 @Service(CustomerRegistry.class)
 public class CustomerRegistryImpl implements CustomerRegistry {
+	
+	private String COMP_VERSION= "Ver_0";
+	
     private volatile static int idGenerator = 0;
     private static Map<String, Customer> customers = new HashMap<String, Customer>();
     
