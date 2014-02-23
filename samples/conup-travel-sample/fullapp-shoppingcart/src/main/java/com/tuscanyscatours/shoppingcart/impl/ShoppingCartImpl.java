@@ -41,7 +41,8 @@ import com.tuscanyscatours.shoppingcart.CartUpdates;
  */
 @Service({CartInitialize.class, CartUpdates.class, CartCheckout.class})
 public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartCheckout {
-	private static String COMP_VER = "Ver_0";
+	private String COMP_VERSION= "Ver_0";
+	
 	private static String COMP_NAME = "ShoppingCart";
 	
 	private static Logger LOGGER = Logger.getLogger(ShoppingCartImpl.class.getName());
@@ -161,7 +162,7 @@ public class ShoppingCartImpl implements CartInitialize, CartUpdates, CartChecko
 //		exeProc = "checkout." + COMP_VER;
 //		exeRecorder.addAction(rootTx, exeProc);
 		
-    	LOGGER.info("Shoppingcart " + COMP_VER);
+    	LOGGER.info("Shoppingcart " + COMP_VERSION);
         // get users credentials. Hard coded for now but should
         // come from the security context
         String customerId = customerName;

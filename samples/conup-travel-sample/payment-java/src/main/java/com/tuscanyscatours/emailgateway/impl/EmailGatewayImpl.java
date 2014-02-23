@@ -29,6 +29,9 @@ import com.tuscanyscatours.emailgateway.EmailGateway;
 
 @Service(EmailGateway.class)
 public class EmailGatewayImpl implements EmailGateway {
+	
+	private String COMP_VERSION= "Ver_0";
+	
 	private Logger LOGGER = Logger.getLogger(EmailGatewayImpl.class.getName());
 	@ConupTransaction
     public boolean sendEmail(String sender, String recipient, String subject, String body) {

@@ -41,7 +41,7 @@ import com.tuscanyscatours.hotel.HotelSearch;
 public class HotelImpl implements HotelSearch, HotelBook, HotelManagement {
 	private static Logger LOGGER = Logger.getLogger(HotelImpl.class.getName());
 	/** it's used to identify component version */
-	private String COMP_VER = "Ver_0";
+	private String COMP_VERSION= "Ver_0";
 
     private List<HotelInfo> hotels = new ArrayList<HotelInfo>();
 
@@ -70,7 +70,7 @@ public class HotelImpl implements HotelSearch, HotelBook, HotelManagement {
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
-    	LOGGER.fine("HotelPartner " + COMP_VER);
+    	LOGGER.fine("HotelPartner " + COMP_VERSION);
         List<TripItem> items = new ArrayList<TripItem>();
 
         // find available hotels

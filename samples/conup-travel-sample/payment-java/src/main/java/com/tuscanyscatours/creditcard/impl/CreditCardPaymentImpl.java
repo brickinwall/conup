@@ -30,6 +30,8 @@ import com.tuscanyscatours.payment.creditcard.CreditCardDetailsType;
 
 @Service(CreditCardPayment.class)
 public class CreditCardPaymentImpl implements CreditCardPayment {
+	private String COMP_VERSION= "Ver_0";
+	
 	private static final Logger LOGGER = Logger.getLogger(CreditCardPaymentImpl.class.getName());
 	
 	@ConupTransaction

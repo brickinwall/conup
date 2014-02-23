@@ -40,7 +40,7 @@ import com.tuscanyscatours.common.TripLeg;
 public class TripImpl implements TripSearch, TripBook {
 	private Logger LOGGER = Logger.getLogger(TripImpl.class.getName());
 	/** it's used to identify component version */
-	private String COMP_VER = "Ver_0";
+	private String COMP_VERSION= "Ver_0";
 	private String COMP_NAME = "TripPartner";
     private List<TripInfo> trips = new ArrayList<TripInfo>();
     
@@ -58,25 +58,23 @@ public class TripImpl implements TripSearch, TripBook {
 //        trips.add(new TripInfo("FS1DEC13", "Florence and Siena pre-packaged tour 2", "LGW", "FLR", "13/12/09",
 //                               "20/12/09", "27", 550, "EUR", "http://localhost:8085/tbd"));
 //    }
+//    String threadID = getThreadID();
+//    ExecutionRecorder exeRecorder;
+//    InterceptorCache interceptorCache;
+//    TransactionContext txContextInCache;
+//    String rootTx;
+//    String exeProc;
+//    interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+//    txContextInCache = interceptorCache.getTxCtx(threadID);
+//    rootTx = txContextInCache.getRootTx();
+//    exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+//    exeProc = "TripPartner.searchSynch." + COMP_VER;
+//    exeRecorder.addAction(rootTx, exeProc);
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
-    	LOGGER.info("TripPartner " + COMP_VER);
-    	String threadID = getThreadID();
-    	ExecutionRecorder exeRecorder;
-		InterceptorCache interceptorCache;
-		TransactionContext txContextInCache;
-		String rootTx;
-		String exeProc;
-		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
-		txContextInCache = interceptorCache.getTxCtx(threadID);
-		rootTx = txContextInCache.getRootTx();
-		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "TripPartner.searchSynch." + COMP_VER;
-		exeRecorder.addAction(rootTx, exeProc);
-		
+    	LOGGER.info("TripPartner " + COMP_VERSION);
         List<TripItem> items = new ArrayList<TripItem>();
-
         // find the pre-package trip
         for (TripInfo trip : trips) {
             if ((trip.getFromLocation().equals(tripLeg.getFromLocation())) && (trip.getToLocation().equals(tripLeg
@@ -112,7 +110,7 @@ public class TripImpl implements TripSearch, TripBook {
 		txContextInCache = interceptorCache.getTxCtx(threadID);
 		rootTx = txContextInCache.getRootTx();
 		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "getPercentComplete." + COMP_VER;
+		exeProc = "getPercentComplete." + COMP_VERSION;
 		exeRecorder.addAction(rootTx, exeProc);
 		
         return 100;
@@ -130,7 +128,7 @@ public class TripImpl implements TripSearch, TripBook {
 		txContextInCache = interceptorCache.getTxCtx(threadID);
 		rootTx = txContextInCache.getRootTx();
 		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
-		exeProc = "TripPartner.book." + COMP_VER;
+		exeProc = "TripPartner.book." + COMP_VERSION;
 		exeRecorder.addAction(rootTx, exeProc);
 		
         return "trip1";

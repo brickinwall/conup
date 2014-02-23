@@ -38,7 +38,7 @@ import com.tuscanyscatours.common.TripLeg;
 public class FlightImpl implements FlightSearch, FlightBook {
 	private Logger LOGGER = Logger.getLogger(FlightImpl.class.getName());
 	/** it's used to identify component version */
-	private String COMP_VER = "Ver_0";
+	private String COMP_VERSION = "Ver_0";
     private List<FlightInfo> flights = new ArrayList<FlightInfo>();
 
     @ComponentName
