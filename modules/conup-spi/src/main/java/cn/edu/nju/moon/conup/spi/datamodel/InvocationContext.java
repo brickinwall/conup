@@ -17,9 +17,20 @@ public class InvocationContext implements Serializable {
 	private String parentComp;
 	private String subTx;
 	private String subComp;
+	// invokeSequence contains all the parent component tx information
+	// for example: A -> B -> C -> D
+	//					 |
+	//					 -----> E
+	// B will get a inovkeSequence("A:tx1Id")
+	// C will get a inovkeSequence("A:tx1Id,B:tx2Id")
+	// E will get a invokeSequence("A:tx1Id,B:tx2Id,E:tx5Id")
+	/**
+	 * @author Guochao Ren<rgc.nju.cs@gmail.com>
+	 */
+	private String invokeSequence;
 
 	public InvocationContext(String rootTx, String rootComp, String parentTx,
-			String parentComp, String subTx, String subComp) {
+			String parentComp, String subTx, String subComp, String invokeSequence) {
 		super();
 		this.rootTx = rootTx;
 		this.rootComp = rootComp;
@@ -27,6 +38,7 @@ public class InvocationContext implements Serializable {
 		this.parentComp = parentComp;
 		this.subTx = subTx;
 		this.subComp = subComp;
+		this.invokeSequence = invokeSequence;
 	}
 
 	public InvocationContext() {
@@ -73,6 +85,7 @@ public class InvocationContext implements Serializable {
 		return "INVOCATION_CONTEXT[" + rootTx + ":" + rootComp + 
 				"," + parentTx + ":" + parentComp + 
 				"," + subTx + ":" + subComp +
+				"," + invokeSequence +
 				"]";
 	}
 
@@ -105,6 +118,7 @@ public class InvocationContext implements Serializable {
 			String rootInfo = txInfos[0];
 			String parentInfo = txInfos[1];
 			String subInfo = txInfos[2];
+			String invokeSequence = txInfos[3];
 			
 			String[] rootInfos = rootInfo.split(":");
 			String rootTx = rootInfos[0].equals("null") ? null : rootInfos[0];
@@ -117,7 +131,7 @@ public class InvocationContext implements Serializable {
 			String[] subInfos = subInfo.split(":");
 			String subTx = subInfos[0].equals("null") ? null : subInfos[0];
 			String subComp = subInfos[1].equals("null") ? null : subInfos[1];
-			return new InvocationContext(rootTx, rootComponent, parentTx, parentComponent, subTx, subComp);
+			return new InvocationContext(rootTx, rootComponent, parentTx, parentComponent, subTx, subComp, invokeSequence);
 		}
 		
 	}
@@ -142,6 +156,14 @@ public class InvocationContext implements Serializable {
 		int head = raw.substring(index).indexOf("[")+1;
 		int tail = raw.substring(index).indexOf("]");
 		return raw.substring(head, tail);
+	}
+
+	public String getInvokeSequence() {
+		return invokeSequence;
+	}
+
+	public void setInvokeSequence(String invokeSequence) {
+		this.invokeSequence = invokeSequence;
 	}
 
 }
