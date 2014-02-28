@@ -139,17 +139,37 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				Map<String, ArrayList<String>> compsVisitLogs = updateMgr.getCompsVisitLogs();
 				if(rootTx != null){
 					// current tx is a sub tx
-					
-					StringBuffer currentCompVisitLog = new StringBuffer(rootTx);
-					currentCompVisitLog.append("#").append(hostComp);
-					currentCompVisitLog.append(":").append((String)msgHeaders.get("COMP_VERSION"));
+					// here we check inconsistency in local component
 					if(compsVisitLogs.get(rootTx) != null){
-						for(String log : compsVisitLogs.get(rootTx)){
-							currentCompVisitLog.append(",").append(log);
-						}
+						List<String> currentCompsLogs = compsVisitLogs.get(rootTx);
+						String version = (String)msgHeaders.get("COMP_VERSION");
+						
+						StringBuffer currentCompLog = new StringBuffer(hostComp);
+						currentCompLog.append(":").append(version);
+						currentCompsLogs.add(currentCompLog.toString());
+						
+						checkInConsistency(currentCompsLogs, hostComp, version);
+						
+					} else {
+						String version = (String)msgHeaders.get("COMP_VERSION");
+						ArrayList<String> currentCompsLogs = new ArrayList<String>();
+						StringBuffer currentCompLog = new StringBuffer(hostComp);
+						currentCompLog.append(":").append(version);
+						currentCompsLogs.add(currentCompLog.toString());
+						compsVisitLogs.put(rootTx, currentCompsLogs);
 					}
-					msgHeaders.put("COMP_VERSION", currentCompVisitLog.toString());
-					LOGGER.info("currentCompVisitLog:" + currentCompVisitLog);
+					
+					// previous version: check inconsistency in root component
+//					StringBuffer currentCompVisitLog = new StringBuffer(rootTx);
+//					currentCompVisitLog.append("#").append(hostComp);
+//					currentCompVisitLog.append(":").append((String)msgHeaders.get("COMP_VERSION"));
+//					if(compsVisitLogs.get(rootTx) != null){
+//						for(String log : compsVisitLogs.get(rootTx)){
+//							currentCompVisitLog.append(",").append(log);
+//						}
+//					}
+//					msgHeaders.put("COMP_VERSION", currentCompVisitLog.toString());
+//					LOGGER.fine("currentCompVisitLog:" + currentCompVisitLog);
 				} else{
 					// when rootTx is null, it means that current tx is root tx
 					// then we do not need to put the component visit log to the header
@@ -167,10 +187,11 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert subTx != null;
 				assert hostComp.equals(subComp);
 				
-				txLifecycleMgr.endLocalSubTx(hostComp, subTx);
+				String proxyRootTxId = txLifecycleMgr.endLocalSubTx(hostComp, subTx);
 				
 				msgHeaders.remove(TxInterceptor.INVOCATION_CONTEXT);
-				
+				// scope
+				msgHeaders.put("PROXY_ROOT_TX_ID", proxyRootTxId);
 			} 
 			return msg;
 		}
@@ -202,41 +223,37 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		assert hostComp != null;
 		assert hostComp.equals(invocationCtx.getParentComp());
 
-		String compVersion = (String)msgHeaders.get("COMP_VERSION");
-		LOGGER.info("COMP_VERSION:" + compVersion + "@attachEndedTxToResAtRefernecePolicy");
+		String proxyRootTxId = (String)msgHeaders.get("PROXY_ROOT_TX_ID");
+		LOGGER.fine("PROXY_ROOT_TX_ID:" + proxyRootTxId + "@attachEndedTxToResAtRefernecePolicy");
 		
-		// A -> B -> C
-		// here we 
-		Map<String, ArrayList<String>> compsVisitLogs = updateMgr.getCompsVisitLogs();
-		if(compsVisitLogs.get(rootTx) != null){
-			// TODO
-			checkConsistency(compsVisitLogs, compVersion.split("#")[0], compVersion.split("#")[1]);
-			compsVisitLogs.get(rootTx).add(compVersion.split("#")[1]);
-			
-		} else{
-			ArrayList<String> logs = new ArrayList<String>();
-			logs.add(compVersion.split("#")[1]);
-			compsVisitLogs.put(rootTx, logs);
-		}
-		LOGGER.info("currentCompVisitLog:" + compsVisitLogs.get(rootTx));
 		if( !subComp.equals(hostComp)){
 			
 //			NodeManager nodeMgr = NodeManager.getInstance();
 //			DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(hostComp);
 //			Printer printer = new Printer();
-			LOGGER.fine("TxS before endRemoteSubTx:");
+//			LOGGER.fine("TxS before endRemoteSubTx:");
 //			printer.printTxs(LOGGER, depMgr.getTxs());
 			
-//			nodeMgr.getTxLifecycleManager(hostComp).endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
-//			txLifecycleMgr.endRemoteSubTx(subComp, hostComp, rootTx, currentTx, subTx);
-			txLifecycleMgr.endRemoteSubTx(invocationCtx);
+			txLifecycleMgr.endRemoteSubTx(invocationCtx, proxyRootTxId);
 			
-			LOGGER.fine("TxS after endRemoteSubTx:");
+//			LOGGER.fine("TxS after endRemoteSubTx:");
 //			printer.printTxs(LOGGER, depMgr.getTxs());
 		}
 		return msg;
 	}
+	
+	private void checkInConsistency(List<String> currentCompsLogs, String hostComp, String version){
+		for(String s : currentCompsLogs){
+			if(s.contains(hostComp)){
+				if(!s.split(":")[1].equals(version)){
+//					assert false;
+					System.out.println("INCONSISTENCY DETECT!!");
+				}
+			}
+		}
+	}
 
+	@Deprecated
 	private void checkConsistency(Map<String, ArrayList<String>> compsVisitLogs, String rootTxId, String subCompVisitLog) {
 		ArrayList<String> previousSubCompVisitLogs = compsVisitLogs.get(rootTxId);
 		String subCompName = subCompVisitLog.split(":")[0];
@@ -245,6 +262,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			if(s.contains(subCompName)){
 				if(!s.split(":")[1].equals(subCompVersion)){
 					// Found inconsistency!
+					assert false;
 				} else {
 					continue;
 				}
