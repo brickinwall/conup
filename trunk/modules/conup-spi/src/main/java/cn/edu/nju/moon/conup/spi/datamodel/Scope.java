@@ -183,7 +183,10 @@ public class Scope {
 	public Set<String> getRootComp(String curComp) {
 		Set<String> rootComps = new HashSet<String>();
 
-		return calcRootComps(curComp, rootComps);
+		// root component include itself?
+		calcRootComps(curComp, rootComps);
+		rootComps.add(curComp);
+		return rootComps;
 	}
 
 	private Set<String> calcRootComps(String curComp, Set<String> rootComps) {
