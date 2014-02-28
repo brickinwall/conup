@@ -151,12 +151,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	}
 
 	@Override
-	public void setTxDepRegistry(TxDepRegistry txDepRegistry) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public boolean manageDependence(String payload) {
 		// TODO Auto-generated method stub
 		return false;
@@ -165,7 +159,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean notifySubTxStatus(TxEventType transactionstart,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr) {
+			CompLifeCycleManager compLifeCycleMgr, String proxyRootTxId) {
 		// TODO Auto-generated method stub
 		return false;
 	}

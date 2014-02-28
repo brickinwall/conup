@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -14,7 +15,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	/** represent version-consistency algorithm */
 	public final static String ALGORITHM_TYPE = "CONSISTENCY_ALGORITHM";
 	@Override
-	public boolean ondemand() {
+	public boolean ondemand(Scope scope) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -10,7 +10,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
 
 /**
  * @author JiangWang<jiang.wang88@gmail.com>
@@ -33,7 +33,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean manageDependence(OperationType operationType,
+	public boolean manageDependence(DepOperationType operationType,
 			Map<String, String> params, DynamicDepManager depMgr,
 			CompLifeCycleManager compLifeCycleMgr) {
 		// TODO Auto-generated method stub
@@ -51,14 +51,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	public Set<String> getOldVersionRootTxs(Set<Dependence> allDeps) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public boolean isBlockRequiredForFree(
-			Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -80,10 +72,21 @@ public class VersionConsistencyImpl implements Algorithm {
 		return false;
 	}
 
+
+	@Override
+	public boolean isBlockRequiredForFree(
+			Set<String> algorithmOldVersionRootTxs,
+			TransactionContext txContext, boolean isUpdateReqRCVD,
+			DynamicDepManager depMgr) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,
+			String proxyRootTxId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
