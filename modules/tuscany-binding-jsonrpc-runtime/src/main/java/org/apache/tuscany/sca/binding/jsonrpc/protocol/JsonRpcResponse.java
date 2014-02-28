@@ -77,7 +77,7 @@ public abstract class JsonRpcResponse {
         response.put("id", id);
         response.put("result", result);
         JsonNode compVersionJsonNode = new TextNode(compVersion);
-        response.put("COMP_VERSION", compVersionJsonNode);
+        response.put("PROXY_ROOT_TX_ID", compVersionJsonNode);
         this.jsonNode = response;
     }
 
