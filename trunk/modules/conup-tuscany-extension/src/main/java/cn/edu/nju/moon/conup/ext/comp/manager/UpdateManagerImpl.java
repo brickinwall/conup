@@ -6,8 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
@@ -17,7 +15,8 @@ import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
-import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -27,6 +26,8 @@ import cn.edu.nju.moon.conup.spi.update.DynamicUpdateContext;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayload;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadResolver;
 
 /**
  * UpdateManager is used to execute the real update operation which is delegated from CompLifeCycleManager
@@ -102,7 +103,7 @@ public class UpdateManagerImpl implements UpdateManager {
 		Object validToFreeSyncMonitor = compObj.getValidToFreeSyncMonitor();
 		synchronized (validToFreeSyncMonitor) {
 			CompStatus compStatus = compLifeCycleMgr.getCompStatus();
-			LOGGER.info("compStatus: " + compStatus);
+			LOGGER.fine("compStatus: " + compStatus);
 			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.FREE);
 			if (compStatus.equals(CompStatus.VALID)) {
 //				compStatus = CompStatus.Free;
@@ -233,6 +234,13 @@ public class UpdateManagerImpl implements UpdateManager {
 		return "manageDepResult:" + manageResult;
 	}
 
+	/**
+	 * this method is invoked during the ondemand process
+	 * it means that during the ondemand process, all the message transfered among the 
+	 * peer components are processed by this method
+	 * @param reqObj
+	 * @return ondemandResult
+	 */
 	private String manageOndemand(RequestObject reqObj) {
 		boolean ondemandResult = false;
 		ondemandResult = ondemandSetupHelper.ondemandSetup(reqObj.getSrcIdentifier(), reqObj.getProtocol(), reqObj.getPayload());
@@ -240,25 +248,32 @@ public class UpdateManagerImpl implements UpdateManager {
 		
 	}
 
+	/**
+	 * All remote configurations are processed by this method
+	 * @param reqObj
+	 * @return
+	 */
 	private String manageRemoteConf(RequestObject reqObj) {
 	//		boolean updateResult = compLifeCycleMgr.remoteConf(reqObj.getPayload());
 			boolean result = false;
 			String payload = reqObj.getPayload();
-			TuscanyPayloadResolver payloadResolver = new TuscanyPayloadResolver(payload);
-			TuscanyOperationType opTyep = payloadResolver.getOperation();
-			String compIdentifier = payloadResolver.getParameter(TuscanyPayload.COMP_IDENTIFIER);
+			UpdateContextPayloadResolver payloadResolver = new UpdateContextPayloadResolver(payload);
+			UpdateOperationType opTyep = payloadResolver.getOperation();
+			String compIdentifier = payloadResolver.getParameter(UpdateContextPayload.COMP_IDENTIFIER);
 			
-			if(opTyep.equals(TuscanyOperationType.UPDATE)){
-				String baseDir = payloadResolver.getParameter(TuscanyPayload.BASE_DIR);
-				String classFilePath = payloadResolver.getParameter(TuscanyPayload.CLASS_FILE_PATH);
-				String contributionURI = payloadResolver.getParameter(TuscanyPayload.CONTRIBUTION_URI);
-				String compositeURI = payloadResolver.getParameter(TuscanyPayload.COMPOSITE_URI);
-				result = update(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier);
-			} else if(opTyep.equals(TuscanyOperationType.ONDEMAND)){
+			if(opTyep.equals(UpdateOperationType.UPDATE)){
+				String baseDir = payloadResolver.getParameter(UpdateContextPayload.BASE_DIR);
+				String classFilePath = payloadResolver.getParameter(UpdateContextPayload.CLASS_FILE_PATH);
+				String contributionURI = payloadResolver.getParameter(UpdateContextPayload.CONTRIBUTION_URI);
+				String compositeURI = payloadResolver.getParameter(UpdateContextPayload.COMPOSITE_URI);
+				Scope scope = Scope.inverse(payloadResolver.getParameter(UpdateContextPayload.SCOPE));
+				result = update(baseDir, classFilePath, contributionURI, compositeURI, compIdentifier, scope);
+			} else if(opTyep.equals(UpdateOperationType.ONDEMAND)){
 				NodeManager nodeMgr = NodeManager.getInstance();
 				OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
-				result = ondemandHelper.ondemandSetup();
-			} else if(opTyep.equals(TuscanyOperationType.QUERY)){
+				Scope scope = Scope.inverse(payloadResolver.getParameter(UpdateContextPayload.SCOPE));
+				result = ondemandHelper.ondemandSetup(scope);
+			} else if(opTyep.equals(UpdateOperationType.QUERY)){
 				
 			}
 			
@@ -276,13 +291,23 @@ public class UpdateManagerImpl implements UpdateManager {
 		} else if(msgType.equals(MsgType.REMOTE_CONF_MSG)){ 
 			return manageRemoteConf(reqObj);
 		} else if(msgType.equals(MsgType.EXPERIMENT_MSG)){
-//			return manageExperimentResult(reqObj);
+			return manageExp(reqObj);
 		} else{
 			//TODO manage negotiation msg
 			return null;
 		}
 		
-		return null;
+	}
+
+	private String manageExp(RequestObject reqObj) {
+		String payload = reqObj.getPayload();
+		UpdateContextPayloadResolver updateCtxPayloadResolver = new UpdateContextPayloadResolver(payload);
+		UpdateOperationType updateOperationType = updateCtxPayloadResolver.getOperation();
+		if(updateOperationType.equals(UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP)){
+			DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
+			LOGGER.info("Coordination receive NOTIFY_UPDATE_IS_DONE_EXP");
+		}
+		return "done";
 	}
 
 	public void setCompUpdator(ComponentUpdator compUpdator) {
@@ -309,7 +334,8 @@ public class UpdateManagerImpl implements UpdateManager {
 		this.ondemandSetupHelper = ondemandSetupHelper;
 	}
 
-	public boolean update(String baseDir, String classFilePath, String contributionURI, String compositeURI, String compIdentifier){
+	public boolean update(String baseDir, String classFilePath,
+			String contributionURI, String compositeURI, String compIdentifier, Scope scope) {
 		NodeManager nodeMgr = NodeManager.getInstance();
 		assert compObj.getIdentifier().equals(compIdentifier);
 		
@@ -336,7 +362,7 @@ public class UpdateManagerImpl implements UpdateManager {
 		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 			OndemandSetupHelper ondemandHelper;
 			ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
-			ondemandHelper.ondemandSetup();
+			ondemandHelper.ondemandSetup(scope);
 		}
 		
 		AttemptUpdateThread attemptUpdaterThread;
@@ -477,8 +503,8 @@ public class UpdateManagerImpl implements UpdateManager {
 				
 				// add for experiments
 				// record update cost time
-				if(compIdentifier.equals("Coordination"))
-					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
+//				if(compIdentifier.equals("Coordination"))
+//					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 			}
 		}
 	}
