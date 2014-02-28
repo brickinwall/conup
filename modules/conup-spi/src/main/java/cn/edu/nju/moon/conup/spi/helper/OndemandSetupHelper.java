@@ -1,8 +1,8 @@
 package cn.edu.nju.moon.conup.spi.helper;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Observer;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
@@ -18,7 +18,7 @@ public interface OndemandSetupHelper{
 	 * invoke OndemandSetup and begin on-demand setup
 	 * @return
 	 */
-	public boolean ondemandSetup();
+	public boolean ondemandSetup(Scope scope);
 	
 	/**
 	 * received on-demand notification from peer component
