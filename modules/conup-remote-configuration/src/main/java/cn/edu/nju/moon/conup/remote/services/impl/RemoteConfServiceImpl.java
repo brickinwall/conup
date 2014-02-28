@@ -4,6 +4,7 @@ import cn.edu.nju.moon.conup.communication.client.AsynCommClient;
 import cn.edu.nju.moon.conup.communication.client.SynCommClient;
 import cn.edu.nju.moon.conup.remote.model.UpdateContext;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
@@ -16,17 +17,13 @@ public class RemoteConfServiceImpl {
 	// String targetIdentifier, String baseDir,String classPath, String
 	// contributionURI, String compositeURI
 
-	public boolean update(UpdateContext updateContext) {
-		return true;
-	}
-
 	public boolean update(String ip, int port, String targetIdentifier,
 			String proctocol, String baseDir, String classFilePath,
-			String contributionUri, String compsiteUri) {
+			String contributionUri, String compsiteUri, Scope scope) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
 		String payload = UpdateContextPayloadCreator.createPayload(
 				UpdateOperationType.UPDATE, targetIdentifier, baseDir,
-				classFilePath, contributionUri, compsiteUri);
+				classFilePath, contributionUri, compsiteUri, scope);
 		SynCommClient asynCommClient = new SynCommClient();
 		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
 				msgType, payload);
@@ -34,10 +31,10 @@ public class RemoteConfServiceImpl {
 	}
 
 	public boolean ondemand(String ip, int port, String targetIdentifier,
-			String proctocol) {
+			String proctocol, Scope scope) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
 		String payload = UpdateContextPayloadCreator.createPayload(
-				UpdateOperationType.ONDEMAND, targetIdentifier);
+				UpdateOperationType.ONDEMAND, targetIdentifier, scope);
 		SynCommClient synCommClient = new SynCommClient();
 		synCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
 				msgType, payload);
@@ -85,8 +82,24 @@ public class RemoteConfServiceImpl {
 		String contributionUri = "conup-sample-auth";
 		String compsiteUri = "auth.composite";
 		rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir,
-				classFilePath, contributionUri, compsiteUri);
+				classFilePath, contributionUri, compsiteUri, null);
 		// rcs.ondemand("localhost", port , targetIdentifier, "CONSISTENCY");
+	}
+	
+	/**
+	 * this method is used in experiment.
+	 * when target component is done, it will send a message to coordination component
+	 * then coordination component will record the time to calculate all these
+	 * affected request.
+	 */
+	public void notifyUpdateIsDone(String targetComp){
+		MsgType msgType = MsgType.EXPERIMENT_MSG;
+//		String payload = UpdateContextPayloadCreator.createPayload(
+//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP);
+//		
+//		SynCommClient synCommClient = new SynCommClient();
+//		return synCommClient.sendMsg(ip, port, null, targetIdentifier,
+//				proctocol, msgType, payload);
 	}
 
 }
