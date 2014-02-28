@@ -1,7 +1,7 @@
 package cn.edu.nju.moon.conup.core.utils;
 
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
-import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepPayload;
 
 /**
  * @author rgc
@@ -16,12 +16,12 @@ public class QuiescencePayloadCreator {
 	 * @param operation
 	 * @return
 	 */
-	public static String createPayload(String srcComp, String targetComp, OperationType operation){
+	public static String createPayload(String srcComp, String targetComp, DepOperationType operation){
 		String result = null;
 		
-		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
-				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
-				PayloadType.OPERATION_TYPE + ":" + operation + "," ;
+		result = DepPayload.SRC_COMPONENT + ":" + srcComp + "," +
+				DepPayload.TARGET_COMPONENT + ":" + targetComp + "," +
+				DepPayload.OPERATION_TYPE + ":" + operation + "," ;
 		
 		return result;
 	}
@@ -38,29 +38,29 @@ public class QuiescencePayloadCreator {
 	 * @return
 	 */
 	public static String createPayload(String srcComp, String targetComp, String rootTx,
-			OperationType operation, String parentTxID, String subTxID){
+			DepOperationType operation, String parentTxID, String subTxID){
 		String result = null;
 		
-		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
-				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
-				PayloadType.ROOT_TX + ":" + rootTx + "," +
-				PayloadType.OPERATION_TYPE + ":" + operation + "," +
-				PayloadType.PARENT_TX + ":" + parentTxID + "," +
-				PayloadType.SUB_TX + ":" + subTxID;
+		result = DepPayload.SRC_COMPONENT + ":" + srcComp + "," +
+				DepPayload.TARGET_COMPONENT + ":" + targetComp + "," +
+				DepPayload.ROOT_TX + ":" + rootTx + "," +
+				DepPayload.OPERATION_TYPE + ":" + operation + "," +
+				DepPayload.PARENT_TX + ":" + parentTxID + "," +
+				DepPayload.SUB_TX + ":" + subTxID;
 		
 		return result;
 	}
 
 	public static String createRootTxEndPayload(String srcComp,
 			String targetComp, String rootTx,
-			OperationType operation) {
+			DepOperationType operation) {
 		
 		String result = null;
 		
-		result = PayloadType.SRC_COMPONENT + ":" + srcComp + "," +
-				PayloadType.TARGET_COMPONENT + ":" + targetComp + "," +
-				PayloadType.ROOT_TX + ":" + rootTx + "," +
-				PayloadType.OPERATION_TYPE + ":" + operation;
+		result = DepPayload.SRC_COMPONENT + ":" + srcComp + "," +
+				DepPayload.TARGET_COMPONENT + ":" + targetComp + "," +
+				DepPayload.ROOT_TX + ":" + rootTx + "," +
+				DepPayload.OPERATION_TYPE + ":" + operation;
 		
 		return result;
 	}

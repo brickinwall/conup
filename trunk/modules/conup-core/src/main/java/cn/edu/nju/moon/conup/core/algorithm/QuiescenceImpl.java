@@ -24,7 +24,7 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -79,7 +79,7 @@ public class QuiescenceImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean manageDependence(OperationType operationType, Map<String, String> params, 
+	public boolean manageDependence(DepOperationType operationType, Map<String, String> params, 
 			DynamicDepManager depMgr,
 			CompLifeCycleManager compLifeCycleMgr) {
 		boolean result = false;
@@ -209,11 +209,9 @@ public class QuiescenceImpl implements Algorithm {
 			if(rootTx.equals(txCtx.getCurrentTx()))
 				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
 			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-//				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
 			} else{
-//				depMgr.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 				depMgr.getTxs().remove(txCtx.getCurrentTx());
 				// check passive when a root tx is end
@@ -338,7 +336,7 @@ public class QuiescenceImpl implements Algorithm {
 		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
 		LOGGER.info(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, OperationType.ACK_PASSIVATE);
+		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, DepOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 	}
 
@@ -408,7 +406,7 @@ public class QuiescenceImpl implements Algorithm {
 	private void sendReqPassivate(String hostComp, String targetComp) {
 		LOGGER.info(hostComp + " sendReqPassivate to " + targetComp);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, OperationType.REQ_PASSIVATE);
+		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, DepOperationType.REQ_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 	}
 
@@ -441,7 +439,7 @@ public class QuiescenceImpl implements Algorithm {
 		//notify parent components that remote dynamic update is done
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : DEPS.keySet()){
-			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, OperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, DepOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.synPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
@@ -474,7 +472,7 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD) {	
+			TransactionContext txContext, boolean isUpdateReqRCVD, DynamicDepManager depMgr) {	
 
 //		boolean isRootComp = txContext.getHostComponent().equals(
 //				txContext.getRootComponent());
@@ -560,7 +558,7 @@ public class QuiescenceImpl implements Algorithm {
 	public boolean updateIsDone(String hostComp, DynamicDepManager depMgr) {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : DEPS.keySet()){
-			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, OperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			String payload = QuiescencePayloadCreator.createPayload(hostComp, comp, DepOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.synPost(hostComp, comp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
@@ -582,7 +580,8 @@ public class QuiescenceImpl implements Algorithm {
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,
+			String proxyRootTxId) {
 		
 		String subComp = invocationCtx.getSubComp();
 		String curComp = invocationCtx.getParentComp();
