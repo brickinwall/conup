@@ -1,5 +1,7 @@
 package cn.edu.nju.moon.conup.ext.utils.experiments.model;
 
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
+
 //	<indepRun>200</indepRun>
 //	<nThreads>10</nThreads>
 //	<threadId>5</threadId>
@@ -14,7 +16,15 @@ public class ExpSetting {
 	private String targetComp;
 	private String ipAddress;
 	private String baseDir;
-	private String type;
+	private Scope scope;
+
+	public Scope getScope() {
+		return scope;
+	}
+
+	public void setScope(Scope scope) {
+		this.scope = scope;
+	}
 
 	public int getUpdateInterval() {
 		return updateInterval;
@@ -22,14 +32,6 @@ public class ExpSetting {
 
 	public void setUpdateInterval(int updateInterval) {
 		this.updateInterval = updateInterval;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getBaseDir() {
@@ -92,7 +94,6 @@ public class ExpSetting {
 	public String toString() {
 		return "indepRun:" + indepRun + " nThreads:" + nThreads + " threadId:" + threadId 
 				+ " rqstInterval:" + rqstInterval + " targetComp:" + targetComp 
-				+ " ipAddress:" + ipAddress + " baseDir:" + baseDir
-				+ " type:" + type;
+				+ " ipAddress:" + ipAddress + " baseDir:" + baseDir;
 	}
 }
