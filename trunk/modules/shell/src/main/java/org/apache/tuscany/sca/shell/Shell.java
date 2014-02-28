@@ -76,6 +76,7 @@ import com.tuscanyscatours.coordination.CoordinationVisitorThread;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.apppre.TuscanyProgramAnalyzer;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.experiments.utils.ConupExpCommands;
 import cn.edu.nju.moon.conup.experiments.utils.ExecutionRecorderAnalyzer;
 import cn.edu.nju.moon.conup.experiments.utils.MyPoissonProcess;
@@ -95,12 +96,14 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 
 /**
  * A little SCA command shell.
@@ -205,26 +208,30 @@ public class Shell {
 							
 							// create CompLifecycleManager, TxDepMonitor, TxLifecycleMgr
 							CompLifeCycleManager compLifecycleMgr = new CompLifecycleManagerImpl(compObj);
-//							compLifecycleMgr.setCompUpdator(UpdateFactory.createCompUpdator(compObj.getImplType()));
-//							compLifecycleMgr.setCompObject(compObj);
-//							compLifecycleMgr.setDepMgr(nodeMgr.getDynamicDepManager(componentName));
 							nodeMgr.setCompLifecycleManager(componentName, compLifecycleMgr);
-							
-							TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
-							nodeMgr.setTxDepMonitor(componentName, txDepMonitor);
 							
 							TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 							nodeMgr.setTxLifecycleManager(componentName, txLifecycleMgr);
+
+							TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+							nodeMgr.setTxDepMonitor(componentName, txDepMonitor);
 							
 							DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 							depMgr.setTxLifecycleMgr(txLifecycleMgr);
-//							compLifecycleMgr.setDepMgr(depMgr);
+							depMgr.setCompLifeCycleMgr(compLifecycleMgr);
 							
-							OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
-							
-//							((CompLifecycleManagerImpl)compLifecycleMgr).setNode(node);
+							nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
 							nodeMgr.setTuscanyNode(node);
+							
+							UpdateManager updateMgr = nodeMgr.getUpdateManageer(componentName);
+							
 						    CommServerManager.getInstance().start(componentName);
+						    
+							ServerIoHandler serverIoHandler = CommServerManager
+									.getInstance().getCommServer(componentName)
+									.getServerIOHandler();
+							serverIoHandler.registerUpdateManager(updateMgr);
+						    
 						}
 					}
 				}
@@ -315,8 +322,15 @@ public class Shell {
     	String targetComp = expSetting.getTargetComp();
     	String ipAddress = expSetting.getIpAddress();
     	String baseDir = expSetting.getBaseDir();
+    	Scope scope = expSetting.getScope();
     	
-    	TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+    	System.out.println("---------------------------------------------");
+    	System.out.println("targetComp:" + targetComp);
+    	System.out.println("ipAddress:" + ipAddress);
+    	System.out.println("baseDir:" + baseDir);
+    	System.out.println("---------------------------------------------");
+    	
+    	TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 	}
 
 	private static void doCorrectnessExp(Node node) throws InterruptedException, InvalidParamsException {
@@ -334,6 +348,7 @@ public class Shell {
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
     	final String baseDir = expSetting.getBaseDir();
+    	final Scope scope = expSetting.getScope();
 		
 		// make request arrival obey to poission process
     	Event event = null;
@@ -351,7 +366,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 			}
 			if(i > 200)
 				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -382,7 +397,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					anotherDisExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -533,6 +548,7 @@ public class Shell {
 	    	String targetComp = expSetting.getTargetComp();
 	    	String ipAddress = expSetting.getIpAddress();
 	    	String baseDir = expSetting.getBaseDir();
+	    	Scope scope = expSetting.getScope();
 	    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
 	    	
 	    	// make request arrival as poission process
@@ -552,7 +568,7 @@ public class Shell {
 			for (int i = 0; i < warmUpTimes; i++) {
 				new CoordinationVisitorThread(node, warmCountDown).start();
 				if(i == 300){
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 				}
 				if(i > 200)
 					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -568,7 +584,7 @@ public class Shell {
 					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 					new CoordinationVisitorThread(node).start();
 					if(j == threadId)
-						TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+						TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 				}
 				updateCountDown.await();
 	    		Thread.sleep(3000);
@@ -586,6 +602,14 @@ public class Shell {
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
     	final String baseDir = expSetting.getBaseDir();
+    	final Scope scope = expSetting.getScope();
+    	
+    	System.out.println("---------------------------------------------");
+    	System.out.println("targetComp:" + targetComp);
+    	System.out.println("ipAddress:" + ipAddress);
+    	System.out.println("baseDir:" + baseDir);
+    	System.out.println("scope:" + scope);
+    	System.out.println("---------------------------------------------");
     	
     	// make request arrival as poission process
     	Event event = null;
@@ -603,7 +627,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 			}
 			Thread.sleep(200);
 		}
@@ -614,7 +638,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 100){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 			}
 			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 		}
@@ -639,7 +663,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					disExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -738,6 +762,7 @@ public class Shell {
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
     	final String baseDir = expSetting.getBaseDir();
+    	final Scope scope = expSetting.getScope();
     	
     	// make request arrival as poission process
     	Event event = null;
@@ -755,7 +780,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 			}
 			Thread.sleep(200);
 		}
@@ -766,7 +791,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i % 100 == 0){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 			}
 			
 			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -798,7 +823,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					disExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir);
+					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
