@@ -24,14 +24,16 @@ import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 //import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -66,6 +68,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		assert depMgr != null;
 		assert compStatus != null;
 		
+//		txContext.setRootTx(txContext.getProxyRootTxId(depMgr.getScope()));
 //		if(txContext.getEventType().equals(TxEventType.TransactionStart)){
 //			LOGGER.fine("TxEventType.TransactionStart, rootTx:" + txContext.getRootTx() + ",currentTx:" + txContext.getCurrentTx());
 //		}
@@ -94,7 +97,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 	
 	@Override
-	public boolean manageDependence(OperationType operationType, Map<String, String> params, 
+	public boolean manageDependence(DepOperationType operationType, Map<String, String> params, 
 			DynamicDepManager depMgr,
 			CompLifeCycleManager compLifeCycleMgr) {
 		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL))
@@ -108,7 +111,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		assert operationType != null;
 		
-//		Printer printer = new Printer();
+		Printer printer = new Printer();
 		
 		switch(operationType){
 		case NOTIFY_FUTURE_CREATE:
@@ -185,10 +188,13 @@ public class VersionConsistencyImpl implements Algorithm {
 			String rootTx;
 
 			hostComp = txCtx.getHostComponent();
-			rootTx = txCtx.getRootTx();
+//			rootTx = txCtx.getRootTx();
 			
 			Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
+				
+				// conup refactor 20140227
+				rootTx = txCtx.getProxyRootTxId(depMgr.getScope());
 				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 //					Printer printer = new Printer();
 //					LOGGER.fine("TxS before notified TransactionEnd:");
@@ -249,13 +255,24 @@ public class VersionConsistencyImpl implements Algorithm {
 	 */
 	private void doValid(TransactionContext txContext, DynamicDepManager depMgr, TxDepRegistry txDepRegistry) {
 		TxEventType txEventType = txContext.getEventType();
-		String rootTx = txContext.getRootTx();
+//		String rootTx = txContext.getRootTx();
+		Scope scope = depMgr.getScope();
+		String rootTx = txContext.getProxyRootTxId(scope);
+		if(!scope.isSpecifiedScope()){
+			assert rootTx.equals(txContext.getRootTx());
+		}
+		
+		if(rootTx == null){
+			System.out.println("InvocationSequence: " + txContext.getInvocationSequence());
+			System.out.println("HostComp: " + txContext.getHostComponent() + " real root: " + txContext.getRootTx());
+			assert rootTx != null;
+		}
+		
 		String currentTx = txContext.getCurrentTx();
 		String hostComponent = txContext.getHostComponent();
 		
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
-//		Set<String> futureComponents = txContext.getFutureComponents();
 		Set<String> futureComponents = txDepRegistry.getLocalDep(currentTx).getFutureComponents();
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
@@ -286,7 +303,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				 * current transaction is not root
 				 * notify parent that a new sub-tx start
 				 */
-				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), rootTx, OperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
+				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), rootTx, DepOperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 			}
@@ -317,7 +334,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				if(!hasFutureInDep && !futureComponents.contains(dep.getTargetCompObjIdentifer()) && !dep.getTargetCompObjIdentifer().equals(hostComponent)){
 					outDepRegistry.removeDependence(dep.getType(), dep.getRootTx(), dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer());
 					//notify sub-comp future removed(here must be coincidence with algorithm)
-					String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, OperationType.NOTIFY_FUTURE_REMOVE);
+					String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, DepOperationType.NOTIFY_FUTURE_REMOVE);
 					DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 					depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.CONSISTENCY,  MsgType.DEPENDENCE_MSG, payload);
 				}
@@ -360,7 +377,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		} else {
 			// up receiving FirstRequestService
 			// if current tx is root tx, we need to start set up
-			Scope scope = depMgr.getScope();
 			Set<String> targetRef = new HashSet<String>();
 			if(scope != null){
 				targetRef.addAll(scope.getSubComponents(hostComponent));
@@ -379,7 +395,7 @@ public class VersionConsistencyImpl implements Algorithm {
 						continue;
 					Dependence dep = new Dependence(FUTURE_DEP, currentTx, hostComponent, targetComp, null, null);
 					outDepRegistry.addDependence(dep);
-					String payload = ConsistencyPayloadCreator.createPayload(hostComponent, targetComp, currentTx, OperationType.NOTIFY_FUTURE_CREATE);
+					String payload = ConsistencyPayloadCreator.createPayload(hostComponent, targetComp, currentTx, DepOperationType.NOTIFY_FUTURE_CREATE);
 					depNotifyService.synPost(hostComponent, targetComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 				}
 				isSetupDone.put(rootTx, true);
@@ -437,7 +453,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		for(String str : targetRef){
 			Dependence futureDep = new Dependence(FUTURE_DEP, rootTx, targetComp, str, null, null);
 			outDepRegistry.addDependence(futureDep);
-			String payload = ConsistencyPayloadCreator.createPayload(targetComp, str, rootTx, OperationType.NOTIFY_FUTURE_CREATE);
+			String payload = ConsistencyPayloadCreator.createPayload(targetComp, str, rootTx, DepOperationType.NOTIFY_FUTURE_CREATE);
 			depNotifyService.synPost(targetComp, str, ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
@@ -487,7 +503,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		boolean flag = false;
 		while(iterator.hasNext()){
 			TransactionContext tc = iterator.next().getValue();
-			if(tc.getRootTx().equals(rootTx) && !tc.getEventType().equals(TxEventType.TransactionEnd) && !tc.isFakeTx()){
+//			if(tc.getRootTx().equals(rootTx) && !tc.getEventType().equals(TxEventType.TransactionEnd) && !tc.isFakeTx()){
+			if(tc.getProxyRootTxId(depMgr.getScope()).equals(rootTx) && !tc.getEventType().equals(TxEventType.TransactionEnd) && !tc.isFakeTx()){
 				flag = true;
 				break;
 			}
@@ -548,7 +565,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			
 			// notify past dep create
 			DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-			String payload = ConsistencyPayloadCreator.createPayload(targetComp, srcComp, rootTx, OperationType.NOTIFY_PAST_CREATE);
+			String payload = ConsistencyPayloadCreator.createPayload(targetComp, srcComp, rootTx, DepOperationType.NOTIFY_PAST_CREATE);
 			depNotifyService.synPost(targetComp, srcComp, ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 			return true;
 		}
@@ -662,14 +679,14 @@ public class VersionConsistencyImpl implements Algorithm {
 		}
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
-			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, OperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, DepOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
 		depMgr.getRuntimeInDeps().clear();
-//		depMgr.setScope(null);
+		depMgr.setScope(null);
 		
 //		compLifeCycleMgr.remoteDynamicUpdateIsDone();
 		UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(hostComp);
@@ -725,7 +742,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				boolean isLastUse = txDepMonitor.isLastUse(currentTxID, dep.getTargetCompObjIdentifer(), currentComp);
 				if(isLastUse){
 					outDepRegistry.removeDependence(dep);
-					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_FUTURE_REMOVE);
+					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_FUTURE_REMOVE);
 					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 //					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_START_REMOTE_SUB_TX);
 //					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
@@ -789,7 +806,8 @@ public class VersionConsistencyImpl implements Algorithm {
 //					Set<String> fDeps = T.getFutureComponents();
 					Set<String> fDeps = txDepRegistry.getLocalDep(T.getCurrentTx()).getFutureComponents();
 					for(String fdep : fDeps){
-						if(fdep.equals(dep.getTargetCompObjIdentifer()) && T.getRootTx().equals(rootTx)){
+//						if(fdep.equals(dep.getTargetCompObjIdentifer()) && T.getRootTx().equals(rootTx)){
+						if(fdep.equals(dep.getTargetCompObjIdentifer()) && T.getProxyRootTxId(depMgr.getScope()).equals(rootTx)){
 							willNotUseFlag = false;
 							break;
 						}
@@ -811,7 +829,7 @@ public class VersionConsistencyImpl implements Algorithm {
 					}
 					
 					outDepRegistry.removeDependence(dep);
-					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_FUTURE_REMOVE);
+					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_FUTURE_REMOVE);
 					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 				}
 			}
@@ -835,12 +853,12 @@ public class VersionConsistencyImpl implements Algorithm {
 		for(Dependence dep : rtOutDeps){
 			if(dep.getRootTx().equals(rootTx) && dep.getType().equals(FUTURE_DEP)
 				&& !dep.getSrcCompObjIdentifier().equals(dep.getTargetCompObjIdentifer())){
-				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, OperationType.NOTIFY_FUTURE_REMOVE);
+				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, DepOperationType.NOTIFY_FUTURE_REMOVE);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.CONSISTENCY,  MsgType.DEPENDENCE_MSG, payload);
 			} else if(dep.getRootTx().equals(rootTx) && dep.getType().equals(PAST_DEP)
 					&& !dep.getSrcCompObjIdentifier().equals(dep.getTargetCompObjIdentifer())){
-				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, OperationType.NOTIFY_PAST_REMOVE);
+				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, DepOperationType.NOTIFY_PAST_REMOVE);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.CONSISTENCY,  MsgType.DEPENDENCE_MSG, payload);
 			}
@@ -880,7 +898,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		//remove tx
 		for(Entry<String,TransactionContext> entry : depMgr.getTxs().entrySet()){
 			TransactionContext txCtx = entry.getValue();
-			if(txCtx.getRootTx().equals(rootTx)){
+//			if(txCtx.getRootTx().equals(rootTx)){
+			if(txCtx.getProxyRootTxId(depMgr.getScope()).equals(rootTx)){
 				//if there are any in deps marked with rootTx, the rootTx id should not be removed
 //				Set<Dependence> rtInDeps = depMgr.getRuntimeInDeps();
 //				boolean isPastDepExist = false;
@@ -898,7 +917,8 @@ public class VersionConsistencyImpl implements Algorithm {
 					inIte = depMgr.getTxs().entrySet().iterator();
 					while(inIte.hasNext()){
 						TransactionContext inCtx = inIte.next().getValue();
-						if(inCtx.getRootTx().equals(rootTx)){
+//						if(inCtx.getRootTx().equals(rootTx)){
+						if(inCtx.getProxyRootTxId(depMgr.getScope()).equals(rootTx)){
 							inIte.remove();
 						}
 					}
@@ -944,13 +964,13 @@ public class VersionConsistencyImpl implements Algorithm {
 		for(Dependence dep : allInDeps){
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("inDepsStr:" + inDepsStr);
+		LOGGER.fine("inDepsStr:" + inDepsStr);
 		String outDepsStr = "";
 		
 		for(String dep : oldRootTx){
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("oldRootTx:" + outDepsStr);
+		LOGGER.fine("oldRootTx:" + outDepsStr);
 		
 		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
 //		LOGGER.fine("in consisitency algorithm(oldrootTxs):" + oldRootTx);
@@ -992,18 +1012,19 @@ public class VersionConsistencyImpl implements Algorithm {
 
 	@Override
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD) {
+			TransactionContext txContext, boolean isUpdateReqRCVD, DynamicDepManager depMgr) {
 		if( !isUpdateReqRCVD ){
 			return false;
 		}
 		
-		String rootTx = txContext.getRootTx();
+//		String rootTx = txContext.getRootTx();
+		String rootTx = txContext.getProxyRootTxId(depMgr.getScope());
 		if ((algorithmOldVersionRootTxs != null)
 				&& algorithmOldVersionRootTxs.contains(rootTx) ){
-			LOGGER.fine(txContext.getRootTx() + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs);
+			LOGGER.fine("real rootTxId:" + txContext.getRootTx() + " proxyRootTxId:" + rootTx + " not blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return false;
 		} else{
-			LOGGER.fine(txContext.getRootTx() + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
+			LOGGER.fine("real rootTxId:" + txContext.getRootTx() + " proxyRootTxId:" + rootTx + " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
 			return true;
 		}
 	}
@@ -1024,15 +1045,18 @@ public class VersionConsistencyImpl implements Algorithm {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		for(String comp : parentComps){
 			LOGGER.fine("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
-			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, OperationType.NOTIFY_REMOTE_UPDATE_DONE);
+			String payload = ConsistencyPayloadCreator.createRemoteUpdateIsDonePayload(hostComp, comp, DepOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.asynPost(hostComp, comp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 		}
 		
 		//clear local deps
 		depMgr.getRuntimeDeps().clear();
 		depMgr.getRuntimeInDeps().clear();
-//		depMgr.setScope(null);
+		depMgr.setScope(null);
 		
+		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
+				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		LOGGER.fine("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
 		
 		return true;
@@ -1055,9 +1079,10 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		Object ondemandMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandMonitor) {
+			rootTx = txContext.getProxyRootTxId(depMgr.getScope());
 			if( compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND) ){
 				Dependence lfe = new Dependence(FUTURE_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.info(lfe.toString());
+				LOGGER.fine(lfe.toString());
 				if(!rtInDeps.contains(lfe)){
 					rtInDeps.add(lfe);
 				}
@@ -1066,7 +1091,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 				
 				Dependence lpe = new Dependence(PAST_DEP, rootTx, hostComp, hostComp, null, null);
-				LOGGER.info(lpe.toString());
+				LOGGER.fine(lpe.toString());
 				if(!rtInDeps.contains(lpe)){
 					rtInDeps.add(lpe);
 				}
@@ -1075,7 +1100,7 @@ public class VersionConsistencyImpl implements Algorithm {
 				}
 				
 				// ACK_SUBTX_INIT
-				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, rootTx, OperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
+				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, rootTx, DepOperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComp, parentComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 				
@@ -1105,7 +1130,9 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
-			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
+			InvocationContext invocationCtx,
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,
+			String proxyRootTxId) {
 		String parentTx = invocationCtx.getParentTx();
 		String subTx = invocationCtx.getSubTx();
 		String subComp = invocationCtx.getSubComp();
@@ -1129,7 +1156,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 			return true;
 		} else if (subTxStatus.equals(TxEventType.TransactionEnd))
-			return doNotifySubTxEnd(subComp, curComp, rootTx, parentTx, subTx,
+			return doNotifySubTxEnd(subComp, curComp, proxyRootTxId, parentTx, subTx,
 					compLifeCycleMgr, depMgr);
 		else {
 			LOGGER.warning("unexpected sub transaction status: " + subTxStatus

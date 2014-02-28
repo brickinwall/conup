@@ -3,12 +3,10 @@ package cn.edu.nju.moon.conup.core.ondemand;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
-import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**
@@ -39,7 +37,7 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	 * @return
 	 */
 	@Override
-	public boolean ondemandSetup(){
+	public boolean ondemandSetup(Scope scope){
 		
 		if(isOndemandRqstRcvd){
 			LOGGER.info("duplicated OndemandSetup request for component " + compObj.getIdentifier());
@@ -51,7 +49,7 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 		ondemandSetup.setOndemandHelper(this);
 		
 		ExtensionOndemandThread extOndemandThread;
-		extOndemandThread = new ExtensionOndemandThread(ondemandSetup, compObj);
+		extOndemandThread = new ExtensionOndemandThread(ondemandSetup, scope);
 		extOndemandThread.start();
 		
 //		ondemandSetup.ondemand();

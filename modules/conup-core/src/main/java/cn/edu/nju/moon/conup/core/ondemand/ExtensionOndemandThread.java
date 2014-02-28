@@ -1,6 +1,6 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
-import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 
 /**
@@ -8,14 +8,15 @@ import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
  *
  */
 public class ExtensionOndemandThread extends Thread {
-	private OndemandSetup ondemandSetup = null; 
-	private ComponentObject compObj;
-	public ExtensionOndemandThread(OndemandSetup ondemandSetup, ComponentObject compObj){
+	private OndemandSetup ondemandSetup = null;
+	private Scope scope = null;
+	
+	public ExtensionOndemandThread(OndemandSetup ondemandSetup, Scope scope){
 		this.ondemandSetup = ondemandSetup;
-		this.compObj = compObj;
+		this.scope = scope;
 	}
 	
 	public void run(){
-		ondemandSetup.ondemand();
+		ondemandSetup.ondemand(scope);
 	}
 }

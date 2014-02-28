@@ -30,11 +30,10 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
-import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
-import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepPayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.DepPayload;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
-
 
 /**
  * 
@@ -75,9 +74,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	private TxDepRegistry txDepRegistry = null;
 	
 	@Override
-	public boolean ondemand() {
+	public boolean ondemand(Scope scope) {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
-		Scope scope = calcScope();
+//		Scope scope = calcScope();
+		if(scope == null) {
+			scope = calcScope();
+		}
+//		System.out.println("scope=" + scope);
 		depMgr.setScope(scope);
 		
 		PerformanceRecorder.getInstance(hostComp).ondemandRqstReceived(System.nanoTime());
@@ -97,15 +100,15 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	
 	@Override
 	public boolean ondemandSetup(String srcComp, String proctocol, String payload) {
-		PayloadResolver payloadResolver;
-		OperationType  operation;
+		DepPayloadResolver payloadResolver;
+		DepOperationType  operation;
 		String curComp;//current component
 		
-		payloadResolver = new PayloadResolver(payload);
+		payloadResolver = new DepPayloadResolver(payload);
 		operation = payloadResolver.getOperation();
-		curComp = payloadResolver.getParameter(PayloadType.TARGET_COMPONENT);
-		if(operation.equals(OperationType.REQ_ONDEMAND_SETUP)){
-			String scopeString = payloadResolver.getParameter(PayloadType.SCOPE);
+		curComp = payloadResolver.getParameter(DepPayload.TARGET_COMPONENT);
+		if(operation.equals(DepOperationType.REQ_ONDEMAND_SETUP)){
+			String scopeString = payloadResolver.getParameter(DepPayload.SCOPE);
 			if(scopeString != null && !scopeString.equals("") && !scopeString.equals("null")){
 				Scope scope = Scope.inverse(scopeString);
 				depMgr.setScope(scope);
@@ -115,26 +118,26 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 //				ondemandHelper.getDynamicDepManager().setScope(scope);
 //			}
 			reqOndemandSetup(curComp, srcComp);
-		} else if(operation.equals(OperationType.CONFIRM_ONDEMAND_SETUP)){
+		} else if(operation.equals(DepOperationType.CONFIRM_ONDEMAND_SETUP)){
 			confirmOndemandSetup(srcComp, curComp);
-		} else if(operation.equals(OperationType.NOTIFY_FUTURE_ONDEMAND)){
+		} else if(operation.equals(DepOperationType.NOTIFY_FUTURE_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-					payloadResolver.getParameter(PayloadType.ROOT_TX), 
+					payloadResolver.getParameter(DepPayload.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifyFutureOndemand(dep);
-		} else if(operation.equals(OperationType.NOTIFY_PAST_ONDEMAND)){
+		} else if(operation.equals(DepOperationType.NOTIFY_PAST_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-					payloadResolver.getParameter(PayloadType.ROOT_TX), 
+					payloadResolver.getParameter(DepPayload.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifyPastOndemand(dep);
-		} else if(operation.equals(OperationType.NOTIFY_SUB_FUTURE_ONDEMAND)){
+		} else if(operation.equals(DepOperationType.NOTIFY_SUB_FUTURE_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-					payloadResolver.getParameter(PayloadType.ROOT_TX), 
+					payloadResolver.getParameter(DepPayload.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifySubFutureOndemand(dep);
-		} else if(operation.equals(OperationType.NOTIFY_SUB_PAST_ONDEMAND)){
+		} else if(operation.equals(DepOperationType.NOTIFY_SUB_PAST_ONDEMAND)){
 			Dependence dep = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-					payloadResolver.getParameter(PayloadType.ROOT_TX), 
+					payloadResolver.getParameter(DepPayload.ROOT_TX), 
 					srcComp, curComp, null, null);
 			notifySubPastOndemand(dep);
 		}
@@ -167,7 +170,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			String requestSrcComp) {
 		//suspend all the threads that is initiated
 		
-		LOGGER.fine("**** in reqOndemandSetup(...):"+
+		LOGGER.info("**** in reqOndemandSetup(...):"+
 			"\t" + "currentComponent=" + currentComp +
 			"\t" + "requestSourceComponent=" + requestSrcComp);
 		
@@ -178,16 +181,20 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		hostComp = currentComp;
 		targetRef = new HashSet<String>();
+		parentComps = new HashSet<String>();
 		scope = depMgr.getScope();
 		
 		//calculate target(sub) components
 		if(scope == null)
-			targetRef.addAll(ondemandHelper.getCompObject().getStaticDeps());
+			targetRef.addAll(depMgr.getStaticDeps());
 		else
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		//calculate parent components
-		parentComps = depMgr.getStaticInDeps();
+		if(scope == null)
+			parentComps.addAll(depMgr.getStaticInDeps());
+		else
+			parentComps.addAll(scope.getParentComponents(hostComp));
 		
 		//init OndemandRequestStatus
 		Map<String, Boolean> reqStatus;
@@ -224,13 +231,13 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		for(String component : targetRef){
 			targetRefs += "\n\t" + component;
 		}
-		LOGGER.fine("**** " + hostComp + "'s targetRef:"
+		LOGGER.info("**** " + hostComp + "'s targetRef:"
 				+ targetRefs);
 		String tmpParentComps = new String();
 		for(String component : parentComps){
 			tmpParentComps += "\n\t" + component;
 		}
-		LOGGER.fine("**** " + hostComp + "'s parents:"
+		LOGGER.info("**** " + hostComp + "'s parents:"
 				+ tmpParentComps);
 		
 		//wait for other reqOndemandSetup(...)
@@ -241,10 +248,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 	
 	private boolean confirmOndemandSetup(String parentComp, 
 			String currentComp) {
-		LOGGER.fine("**** " + "confirmOndemandSetup(...) from " + parentComp);
+		LOGGER.info("**** " + "confirmOndemandSetup(...) from " + parentComp);
 //		DynamicDepManager depMgr = ondemandHelper.getDynamicDepManager();
 		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)){
-			LOGGER.fine("**** component status is valid, and return");
+			LOGGER.info("**** component status is valid, and return");
 			return true;
 		}
 		
@@ -255,14 +262,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		if(confirmStatus.containsKey(parentComp))
 			confirmStatus.put(parentComp, true);
 		else
-			LOGGER.fine("Illegal status while confirmOndemandSetup(...)");
+			LOGGER.info("Illegal status while confirmOndemandSetup(...)");
 		
 		//print ConfirmOndemandStatus
 		String confirmOndemandStatusStr = "currentComp:" + currentComp + ",ConfirmOndemandStatus:";
 		for(Entry<String, Boolean> entry : confirmStatus.entrySet()){
 			confirmOndemandStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
-		LOGGER.fine(confirmOndemandStatusStr);
+		LOGGER.info(confirmOndemandStatusStr);
 		
 		//isConfirmedAll?
 		boolean isConfirmedAll = true;
@@ -272,7 +279,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			}
 			if (isConfirmedAll	&& compLifeCycleMgr.getCompStatus().equals(CompStatus.ONDEMAND)) {
 				// change current componentStatus to 'valid'
-				LOGGER.fine("confirmOndemandSetup(...) from " + parentComp
+				LOGGER.info("confirmOndemandSetup(...) from " + parentComp
 						+ ", and confirmed All, trying to change mode to valid");
 				//TODO
 //				ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
@@ -316,7 +323,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		while(iterator.hasNext()){
 			TransactionContext txContext = 
 					(TransactionContext)iterator.next().getValue();
-			String rootTx = txContext.getRootTx();
+//			String rootTx = txContext.getRootTx();
+			// TODO current rootTx is not the rootTx in the specified scope
+			// 		here we need to change
+			String rootTx = txContext.getProxyRootTxId(scope);
+//			if(scope == null || !scope.isSpecifiedScope()){
+//				assert rootTx.equals(txContext.getRootTx());
+//			}
+			
 			assert(txContext.getHostComponent().equals(curComp));
 			String curTx = txContext.getCurrentTx();
 			
@@ -403,7 +417,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									OperationType.NOTIFY_FUTURE_ONDEMAND));
+									DepOperationType.NOTIFY_FUTURE_ONDEMAND));
 				}
 			}
 			
@@ -424,7 +438,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									OperationType.NOTIFY_PAST_ONDEMAND));
+									DepOperationType.NOTIFY_PAST_ONDEMAND));
 				}
 			}
 			
@@ -443,7 +457,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									OperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
+									DepOperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
 				}
 				
 				dep.setType(VersionConsistencyImpl.PAST_DEP);
@@ -455,7 +469,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 							ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), 
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(), 
-									OperationType.NOTIFY_SUB_PAST_ONDEMAND));
+									DepOperationType.NOTIFY_SUB_PAST_ONDEMAND));
 				}
 				
 			}
@@ -507,7 +521,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, subComp, 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, subComp, rootTx, 
-								OperationType.NOTIFY_FUTURE_ONDEMAND));
+								DepOperationType.NOTIFY_FUTURE_ONDEMAND));
 			}
 		}//END FOR
 		
@@ -555,7 +569,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, subComp, 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, subComp, rootTx, 
-								OperationType.NOTIFY_PAST_ONDEMAND));
+								DepOperationType.NOTIFY_PAST_ONDEMAND));
 			}
 		}//END FOR
 		
@@ -609,7 +623,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(), 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								OperationType.NOTIFY_FUTURE_ONDEMAND));
+								DepOperationType.NOTIFY_FUTURE_ONDEMAND));
 				
 			}
 		}
@@ -628,7 +642,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(),
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								OperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
+								DepOperationType.NOTIFY_SUB_FUTURE_ONDEMAND));
 			}
 		}
 		
@@ -676,7 +690,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(), 
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								OperationType.NOTIFY_PAST_ONDEMAND));
+								DepOperationType.NOTIFY_PAST_ONDEMAND));
 				
 			}
 		}
@@ -695,7 +709,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				ondemandComm.synPost(curComp, ose.getTargetCompObjIdentifer(),
 						CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, 
 						ConsistencyPayloadCreator.createPayload(curComp, ose.getTargetCompObjIdentifer(), rootTx, 
-								OperationType.NOTIFY_SUB_PAST_ONDEMAND));
+								DepOperationType.NOTIFY_SUB_PAST_ONDEMAND));
 			}
 		}
 
@@ -709,14 +723,14 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		if(reqStatus.containsKey(requestSrcComp))
 			reqStatus.put(requestSrcComp, true);
 		else
-			LOGGER.fine("OndemandRequestStatus doesn't contain " + requestSrcComp);
+			LOGGER.info("OndemandRequestStatus doesn't contain " + requestSrcComp);
 		
 		//print OndemandRequestStatus
 		String ondemandRequestStatusStr = "currentComp: " + currentComp + ", OndemandRequestStatus:";
 		for(Entry<String, Boolean> entry : reqStatus.entrySet()){
 			ondemandRequestStatusStr += "\n\t" + entry.getKey() + ": " + entry.getValue();
 		}
-		LOGGER.fine(ondemandRequestStatusStr);
+		LOGGER.info(ondemandRequestStatusStr);
 
 		/*
 		 * To judge whether current component has received reqOndemandSetup(...)
@@ -729,10 +743,10 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		synchronized (this) {
 			// if received all
 			if (isReceivedAll && compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)) {
-				LOGGER.fine("Received reqOndemandSetup(...) from "
+				LOGGER.info("Received reqOndemandSetup(...) from "
 						+ requestSrcComp);
-				LOGGER.fine("Received all reqOndemandSetup(...)");
-				LOGGER.fine("trying to change mode to ondemand");
+				LOGGER.info("Received all reqOndemandSetup(...)");
+				LOGGER.info("trying to change mode to ondemand");
 
 				if (depMgr.getRuntimeInDeps().size() != 0) {
 					depMgr.getRuntimeInDeps().clear();
@@ -765,7 +779,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 						}
 						LOGGER.fine("TxRegistry:\n" + txStr);
 
-						LOGGER.fine("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
+						LOGGER.info("synchronizing for method onDemandSetUp() in VersionConsistencyOndemandSetupImpl..");
 						onDemandSetUp();
 					}
 				}
@@ -789,15 +803,15 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 					confirmOndemandStatusStr += "\t" + entry.getKey() + ": "
 							+ entry.getValue();
 				}
-				LOGGER.fine(confirmOndemandStatusStr);
+				LOGGER.info(confirmOndemandStatusStr);
 
 				if (isConfirmedAll) {
 					if (compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)) {
-						LOGGER.fine("Confirmed all, and component status is valid");
+						LOGGER.info("Confirmed all, and component status is valid");
 						return;
 					}
-					LOGGER.fine("Confirmed from all parent components in receivedReqOndemandSetup(...)");
-					LOGGER.fine("trying to change mode to valid");
+					LOGGER.info("Confirmed from all parent components in receivedReqOndemandSetup(...)");
+					LOGGER.info("trying to change mode to valid");
 
 					// change current componentStatus to 'valid'
 //					ondemandHelper.getDynamicDepManager().ondemandSetupIsDone();
@@ -816,23 +830,23 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			Set<String> parentComps, String hostComp){
 		
 		// FOR TEST
-		LOGGER.fine("current compStatus=ondemand, before send req ondemand to parent component.");
+		LOGGER.info("current compStatus=ondemand, before send req ondemand to parent component.");
 		
 		String str = "currentComp:" + hostComp + ", sendReqOndemandSetup(...) to parent components:";
 		for(String component : parentComps){
 			str += "\n\t" + component;
 		}
-		LOGGER.fine(str);
+		LOGGER.info(str);
 		
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
 		String payload;
 
 		for(String parent : parentComps){
-			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.REQ_ONDEMAND_SETUP + "," +
-					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
-					PayloadType.TARGET_COMPONENT + ":" + parent + "," +
-					PayloadType.SCOPE + ":" + depMgr.getScope().toString();
+			payload = DepPayload.OPERATION_TYPE + ":" + DepOperationType.REQ_ONDEMAND_SETUP + "," +
+					DepPayload.SRC_COMPONENT + ":" + hostComp + "," +
+					DepPayload.TARGET_COMPONENT + ":" + parent + "," +
+					DepPayload.SCOPE + ":" + depMgr.getScope().toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -852,19 +866,19 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			targetRef.addAll(scope.getSubComponents(hostComp));
 		
 		String str = "sendConfirmOndemandSetup(...) to sub components:";
-//		LOGGER.fine("sendConfirmOndemandSetup(...) to sub components:");
+//		LOGGER.info("sendConfirmOndemandSetup(...) to sub components:");
 		for(String component : targetRef){
 			str += "\n\t" + component;
 		}
-		LOGGER.fine(str);
+		LOGGER.info(str);
 		
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
 		String payload;
 		for(String subComp : targetRef){
-			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.CONFIRM_ONDEMAND_SETUP + "," +
-					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
-					PayloadType.TARGET_COMPONENT + ":" + subComp;
+			payload = DepPayload.OPERATION_TYPE + ":" + DepOperationType.CONFIRM_ONDEMAND_SETUP + "," +
+					DepPayload.SRC_COMPONENT + ":" + hostComp + "," +
+					DepPayload.TARGET_COMPONENT + ":" + subComp;
 			ondemandComm.asynPost(hostComp, subComp, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -901,20 +915,22 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 			TransactionContext ctx;
 			while (txIterator.hasNext()) {
 				ctx = txIterator.next().getValue();
-				if (ctx.getRootTx().equals(txID) 
+//				if (ctx.getRootTx().equals(txID) 
+				if (ctx.getProxyRootTxId(depMgr.getScope()).equals(txID) 
 						|| ctx.getCurrentTx().equals(txID)) {
 //					if(ctx.getFutureComponents() != null
 //							|| ctx.getFutureComponents().size()!=0){
 					if(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents() != null
 							|| txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents().size()!=0){
-						rootTx = ctx.getRootTx();
+//						rootTx = ctx.getRootTx();
+						rootTx = ctx.getProxyRootTxId(depMgr.getScope());
 						futureC.addAll(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getFutureComponents());
 //					break;
 					}
 				}
 			}// END WHILE
 		} else{	// the txID has not started on local component
-			LOGGER.fine("no local subTx running...");
+			LOGGER.info("no local subTx running...");
 			Scope scope = depMgr.getScope();
 			if(scope == null){
 				futureC.addAll(depMgr.getStaticDeps());
@@ -930,7 +946,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		}//END FOR
 		
 		//FOR TEST
-//		LOGGER.fine("In getFDeps(...), size=" + result.size());
+//		LOGGER.info("In getFDeps(...), size=" + result.size());
 		StringBuffer strBuffer = new StringBuffer();
 		for(Dependence dep : result){
 			strBuffer.append("\n" + dep.toString());
@@ -956,13 +972,15 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		TransactionContext ctx;
 		while (txIterator.hasNext()) {
 			ctx = txIterator.next().getValue();
-			if (ctx.getRootTx().equals(txID) 
+//			if (ctx.getRootTx().equals(txID) 
+			if (ctx.getProxyRootTxId(depMgr.getScope()).equals(txID) 
 				|| ctx.getCurrentTx().equals(txID)) {
 //					if(ctx.getPastComponents() != null
 //						|| ctx.getPastComponents().size()!=0){
 					if(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents() != null
 						|| txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents().size()!=0){
-						rootTx = ctx.getRootTx();
+//						rootTx = ctx.getRootTx();
+						rootTx = ctx.getProxyRootTxId(depMgr.getScope());
 						pastC.addAll(txDepRegistry.getLocalDep(ctx.getCurrentTx()).getPastComponents());
 //						break;
 					}
@@ -977,7 +995,7 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		
 		//FOR TEST
 		
-//		LOGGER.fine("In getPArcs(...), size=" + result.size());
+//		LOGGER.info("In getPArcs(...), size=" + result.size());
 		
 		StringBuffer strBuffer = new StringBuffer();
 		for(Dependence dep : result){
@@ -1005,9 +1023,11 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 		TransactionContext ctx;
 		while (txIterator.hasNext()) {
 			ctx = txIterator.next().getValue();
-			if (ctx.getRootTx().equals(transactionID) 
+//			if (ctx.getRootTx().equals(transactionID) 
+			if (ctx.getProxyRootTxId(depMgr.getScope()).equals(transactionID) 
 				|| ctx.getCurrentTx().equals(transactionID)) {
-				rootTx = ctx.getRootTx();
+//				rootTx = ctx.getRootTx();
+				rootTx = ctx.getProxyRootTxId(depMgr.getScope());
 				if(ctx.getSubTxHostComps() == null){
 					continue;
 				}
@@ -1070,7 +1090,8 @@ public class VersionConsistencyOndemandSetupImpl implements OndemandSetup {
 				continue;
 			
 			assert(ctx.getCurrentTx().equals(currentTx));
-			if (ctx.getRootTx().equals(rootTx) 
+//			if (ctx.getRootTx().equals(rootTx) 
+			if (ctx.getProxyRootTxId(depMgr.getScope()).equals(rootTx) 
 				&& !ctx.getEventType().equals(TxEventType.TransactionEnd)) {
 				subTx = currentTx;
 			}

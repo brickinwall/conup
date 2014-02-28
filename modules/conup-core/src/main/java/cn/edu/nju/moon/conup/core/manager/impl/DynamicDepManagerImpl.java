@@ -20,9 +20,9 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
-import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
-import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepPayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.DepPayload;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 
 /**
@@ -118,6 +118,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public Map<String, TransactionContext> getTxs() {
 //		return txRegistry.getTransactionContexts();
+		assert txLifecycleMgr != null;
 		return txLifecycleMgr.getTxs();
 	}
 
@@ -129,7 +130,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
 			TransactionContext txContext, boolean isUpdateReqRCVD) {
-		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, txContext, isUpdateReqRCVD);
+		return algorithm.isBlockRequiredForFree(algorithmOldVersionRootTxs, txContext, isUpdateReqRCVD, this);
 	}
 	
 	@Override
@@ -141,9 +142,9 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean manageDependence(String payload) {
-		PayloadResolver plResolver;
-		plResolver = new PayloadResolver(payload);
-		OperationType operationType = plResolver.getOperation();
+		DepPayloadResolver plResolver;
+		plResolver = new DepPayloadResolver(payload);
+		DepOperationType operationType = plResolver.getOperation();
 		Map<String, String> params = getParamFromPayload(plResolver);
 		
 		return algorithm.manageDependence(operationType, params, this, compLifeCycleMgr);
@@ -197,16 +198,16 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		for (Dependence dep : inDepRegistry.getDependences()) {
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+		LOGGER.info("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
 		
 		String outDepsStr = "";
 		for (Dependence dep : outDepRegistry.getDependences()) {
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
+		LOGGER.info("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
 
 		Printer printer = new Printer();
-		LOGGER.fine("ondemandSetupIsDone, Txs:");
+		LOGGER.info("ondemandSetupIsDone, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 				
 		algorithm.initiate(compObj.getIdentifier(), this);
@@ -245,13 +246,13 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 //		this.txRegistry = txLifecycleMgr.getTxRegistry();
 	}
 
-	private Map<String, String> getParamFromPayload(PayloadResolver plResolver) {
+	private Map<String, String> getParamFromPayload(DepPayloadResolver plResolver) {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("srcComp", plResolver.getParameter(PayloadType.SRC_COMPONENT));
-		params.put("targetComp", plResolver.getParameter(PayloadType.TARGET_COMPONENT));
-		params.put("rootTx", plResolver.getParameter(PayloadType.ROOT_TX));
-		params.put("parentTx", plResolver.getParameter(PayloadType.PARENT_TX));
-		params.put("subTx", plResolver.getParameter(PayloadType.SUB_TX));
+		params.put("srcComp", plResolver.getParameter(DepPayload.SRC_COMPONENT));
+		params.put("targetComp", plResolver.getParameter(DepPayload.TARGET_COMPONENT));
+		params.put("rootTx", plResolver.getParameter(DepPayload.ROOT_TX));
+		params.put("parentTx", plResolver.getParameter(DepPayload.PARENT_TX));
+		params.put("subTx", plResolver.getParameter(DepPayload.SUB_TX));
 		return params;
 	}
 
@@ -263,7 +264,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
-			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr) {
-		return algorithm.notifySubTxStatus(subTxStatus, invocationCtx, compLifeCycleMgr, this);
+			InvocationContext invocationCtx, CompLifeCycleManager compLifeCycleMgr, String proxyRootTxId) {
+		return algorithm.notifySubTxStatus(subTxStatus, invocationCtx, compLifeCycleMgr, this, proxyRootTxId);
 	}
 }
