@@ -34,7 +34,6 @@ public class DeviationExp {
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
-		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	

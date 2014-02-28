@@ -37,12 +37,11 @@ public class TimelinessExp {
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
-		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/timeliness/";
-		fileName = algorithm + "_" + strategy + "_" + expType + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
+		fileName = algorithm + "_" + strategy + "_TimelinessExp_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
 				+ targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {

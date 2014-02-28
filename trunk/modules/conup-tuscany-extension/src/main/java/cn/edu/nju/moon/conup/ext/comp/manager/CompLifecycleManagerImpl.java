@@ -2,17 +2,17 @@ package cn.edu.nju.moon.conup.ext.comp.manager;
 
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadResolver;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayload;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayload;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadResolver;
 
 /**
  * CompLifecycleManager: manage the component's lifecyle 
@@ -54,14 +54,14 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 	}
 	
 	public String experimentResult(String payload){
-		TuscanyPayloadResolver payloadResolver = new TuscanyPayloadResolver(payload);
-		TuscanyOperationType opTyep = payloadResolver.getOperation();
-		String compIdentifier = payloadResolver.getParameter(TuscanyPayload.COMP_IDENTIFIER);
-		if(opTyep.equals(TuscanyOperationType.GET_EXECUTION_RECORDER)){
+		UpdateContextPayloadResolver payloadResolver = new UpdateContextPayloadResolver(payload);
+		UpdateOperationType opTyep = payloadResolver.getOperation();
+		String compIdentifier = payloadResolver.getParameter(UpdateContextPayload.COMP_IDENTIFIER);
+		if(opTyep.equals(UpdateOperationType.GET_EXECUTION_RECORDER)){
 			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
-		} else if(opTyep.equals(TuscanyOperationType.GET_UPDATE_ENDTIME)){
+		} else if(opTyep.equals(UpdateOperationType.GET_UPDATE_ENDTIME)){
 			return Long.toString(PerformanceRecorder.getInstance(compIdentifier).getUpdateEndTime());
-		} else if(opTyep.equals(TuscanyOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP)){
+		} else if(opTyep.equals(UpdateOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP)){
 			DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 			return "ok";
 		} else{
