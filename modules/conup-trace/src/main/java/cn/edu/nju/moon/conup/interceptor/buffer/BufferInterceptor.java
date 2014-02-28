@@ -325,7 +325,7 @@ public class BufferInterceptor extends Interceptor {
 				updateMgr.achieveFree();
 			} else if (freeness.isInterceptRequiredForFree(txCtx.getRootTx(),
 					hostComp, txCtx, true)) {
-				LOGGER.info("ThreadID="
+				LOGGER.fine("ThreadID="
 						+ getThreadID()
 						+ "compStatus="
 						+ compLifeCycleMgr.getCompStatus()
@@ -343,7 +343,7 @@ public class BufferInterceptor extends Interceptor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				LOGGER.info("ThreadID=" + getThreadID() + "compStatus="
+				LOGGER.fine("ThreadID=" + getThreadID() + "compStatus="
 						+ compLifeCycleMgr.getCompStatus()
 						+ "----------------validToFreeSyncMonitor.recover()");
 			}
@@ -393,14 +393,14 @@ public class BufferInterceptor extends Interceptor {
 				String threadID = getThreadID();
 				InterceptorCache cache = InterceptorCache.getInstance(hostComp);
 				TransactionContext txCtx = cache.getTxCtx(threadID);
-				LOGGER.info("freezee() --> ThreadID="
+				LOGGER.fine("freezee() --> ThreadID="
 						+ getThreadID()
 						+ "compStatus:"
 						+ compLifeCycleMgr.getCompStatus() + " bufferEventType:" + bufferEventType
 						+ "----------------validToFreeSyncMonitor.wait();buffer------------root:"
 						+ txCtx.getRootTx() + ",parent:" + txCtx.getParentTx());
 				freezeSyncMonitor.wait();
-				LOGGER.info("freezee() --> ThreadID="
+				LOGGER.fine("freezee() --> ThreadID="
 						+ getThreadID() + " after...");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
