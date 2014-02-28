@@ -58,6 +58,7 @@ public class ScopeTest {
 		// target component
 		targetComps.add("AuthComponent");
 		scope.setTarget(targetComps);
+		scope.setSpecifiedScope(true);
 
 		String real = scope.toString();
 		System.out.println(real);
@@ -68,6 +69,7 @@ public class ScopeTest {
 		assertTrue(real.contains(Scope.TARGET_IDENTIFIER
 				+ Scope.TARGET_SEPERATOR + "AuthComponent"));
 		assertTrue(!real.endsWith(Scope.SCOPE_ENTRY_SEPERATOR));
+		assertTrue(scope.isSpecifiedScope());
 	}
 
 	@Test
@@ -159,23 +161,26 @@ public class ScopeTest {
 		scope.setTarget(targetComps);
 
 		Set<String> rootComps = scope.getRootComp("AuthComponent");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(rootComps.contains("PortalComponent"));
 
 		rootComps = scope.getRootComp("ProcComponent");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(rootComps.contains("PortalComponent"));
 
 		// TEST CASE 2
 		parentComps.clear();
 		subComps.clear();
+		targetComps.clear();
 		scope = new Scope();
 
 		// D component
 		parentComps.add("C");
 		parentComps.add("E");
 		scope.addComponent("D", parentComps, subComps);
-
+		targetComps.add("D");
+		scope.setTarget(targetComps);
+		
 		// C component
 		parentComps.clear();
 		subComps.clear();
@@ -198,15 +203,15 @@ public class ScopeTest {
 		scope.addComponent("B", parentComps, subComps);
 
 		rootComps = scope.getRootComp("D");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(rootComps.contains("B"));
 
 		rootComps = scope.getRootComp("C");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(rootComps.contains("B"));
 
 		rootComps = scope.getRootComp("E");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(rootComps.contains("B"));
 
 		// TEST CASE 3
@@ -246,12 +251,12 @@ public class ScopeTest {
 		scope.addComponent("A", parentComps, subComps);
 		
 		rootComps = scope.getRootComp("D");
-		assertTrue(rootComps.size() == 2);
+		assertTrue(rootComps.size() == 3);
 		assertTrue(rootComps.contains("B"));
 		assertTrue(rootComps.contains("A"));
 		
 		rootComps = scope.getRootComp("E");
-		assertTrue(rootComps.size() == 1);
+		assertTrue(rootComps.size() == 2);
 		assertTrue(!rootComps.contains("B"));
 		assertTrue(rootComps.contains("A"));
 

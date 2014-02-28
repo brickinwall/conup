@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <experiment>
-	<setting enable="no">
-		<type>disruption</type>
-		<indepRun>50</indepRun>
-		<nThreads>100</nThreads>
-		<threadId>50</threadId>
-		<targetComp>CurrencyConverter</targetComp>
-		<baseDir>/home/conup</baseDir>
-		<ipAddress>114.212.191.22</ipAddress>
-		<rqstInterval>50</rqstInterval>
-		<updateInterval>80</updateInterval>
-	</setting>
 	<setting enable="yes">
-		<type>timeliness</type>
 		<indepRun>50</indepRun>
 		<nThreads>100</nThreads>
 		<threadId>50</threadId>
@@ -23,7 +11,28 @@
 		<updateInterval>80</updateInterval>
 	</setting>
 	<setting enable="no">
-		<type>overhead</type>
+		<indepRun>50</indepRun>
+		<nThreads>100</nThreads>
+		<threadId>50</threadId>
+		<targetComp>CurrencyConverter</targetComp>
+		<baseDir>/home/conup</baseDir>
+		<ipAddress>114.212.191.22</ipAddress>
+		<rqstInterval>50</rqstInterval>
+		<updateInterval>80</updateInterval>
+		<scope>
+			<component name="TravelCatalog">
+				<parent>Coordination</parent>
+				<child>CurrencyConverter</child>
+			</component>
+			<component name="CurrencyConverter">
+				<parent>TravelCatalog</parent>
+			</component>
+			<component name="Coordination">
+				<child>TravelCatalog</child>
+			</component>
+		</scope>
+	</setting>
+	<setting enable="no">
 		<indepRun>50</indepRun>
 		<nThreads>100</nThreads>
 		<threadId>50</threadId>

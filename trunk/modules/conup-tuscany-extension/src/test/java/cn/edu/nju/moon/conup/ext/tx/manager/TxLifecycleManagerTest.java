@@ -2,9 +2,6 @@ package cn.edu.nju.moon.conup.ext.tx.manager;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -82,6 +79,7 @@ public class TxLifecycleManagerTest {
 			txContext.setParentComponent(parentComp);
 			txContext.setRootTx(rootTx);
 			txContext.setRootComponent(rootComp);
+			txContext.setInvocationSequence("PortalComponent:a358ab2d-cf1a-4e7e-857a-d89c2db40102>ProcComponent:d130a1f8-657c-4791-8fae-f1cda8d2dd53");
 			//add to InterceptorCacheImpl
 			interceptorCache.addTxCtx(getThreadID(), txContext);
 		} else{

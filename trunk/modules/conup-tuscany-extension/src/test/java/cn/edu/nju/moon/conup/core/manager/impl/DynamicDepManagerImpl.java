@@ -169,7 +169,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean notifySubTxStatus(TxEventType transactionstart,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr) {
+			CompLifeCycleManager compLifeCycleMgr, String proxyRootTxId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
