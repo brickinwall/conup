@@ -27,9 +27,9 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
-import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
-import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepPayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.DepPayload;
 import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
@@ -60,9 +60,12 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	private TxDepRegistry txDepRegistry = null;
 
 	@Override
-	public boolean ondemand() {
+	public boolean ondemand(Scope scope) {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
-		Scope scope = calcScope();
+//		Scope scope = calcScope();
+		if(scope == null) {
+			scope = calcScope();
+		}
 		depMgr.setScope(scope);
 		
 		if(depMgr.getRuntimeInDeps().size() != 0){
@@ -85,15 +88,15 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 	@Override
 	public boolean ondemandSetup(String srcComp, String proctocol,
 			String payload) {
-		PayloadResolver payloadResolver;
-		OperationType operation;
+		DepPayloadResolver payloadResolver;
+		DepOperationType operation;
 		String curComp;// current component
 
-		payloadResolver = new PayloadResolver(payload);
+		payloadResolver = new DepPayloadResolver(payload);
 		operation = payloadResolver.getOperation();
-		curComp = payloadResolver.getParameter(PayloadType.TARGET_COMPONENT);
-		if (operation.equals(OperationType.REQ_ONDEMAND_SETUP)) {
-			String scopeString = payloadResolver.getParameter(PayloadType.SCOPE);
+		curComp = payloadResolver.getParameter(DepPayload.TARGET_COMPONENT);
+		if (operation.equals(DepOperationType.REQ_ONDEMAND_SETUP)) {
+			String scopeString = payloadResolver.getParameter(DepPayload.SCOPE);
 			if (scopeString != null && !scopeString.equals("")
 					&& !scopeString.equals("null")) {
 				Scope scope = Scope.inverse(scopeString);
@@ -104,16 +107,16 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 				depMgr.setScope(scope);
 			}
 			reqOndemandSetup(curComp, srcComp);
-		} else if (operation.equals(OperationType.CONFIRM_ONDEMAND_SETUP)) {
+		} else if (operation.equals(DepOperationType.CONFIRM_ONDEMAND_SETUP)) {
 			confirmOndemandSetup(srcComp, curComp);
-		} else if (operation.equals(OperationType.NOTIFY_FUTURE_ONDEMAND)) {
+		} else if (operation.equals(DepOperationType.NOTIFY_FUTURE_ONDEMAND)) {
 			Dependence dep = new Dependence(VersionConsistencyImpl.FUTURE_DEP,
-					payloadResolver.getParameter(PayloadType.ROOT_TX),
+					payloadResolver.getParameter(DepPayload.ROOT_TX),
 					srcComp, curComp, null, null);
 			notifyFutureOndemand(dep);
-		} else if (operation.equals(OperationType.NOTIFY_PAST_ONDEMAND)) {
+		} else if (operation.equals(DepOperationType.NOTIFY_PAST_ONDEMAND)) {
 			Dependence dep = new Dependence(VersionConsistencyImpl.PAST_DEP,
-					payloadResolver.getParameter(PayloadType.ROOT_TX),
+					payloadResolver.getParameter(DepPayload.ROOT_TX),
 					srcComp, curComp, null, null);
 			notifyPastOndemand(dep);
 		}
@@ -255,10 +258,10 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 		OndemandDynDepSetupServiceImpl ondemandComm;
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
 		String payload;
-		payload = PayloadType.OPERATION_TYPE + ":"
-				+ OperationType.CONFIRM_ONDEMAND_SETUP + ","
-				+ PayloadType.SRC_COMPONENT + ":" + currentComp + ","
-				+ PayloadType.TARGET_COMPONENT + ":" + requestSrcComp;
+		payload = DepPayload.OPERATION_TYPE + ":"
+				+ DepOperationType.CONFIRM_ONDEMAND_SETUP + ","
+				+ DepPayload.SRC_COMPONENT + ":" + currentComp + ","
+				+ DepPayload.TARGET_COMPONENT + ":" + requestSrcComp;
 		ondemandComm.asynPost(currentComp, requestSrcComp,
 				CommProtocol.TRANQUILLITY, MsgType.ONDEMAND_MSG, payload);
 
@@ -380,7 +383,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 					OndemandDynDepSetupServiceImpl ondemandComm;
 					ondemandComm = new OndemandDynDepSetupServiceImpl();
 					ondemandComm.synPost(curComp, dep.getTargetCompObjIdentifer(), CommProtocol.TRANQUILLITY, MsgType.ONDEMAND_MSG, 
-							TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_FUTURE_ONDEMAND));
+							TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_FUTURE_ONDEMAND));
 				}
 			}
 
@@ -401,7 +404,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 					OndemandDynDepSetupServiceImpl ondemandComm;
 					ondemandComm = new OndemandDynDepSetupServiceImpl();
 					ondemandComm.synPost(curComp, dep.getTargetCompObjIdentifer(), CommProtocol.TRANQUILLITY, MsgType.ONDEMAND_MSG, 
-							TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_PAST_ONDEMAND));
+							TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_PAST_ONDEMAND));
 				}
 			}
 		}// END WHILE
@@ -496,7 +499,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.TRANQUILLITY, MsgType.ONDEMAND_MSG, 
 							TranquillityPayloadCreator.createPayload(
 									dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(),	dep.getRootTx(),
-									OperationType.NOTIFY_FUTURE_ONDEMAND));
+									DepOperationType.NOTIFY_FUTURE_ONDEMAND));
 				}
 			}
 	
@@ -515,7 +518,7 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 							CommProtocol.TRANQUILLITY, MsgType.ONDEMAND_MSG, 
 							TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(),
 									dep.getTargetCompObjIdentifer(), dep.getRootTx(),
-									OperationType.NOTIFY_PAST_ONDEMAND));
+									DepOperationType.NOTIFY_PAST_ONDEMAND));
 				}
 			}
 	
@@ -635,11 +638,11 @@ public class TranquillityOndemandSetupImpl implements OndemandSetup {
 			parentSet.add(parent);
 			scope.addComponent(hostComp, parentSet, subSet);
 			scope.setTarget(targetSet);
-			payload = PayloadType.OPERATION_TYPE + ":"
-					+ OperationType.REQ_ONDEMAND_SETUP + ","
-					+ PayloadType.SRC_COMPONENT + ":" + hostComp + ","
-					+ PayloadType.TARGET_COMPONENT + ":" + parent + ","
-					+ PayloadType.SCOPE + ":" + scope.toString();
+			payload = DepPayload.OPERATION_TYPE + ":"
+					+ DepOperationType.REQ_ONDEMAND_SETUP + ","
+					+ DepPayload.SRC_COMPONENT + ":" + hostComp + ","
+					+ DepPayload.TARGET_COMPONENT + ":" + parent + ","
+					+ DepPayload.SCOPE + ":" + scope.toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.TRANQUILLITY,
 					MsgType.ONDEMAND_MSG, payload);
 		}

@@ -18,7 +18,6 @@ import cn.edu.nju.moon.conup.core.DependenceRegistry;
 import cn.edu.nju.moon.conup.core.manager.impl.DynamicDepManagerImpl;
 import cn.edu.nju.moon.conup.core.utils.ConsistencyPayloadCreator;
 import cn.edu.nju.moon.conup.core.utils.TranquillityPayloadCreator;
-import cn.edu.nju.moon.conup.ext.utils.TuscanyPayloadCreator;
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
 import cn.edu.nju.moon.conup.spi.datamodel.CommProtocol;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
@@ -27,7 +26,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TuscanyOperationType;
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -35,7 +34,8 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 
 /**
@@ -93,7 +93,7 @@ public class TranquillityImpl implements Algorithm {
 	}
 	
 	@Override
-	public boolean manageDependence(OperationType operationType, Map<String, String> params, 
+	public boolean manageDependence(DepOperationType operationType, Map<String, String> params, 
 			DynamicDepManager depMgr,
 			CompLifeCycleManager compLifeCycleMgr) {
 		if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL))
@@ -298,7 +298,7 @@ public class TranquillityImpl implements Algorithm {
 			 * notify parent that a new sub-tx start
 			 */
 			if( !parentTx.equals(currentTx) ) {
-				String payload = TranquillityPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), parentTx, OperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
+				String payload = TranquillityPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), parentTx, DepOperationType.ACK_SUBTX_INIT, txContext.getParentTx(), txContext.getCurrentTx());
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.TRANQUILLITY, MsgType.DEPENDENCE_MSG, payload);
 			}
@@ -330,7 +330,7 @@ public class TranquillityImpl implements Algorithm {
 					outDepRegistry.removeDependence(dep.getType(), dep.getRootTx(), dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer());
 					if(targetRef.contains(dep.getTargetCompObjIdentifer())){
 						//notify sub-comp future removed(here must be coincidence with algorithm)
-						String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), currentTx, OperationType.NOTIFY_FUTURE_REMOVE);
+						String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), currentTx, DepOperationType.NOTIFY_FUTURE_REMOVE);
 						DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 						depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.TRANQUILLITY,  MsgType.DEPENDENCE_MSG, payload);
 					}
@@ -371,7 +371,7 @@ public class TranquillityImpl implements Algorithm {
 					if (!outDepRegistry.contain(dep)) {
 						outDepRegistry.addDependence(dep);
 						String payload = TranquillityPayloadCreator
-								.createPayload(	hostComponent, targetComp, currentTx, OperationType.NOTIFY_FUTURE_CREATE);
+								.createPayload(	hostComponent, targetComp, currentTx, DepOperationType.NOTIFY_FUTURE_CREATE);
 						depNotifyService.synPost(hostComponent, targetComp, CommProtocol.TRANQUILLITY, MsgType.DEPENDENCE_MSG, payload);
 					}
 				}
@@ -591,7 +591,7 @@ public class TranquillityImpl implements Algorithm {
 				
 				// notify past dep create
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-				String payload = TranquillityPayloadCreator.createPayload(targetComp, srcComp, parentTx, OperationType.NOTIFY_PAST_CREATE);
+				String payload = TranquillityPayloadCreator.createPayload(targetComp, srcComp, parentTx, DepOperationType.NOTIFY_PAST_CREATE);
 				depNotifyService.synPost(targetComp, srcComp, ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 				
 				// TODO remove PAST_DEP should be deferred to cleanup 
@@ -734,7 +734,7 @@ public class TranquillityImpl implements Algorithm {
 				boolean isLastUse = txDepMonitor.isLastUse(currentTxID, dep.getTargetCompObjIdentifer(), currentComp);
 				if(isLastUse){
 					outDepRegistry.removeDependence(dep);
-					String payload = TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_FUTURE_REMOVE);
+					String payload = TranquillityPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_FUTURE_REMOVE);
 					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 				}else{
 				}
@@ -754,12 +754,12 @@ public class TranquillityImpl implements Algorithm {
 		for(Dependence dep : rtOutDeps){
 			if(dep.getRootTx().equals(rootTx) && dep.getType().equals(FUTURE_DEP)
 				&& !dep.getSrcCompObjIdentifier().equals(dep.getTargetCompObjIdentifer())){
-				String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, OperationType.NOTIFY_FUTURE_REMOVE);
+				String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, DepOperationType.NOTIFY_FUTURE_REMOVE);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.TRANQUILLITY,  MsgType.DEPENDENCE_MSG, payload);
 			} else if(dep.getRootTx().equals(rootTx) && dep.getType().equals(PAST_DEP)
 					&& !dep.getSrcCompObjIdentifier().equals(dep.getTargetCompObjIdentifer())){
-				String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, OperationType.NOTIFY_PAST_REMOVE);
+				String payload = TranquillityPayloadCreator.createPayload(hostComponent, dep.getTargetCompObjIdentifer(), rootTx, DepOperationType.NOTIFY_PAST_REMOVE);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComponent, dep.getTargetCompObjIdentifer(), CommProtocol.TRANQUILLITY,  MsgType.DEPENDENCE_MSG, payload);
 				LOGGER.fine("removeAllEdges:PAST_DEP:rootTx:" + rootTx + ":srcHost:" + hostComponent + ":targetHost:" + dep.getTargetCompObjIdentifer());
@@ -815,7 +815,7 @@ public class TranquillityImpl implements Algorithm {
 	
 	@Override
 	public boolean isBlockRequiredForFree( Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD) {
+			TransactionContext txContext, boolean isUpdateReqRCVD, DynamicDepManager depMgr) {
 		if( !isUpdateReqRCVD ){
 			return false;
 		}
@@ -847,7 +847,7 @@ public class TranquillityImpl implements Algorithm {
 			LOGGER.fine("Sending NOTIFY_REMOTE_UPDATE_DONE to " + comp);
 			String payload = TranquillityPayloadCreator
 					.createRemoteUpdateIsDonePayload(hostComp, comp,
-							OperationType.NOTIFY_REMOTE_UPDATE_DONE);
+							DepOperationType.NOTIFY_REMOTE_UPDATE_DONE);
 			depNotifyService.asynPost(hostComp, comp, CommProtocol.TRANQUILLITY,
 					MsgType.DEPENDENCE_MSG, payload);
 		}
@@ -865,7 +865,7 @@ public class TranquillityImpl implements Algorithm {
 
 	private void notifyCoordinationUpdateIsDone(String hostComp) {
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-		String payload = TuscanyPayloadCreator.createPayload(TuscanyOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP, "Coordination");
+		String payload = UpdateContextPayloadCreator.createPayload(UpdateOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP, "Coordination");
 		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.TRANQUILLITY,
 				MsgType.EXPERIMENT_MSG, payload);
 	}
@@ -958,7 +958,7 @@ public class TranquillityImpl implements Algorithm {
 				}
 				
 				// ACK_SUBTX_INIT
-				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, parentTx, OperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
+				String payload = ConsistencyPayloadCreator.createPayload(hostComp, parentComp, parentTx, DepOperationType.ACK_SUBTX_INIT, parentTx, fakeSubTx);
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 				depNotifyService.synPost(hostComp, parentComp, CommProtocol.CONSISTENCY, MsgType.DEPENDENCE_MSG, payload);
 				
@@ -970,7 +970,8 @@ public class TranquillityImpl implements Algorithm {
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,
+			String proxyRootTxId) {
 		String parentTx = invocationCtx.getParentTx();
 		
 		String subTx = invocationCtx.getSubTx();

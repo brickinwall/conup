@@ -24,9 +24,9 @@ import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
-import cn.edu.nju.moon.conup.spi.utils.PayloadResolver;
-import cn.edu.nju.moon.conup.spi.utils.PayloadType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepPayloadResolver;
+import cn.edu.nju.moon.conup.spi.utils.DepPayload;
 import cn.edu.nju.moon.conup.spi.utils.XMLUtil;
 
 /**
@@ -60,9 +60,12 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	private boolean isOndemandDone = false;
 	
 	@Override
-	public boolean ondemand() {
+	public boolean ondemand(Scope scope) {
 		String hostComp = ondemandHelper.getCompObject().getIdentifier();
-		Scope scope = calcScope();
+//		Scope scope = calcScope();
+		if(scope == null) {
+			scope = calcScope();
+		}
 		depMgr.setScope(scope);
 		
 //		DynamicDepManager ddm = ondemandHelper.getDynamicDepManager();
@@ -73,21 +76,21 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 	
 	@Override
 	public boolean ondemandSetup(String srcComp, String proctocol, String payload) {
-		PayloadResolver payloadResolver;
-		OperationType  operation;
+		DepPayloadResolver payloadResolver;
+		DepOperationType  operation;
 		String curComp;//current component
 		
-		payloadResolver = new PayloadResolver(payload);
+		payloadResolver = new DepPayloadResolver(payload);
 		operation = payloadResolver.getOperation();
-		curComp = payloadResolver.getParameter(PayloadType.TARGET_COMPONENT);
-		if(operation.equals(OperationType.REQ_ONDEMAND_SETUP)){
-			String scopeString = payloadResolver.getParameter(PayloadType.SCOPE);
+		curComp = payloadResolver.getParameter(DepPayload.TARGET_COMPONENT);
+		if(operation.equals(DepOperationType.REQ_ONDEMAND_SETUP)){
+			String scopeString = payloadResolver.getParameter(DepPayload.SCOPE);
 			if(scopeString != null && !scopeString.equals("") && !scopeString.equals("null")){
 				Scope scope = Scope.inverse(scopeString);
 				depMgr.setScope(scope);
 			}
 			reqOndemandSetup(curComp, srcComp);
-		} else if(operation.equals(OperationType.CONFIRM_ONDEMAND_SETUP)){
+		} else if(operation.equals(DepOperationType.CONFIRM_ONDEMAND_SETUP)){
 			confirmOndemandSetup(srcComp, curComp);
 		}
 		
@@ -353,10 +356,10 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		String payload;
 
 		for(String parent : parentComps){
-			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.REQ_ONDEMAND_SETUP + "," +
-					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
-					PayloadType.TARGET_COMPONENT + ":" + parent + "," +
-					PayloadType.SCOPE + ":" + depMgr.getScope().toString();
+			payload = DepPayload.OPERATION_TYPE + ":" + DepOperationType.REQ_ONDEMAND_SETUP + "," +
+					DepPayload.SRC_COMPONENT + ":" + hostComp + "," +
+					DepPayload.TARGET_COMPONENT + ":" + parent + "," +
+					DepPayload.SCOPE + ":" + depMgr.getScope().toString();
 			ondemandComm.asynPost(hostComp, parent, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
@@ -385,9 +388,9 @@ public class QuiescenceOndemandSetupImpl implements OndemandSetup {
 		ondemandComm = new OndemandDynDepSetupServiceImpl();
 		String payload;
 		for(String subComp : targetRef){
-			payload = PayloadType.OPERATION_TYPE + ":" + OperationType.CONFIRM_ONDEMAND_SETUP + "," +
-					PayloadType.SRC_COMPONENT + ":" + hostComp + "," +
-					PayloadType.TARGET_COMPONENT + ":" + subComp;
+			payload = DepPayload.OPERATION_TYPE + ":" + DepOperationType.CONFIRM_ONDEMAND_SETUP + "," +
+					DepPayload.SRC_COMPONENT + ":" + hostComp + "," +
+					DepPayload.TARGET_COMPONENT + ":" + subComp;
 			ondemandComm.asynPost(hostComp, subComp, CommProtocol.CONSISTENCY, MsgType.ONDEMAND_MSG, payload);
 		}
 		
