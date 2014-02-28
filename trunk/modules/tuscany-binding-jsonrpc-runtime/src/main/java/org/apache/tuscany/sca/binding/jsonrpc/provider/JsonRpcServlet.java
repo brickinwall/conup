@@ -299,10 +299,10 @@ public class JsonRpcServlet extends HttpServlet {
                     
                     // add for conup
                     JsonRpc10Response response = null;
-					if (responseMessage.getHeaders().get("COMP_VERSION") != null) {
+					if (responseMessage.getHeaders().get("PROXY_ROOT_TX_ID") != null) {
 						response = new JsonRpc10Response(request.getId(),
 								(JsonNode) result, (String) responseMessage
-										.getHeaders().get("COMP_VERSION"));
+										.getHeaders().get("PROXY_ROOT_TX_ID"));
 					} else {
 						response = new JsonRpc10Response(request.getId(),
 								(JsonNode) result);
