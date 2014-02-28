@@ -86,11 +86,10 @@ public interface TxLifecycleManager {
 	 * @param fakeSubTx
 	 * @return
 	 */
-	public boolean endLocalSubTx(String hostComp, String fakeSubTx);
+	public String endLocalSubTx(String hostComp, String fakeSubTx);
 	
 	/**
-	 * when a root tx ends, TxDepMonitor should be notified.
-	 * Given a parentTxId, which means that only the root Txs associated with the parentTxId
+	 * when a root tx ends, TxLifecycleManager should be notified.
 	 * @param hostComp
 	 * @param rootTxId
 	 * @return
@@ -109,18 +108,36 @@ public interface TxLifecycleManager {
 	 */
 	public TransactionRegistry getTxRegistry();
 
-	void resolveInvocationContext(InvocationContext invocationContext,
+	/**
+	 * Get Tx information from InvocationContext.
+	 * for example: root tx id, root tx host component;
+	 * parent tx id, parent tx host component etc.
+	 * @param invocationContext
+	 * @param hostComponent
+	 */
+	public void resolveInvocationContext(InvocationContext invocationContext,
 			String hostComponent);
 
+	/**
+	 * create a invocation context which is used to attached to Message to transfer between components.
+	 * InvocationContext contains 
+	 * rootTxId:rootComponent, parentTxId:parentComponent, subTxId:subComponent, invocationSequence.
+	 * invocationSequence contains all these invoked tx's id and host component.
+	 * @param hostComponent
+	 * @param serviceName
+	 * @param txDepMonitor
+	 * @return
+	 */
 	public InvocationContext createInvocationCtx(String hostComponent, String serviceName,
 			TxDepMonitor txDepMonitor);
 
 	/**
 	 * a sub-transaction just ended and returned from a remote component
 	 * @param invocationCtx
+	 * @param proxyRootTxId 
 	 * @return
 	 */
-	public boolean endRemoteSubTx(InvocationContext invocationCtx);
+	public boolean endRemoteSubTx(InvocationContext invocationCtx, String proxyRootTxId);
 
 	public void updateTxContext(String currentTxID, TransactionContext txContext);
 
