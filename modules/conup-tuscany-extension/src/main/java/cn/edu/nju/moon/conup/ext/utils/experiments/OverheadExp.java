@@ -32,11 +32,10 @@ public class OverheadExp {
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
-		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/overhead/";
-		fileName = algorithm + "_" + expType + "_{" + nThreads + "}_" + ".csv";
+		fileName = algorithm + "_OverheadExp_{" + nThreads + "}_" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);

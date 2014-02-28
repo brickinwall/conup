@@ -29,11 +29,11 @@ public class Experiment {
 		expSetting = xmlUtil.getExpSetting();
 		nThreads = expSetting.getnThreads();
 		threadId = expSetting.getThreadId();
-		String expType = expSetting.getType();
+//		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 		
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/";
-		fileName = expType + "_{" + nThreads + "}_" + threadId + "_" + targetComp + ".csv";
+		fileName = "_{" + nThreads + "}_" + threadId + "_" + targetComp + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath+fileName);

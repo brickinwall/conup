@@ -35,7 +35,6 @@ public class CorrectnessExp {
 		String freenessStrategy = xmlUtil.getFreenessStrategy();
 		freenessStrategy = freenessStrategy.substring(0, freenessStrategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
-		String expType = expSetting.getType();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	
