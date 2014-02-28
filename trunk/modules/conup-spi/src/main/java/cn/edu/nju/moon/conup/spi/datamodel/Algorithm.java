@@ -8,7 +8,7 @@ import java.util.Set;
 
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
-import cn.edu.nju.moon.conup.spi.utils.OperationType;
+import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
 
 
 /**
@@ -44,7 +44,7 @@ public interface Algorithm {
 	 * @param extraParams
 	 * @return
 	 */
-	public boolean manageDependence(OperationType operationType, Map<String, String> params, 
+	public boolean manageDependence(DepOperationType operationType, Map<String, String> params, 
 			DynamicDepManager depMgr,
 			CompLifeCycleManager compLifeCycleMgr);
 
@@ -76,7 +76,7 @@ public interface Algorithm {
 	 * @return
 	 */
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
-			TransactionContext txContext, boolean isUpdateReqRCVD);
+			TransactionContext txContext, boolean isUpdateReqRCVD, DynamicDepManager depMgr);
 	
 	/**
 	 * when dynamic update is done, the concrete algorithm should get notified to execute cleanup
@@ -128,11 +128,12 @@ public interface Algorithm {
 	 * @param invocationCtx
 	 * @param compLifeCycleMgr
 	 * @param depMgr
+	 * @param proxyRootTxId 
 	 * @return
 	 */
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
 			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr);
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr, String proxyRootTxId);
 
 	/**
 	 * when necessary, algorithm may need to be notified to execute related initiation.
