@@ -81,7 +81,7 @@ public class TransactionContext {
 	 * @return proxy root tx id
 	 */
 	public String getProxyRootTxId(Scope scope){
-		if(!scope.isSpecifiedScope()){
+		if(scope == null || !scope.isSpecifiedScope()){
 			return rootTx;
 		} else {
 			return calcProxyRootTxId(rootTx, hostComponent, scope);
@@ -96,7 +96,16 @@ public class TransactionContext {
 		
 		// 2. calc the proxy root tx id
 		Set<String> proxyRootComps = scope.getRootComp(hostComponent);
+		if(invocationSequence == null || invocationSequence.equals("null")){
+			return currentTx;
+		}
+		
+		if(scope.contains(invocationSequence.split(">")[0].split(":")[0]) && proxyRootComps.contains(hostComponent)){
+			return rootTx;
+		}
+		
 		for(String proxyRootComp : proxyRootComps){
+			assert invocationSequence != null;
 			if(invocationSequence.contains(proxyRootComp)){
 				String[] enties = invocationSequence.split(">");
 				for(String entry : enties){
@@ -106,7 +115,10 @@ public class TransactionContext {
 				}
 			}
 		}
-		return null;
+//		System.out.println("proxyRootComps: " + proxyRootComps);
+//		System.out.println("rootTx: " + rootTx);
+//		System.out.println("hostComp: " + hostComponent);
+		return currentTx;
 	}
 
 	/**
