@@ -1054,6 +1054,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 		depMgr.setScope(null);
 		
+		// add for experiment
 		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
 				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
 				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));

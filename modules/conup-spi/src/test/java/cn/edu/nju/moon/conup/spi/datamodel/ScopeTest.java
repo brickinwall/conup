@@ -262,4 +262,15 @@ public class ScopeTest {
 
 		System.out.println(rootComps);
 	}
+	
+//	@Test
+//	public void testcase1(){
+//		String s = "xxxx:version 1";
+//		String version = "version 2";
+//		StringBuffer infos = new StringBuffer("INCONSISTENCY DETECT!!\n");
+//		infos.append("\tPrevious Component Version:").append(s.split(":")[1])
+//			.append(", Current Component Version:").append(version).append("\n")
+//			.append("\tInvoke Compesation Function.\n");
+//		System.out.println(infos.toString());
+//	}
 }

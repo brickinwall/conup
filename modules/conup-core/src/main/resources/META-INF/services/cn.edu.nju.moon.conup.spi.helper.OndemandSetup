@@ -1,3 +1,4 @@
 cn.edu.nju.moon.conup.core.ondemand.QuiescenceOndemandSetupImpl
 cn.edu.nju.moon.conup.core.ondemand.TranquillityOndemandSetupImpl
 cn.edu.nju.moon.conup.core.ondemand.VersionConsistencyOndemandSetupImpl
+cn.edu.nju.moon.conup.core.ondemand.IdleOndemandSetupImpl

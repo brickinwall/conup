@@ -26,7 +26,7 @@ public class Printer {
 			Dependence dependence = (Dependence) iterator.next();
 			result += dependence + "\n\t";
 		}
-		LOGGER.info(result);
+		LOGGER.fine(result);
 	}
 	
 	public void printDeps(Logger LOGGER, Set<Dependence> deps, String type){
@@ -61,6 +61,6 @@ public class Printer {
 			TransactionContext tc = entry.getValue();
 			result += tc.toString() + "\n\t";
 		}
-		LOGGER.info(result);
+		LOGGER.fine(result);
 	}
 }
