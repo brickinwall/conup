@@ -73,21 +73,25 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
 //		TransactionContext txContext = txRegistry.getTransactionContext(curTxID);
 		TransactionContext txContext = txLifeCycleMgr.getTransactionContext(curTxID);
-		txContext.setEventType(et);
+		
+		CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
+		Object ondemandMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
+		synchronized (ondemandMonitor) {
+			txContext.setEventType(et);
+		}
 		
 		/*
 		 * set eventType, futureC, pastC 
 		 */
-		TxDep txDep = new TxDep(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()), convertServiceToComponent(ddm.getPast(), txContext.getHostComponent()));
-//		System.out.println("txDep:" + txDep);
+		TxDep txDep = new TxDep(convertServiceToComponent(ddm.getFuture(), compIdentifier), convertServiceToComponent(ddm.getPast(), compIdentifier));
 		txDepRegistry.addLocalDep(curTxID, txDep);
-//		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), txContext.getHostComponent()));
-//		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), txContext.getHostComponent()));
+//		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), compIdentifier));
+//		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), compIdentifier));
 		/*
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
 		
-		DynamicDepManager dynamicDepMgr = nodeMgr.getDynamicDepManager(txContext.getHostComponent());
+		DynamicDepManager dynamicDepMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TxRegistry.
 		if(et.equals(TxEventType.TransactionEnd)){
@@ -95,10 +99,9 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 			txLifeCycleMgr.removeTransactionContext(curTxID);
 			txDepRegistry.removeLocalDep(curTxID);
 			
-			InterceptorCache interceptorCache = InterceptorCache.getInstance(txContext.getHostComponent());
+			InterceptorCache interceptorCache = InterceptorCache.getInstance(compIdentifier);
 			interceptorCache.removeTxCtx(getThreadID());
 			
-			CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 			UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID)
 					&& updateMgr.isDynamicUpdateRqstRCVD()){

@@ -113,7 +113,7 @@ public class UpdateManagerImpl implements UpdateManager {
 				bufferEventType = BufferEventType.EXEUPDATE;
 				notifyInterceptors(bufferEventType);
 
-				LOGGER.info("-----------component has achieved free,now nitify all...\n\n");
+				LOGGER.info("**** Component has achieved free, now notify all ****\n\n");
 				validToFreeSyncMonitor.notifyAll();
 			}
 		}		
@@ -460,7 +460,7 @@ public class UpdateManagerImpl implements UpdateManager {
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 				ondemandSetupHelper.onDemandIsDone();
 				ondemandSyncMonitor.notifyAll();
-				LOGGER.info("-------------- " + compObj.getIdentifier() + "ondemand setup is done, now notify all...------\n\n");
+				LOGGER.info("**** " + compObj.getIdentifier() + "ondemand setup is done, now notify all ****\n\n");
 				Printer printer = new Printer();
 				printer.printDeps(LOGGER, depMgr.getRuntimeInDeps(), "In");
 				printer.printDeps(LOGGER, depMgr.getRuntimeDeps(), "Out");

@@ -99,10 +99,6 @@ public class BufferInterceptor extends Interceptor {
 						assert msgHeaders != null;
 						
 						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
-						
-//						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
-//								txCtx.getRootTx(), txCtx.getRootComponent(),
-//								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
 					return msg;
 				}
@@ -140,9 +136,6 @@ public class BufferInterceptor extends Interceptor {
 						assert subTx != null;
 						
 						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), txCtx);
-//						txLifecycleMgr.initLocalSubTx(hostComp, subTx.toString(), 
-//								txCtx.getRootTx(), txCtx.getRootComponent(),
-//								txCtx.getParentTx(), txCtx.getParentComponent());
 					}
 					return msg;
 				}
@@ -177,7 +170,6 @@ public class BufferInterceptor extends Interceptor {
 						}
 					}
 					if (freeness.isReadyForUpdate(hostComp)) {
-//						depMgr.achievedFree();
 						updateMgr.achieveFree();
 					} else if (freeness.isInterceptRequiredForFree(
 							txCtx.getRootTx(), hostComp, txCtx, true)) {

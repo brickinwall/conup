@@ -242,12 +242,26 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		return msg;
 	}
 	
+	/**
+	 * check inconsistency in service phase
+	 * check current component's version is consistency with these previous version
+	 * @param currentCompsLogs
+	 * @param hostComp 
+	 * @param version current component's version
+	 */
 	private void checkInConsistency(List<String> currentCompsLogs, String hostComp, String version){
 		for(String s : currentCompsLogs){
 			if(s.contains(hostComp)){
 				if(!s.split(":")[1].equals(version)){
 //					assert false;
-					System.out.println("INCONSISTENCY DETECT!!");
+					
+					StringBuffer infos = new StringBuffer("INCONSISTENCY DETECT!!\n");
+					infos.append("Previous Component Version:").append(s.split(":")[1])
+						.append(", Current Component Version:").append(version).append("\n")
+						.append("Invoke Compesation Function.\n");
+					LOGGER.info(infos.toString());
+//					System.out.println("INCONSISTENCY DETECT!!");
+					break;
 				}
 			}
 		}

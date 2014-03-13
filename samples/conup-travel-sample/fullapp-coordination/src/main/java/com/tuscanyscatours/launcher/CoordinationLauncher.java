@@ -23,6 +23,7 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
@@ -38,10 +39,12 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class CoordinationLauncher {
@@ -62,69 +65,66 @@ public class CoordinationLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
-//		nodeMgr.loadConupConf("TravelCatalog", "oldVersion");
-//		CompLifecycleManager.getInstance("TravelCatalog").setNode(node);
-//		CommServerManager.getInstance().start("TravelCatalog");
 		
 		nodeMgr.loadConupConf("TravelCatalog", "oldVersion");
 		ComponentObject travelCatalogCompObj = nodeMgr.getComponentObject("TravelCatalog");
 		CompLifecycleManagerImpl travelCatalogCompLifecycleManager = new CompLifecycleManagerImpl(travelCatalogCompObj);
-//		travelCatalogCompLifecycleManager.setNode(node);
 		nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager("TravelCatalog", travelCatalogCompLifecycleManager);
-		TxDepMonitor travelCatalogTxDepMonitor = new TxDepMonitorImpl(travelCatalogCompObj);
-		nodeMgr.setTxDepMonitor("TravelCatalog", travelCatalogTxDepMonitor);
 		TxLifecycleManager travelCatalogTxLifecycleMgr = new TxLifecycleManagerImpl(travelCatalogCompObj);
 		nodeMgr.setTxLifecycleManager("TravelCatalog", travelCatalogTxLifecycleMgr);
+		TxDepMonitor travelCatalogTxDepMonitor = new TxDepMonitorImpl(travelCatalogCompObj);
+		nodeMgr.setTxDepMonitor("TravelCatalog", travelCatalogTxDepMonitor);
 		
 		DynamicDepManager travelCatalogDepMgr = NodeManager.getInstance().getDynamicDepManager(travelCatalogCompObj.getIdentifier());
 		travelCatalogDepMgr.setTxLifecycleMgr(travelCatalogTxLifecycleMgr);
-//		travelCatalogCompLifecycleManager.setDepMgr(travelCatalogDepMgr);
+		travelCatalogDepMgr.setCompLifeCycleMgr(travelCatalogCompLifecycleManager);
 		
+		nodeMgr.getOndemandSetupHelper("TravelCatalog");
+		UpdateManager travelCatalogUpdateMgr = nodeMgr.getUpdateManageer("TravelCatalog");
 		CommServerManager.getInstance().start("TravelCatalog");
-		
+		ServerIoHandler travelCatalogServerIoHandler = CommServerManager.getInstance().getCommServer("TravelCatalog").getServerIOHandler();
+		travelCatalogServerIoHandler.registerUpdateManager(travelCatalogUpdateMgr);
 
-//		nodeMgr.loadConupConf("TripBooking", "oldVersion");
-//		CompLifecycleManager.getInstance("TripBooking").setNode(node);
-//		CommServerManager.getInstance().start("TripBooking");
-		
 		nodeMgr.loadConupConf("TripBooking", "oldVersion");
 		ComponentObject tripBookingCompObj = nodeMgr.getComponentObject("TripBooking");
 		CompLifecycleManagerImpl tripBookingCompLifecycleManager = new CompLifecycleManagerImpl(tripBookingCompObj);
-//		tripBookingCompLifecycleManager.setNode(node);
 		
 		nodeMgr.setCompLifecycleManager("TripBooking", tripBookingCompLifecycleManager);
-		TxDepMonitor tripBookingTxDepMonitor = new TxDepMonitorImpl(tripBookingCompObj);
-		nodeMgr.setTxDepMonitor("TripBooking", tripBookingTxDepMonitor);
 		TxLifecycleManager tripBookingTxLifecycleMgr = new TxLifecycleManagerImpl(tripBookingCompObj);
 		nodeMgr.setTxLifecycleManager("TripBooking", tripBookingTxLifecycleMgr);
+		TxDepMonitor tripBookingTxDepMonitor = new TxDepMonitorImpl(tripBookingCompObj);
+		nodeMgr.setTxDepMonitor("TripBooking", tripBookingTxDepMonitor);
 		
 		DynamicDepManager tripBookingDepMgr = NodeManager.getInstance().getDynamicDepManager(tripBookingCompObj.getIdentifier());
 		tripBookingDepMgr.setTxLifecycleMgr(tripBookingTxLifecycleMgr);
-//		travelCatalogCompLifecycleManager.setDepMgr(tripBookingDepMgr);
+		tripBookingDepMgr.setCompLifeCycleMgr(tripBookingCompLifecycleManager);
 		
+		nodeMgr.getOndemandSetupHelper("TripBooking");
+		UpdateManager tripBookingUpdateMgr = nodeMgr.getUpdateManageer("TripBooking");
 		CommServerManager.getInstance().start("TripBooking");
+		ServerIoHandler tripBookingServerIoHandler = CommServerManager.getInstance().getCommServer("TripBooking").getServerIOHandler();
+		tripBookingServerIoHandler.registerUpdateManager(tripBookingUpdateMgr);
 		
-		
-//		nodeMgr.loadConupConf("Coordination", "oldVersion");
-//		CompLifecycleManager.getInstance("Coordination").setNode(node);
-//		CommServerManager.getInstance().start("Coordination");
 		
 		nodeMgr.loadConupConf("Coordination", "oldVersion");
 		ComponentObject coordinationCompObj = nodeMgr.getComponentObject("Coordination");
 		CompLifecycleManagerImpl coordinationCompLifecycleManager = new CompLifecycleManagerImpl(coordinationCompObj);
-//		coordinationCompLifecycleManager.setNode(node);
 		nodeMgr.setCompLifecycleManager("Coordination", coordinationCompLifecycleManager);
-		TxDepMonitor coordinationTxDepMonitor = new TxDepMonitorImpl(coordinationCompObj);
-		nodeMgr.setTxDepMonitor("Coordination", coordinationTxDepMonitor);
 		TxLifecycleManager coordinationTxLifecycleMgr = new TxLifecycleManagerImpl(coordinationCompObj);
 		nodeMgr.setTxLifecycleManager("Coordination", coordinationTxLifecycleMgr);
+		TxDepMonitor coordinationTxDepMonitor = new TxDepMonitorImpl(coordinationCompObj);
+		nodeMgr.setTxDepMonitor("Coordination", coordinationTxDepMonitor);
 		
 		DynamicDepManager coordinationDepMgr = NodeManager.getInstance().getDynamicDepManager(coordinationCompObj.getIdentifier());
 		coordinationDepMgr.setTxLifecycleMgr(coordinationTxLifecycleMgr);
-//		travelCatalogCompLifecycleManager.setDepMgr(coordinationDepMgr);
-		
+		coordinationDepMgr.setCompLifeCycleMgr(coordinationCompLifecycleManager);
+
+		nodeMgr.getOndemandSetupHelper("Coordination");
+		UpdateManager coordinationUpdateMgr = nodeMgr.getUpdateManageer("Coordination");
 		CommServerManager.getInstance().start("Coordination");
+		ServerIoHandler coordinationServerIoHandler = CommServerManager.getInstance().getCommServer("Coordination").getServerIOHandler();
+		coordinationServerIoHandler.registerUpdateManager(coordinationUpdateMgr);
 
 //		nodeMgr.getDynamicDepManager("TravelCatalog").ondemandSetting();
 //		nodeMgr.getDynamicDepManager("TripBooking").ondemandSetting();
@@ -152,6 +152,8 @@ public class CoordinationLauncher {
 		algorithm = algorithm.substring(0, algorithm.indexOf("_ALGORITHM"));
 		ExpSetting expSetting = xmlUtil.getExpSetting();
 		rqstInterval = expSetting.getRqstInterval();
+		final Scope scope = expSetting.getScope();
+		System.out.println("SCOPE:" + scope);
 		int nThreads = expSetting.getnThreads();
 		int threadId = expSetting.getThreadId();
 		int indepRun = expSetting.getIndepRun();
@@ -194,7 +196,7 @@ public class CoordinationLauncher {
 					String targetComp1 = input[1].trim();
 					toVer = input[2].trim();
 //					System.out.println("update " + targetComp + " " + toVer);
-					TravelCompUpdate.update(targetComp1, toVer);
+					TravelCompUpdate.update(targetComp1, toVer, scope);
 				} else{
 					System.out.println("Illegal parameters for 'update'");
 					break;
@@ -221,7 +223,7 @@ public class CoordinationLauncher {
 					new CoordinationVisitorThread(node, 0 , i + 1, updateAtCountDown).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
-						TravelCompUpdate.update(targetComp1, updatePoints.get(i));
+						TravelCompUpdate.update(targetComp1, updatePoints.get(i), scope);
 					}
 				}
 				break;
@@ -243,7 +245,7 @@ public class CoordinationLauncher {
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					if(i == 300){
-						TravelCompUpdate.update(targetComp);
+						TravelCompUpdate.update(targetComp, scope);
 					}
 					if(i > 200)
 						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -275,7 +277,7 @@ public class CoordinationLauncher {
 						public void run(){
 							System.out.println("start send update command " + new Date());
 							anotherDisExp.setUpdateStartTime(System.nanoTime());
-							TravelCompUpdate.update(targetComp);
+							TravelCompUpdate.update(targetComp, scope);
 						}
 					};
 					Timer sendUpdateTimer = new Timer();
@@ -386,7 +388,7 @@ public class CoordinationLauncher {
 				for (int i = 0; i < warmUpTimes; i++) {
 					new CoordinationVisitorThread(node, warmCountDown).start();
 					if(i == 300){
-						TravelCompUpdate.update(targetComp);
+						TravelCompUpdate.update(targetComp, scope);
 					}
 					if(i > 200)
 						Thread.sleep((long) timelinessMpp.getNextTriggeringTime(timelinessEvent, 0));
@@ -403,7 +405,7 @@ public class CoordinationLauncher {
 					for (int i = 0; i < nThreads; i++) {
 						new CoordinationVisitorThread(node, updateCountDown, i + 1, timelinessRec).start();
 						if(i == threadId){
-							TravelCompUpdate.update(targetComp);
+							TravelCompUpdate.update(targetComp, scope);
 						}
 						Thread.sleep((long) timelinessMpp.getNextTriggeringTime(timelinessEvent, 0));
 					}
@@ -498,6 +500,7 @@ public class CoordinationLauncher {
 		int indepRun = expSetting.getIndepRun();
 		int rqstInterval = expSetting.getRqstInterval();
 		final String targetComp = expSetting.getTargetComp();
+		final Scope scope = expSetting.getScope();
 		
 		// make request arrival obey to poission process
     	Event event = null;
@@ -515,7 +518,7 @@ public class CoordinationLauncher {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp);
+				TravelCompUpdate.update(targetComp, scope);
 			}
 			if(i > 200)
 				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -546,7 +549,7 @@ public class CoordinationLauncher {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					anotherDisExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp);
+					TravelCompUpdate.update(targetComp, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -604,7 +607,7 @@ public class CoordinationLauncher {
 			Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
 			int disruptedTxs = disruptedTxsResTime.size();
 			String gerResult =TravelExpResultQuery.queryExpResult(targetComp, ExperimentOperation.GET_EXECUTION_RECORDER);
-//			System.out.println(gerResult);
+			System.out.println("gerResult:" + gerResult);
 			ExecutionRecorderAnalyzer analyzer = new ExecutionRecorderAnalyzer(gerResult);
 			int totalRecords = analyzer.getTotalRecords();
 			String correctnessExpData = round + ", " + analyzer.getInconsistentRecords() + ",  " + disruptedTxs + "\n";
