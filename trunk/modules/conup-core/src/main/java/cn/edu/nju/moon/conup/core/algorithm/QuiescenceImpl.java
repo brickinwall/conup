@@ -20,11 +20,13 @@ import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
+import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
+import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -56,7 +58,6 @@ public class QuiescenceImpl implements Algorithm {
 
 	@Override
 	public void manageDependence(TransactionContext txContext, DynamicDepManager depMgr, CompLifeCycleManager compLifeCycleMgr) {
-//		initDynamicDepMgr(txContext.getHostComponent());
 		CompStatus compStatus = compLifeCycleMgr.getCompStatus();
 		switch (compStatus) {
 		case NORMAL:
@@ -159,8 +160,6 @@ public class QuiescenceImpl implements Algorithm {
 	}
 	
 	private void doNormal(TransactionContext txCtx, CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr){
-//		depMgr.ondemandSetupIsDone();
-//		doValid(txContext);
 		if (txCtx.getEventType().equals(TxEventType.TransactionEnd)) {
 			String hostComp;
 			String rootTx;
@@ -173,7 +172,6 @@ public class QuiescenceImpl implements Algorithm {
 			synchronized (ondemandSyncMonitor) {
 				if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL)){
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
-//					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
 					
@@ -197,7 +195,6 @@ public class QuiescenceImpl implements Algorithm {
 		TxEventType txEventType = txCtx.getEventType();
 		String hostComp = txCtx.getHostComponent();
 		String rootTx = txCtx.getRootTx();
-//		initDynamicDepMgr(txCtx.getHostComponent());
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
 //			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
@@ -465,11 +462,6 @@ public class QuiescenceImpl implements Algorithm {
 		return new HashSet<String>();
 	}
 
-//	@Override
-//	public boolean isReadyForUpdate(String compIdentifier) {
-//		return compLifeCycleMgr.getCompStatus().equals(CompStatus.Free);
-//	}
-
 	@Override
 	public boolean isBlockRequiredForFree(Set<String> algorithmOldVersionRootTxs,
 			TransactionContext txContext, boolean isUpdateReqRCVD, DynamicDepManager depMgr) {	
@@ -516,37 +508,6 @@ public class QuiescenceImpl implements Algorithm {
 		doReqPassivate(hostComp, hostComp, depMgr);
 	}
 
-//	@Override
-//	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs) {
-//		Set<String> result = new HashSet<String>();
-//		
-//		Iterator<Entry<String, String>> iterator;
-//		iterator = oldRootTxs.entrySet().iterator();
-//		while(iterator.hasNext()){
-//			result.add(iterator.next().getValue());
-//		}
-//		
-//		return result;
-//	}
-//
-//	@Override
-//	public String getAlgorithmRoot(String parentTx, String rootTx) {
-//		return rootTx;
-//	}
-
-//	@Override
-//	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
-//			String parentTx, String subTx) {
-//		if(subTxStatus.equals(TxEventType.TransactionStart))
-//			return doAckSubtxInit(subComp, curComp, rootTx, parentTx, subTx);
-//		else if(subTxStatus.equals(TxEventType.TransactionEnd))
-//			return doNotifySubTxEnd(subComp, curComp, rootTx, parentTx, subTx);
-//		else{
-//			LOGGER.warning("unexpected sub transaction status: " + subTxStatus + " for rootTx " + rootTx);
-//			return false;
-//		}
-//	}
-
 	@Override
 	public boolean readyForUpdate(String compIdentifier,
 			DynamicDepManager depMgr) {
@@ -567,6 +528,10 @@ public class QuiescenceImpl implements Algorithm {
 		REQS.clear();
 		isPassivateRCVD = false;
 		PASSIVATED = false;
+		
+		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.QUIESCENCE, 
+				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		return true;
 	}
 
@@ -597,20 +562,5 @@ public class QuiescenceImpl implements Algorithm {
 			return false;
 		}
 	}
-
-//	@Override
-//	public boolean initLocalSubTx(String hostComp, String fakeSubTx, String rootTx, String rootComp, String parentTx, String parentComp) {
-//		return true;
-//	}
-
-//	@Override
-//	public void setDynamicDepMgr(DynamicDepManager depMgr) {
-//		this.depMgr = depMgr;
-//	}
-
-
-//	@Override
-//	public void setTxDepRegistry(TxDepRegistry txDepRegistry){
-//	}
 
 }

@@ -13,7 +13,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.datamodel.InvocationContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
@@ -136,7 +135,7 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public boolean isReadyForUpdate() {
 		boolean algReadyForUpdate = algorithm.readyForUpdate(compObj.getIdentifier(), this);
-		LOGGER.info("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID));
+		LOGGER.fine("algReadyForUpdate:" + algReadyForUpdate + " compStatus.equals(CompStatus.VALID): " + compLifeCycleMgr.getCompStatus().equals(CompStatus.VALID));
 		return algReadyForUpdate;
 	}
 
@@ -198,16 +197,16 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		for (Dependence dep : inDepRegistry.getDependences()) {
 			inDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
+		LOGGER.fine("ondemandSetupIsDone, inDepsStr:" + inDepsStr);
 		
 		String outDepsStr = "";
 		for (Dependence dep : outDepRegistry.getDependences()) {
 			outDepsStr += "\n" + dep.toString();
 		}
-		LOGGER.info("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
+		LOGGER.fine("ondemandSetupIsDone, outDepsStr:" + outDepsStr);
 
 		Printer printer = new Printer();
-		LOGGER.info("ondemandSetupIsDone, Txs:");
+		LOGGER.fine("ondemandSetupIsDone, Txs:");
 		printer.printTxs(LOGGER, getTxs());
 				
 		algorithm.initiate(compObj.getIdentifier(), this);
