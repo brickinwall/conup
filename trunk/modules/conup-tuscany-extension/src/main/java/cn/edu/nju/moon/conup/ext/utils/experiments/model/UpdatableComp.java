@@ -5,5 +5,7 @@ public enum UpdatableComp {
 	Bank,
 	ShoppingCart,
 	HotelPartner,
-	TripPartner;
+	TripPartner, 
+	TravelCatalog, 
+	EmailGateway;
 }
