@@ -104,6 +104,7 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 		txContext.setParentComponent(parentComponent);
 		txContext.setRootComponent(rootComponent);
 		txContext.setParentTx(parentTx);
+		assert rootTx != null;
 		txContext.setRootTx(rootTx);
 		txContext.setInvocationSequence(invocationSequence);
 		txRegistry.addTransactionContext(txID, txContext);

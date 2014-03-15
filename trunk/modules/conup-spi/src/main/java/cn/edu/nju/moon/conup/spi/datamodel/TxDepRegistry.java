@@ -39,7 +39,6 @@ public class TxDepRegistry {
 	}
 	
 	private void updateLocalDep(String txId, TxDep txDep){
-		txDeps.remove(txId);
 		txDeps.put(txId, txDep);
 	}
 

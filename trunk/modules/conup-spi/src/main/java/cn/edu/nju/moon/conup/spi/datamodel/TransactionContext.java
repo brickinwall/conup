@@ -84,7 +84,12 @@ public class TransactionContext {
 		if(scope == null || !scope.isSpecifiedScope()){
 			return rootTx;
 		} else {
-			return calcProxyRootTxId(rootTx, hostComponent, scope);
+			String proxyRootTxId = calcProxyRootTxId(rootTx, hostComponent, scope);
+			if(proxyRootTxId == null) {
+				return rootTx;
+			}
+			
+			return proxyRootTxId;
 		}
 	}
 	

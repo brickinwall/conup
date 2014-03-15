@@ -84,6 +84,7 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		 * set eventType, futureC, pastC 
 		 */
 		TxDep txDep = new TxDep(convertServiceToComponent(ddm.getFuture(), compIdentifier), convertServiceToComponent(ddm.getPast(), compIdentifier));
+		assert txDep != null;
 		txDepRegistry.addLocalDep(curTxID, txDep);
 //		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), compIdentifier));
 //		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), compIdentifier));
@@ -95,7 +96,6 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		boolean result = dynamicDepMgr.manageTx(txContext);
 		// when be notified that a tx ends, remove it from TxRegistry.
 		if(et.equals(TxEventType.TransactionEnd)){
-//			txRegistry.removeTransactionContext(curTxID);
 			txLifeCycleMgr.removeTransactionContext(curTxID);
 			txDepRegistry.removeLocalDep(curTxID);
 			
