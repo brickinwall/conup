@@ -145,6 +145,13 @@ public class JsonRpcInvoker implements Invoker, DataExchangeSemantics {
 
                     if (returnType == null) {
                         msg.setBody(null);
+                        // add for conup by rgc
+                        // 2014-03-15 17:05
+                        JsonNode compVersionJsonNode = jsonResponse.get("PROXY_ROOT_TX_ID");
+    					if (compVersionJsonNode != null) {
+    						msg.getHeaders().put("PROXY_ROOT_TX_ID",
+    								compVersionJsonNode.asText());
+    					}
                         return msg;
                     }
 

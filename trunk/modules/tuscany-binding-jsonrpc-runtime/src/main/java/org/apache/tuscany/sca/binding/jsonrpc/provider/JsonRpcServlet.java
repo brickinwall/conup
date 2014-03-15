@@ -288,9 +288,22 @@ public class JsonRpcServlet extends HttpServlet {
                 return new JsonRpc10Response((ObjectNode)JacksonHelper.MAPPER.readTree(result.toString()));
             } else {
                 if (jsonOperation.getOutputType().getLogical().size() == 0) {
-                    // void operation (json-rpc notification)
-                    JsonRpc10Response response =
-                        new JsonRpc10Response(request.getId(), JsonNodeFactory.instance.nullNode());
+                	
+                	// add for conup
+                	JsonRpc10Response response = null;
+                	if (responseMessage.getHeaders().get("PROXY_ROOT_TX_ID") != null) {
+						response = new JsonRpc10Response(request.getId(),
+								JsonNodeFactory.instance.nullNode(),
+								(String) responseMessage.getHeaders().get(
+										"PROXY_ROOT_TX_ID"));
+					} else {
+						response = new JsonRpc10Response(request.getId(), JsonNodeFactory.instance.nullNode());
+					}
+                	
+                	//original version
+//                    // void operation (json-rpc notification)
+//                    JsonRpc10Response response =
+//                        new JsonRpc10Response(request.getId(), JsonNodeFactory.instance.nullNode());
                     return response;
 
                 } else {
