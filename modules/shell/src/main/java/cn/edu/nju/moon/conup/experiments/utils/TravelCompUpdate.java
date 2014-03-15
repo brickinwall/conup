@@ -19,12 +19,129 @@ public class TravelCompUpdate {
 		case "HotelPartner":
 			updateHotelPartner(ipAddress, baseDir, scope);
 			break;
+		case "Payment":
+			updatePayment(ipAddress, baseDir, scope);
+			break;
+		case "TravelCatalog":
+			updateTravelCatalog(ipAddress, baseDir, scope);
+			break;
+		case "EmailGateway":
+			updateEmailGateway(ipAddress, baseDir, scope);
+			break;
 		default:
 			System.out.println("No such component for update or unsupported component.");
 			break;
 		}
 	}
 	
+	private static void updateEmailGateway(String ipAddress, String baseDir,
+			final Scope scope) {
+		final String ip = ipAddress;
+		final String targetIdentifier = "EmailGateway";
+		final int port = 22312;
+		final String classFilePath = "com.tuscanyscatours.emailgateway.impl.EmailGatewayImpl";
+		final String contributionUri = "payment-java";
+		final String compsiteUri = "payment.composite";
+		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		if(updateTimesCount % 2 == 0){
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/emailGateWayVer1";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		} else{
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/emailGateWayVer2";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		}
+		
+		updateTimesCount++;
+	}
+
+	private static void updateTravelCatalog(String ipAddress, String baseDir,
+			final Scope scope) {
+		final String ip = ipAddress;
+		final String targetIdentifier = "TravelCatalog";
+		final int port = 22305;
+		final String classFilePath = "com.tuscanyscatours.travelcatalog.impl.TravelCatalogImpl";
+		final String contributionUri = "fullapp-travelcatalog";
+		final String compsiteUri = "fullapp-travelcatalog.composite";
+		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		if(updateTimesCount % 2 == 0){
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/travelCatalogVer1";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		} else{
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/travelCatalogVer2";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		}
+		
+		updateTimesCount++;
+	}
+
+	private static void updatePayment(String ipAddress, String baseDir,
+			final Scope scope) {
+		final String ip = ipAddress;
+		final String targetIdentifier = "Payment";
+		final int port = 22310;
+		final String classFilePath = "com.tuscanyscatours.payment.impl.PaymentImpl";
+		final String contributionUri = "payment-java";
+		final String compsiteUri = "payment.composite";
+		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		if(updateTimesCount % 2 == 0){
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/paymentVer1";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		} else{
+			Thread thread = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					String baseDir = "/home/conup/redeploy/paymentVer2";
+					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				}
+			});
+			
+			thread.start();
+		}
+		
+		updateTimesCount++;
+	}
+
 	private static void updateHotelPartner(String ipAddress, String baseDir, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "HotelPartner";
