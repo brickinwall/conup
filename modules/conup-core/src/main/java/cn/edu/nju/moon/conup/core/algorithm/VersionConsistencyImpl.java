@@ -257,8 +257,9 @@ public class VersionConsistencyImpl implements Algorithm {
 		TxEventType txEventType = txContext.getEventType();
 //		String rootTx = txContext.getRootTx();
 		Scope scope = depMgr.getScope();
+		assert txContext != null;
 		String rootTx = txContext.getProxyRootTxId(scope);
-		if(!scope.isSpecifiedScope()){
+		if(scope != null && !scope.isSpecifiedScope()){
 			assert rootTx.equals(txContext.getRootTx());
 		}
 		
@@ -273,6 +274,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
+		assert txDepRegistry.getLocalDep(currentTx) != null;
 		Set<String> futureComponents = txDepRegistry.getLocalDep(currentTx).getFutureComponents();
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {

@@ -188,7 +188,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 				assert hostComp.equals(subComp);
 				
 				String proxyRootTxId = txLifecycleMgr.endLocalSubTx(hostComp, subTx);
+				assert proxyRootTxId != null;
 				
+				LOGGER.fine("PROXY_ROOT_TX_ID:" + proxyRootTxId + "@attachEndedTxToResAtServicePolicy");
 				msgHeaders.remove(TxInterceptor.INVOCATION_CONTEXT);
 				// scope
 				msgHeaders.put("PROXY_ROOT_TX_ID", proxyRootTxId);
@@ -225,6 +227,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 
 		String proxyRootTxId = (String)msgHeaders.get("PROXY_ROOT_TX_ID");
 		LOGGER.fine("PROXY_ROOT_TX_ID:" + proxyRootTxId + "@attachEndedTxToResAtRefernecePolicy");
+		assert proxyRootTxId != null;
 		
 		if( !subComp.equals(hostComp)){
 			
