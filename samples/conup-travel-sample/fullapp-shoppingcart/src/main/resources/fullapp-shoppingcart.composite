@@ -29,13 +29,13 @@
     
     <component name="ShoppingCart">
         <implementation.java class="com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl"/>
-        <service name="CartInitialize">
+        <service name="CartInitialize" requires="trace" policySets="traceBindingPolicySet">
             <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartInitialize" />
         </service>
-        <service name="CartUpdates">
+        <service name="CartUpdates" requires="trace" policySets="traceBindingPolicySet">
             <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartUpdates" />
         </service>
-        <service name="CartCheckout">
+        <service name="CartCheckout" requires="trace" policySets="traceBindingPolicySet">
             <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartCheckout" />
         </service>
         

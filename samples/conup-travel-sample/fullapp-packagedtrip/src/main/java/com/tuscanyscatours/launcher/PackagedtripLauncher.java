@@ -12,14 +12,17 @@ import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.trip.impl.TripSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class PackagedtripLauncher {
@@ -42,29 +45,32 @@ public class PackagedtripLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
-//		nodeMgr.loadConupConf("TripPartner", "oldVersion");
-//		CompLifecycleManager.getInstance("TripPartner").setNode(node);
-//		CommServerManager.getInstance().start("TripPartner");
 
-		nodeMgr.loadConupConf("TripPartner", "oldVersion");
-		ComponentObject triPartnerCompObj = nodeMgr.getComponentObject("TripPartner");
+		String compIdentifier = "TripPartner";
+		nodeMgr.loadConupConf(compIdentifier, "oldVersion");
+		ComponentObject triPartnerCompObj = nodeMgr.getComponentObject(compIdentifier);
 		CompLifecycleManagerImpl triPartnerCompLifecycleManager = new CompLifecycleManagerImpl(triPartnerCompObj);
-//		triPartnerCompLifecycleManager.setNode(node);
+		
 		nodeMgr.setTuscanyNode(node);
-		nodeMgr.setCompLifecycleManager("TripPartner", triPartnerCompLifecycleManager);
-		TxDepMonitor triPartnerTxDepMonitor = new TxDepMonitorImpl(triPartnerCompObj);
-		nodeMgr.setTxDepMonitor("TripPartner", triPartnerTxDepMonitor);
+		nodeMgr.setCompLifecycleManager(compIdentifier, triPartnerCompLifecycleManager);
 		TxLifecycleManager triPartnerTxLifecycleMgr = new TxLifecycleManagerImpl(triPartnerCompObj);
-		nodeMgr.setTxLifecycleManager("TripPartner", triPartnerTxLifecycleMgr);
+		nodeMgr.setTxLifecycleManager(compIdentifier, triPartnerTxLifecycleMgr);
+		TxDepMonitor triPartnerTxDepMonitor = new TxDepMonitorImpl(triPartnerCompObj);
+		nodeMgr.setTxDepMonitor(compIdentifier, triPartnerTxDepMonitor);
 		
 		DynamicDepManager tripPartnerDepMgr = NodeManager.getInstance().getDynamicDepManager(triPartnerCompObj.getIdentifier());
 		tripPartnerDepMgr.setTxLifecycleMgr(triPartnerTxLifecycleMgr);
-//		triPartnerCompLifecycleManager.setDepMgr(tripPartnerDepMgr);
+		tripPartnerDepMgr.setCompLifeCycleMgr(triPartnerCompLifecycleManager);
 		
-		CommServerManager.getInstance().start("TripPartner");
+		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
 		
-//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetting();
-//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetupIsDone();
+		UpdateManager currencyConverterUpdateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		CommServerManager.getInstance().start(compIdentifier);
+		ServerIoHandler currencyConverterServerIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
+		currencyConverterServerIoHandler.registerUpdateManager(currencyConverterUpdateMgr);
+		
+//		nodeMgr.getDynamicDepManager(compIdentifier).ondemandSetting();
+//		nodeMgr.getDynamicDepManager(compIdentifier).ondemandSetupIsDone();
 
 		// launch DepRecorder
 		DepRecorder depRecorder;
@@ -80,7 +86,7 @@ public class PackagedtripLauncher {
 			System.out
 				.println("\nTry to access TripPartner#service-binding(Search/Search):");
 			TripSearch carSearch = node.getService(TripSearch.class, "TripPartner/TripSearch");
-			LOGGER.fine("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
+			LOGGER.info("\t" + "carSearch.searchSynch(tripLeg)=" + carSearch.searchSynch(tripLeg));
 
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
