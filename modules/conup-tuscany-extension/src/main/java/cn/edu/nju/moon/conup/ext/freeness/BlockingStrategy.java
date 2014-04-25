@@ -51,7 +51,7 @@ public class BlockingStrategy implements FreenessStrategy {
 		boolean isBlock = depManager.isBlockRequiredForFree(algorithmOldVersionRootTxs, txCtx, isUpdateReqRCVD);
 		
 		if(isBlock){
-			LOGGER.info("real rootTxId:" + txCtx.getRootTx()
+			LOGGER.fine("real rootTxId:" + txCtx.getRootTx()
 					+ " proxy rootTxId:"
 					+ txCtx.getProxyRootTxId(depManager.getScope())
 					+ " is blocked, \n algorithm:" + algorithmOldVersionRootTxs);
