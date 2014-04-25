@@ -330,8 +330,8 @@ public class QuiescenceImpl implements Algorithm {
 	 * @param targetComp
 	 */
 	private void ackPassivate(String hostComp, String targetComp) {
-		LOGGER.info(hostComp + " ackPassivate to " + targetComp);
-		LOGGER.info(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
+		LOGGER.fine(hostComp + " ackPassivate to " + targetComp);
+		LOGGER.fine(hostComp + "  " + "isPassivateRCVD:" + isPassivateRCVD + "  isPASSIVATED:" + PASSIVATED);
 		DepNotifyService depNotifyService = new DepNotifyServiceImpl();
 		String payload = QuiescencePayloadCreator.createPayload(hostComp, targetComp, DepOperationType.ACK_PASSIVATE);
 		depNotifyService.asynPost(hostComp, targetComp, CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
