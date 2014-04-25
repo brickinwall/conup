@@ -170,8 +170,7 @@ public class Shell {
 				String absContributionPath = file.getAbsolutePath();
 
 				System.out.println("Try to preprocess source code...");
-				if(absContributionPath.contains("conup-sample-visitor") || absContributionPath.contains("conup-sample-configuration-client"))
-					requirePreprocessor = false;
+
 				// preprocess
 				if (requirePreprocessor) {	
 					TuscanyProgramAnalyzer analyzer;
@@ -238,7 +237,8 @@ public class Shell {
 					
 				if(absContributionPath.contains("coordination")){
 					Thread.sleep(5000);
-					accessServices(node);
+					doDisruptionExp(node);
+//					accessServices(node);
 //					doExps(node);
 				}
 			}	// END IF

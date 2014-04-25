@@ -63,11 +63,6 @@
         	<version>0.9.6-DU-SNAPSHOT</version>
         </dependency>
         <dependency>
-        	<groupId>cn.edu.nju.moon</groupId>
-        	<artifactId>conup-remote-configuration</artifactId>
-        	<version>0.9.6-DU-SNAPSHOT</version>
-        </dependency>
-        <dependency>
 			<groupId>it.unipr.ce.dsg</groupId>
 			<artifactId>deus</artifactId>
 			<version>0.4.8</version>

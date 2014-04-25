@@ -1,6 +1,6 @@
 package cn.edu.nju.moon.conup.experiments.utils;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 public class TravelCompUpdate {
@@ -42,7 +42,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.emailgateway.impl.EmailGatewayImpl";
 		final String contributionUri = "payment-java";
 		final String compsiteUri = "payment.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -78,7 +78,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.travelcatalog.impl.TravelCatalogImpl";
 		final String contributionUri = "fullapp-travelcatalog";
 		final String compsiteUri = "fullapp-travelcatalog.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -114,7 +114,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.payment.impl.PaymentImpl";
 		final String contributionUri = "payment-java";
 		final String compsiteUri = "payment.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -149,7 +149,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.hotel.impl.HotelImpl";
 		final String contributionUri = "fullapp-bespoketrip";
 		final String compsiteUri = "fullapp-bespoketrip.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -184,7 +184,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 		final String contributionUri = "fullapp-currency";
 		final String compsiteUri = "fullapp-currency.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
@@ -221,7 +221,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.trip.impl.TripImpl";
 		final String contributionUri = "fullapp-packagedtrip";
 		final String compsiteUri = "fullapp-packagedtrip.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
