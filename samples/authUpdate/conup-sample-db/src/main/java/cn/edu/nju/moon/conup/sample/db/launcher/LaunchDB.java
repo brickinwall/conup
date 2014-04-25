@@ -48,8 +48,6 @@ public class LaunchDB {
 		node.installContribution(contributionURL);
 		node.startComposite("conup-sample-db", "db.composite");
 
-		// add current business node to container
-
 		LOGGER.fine("db.composite ready for big business !!!");
 
 		// initiate NodeManager
@@ -57,32 +55,26 @@ public class LaunchDB {
 		nodeMgr = NodeManager.getInstance();
 		String compIdentifier = "DBComponent";
 		nodeMgr.loadConupConf(compIdentifier, "oldVersion");
-		// LOGGER.fine(compObj.getStaticDeps() + "\n" +
-		// compObj.getStaticInDeps() + "\n" + compObj.getAlgorithmConf());
 		ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
+		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
 		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
-//		compLifecycleManager.setNode(node);
+//		compLifecycleManager.transitToValid();
+		
 		nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 
-//		nodeMgr.getDynamicDepManager(compIdentifier).ondemandSetupIsDone();
-		
-		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
-		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
-		
 		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		depMgr.setCompLifeCycleMgr(compLifecycleManager);
-//		compLifecycleManager.setDepMgr(depMgr);
 		
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 		
 		CommServerManager.getInstance().start(compIdentifier);
-		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
-		updateMgr.setCompLifeCycleMgr(compLifecycleManager);
-		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
+		
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);
  		// send ondemand request
@@ -121,7 +113,7 @@ public class LaunchDB {
 		compLcMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
-		ondemandHelper.ondemandSetup();
+		ondemandHelper.ondemandSetup(null);
 		Set<Dependence> outDeps = depMgr.getRuntimeDeps();
 		LOGGER.fine("OutDepRegistry:");
 		for (Iterator iterator = outDeps.iterator(); iterator.hasNext();) {

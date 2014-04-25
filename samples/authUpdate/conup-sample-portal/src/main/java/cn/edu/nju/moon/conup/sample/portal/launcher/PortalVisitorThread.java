@@ -30,18 +30,19 @@ public class PortalVisitorThread extends Thread {
 			long startTime = System.nanoTime();
 			
 			PortalService portalService = node.getService(PortalService.class, "PortalComponent/PortalService");
-			portalService.execute("", "nju", "cs");
+			String executeStr = portalService.execute("", "nju", "cs");
+			LOGGER.info(executeStr);
 			long endTime = System.nanoTime();
 			double responseTime = (endTime - startTime) / 1000000.0;
-			LOGGER.info("responseTime:" + responseTime);
+			LOGGER.fine("responseTime:" + responseTime);
 			
 			Experiment exp = Experiment.getInstance();
 			ExpSetting expSetting = exp.getExpSetting();
-			if(expSetting.getType().contains("disruption")){
-				String statusWhenStart = "start_status";
-				String statusWhenEnd = "end_status";
-				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
-			}
+//			if(expSetting.getType().contains("disruption")){
+//				String statusWhenStart = "start_status";
+//				String statusWhenEnd = "end_status";
+//				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
+//			}
 			
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();

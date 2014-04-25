@@ -10,7 +10,7 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
 @Service(DBService.class)
 public class DBServiceImpl implements DBService {
-	private String version = "version.1";
+	private String COMP_VERSION = "version.1";
 
 	@Override
 	@ConupTransaction
@@ -39,5 +39,10 @@ public class DBServiceImpl implements DBService {
 	
 	private String getThreadID(){
 		return new Integer(Thread.currentThread().hashCode()).toString();
+	}
+
+	@Override
+	public void sayHello(User user) {
+		System.out.println(user.getName() + " " + user.getAge());
 	}
 }

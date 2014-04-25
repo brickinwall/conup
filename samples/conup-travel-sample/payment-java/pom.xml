@@ -113,11 +113,6 @@
 			<version>0.9.6-DU-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>cn.edu.nju.moon</groupId>
-			<artifactId>conup-remote-configuration</artifactId>
-			<version>0.9.6-DU-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>com.tuscanyscatours</groupId>
 			<artifactId>common</artifactId>
 			<version>0.9.6-DU-SNAPSHOT</version>

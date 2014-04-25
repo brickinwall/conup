@@ -10,12 +10,11 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.ext.comp.manager.UpdateManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Dependence;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
@@ -54,13 +53,15 @@ public class LaunchAuth {
         ComponentObject compObj = nodeMgr.getComponentObject(compIdentifier);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+//        compLifecycleManager.transitToValid();
+        
         nodeMgr.setTuscanyNode(node);
         nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
 
+        TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
+        nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
         TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
 		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
-		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
-		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
 		
 		
 		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
@@ -68,11 +69,10 @@ public class LaunchAuth {
 		depMgr.setCompLifeCycleMgr(compLifecycleManager);
 		
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
         
 		CommServerManager.getInstance().start(compIdentifier);
-		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
-		updateMgr.setCompLifeCycleMgr(compLifecycleManager);
-		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
+
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);
         //access
@@ -109,14 +109,14 @@ public class LaunchAuth {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
 				String baseDir = "/home/artemis/Tuscany/deploy/auth2";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, null);
 				
 			}
 		});
@@ -134,7 +134,7 @@ public class LaunchAuth {
 		compLcMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
-		ondemandHelper.ondemandSetup();
+		ondemandHelper.ondemandSetup(null);
 		Set<Dependence> outDeps = depMgr.getRuntimeDeps();
 		LOGGER.fine("OutDepRegistry:");
 		for (Iterator iterator = outDeps.iterator(); iterator.hasNext();) {

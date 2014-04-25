@@ -1,10 +1,10 @@
 package cn.edu.nju.moon.conup.sample.portal.services;
 
-
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
+import cn.edu.nju.moon.conup.sample.portal.launcher.AuthCompUpdate;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
@@ -16,7 +16,7 @@ public class PortalServiceImpl implements PortalService {
 	private ProcService procService;
 //	private TxLifecycleManager _txLifecycleMgr;
 	
-	private String version = "version.1";
+	private String COMP_VERSION = "version.1";
 
 	public TokenService getTokenService() {
 		return tokenService;
@@ -58,6 +58,8 @@ public class PortalServiceImpl implements PortalService {
 //		return exeRecorder.getCompleteAction(rootTx);
 		tokenService.getToken("", "");
 		
+//		testOndemand();
+		
 		procService.process(exeProc, "", "");
 		
 		return exeProc + " " + userName + " " + passwd;
@@ -78,14 +80,14 @@ public class PortalServiceImpl implements PortalService {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
 				String baseDir = "/home/nju/deploy/sample/update";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, null);
 				
 			}
 		});
@@ -95,10 +97,10 @@ public class PortalServiceImpl implements PortalService {
 	
 	private void testOndemand() {
 		// test
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "AuthComponent";
 		int port = 18082;
-		rcs.ondemand("10.0.2.15", port, targetIdentifier, "TRANQUILLITY");
+		rcs.ondemand("10.0.2.15", port, targetIdentifier, "CONSISTENCY", null);
 		//TRANQUILLITY
 		//CONSISTENCY
 	}

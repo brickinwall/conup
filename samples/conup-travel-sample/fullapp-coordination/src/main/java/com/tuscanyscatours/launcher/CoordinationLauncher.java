@@ -22,6 +22,7 @@ import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
+
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
 import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
@@ -35,9 +36,9 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
@@ -340,9 +341,9 @@ public class CoordinationLauncher {
 						} else if(targetComp.equals("HotelPartner")){
 							port = 22301;
 						}
-						String updateEndTime = new RemoteConfServiceImpl().getUpdateEndTime(ip, port, targetComp, "CONSISTENCY");
-						System.out.println("updateEndTime:" + updateEndTime + " algorithm:" + algorithm);
-						DisruptionExp.getInstance().setUpdateEndTime(Long.parseLong(updateEndTime));
+//						String updateEndTime = new RemoteConfServiceImpl().getUpdateEndTime(ip, port, targetComp, "CONSISTENCY");
+						System.out.println("updateEndTime:" + DisruptionExp.getInstance().getUpdateEndTime() + " algorithm:" + algorithm);
+//						DisruptionExp.getInstance().setUpdateEndTime(Long.parseLong(updateEndTime));
 					}
 					Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
 					Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
@@ -493,6 +494,7 @@ public class CoordinationLauncher {
 		}//WHILE
 		
 	}
+	
 	
 	private static void doCorrectnessExp(Node node, ExpSetting expSetting) throws InterruptedException, InvalidParamsException {
 		CorrectnessExp correctnessExp = CorrectnessExp.getInstance();

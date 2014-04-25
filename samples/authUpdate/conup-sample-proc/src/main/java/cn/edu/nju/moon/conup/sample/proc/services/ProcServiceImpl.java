@@ -3,7 +3,7 @@ package cn.edu.nju.moon.conup.sample.proc.services;
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
@@ -13,7 +13,7 @@ import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 public class ProcServiceImpl implements ProcService {
 	private VerificationService verify;
 	private DBService db;
-	String version = "version.1";
+	String COMP_VERSION = "version.1";
 	public VerificationService getVerify() {
 		return verify;
 	}
@@ -41,8 +41,8 @@ public class ProcServiceImpl implements ProcService {
 //		ExecutionRecorder exeRecorder;
 //		exeRecorder = ExecutionRecorder.getInstance("ProcComponent");
 ////		exeRecorder.addAction(rootTx, exeProc);
-////		exeRecorder.addAction(rootTx, "ProcComponent.process." + version);
-//		exeProc += "; ProcComponent.process." + version;
+////		exeRecorder.addAction(rootTx, "ProcComponent.process." + COMP_VERSION);
+//		exeProc += "; ProcComponent.process." + COMP_VERSION;
 //		
 		exeProc = verify.verify(exeProc, token);
 //		
@@ -76,14 +76,14 @@ public class ProcServiceImpl implements ProcService {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
 				String baseDir = "/home/nju/deploy/sample/update";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, null);
 				
 			}
 		});

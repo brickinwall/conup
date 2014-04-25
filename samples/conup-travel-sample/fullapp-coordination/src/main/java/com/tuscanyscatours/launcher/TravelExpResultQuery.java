@@ -1,8 +1,8 @@
 package com.tuscanyscatours.launcher;
 
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.UpdatableComp;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 
 public class TravelExpResultQuery {
 	public static String queryExpResult(String queryComp, ExperimentOperation expOp){
@@ -52,7 +52,7 @@ public class TravelExpResultQuery {
 	
 	private static String getExeRecorderForShoppingcart(){
 		String result = null;
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "ShoppingCart";
 		int port = 22307;
 		String ip = "10.0.2.15";
@@ -62,7 +62,7 @@ public class TravelExpResultQuery {
 	
 	private static String getExeRecorderForTripPartner(){
 		String result = null;
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "TripPartner";
 		int port = 22304;
 		String ip = "10.0.2.15";
