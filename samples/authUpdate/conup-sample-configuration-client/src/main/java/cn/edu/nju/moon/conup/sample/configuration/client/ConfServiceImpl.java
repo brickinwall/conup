@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.sample.configuration.model.TargetComp;
 import cn.edu.nju.moon.conup.sample.configuration.util.UpdateXmlUtil;
 
@@ -15,7 +15,7 @@ public class ConfServiceImpl implements ConfService {
 
 	@Override
 	public void ondemand() {
-		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		RemoteConfigTool rcs =  new RemoteConfigTool();
 		UpdateXmlUtil updateXmlUtil = new UpdateXmlUtil();
 		try {
 			TargetComp targetComp = updateXmlUtil.getTargetComp();
@@ -23,14 +23,14 @@ public class ConfServiceImpl implements ConfService {
 			String targetCompIdentifier = targetComp.getTargetCompIdentifier();
 			int port = targetComp.getPort();
 			
-			rcs.ondemand(ipAddress, port, targetCompIdentifier, "CONSISTENCY");
+			rcs.ondemand(ipAddress, port, targetCompIdentifier, "CONSISTENCY", null);
 		} catch (ConnectException e) {
 			e.printStackTrace();
 		}
 	}
 	@Override
 	public void update() {
-		RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		RemoteConfigTool rcs =  new RemoteConfigTool();
 		UpdateXmlUtil updateXmlUtil = new UpdateXmlUtil();
 		try {
 			TargetComp targetComp = updateXmlUtil.getTargetComp();
@@ -42,10 +42,9 @@ public class ConfServiceImpl implements ConfService {
 			String baseDir = targetComp.getBaseDir();
 			String compImpl = targetComp.getCompImpl();
 			
-			rcs.update(ipAddress, port, targetCompIdentifier, "CONSISTENCY", baseDir, compImpl, contributionUri, compsiteUri);
+			rcs.update(ipAddress, port, targetCompIdentifier, "CONSISTENCY", baseDir, compImpl, contributionUri, compsiteUri, null);
 		} catch (ConnectException e) {
 			e.printStackTrace();
 		}
 	}
-
 }
