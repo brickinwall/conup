@@ -2,9 +2,9 @@ package com.tuscanyscatours.launcher;
 
 import java.util.Arrays;
 
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.CompVersion;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.UpdatableComp;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 /**
@@ -23,7 +23,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "Bank";
 				int port1 = 22313;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer1";	//update component to version 1
@@ -43,7 +43,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "Bank";
 				int port1 = 22313;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer2";	//update component to version 2
@@ -63,7 +63,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "ShoppingCart";
 				int port1 = 22307;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/shoppingcartVer1";	//update component to version 
@@ -82,7 +82,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "HotelPartner";
 				int port1 = 22301;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/hotelVer1";	//update component to version 
@@ -101,7 +101,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "TripPartner";
 				int port1 = 22304;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer1";	//update component to version 
@@ -120,7 +120,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier1 = "TripPartner";
 				int port1 = 22304;
 				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer2";	//update component to version 
@@ -139,7 +139,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
 				String baseDir = "/home/artemis/Tuscany/deploy/currencyVer1";
@@ -159,7 +159,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
 				String baseDir = "/home/artemis/Tuscany/deploy/currencyVer2";
@@ -208,7 +208,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "CurrencyConverter";
 				String baseDir = "/home/artemis/Tuscany/deploy/travelCatalogVer2";
 				
@@ -230,7 +230,7 @@ public class TravelCompUpdate {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "CurrencyConverter";
 				String baseDir = "/home/artemis/Tuscany/deploy/travelCatalogVer1";
 				
@@ -350,7 +350,7 @@ public class TravelCompUpdate {
 		final String classFilePath = "com.tuscanyscatours.emailgateway.impl.EmailGatewayImpl";
 		final String contributionUri = "payment-java";
 		final String compsiteUri = "payment.composite";
-		final RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+		final RemoteConfigTool rcs =  new RemoteConfigTool();
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				

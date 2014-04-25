@@ -58,25 +58,26 @@ public class LaunchProc {
 //        CompLifecycleManagerImpl.getInstance("ProcComponent").setNode(node);
         
         CompLifecycleManagerImpl compLifecycleManager = new CompLifecycleManagerImpl(compObj);
+//        compLifecycleManager.transitToValid();
+        
 //		compLifecycleManager.setNode(node);
         nodeMgr.setTuscanyNode(node);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleManager);
-		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
-		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		TxLifecycleManager txLifecycleMgr = new TxLifecycleManagerImpl(compObj);
 		nodeMgr.setTxLifecycleManager(compIdentifier, txLifecycleMgr);
+		TxDepMonitor txDepMonitor = new TxDepMonitorImpl(compObj);
+		nodeMgr.setTxDepMonitor(compIdentifier, txDepMonitor);
 		
-		DynamicDepManager depMgr = NodeManager.getInstance().getDynamicDepManager(compObj.getIdentifier());
+		DynamicDepManager depMgr = nodeMgr.getDynamicDepManager(compObj.getIdentifier());
 		depMgr.setTxLifecycleMgr(txLifecycleMgr);
 		depMgr.setCompLifeCycleMgr(compLifecycleManager);
 //		compLifecycleManager.setDepMgr(depMgr);
         
 		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compObj.getIdentifier());
+		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 		
 		CommServerManager.getInstance().start(compIdentifier);
-		UpdateManager updateMgr = new UpdateManagerImpl(compObj);
-		updateMgr.setCompLifeCycleMgr(compLifecycleManager);
-		nodeMgr.setUpdateManager(compIdentifier, updateMgr);
+		
 		ServerIoHandler serverIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
 		serverIoHandler.registerUpdateManager(updateMgr);
         
@@ -84,7 +85,7 @@ public class LaunchProc {
 //        sendOndemandRqst();
         
         //access
-//        accessServices(node);
+        accessServices(node);
         
         System.in.read();
         LOGGER.fine("Stopping ...");
@@ -94,16 +95,16 @@ public class LaunchProc {
 	
 	private static void accessServices(Node node) throws InterruptedException {
 		try {
-//				LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
-//				ProcService pi = node.getService(ProcService.class, "ProcComponent#service-binding(ProcService/ProcService)");
-//				LOGGER.fine("\t" + "" + pi.process("nju,cs,pass", ""));
+				LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
+				ProcService pi = node.getService(ProcService.class, "ProcComponent/ProcService");
+				LOGGER.info("\t" + "" + pi.process("nju,cs,pass", "", ""));
 			
-		while(true){
-			LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
-			ProcService pi = node.getService(ProcService.class, "ProcComponent/ProcService");
-			LOGGER.fine("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
-			Thread.sleep(50);
-		}
+//		while(true){
+//			LOGGER.fine("\nTry to access ProcComponent#service-binding(ProcService/ProcService):");
+//			ProcService pi = node.getService(ProcService.class, "ProcComponent/ProcService");
+//			LOGGER.fine("\t" + "" + pi.process("emptyExeProc", "nju,cs,pass", ""));
+//			Thread.sleep(50);
+//		}
 		
 //			int threadNum = 100;
 //			for(int i=0; i<threadNum; i++){
@@ -141,7 +142,7 @@ public class LaunchProc {
 		compLcMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
 		depMgr = nodeMgr.getDynamicDepManager(compIdentifier);
 		ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
-		ondemandHelper.ondemandSetup();
+		ondemandHelper.ondemandSetup(null);
 	}
 
 }

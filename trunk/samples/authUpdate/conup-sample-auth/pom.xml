@@ -56,11 +56,6 @@
 			<artifactId>conup-communication-api</artifactId>
 			<version>0.9.6-DU-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>cn.edu.nju.moon</groupId>
-			<artifactId>conup-remote-configuration</artifactId>
-			<version>0.9.6-DU-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -144,9 +139,11 @@
 								<delete dir="target/module" />
 								<property name="module.dir" value="samples/${module.path}/" />
 
-								<copy file="target/${project.artifactId}-${project.version}.jar" tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
+								<copy file="target/${project.artifactId}-${project.version}.jar"
+									tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
 
-								<echo>Module ${module.name} has been created in the	TUSCANY_HOME/samples directory.</echo>
+								<echo>Module ${module.name} has been created in the
+									TUSCANY_HOME/samples directory.</echo>
 							</target>
 						</configuration>
 					</execution>

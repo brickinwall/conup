@@ -11,8 +11,8 @@ import org.oasisopen.sca.annotation.Service;
 
 @Service({ TokenService.class, VerificationService.class })
 public class AuthServiceImpl implements TokenService, VerificationService {
-	Logger logger = Logger.getLogger(AuthServiceImpl.class.getName());
-	String version = "version.1";
+	final Logger LOGGER = Logger.getLogger(AuthServiceImpl.class.getName());
+	String COMP_VERSION = "version.1";
 	
 	@ConupTransaction
 	public String getToken(String exeProc, String cred) {
@@ -41,8 +41,8 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //		exeRecorder.addAction(rootTx, "AuthComponent.getToken." + version);
 //
 //		return exeRecorder.getAction(rootTx);
-		System.out.println(version);
-		return exeProc + ", " + "AuthComponent.getToken." + version;
+		System.out.println(COMP_VERSION);
+		return exeProc + ", " + "AuthComponent.getToken." + COMP_VERSION;
 	}
 
 	@ConupTransaction
