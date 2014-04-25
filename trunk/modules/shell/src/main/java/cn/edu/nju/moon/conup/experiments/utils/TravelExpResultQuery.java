@@ -1,8 +1,8 @@
 package cn.edu.nju.moon.conup.experiments.utils;
 
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.UpdatableComp;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 
 
 public class TravelExpResultQuery {
@@ -43,7 +43,7 @@ public class TravelExpResultQuery {
 
 	private static String getExeRecorderForCurrencyConverter(String ip) {
 		String result = null;
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "CurrencyConverter";
 		int port = 22300;
 		result = rcs.getExecutionRecorder(ip, port, targetIdentifier, "CONSISTENCY");
@@ -74,7 +74,7 @@ public class TravelExpResultQuery {
 	
 	private static String getExeRecorderForShoppingcart(String ip){
 		String result = null;
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "ShoppingCart";
 		int port = 22307;
 		result = rcs.getExecutionRecorder(ip, port, targetIdentifier, "CONSISTENCY");
@@ -83,7 +83,7 @@ public class TravelExpResultQuery {
 	
 	private static String getExeRecorderForTripPartner(String ip){
 		String result = null;
-		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
+		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "TripPartner";
 		int port = 22304;
 		result = rcs.getExecutionRecorder(ip, port, targetIdentifier, "CONSISTENCY");

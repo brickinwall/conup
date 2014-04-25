@@ -28,18 +28,17 @@ public class CoordinationVisitorThread extends Thread{
 	}
 	
 	public CoordinationVisitorThread(Node node, CountDownLatch countDown) {
+		this(node);
 		this.countDown = countDown;
-		this.node = node;
 	}
 	
 	public CoordinationVisitorThread(Node node, int threadId){
-		this.node = node;
+		this(node);
 		this.threadId = threadId;
 	}
 	
 	public CoordinationVisitorThread(Node node, int threadId, ResponseTimeRecorder resTimeRec, String execType){
-		this.node = node;
-		this.threadId = threadId;
+		this(node, threadId);
 		this.resTimeRec = resTimeRec;
 		this.execType = execType;
 	}
