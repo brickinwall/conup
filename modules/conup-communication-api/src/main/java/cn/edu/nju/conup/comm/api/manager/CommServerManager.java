@@ -118,8 +118,6 @@ public class CommServerManager {
 
 		synchronized (compNameToAddressInfo) {
 			if(compNameToAddressInfo.size() == 0){
-//				CompLifecycleManagerImpl compLifeCycleMgr = CompLifecycleManagerImpl.getInstance(srcComp);
-//				NodeImpl node = (NodeImpl) compLifeCycleMgr.getNode();
 				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
@@ -127,7 +125,6 @@ public class CommServerManager {
 					String compName = ep.getComponent().getName();
 					if( compNameToAddressInfo.containsKey(compName))
 						continue;
-//					String deployURI = ep.getDeployedURI();
 					String bindingURI = ep.getBinding().getURI();
 					assert bindingURI != null;
 					if (bindingURI.startsWith("http://")) {
@@ -152,8 +149,6 @@ public class CommServerManager {
 	 * @return
 	 */
 	public CompCommAddress getInfos(String hostComponentIdentifier) {
-//		CompLifecycleManagerImpl compLifecycleMgr = CompLifecycleManagerImpl.getInstance(hostComponentIdentifier);
-//		NodeImpl node = (NodeImpl) compLifecycleMgr.getNode();
 		Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 		DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 		Collection<Endpoint> endpoints = domainRegistry.getEndpoints();
