@@ -306,8 +306,10 @@ public class UpdateManagerImpl implements UpdateManager {
 		if(updateOperationType.equals(UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP)){
 			DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 			LOGGER.info("Coordination receive NOTIFY_UPDATE_IS_DONE_EXP");
+		} else if(updateOperationType.equals(UpdateOperationType.GET_EXECUTION_RECORDER)) {
+			return ExecutionRecorder.getInstance(reqObj.getTargetIdentifier()).getActionsAndClear();
 		}
-		return "done";
+		return "default message";
 	}
 
 	public void setCompUpdator(ComponentUpdator compUpdator) {
