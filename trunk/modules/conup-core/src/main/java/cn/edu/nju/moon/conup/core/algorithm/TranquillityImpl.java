@@ -853,12 +853,17 @@ public class TranquillityImpl implements Algorithm {
 		}
 		
 		// for experiment
-		//notifyCoordinationUpdateIsDone(hostComp);
+//		notifyCoordinationUpdateIsDone(hostComp);
 
 		// clear local deps
 		depMgr.getRuntimeDeps().clear();
 		depMgr.getRuntimeInDeps().clear();
 //		depMgr.setScope(null);
+		
+		// add for experiment
+//		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.TRANQUILLITY, 
+//				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		
 		return true;
 	}
