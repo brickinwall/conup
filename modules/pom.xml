@@ -40,7 +40,6 @@
 	<module>conup-communication-api</module>
 	<module>conup-core</module>
 	<module>conup-preprocessor</module>
-	<module>conup-remote-configuration</module>
 	<module>conup-spi</module>
 	<module>conup-trace</module>
 	<module>conup-tuscany-extension</module>
