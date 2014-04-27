@@ -16,7 +16,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import cn.edu.nju.moon.conup.sample.configuration.model.TargetComp;
-import cn.edu.nju.moon.conup.spi.exception.ConupEnvException;
+import cn.edu.nju.moon.conup.spi.exception.ConupException;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class UpdateXmlUtil {
 			e.printStackTrace();
 		} catch (IOException e) {
 			if (disPath == "" || disPath == null) {
-				throw new ConupEnvException(
+				throw new ConupException(
 						"TUSCANY_HOME environment is not set!");
 			} else {
 				e.printStackTrace();
