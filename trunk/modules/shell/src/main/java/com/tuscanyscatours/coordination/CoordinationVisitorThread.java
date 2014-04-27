@@ -1,25 +1,19 @@
 package com.tuscanyscatours.coordination;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Logger;
-
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
 
 
 public class CoordinationVisitorThread extends Thread{
 	
-	private static final Logger LOGGER = Logger.getLogger(CoordinationVisitorThread.class.getName());
 	private Node node;
 	private int threadId;
-	private int roundId;
 	private CountDownLatch countDown;
 	private ResponseTimeRecorder resTimeRec;
-	private TimelinessRecorder timelinessRec;
 	private String execType;
 	private Long rqstAbsoluteStartTime = null;
 	
