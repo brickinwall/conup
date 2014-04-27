@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cn.edu.nju.moon</groupId>
@@ -7,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>conup-sample-configuration-client</name>
-	
+
 	<properties>
 		<module.name>auth-update/config</module.name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,7 +41,7 @@
 		<dependency>
 			<groupId>org.apache.tuscany.sca</groupId>
 			<artifactId>tuscany-binding-jsonrpc-runtime</artifactId>
-			<version>2.0</version>
+			<version>0.9.6-DU-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -72,6 +73,12 @@
 			<groupId>cn.edu.nju.moon</groupId>
 			<artifactId>conup-communication-api</artifactId>
 			<version>0.9.6-DU-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -151,9 +158,11 @@
 								<delete dir="target/module" />
 								<property name="module.dir" value="samples/${module.path}/" />
 
-								<copy file="target/${project.artifactId}-${project.version}.jar" tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
+								<copy file="target/${project.artifactId}-${project.version}.jar"
+									tofile="${env.TUSCANY_HOME}/${module.dir}/${project.artifactId}.jar" />
 
-								<echo>Module ${module.name} has been created in the	TUSCANY_HOME/samples directory.</echo>
+								<echo>Module ${module.name} has been created in the
+									TUSCANY_HOME/samples directory.</echo>
 							</target>
 						</configuration>
 					</execution>
