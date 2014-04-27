@@ -8,5 +8,5 @@ public enum ConupExpCommands {
 	frameworkExp5,
 	invoke,
 	update,
-	help;
+ help, oneRoundResponse, correctness, disruptionAndTimeliness, tuscany, txGranularity;
 }
