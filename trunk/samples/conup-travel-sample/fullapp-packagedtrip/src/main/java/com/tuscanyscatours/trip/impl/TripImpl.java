@@ -73,7 +73,21 @@ public class TripImpl implements TripSearch, TripBook {
 
     @ConupTransaction
     public TripItem[] searchSynch(TripLeg tripLeg) {
-    	LOGGER.info("TripPartner " + COMP_VERSION);
+    	LOGGER.fine("TripPartner " + COMP_VERSION);
+    	
+    	String threadID = getThreadID();
+    	ExecutionRecorder exeRecorder;
+		InterceptorCache interceptorCache;
+		TransactionContext txContextInCache;
+		String rootTx;
+		String exeProc;
+		interceptorCache = InterceptorCache.getInstance(COMP_NAME);
+		txContextInCache = interceptorCache.getTxCtx(threadID);
+		rootTx = txContextInCache.getRootTx();
+		exeRecorder = ExecutionRecorder.getInstance(COMP_NAME);
+		exeProc = "TripPartner.searchSynch." + COMP_VERSION;
+		exeRecorder.addAction(rootTx, exeProc);
+    	
         List<TripItem> items = new ArrayList<TripItem>();
         // find the pre-package trip
         for (TripInfo trip : trips) {

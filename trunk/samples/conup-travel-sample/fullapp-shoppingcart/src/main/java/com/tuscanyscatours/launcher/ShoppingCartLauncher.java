@@ -20,6 +20,7 @@ import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -65,7 +66,6 @@ public class ShoppingCartLauncher {
 		DynamicDepManager shoppingcartDepMgr = NodeManager.getInstance().getDynamicDepManager(shoppingCartCompObj.getIdentifier());
 		shoppingcartDepMgr.setTxLifecycleMgr(shoppingCartTxLifecycleMgr);
 		shoppingcartDepMgr.setCompLifeCycleMgr(shoppingCartCompLifecycleManager);
-		
 		nodeMgr.getOndemandSetupHelper("ShoppingCart");
 		
 		UpdateManager shoppingCartUpdateMgr = nodeMgr.getUpdateManageer("ShoppingCart");
@@ -160,13 +160,19 @@ public class ShoppingCartLauncher {
 //				String compsiteUri = "fullapp-shoppingcart.composite";
 //				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
-				String targetIdentifier1 = "CurrencyConverter";
-				int port1 = 22300;
-				String baseDir1 = "/home/rgc";
-				String classFilePath1 = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
-				String contributionUri1 = "fullapp-currency";
-				String compsiteUri1 = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, null);
+				String targetIdentifier = "CurrencyConverter";
+				int port = 22300;
+				String baseDir = "/home/rgc";
+				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
+				String contributionUri = "fullapp-currency";
+				String compsiteUri = "fullapp-currency.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 				
 			}
 		});
