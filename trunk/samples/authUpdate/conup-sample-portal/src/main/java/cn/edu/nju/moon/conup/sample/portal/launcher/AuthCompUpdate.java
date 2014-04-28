@@ -5,6 +5,7 @@ import java.util.Set;
 
 import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 
 /**
  * 
@@ -28,14 +29,16 @@ public class AuthCompUpdate {
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY",
-						baseDir, classFilePath, contributionUri, compsiteUri, null);
-
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 
 		thread.start();
 	}
+
 
 	private static void testUpdateVersion2WithScope() {
 		final Scope scope = new Scope();
@@ -66,8 +69,10 @@ public class AuthCompUpdate {
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY",
-						baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 
 			}
 		});
@@ -104,8 +109,11 @@ public class AuthCompUpdate {
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY",
-						baseDir, classFilePath, contributionUri, compsiteUri, scope);
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 
 			}
 		});
@@ -125,9 +133,11 @@ public class AuthCompUpdate {
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY",
-						baseDir, classFilePath, contributionUri, compsiteUri, null);
-
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 

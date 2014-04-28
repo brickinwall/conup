@@ -1,32 +1,33 @@
 package cn.edu.nju.moon.conup.experiments.utils;
 
 import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 public class TravelCompUpdate {
 	
 	private static int updateTimesCount = 0;
 
-	public static void update(String targetComp, String ipAddress, String baseDir, Scope scope){
+	public static void update(String targetComp, String ipAddress, Scope scope){
 		
 		switch (targetComp) {
 		case "CurrencyConverter":
-			updateCurrency(ipAddress, baseDir, scope);
+			updateCurrency(ipAddress, scope);
 			break;
 		case "TripPartner":
-			updateTripPartner(ipAddress, baseDir, scope);
+			updateTripPartner(ipAddress, scope);
 			break;
 		case "HotelPartner":
-			updateHotelPartner(ipAddress, baseDir, scope);
+			updateHotelPartner(ipAddress, scope);
 			break;
 		case "Payment":
-			updatePayment(ipAddress, baseDir, scope);
+			updatePayment(ipAddress, scope);
 			break;
 		case "TravelCatalog":
-			updateTravelCatalog(ipAddress, baseDir, scope);
+			updateTravelCatalog(ipAddress, scope);
 			break;
 		case "EmailGateway":
-			updateEmailGateway(ipAddress, baseDir, scope);
+			updateEmailGateway(ipAddress, scope);
 			break;
 		default:
 			System.out.println("No such component for update or unsupported component.");
@@ -34,8 +35,7 @@ public class TravelCompUpdate {
 		}
 	}
 	
-	private static void updateEmailGateway(String ipAddress, String baseDir,
-			final Scope scope) {
+	private static void updateEmailGateway(String ipAddress, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "EmailGateway";
 		final int port = 22312;
@@ -43,13 +43,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "payment-java";
 		final String compsiteUri = "payment.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/emailGateWayVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -60,7 +63,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/emailGateWayVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -70,8 +74,7 @@ public class TravelCompUpdate {
 		updateTimesCount++;
 	}
 
-	private static void updateTravelCatalog(String ipAddress, String baseDir,
-			final Scope scope) {
+	private static void updateTravelCatalog(String ipAddress, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "TravelCatalog";
 		final int port = 22305;
@@ -79,13 +82,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "fullapp-travelcatalog";
 		final String compsiteUri = "fullapp-travelcatalog.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/travelCatalogVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -96,7 +102,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/travelCatalogVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -106,8 +113,7 @@ public class TravelCompUpdate {
 		updateTimesCount++;
 	}
 
-	private static void updatePayment(String ipAddress, String baseDir,
-			final Scope scope) {
+	private static void updatePayment(String ipAddress, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "Payment";
 		final int port = 22310;
@@ -115,13 +121,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "payment-java";
 		final String compsiteUri = "payment.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/paymentVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -132,7 +141,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/paymentVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -142,7 +152,7 @@ public class TravelCompUpdate {
 		updateTimesCount++;
 	}
 
-	private static void updateHotelPartner(String ipAddress, String baseDir, final Scope scope) {
+	private static void updateHotelPartner(String ipAddress, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "HotelPartner";
 		final int port = 22301;
@@ -150,13 +160,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "fullapp-bespoketrip";
 		final String compsiteUri = "fullapp-bespoketrip.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/hotelVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -167,7 +180,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/hotelVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -177,7 +191,7 @@ public class TravelCompUpdate {
 		updateTimesCount++;
 	}
 
-	public static void updateCurrency(String ipAddress, String newClassLocation, final Scope scope) {
+	public static void updateCurrency(String ipAddress, final Scope scope) {
 		final String ip = ipAddress;
 		final String targetIdentifier = "CurrencyConverter";
 		final int port = 22300;
@@ -185,13 +199,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "fullapp-currency";
 		final String compsiteUri = "fullapp-currency.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/currencyVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 					
 				}
 			});
@@ -203,8 +220,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/currencyVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
-					
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -214,7 +231,7 @@ public class TravelCompUpdate {
 		updateTimesCount++;
 	}
 	
-	public static void updateTripPartner(String ipAddress, String newClassLocation, final Scope scope){
+	public static void updateTripPartner(String ipAddress, final Scope scope){
 		final String ip = ipAddress;
 		final String targetIdentifier = "TripPartner";
 		final int port = 22304;
@@ -222,13 +239,16 @@ public class TravelCompUpdate {
 		final String contributionUri = "fullapp-packagedtrip";
 		final String compsiteUri = "fullapp-packagedtrip.composite";
 		final RemoteConfigTool rcs =  new RemoteConfigTool();
+		final String protocol = "CONSISTENCY";
+		final RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, null, classFilePath, contributionUri, scope, compsiteUri);
 		if(updateTimesCount % 2 == 0){
 			Thread thread = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/tripVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -239,7 +259,8 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/conup/redeploy/tripVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					rcc.setBaseDir(baseDir);
+					rcs.update(rcc);
 				}
 			});
 			

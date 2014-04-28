@@ -1,5 +1,6 @@
 package cn.edu.nju.moon.conup.spi.utils;
 
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 
@@ -20,7 +21,7 @@ public class UpdateContextPayloadCreator {
 	 * @param compsiteUri
 	 * @return
 	 */
-	public static String createPayload(UpdateOperationType operationType,
+	private static String createPayload(UpdateOperationType operationType,
 			String targetCompIdentifier, String baseDir, String classFilePath,
 			String contributionUri, String compsiteUri) {
 		String result = null;
@@ -32,30 +33,6 @@ public class UpdateContextPayloadCreator {
 				+ UpdateContextPayload.CONTRIBUTION_URI + ":" + contributionUri
 				+ "," + UpdateContextPayload.COMPOSITE_URI + ":" + compsiteUri;
 		return result;
-	}
-
-	/**
-	 * 
-	 * @param operationType
-	 * @param targetCompIdentifier
-	 * @param baseDir
-	 * @param classFilePath
-	 * @param contributionUri
-	 * @param compsiteUri
-	 * @param scope
-	 * @return
-	 */
-	public static String createPayload(UpdateOperationType operationType,
-			String targetCompIdentifier, String baseDir, String classFilePath,
-			String contributionUri, String compsiteUri, Scope scope) {
-		StringBuffer result = new StringBuffer(createPayload(operationType,
-				targetCompIdentifier, baseDir, classFilePath, contributionUri,
-				compsiteUri));
-		if (scope != null)
-			result.append(",").append(UpdateContextPayload.SCOPE).append(":")
-					.append(scope.toString());
-
-		return result.toString();
 	}
 
 	/**
@@ -87,6 +64,24 @@ public class UpdateContextPayloadCreator {
 		if (scope != null)
 			result.append(",").append(UpdateContextPayload.SCOPE).append(":")
 					.append(scope.toString());
+
+		return result.toString();
+	}
+
+	/**
+	 * @param operationType
+	 * @param rcc
+	 * @return
+	 */
+	public static String createPayload(UpdateOperationType operationType,
+			RemoteConfigContext rcc) {
+		
+		StringBuffer result = new StringBuffer(createPayload(operationType,
+				rcc.getTargetIdentifier(), rcc.getBaseDir(), rcc.getClassFilePath(), rcc.getContributionUri(),
+				rcc.getCompsiteUri()));
+		if (rcc.getScope() != null)
+			result.append(",").append(UpdateContextPayload.SCOPE).append(":")
+					.append(rcc.getScope().toString());
 
 		return result.toString();
 	}

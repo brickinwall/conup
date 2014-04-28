@@ -98,7 +98,6 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
-import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -239,7 +238,6 @@ public class Shell {
 				if(absContributionPath.contains("coordination")){
 					Thread.sleep(5000);
 					accessServices(node, shell);
-//					doOneRoundResponseExp(node);
 				}
 			}	// END IF
 		}	// END ELSE
@@ -324,16 +322,14 @@ public class Shell {
     	
     	String targetComp = expSetting.getTargetComp();
     	String ipAddress = expSetting.getIpAddress();
-    	String baseDir = expSetting.getBaseDir();
     	Scope scope = expSetting.getScope();
     	
     	System.out.println("---------------------------------------------");
     	System.out.println("targetComp:" + targetComp);
     	System.out.println("ipAddress:" + ipAddress);
-    	System.out.println("baseDir:" + baseDir);
     	System.out.println("---------------------------------------------");
     	
-    	TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+    	TravelCompUpdate.update(targetComp, ipAddress, scope);
 	}
 
 	private static void doCorrectnessExp(Node node) throws InterruptedException, InvalidParamsException {
@@ -350,7 +346,6 @@ public class Shell {
     	// launching the update threadId
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
-    	final String baseDir = expSetting.getBaseDir();
     	final Scope scope = expSetting.getScope();
 		
 		// make request arrival obey to poission process
@@ -369,7 +364,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			if(i > 200)
 				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -400,7 +395,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					anotherDisExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+					TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -487,7 +482,6 @@ public class Shell {
 	    	int threadId = expSetting.getThreadId();
 	    	String targetComp = expSetting.getTargetComp();
 	    	String ipAddress = expSetting.getIpAddress();
-	    	String baseDir = expSetting.getBaseDir();
 	    	Scope scope = expSetting.getScope();
 	    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
 	    	
@@ -508,7 +502,7 @@ public class Shell {
 			for (int i = 0; i < warmUpTimes; i++) {
 				new CoordinationVisitorThread(node, warmCountDown).start();
 				if(i == 300){
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+					TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 				if(i > 200)
 					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -524,7 +518,7 @@ public class Shell {
 					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 					new CoordinationVisitorThread(node).start();
 					if(j == threadId)
-						TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+						TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 				updateCountDown.await();
 	    		Thread.sleep(3000);
@@ -541,13 +535,11 @@ public class Shell {
     	int indepRun = expSetting.getIndepRun();
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
-    	final String baseDir = expSetting.getBaseDir();
     	final Scope scope = expSetting.getScope();
     	
     	System.out.println("---------------------------------------------");
     	System.out.println("targetComp:" + targetComp);
     	System.out.println("ipAddress:" + ipAddress);
-    	System.out.println("baseDir:" + baseDir);
     	System.out.println("scope:" + scope);
     	System.out.println("---------------------------------------------");
     	
@@ -567,7 +559,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			Thread.sleep(200);
 		}
@@ -578,7 +570,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 100){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 		}
@@ -603,7 +595,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					disExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+					TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -724,7 +716,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new FakeTxThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			Thread.sleep(200);
 		}
@@ -735,7 +727,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new FakeTxThread(node, warmCountDown).start();
 			if(i == 100){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
 		}
@@ -760,7 +752,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					disExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+					TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();
@@ -860,7 +852,6 @@ public class Shell {
     	// launching the update threadId
     	final String targetComp = expSetting.getTargetComp();
     	final String ipAddress = expSetting.getIpAddress();
-    	final String baseDir = expSetting.getBaseDir();
     	final Scope scope = expSetting.getScope();
     	
     	// make request arrival as poission process
@@ -879,7 +870,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i == 300){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			Thread.sleep(200);
 		}
@@ -890,7 +881,7 @@ public class Shell {
 		for (int i = 0; i < warmUpTimes; i++) {
 			new CoordinationVisitorThread(node, warmCountDown).start();
 			if(i % 100 == 0){
-				TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+				TravelCompUpdate.update(targetComp, ipAddress, scope);
 			}
 			
 			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
@@ -922,7 +913,7 @@ public class Shell {
 				public void run(){
 					System.out.println("start send update command " + new Date());
 					disExp.setUpdateStartTime(System.nanoTime());
-					TravelCompUpdate.update(targetComp, ipAddress, baseDir, scope);
+					TravelCompUpdate.update(targetComp, ipAddress, scope);
 				}
 			};
 			Timer sendUpdateTimer = new Timer();

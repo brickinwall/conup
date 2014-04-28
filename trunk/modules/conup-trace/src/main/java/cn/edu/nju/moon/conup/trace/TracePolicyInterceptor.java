@@ -98,11 +98,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			msg = bufferInterceptor.invoke(msg);
 		}
 		
-		//test
-//		String hostComponent = null;
-//		if(getComponent() != null)
-//			hostComponent = getComponent().getName();
-		
 		msg = getNext().invoke(msg);
 		
 		if(phase.equals(Phase.SERVICE_POLICY)){
