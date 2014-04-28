@@ -6,6 +6,7 @@ import org.oasisopen.sca.annotation.Service;
 import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.spi.datamodel.ConupTransaction;
 import cn.edu.nju.moon.conup.spi.datamodel.InterceptorCache;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
 import cn.edu.nju.moon.conup.spi.utils.ExecutionRecorder;
 
@@ -83,7 +84,13 @@ public class ProcServiceImpl implements ProcService {
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, null);
+				
+				String protocol = "CONSISTENCY";
+				String ipAddress = "10.0.2.15";
+				RemoteConfigContext rcc = new RemoteConfigContext(ipAddress,
+						port, targetIdentifier, protocol, baseDir,
+						classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 				
 			}
 		});

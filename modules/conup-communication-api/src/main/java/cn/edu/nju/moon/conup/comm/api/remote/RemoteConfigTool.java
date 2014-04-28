@@ -3,6 +3,7 @@ package cn.edu.nju.moon.conup.comm.api.remote;
 import cn.edu.nju.moon.conup.communication.client.AsynCommClient;
 import cn.edu.nju.moon.conup.communication.client.SynCommClient;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
@@ -12,19 +13,6 @@ import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
  * @version Nov 28, 2012 4:54:05 PM
  */
 public class RemoteConfigTool {
-
-	public boolean update(String ip, int port, String targetIdentifier,
-			String proctocol, String baseDir, String classFilePath,
-			String contributionUri, String compsiteUri, Scope scope) {
-		MsgType msgType = MsgType.REMOTE_CONF_MSG;
-		String payload = UpdateContextPayloadCreator.createPayload(
-				UpdateOperationType.UPDATE, targetIdentifier, baseDir,
-				classFilePath, contributionUri, compsiteUri, scope);
-		SynCommClient asynCommClient = new SynCommClient();
-		asynCommClient.sendMsg(ip, port, null, targetIdentifier, proctocol,
-				msgType, payload);
-		return true;
-	}
 
 	public boolean ondemand(String ip, int port, String targetIdentifier,
 			String proctocol, Scope scope) {
@@ -72,14 +60,15 @@ public class RemoteConfigTool {
 	public static void main(String[] args) {
 		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "AuthComponent";
+		String ip = "10.0.2.15";
 		int port = 18082;
 		String baseDir = "/home/nju/deploy/sample/update";
 		String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 		String contributionUri = "conup-sample-auth";
 		String compsiteUri = "auth.composite";
-		rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir,
-				classFilePath, contributionUri, compsiteUri, null);
-		// rcs.ondemand("localhost", port , targetIdentifier, "CONSISTENCY");
+		String protocol = "CONSISTENCY";
+		RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol , baseDir, classFilePath, contributionUri, null, compsiteUri);
+		rcs.update(rcc);
 	}
 	
 	/**
@@ -96,6 +85,18 @@ public class RemoteConfigTool {
 //		SynCommClient synCommClient = new SynCommClient();
 //		return synCommClient.sendMsg(ip, port, null, targetIdentifier,
 //				proctocol, msgType, payload);
+	}
+
+	public void update(RemoteConfigContext rcc) {
+		MsgType msgType = MsgType.REMOTE_CONF_MSG;
+		
+		
+		String payload = UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.UPDATE, rcc);
+		SynCommClient asynCommClient = new SynCommClient();
+		asynCommClient.sendMsg(rcc.getIp(), rcc.getPort(), null, rcc.getTargetIdentifier(), rcc.getProtocol(),
+				msgType, payload);
+		return;
 	}
 
 }

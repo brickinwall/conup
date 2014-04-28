@@ -8,6 +8,7 @@ import org.oasisopen.sca.annotation.Service;
 import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.sample.configuration.model.TargetComp;
 import cn.edu.nju.moon.conup.sample.configuration.util.UpdateXmlUtil;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 
 @Service(ConfService.class)
 public class ConfServiceImpl implements ConfService {
@@ -42,7 +43,12 @@ public class ConfServiceImpl implements ConfService {
 			String baseDir = targetComp.getBaseDir();
 			String compImpl = targetComp.getCompImpl();
 			
-			rcs.update(ipAddress, port, targetCompIdentifier, "CONSISTENCY", baseDir, compImpl, contributionUri, compsiteUri, null);
+			String protocol = "CONSISTENCY";
+			RemoteConfigContext rcc = new RemoteConfigContext(ipAddress, port,
+					targetCompIdentifier, protocol, baseDir, compImpl,
+					contributionUri, null, compsiteUri);
+			rcs.update(rcc);
+			
 		} catch (ConnectException e) {
 			e.printStackTrace();
 		}
