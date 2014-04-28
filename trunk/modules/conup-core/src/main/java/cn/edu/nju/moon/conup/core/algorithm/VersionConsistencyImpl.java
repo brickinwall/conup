@@ -1057,9 +1057,9 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.setScope(null);
 		
 		// add for experiment
-		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
-				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
-				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
+//		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
+//				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		LOGGER.fine("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
 		
 		return true;
