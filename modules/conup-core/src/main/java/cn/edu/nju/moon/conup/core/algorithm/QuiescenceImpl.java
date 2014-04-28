@@ -529,9 +529,9 @@ public class QuiescenceImpl implements Algorithm {
 		isPassivateRCVD = false;
 		PASSIVATED = false;
 		
-		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.QUIESCENCE, 
-				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
-				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
+//		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.QUIESCENCE, 
+//				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		return true;
 	}
 
