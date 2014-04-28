@@ -13,12 +13,13 @@ import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.hotel.HotelSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
@@ -152,14 +153,20 @@ public class BespoketripLauncher {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "CurrencyConverter";
 				int port = 11230;
 				String baseDir = "/home/stone/deploy/travleSample/currencyNew";
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, null);
+
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 				
 			}
 		});

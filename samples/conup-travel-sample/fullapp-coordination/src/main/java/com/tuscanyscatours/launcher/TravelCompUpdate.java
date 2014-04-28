@@ -5,6 +5,7 @@ import java.util.Arrays;
 import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.CompVersion;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.UpdatableComp;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 /**
@@ -24,13 +25,20 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "Bank";
-				int port1 = 22313;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer1";	//update component to version 1
-				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
-				String contributionUri1 = "fullapp-bank";
-				String compsiteUri1 = "bank.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "Bank";
+				int port = 22313;
+				String baseDir = "/home/artemis/Tuscany/deploy/bankVer1";	//update component to version 1
+				String classFilePath = "com.tuscanyscatours.bank.impl.BankImpl";
+				String contributionUri = "fullapp-bank";
+				String compsiteUri = "bank.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
+				
 			}
 		});
 		
@@ -44,13 +52,21 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "Bank";
-				int port1 = 22313;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/bankVer2";	//update component to version 2
-				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
-				String contributionUri1 = "fullapp-bank";
-				String compsiteUri1 = "bank.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "Bank";
+				int port = 22313;
+				String baseDir = "/home/artemis/Tuscany/deploy/bankVer2";	//update component to version 2
+				String classFilePath = "com.tuscanyscatours.bank.impl.BankImpl";
+				String contributionUri = "fullapp-bank";
+				String compsiteUri = "bank.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
+				
+//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
 			}
 		});
 		
@@ -64,13 +80,20 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "ShoppingCart";
-				int port1 = 22307;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/shoppingcartVer1";	//update component to version 
-				String classFilePath1 = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
-				String contributionUri1 = "fullapp-shoppingcart";
-				String compsiteUri1 = "fullapp-shoppingcart.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "ShoppingCart";
+				int port = 22307;
+				String baseDir = "/home/artemis/Tuscany/deploy/shoppingcartVer1";	//update component to version 
+				String classFilePath = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
+				String contributionUri = "fullapp-shoppingcart";
+				String compsiteUri = "fullapp-shoppingcart.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
+				
 			}
 		});
 		
@@ -83,13 +106,19 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "HotelPartner";
-				int port1 = 22301;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/hotelVer1";	//update component to version 
-				String classFilePath1 = "com.tuscanyscatours.hotel.impl.HotelImpl";
-				String contributionUri1 = "fullapp-bespoketrip";
-				String compsiteUri1 = "fullapp-bespoketrip.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "HotelPartner";
+				int port = 22301;
+				String baseDir = "/home/artemis/Tuscany/deploy/hotelVer1";	//update component to version 
+				String classFilePath = "com.tuscanyscatours.hotel.impl.HotelImpl";
+				String contributionUri = "fullapp-bespoketrip";
+				String compsiteUri = "fullapp-bespoketrip.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -102,13 +131,19 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "TripPartner";
-				int port1 = 22304;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer1";	//update component to version 
-				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
-				String contributionUri1 = "fullapp-packagedtrip";
-				String compsiteUri1 = "fullapp-packagedtrip.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "TripPartner";
+				int port = 22304;
+				String baseDir = "/home/artemis/Tuscany/deploy/tripVer1";	//update component to version 
+				String classFilePath = "com.tuscanyscatours.trip.impl.TripImpl";
+				String contributionUri = "fullapp-packagedtrip";
+				String compsiteUri = "fullapp-packagedtrip.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -121,13 +156,19 @@ public class TravelCompUpdate {
 			@Override
 			public void run() {
 				RemoteConfigTool rcs =  new RemoteConfigTool();
-				String targetIdentifier1 = "TripPartner";
-				int port1 = 22304;
-				String baseDir1 = "/home/artemis/Tuscany/deploy/tripVer2";	//update component to version 
-				String classFilePath1 = "com.tuscanyscatours.trip.impl.TripImpl";
-				String contributionUri1 = "fullapp-packagedtrip";
-				String compsiteUri1 = "fullapp-packagedtrip.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1, scope);
+				String targetIdentifier = "TripPartner";
+				int port = 22304;
+				String baseDir = "/home/artemis/Tuscany/deploy/tripVer2";	//update component to version 
+				String classFilePath = "com.tuscanyscatours.trip.impl.TripImpl";
+				String contributionUri = "fullapp-packagedtrip";
+				String compsiteUri = "fullapp-packagedtrip.composite";
+				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -146,8 +187,13 @@ public class TravelCompUpdate {
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
 				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -166,8 +212,13 @@ public class TravelCompUpdate {
 				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
-				
+
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -217,8 +268,12 @@ public class TravelCompUpdate {
 				final String contributionUri = "fullapp-travelcatalog";
 				final String compsiteUri = "fullapp-travelcatalog.composite";
 				
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
-				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);				
 			}
 		});
 		
@@ -239,8 +294,12 @@ public class TravelCompUpdate {
 				final String contributionUri = "fullapp-travelcatalog";
 				final String compsiteUri = "fullapp-travelcatalog.composite";
 				
-				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
-				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);				
 			}
 		});
 		
@@ -357,7 +416,12 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/artemis/Tuscany/deploy/emailGateWayVer1";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					
+					String protocol = "CONSISTENCY";
+					RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+							targetIdentifier, protocol, baseDir, classFilePath,
+							contributionUri, null, compsiteUri);
+					rcs.update(rcc);
 				}
 			});
 			
@@ -368,7 +432,11 @@ public class TravelCompUpdate {
 				@Override
 				public void run() {
 					String baseDir = "/home/artemis/Tuscany/deploy/emailGateWayVer2";
-					rcs.update(ip, port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri, scope);
+					String protocol = "CONSISTENCY";
+					RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+							targetIdentifier, protocol, baseDir, classFilePath,
+							contributionUri, null, compsiteUri);
+					rcs.update(rcc);
 				}
 			});
 			
