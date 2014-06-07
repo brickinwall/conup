@@ -23,6 +23,11 @@ public class TransactionRegistry  {
 		return txContexts.get(transactionID);
 	}
 
+	/**
+	 * key is the tx_id
+	 * value is the TxCtx 
+	 * @return
+	 */
 	public Map<String, TransactionContext> getTransactionContexts() {
 		return txContexts;
 	}
