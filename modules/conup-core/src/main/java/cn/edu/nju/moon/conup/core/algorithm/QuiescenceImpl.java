@@ -73,7 +73,6 @@ public class QuiescenceImpl implements Algorithm {
 			doFree(txContext, compLifeCycleMgr, depMgr);
 			break;
 		default:
-//			doValid(txContext);
 			throw new RuntimeException("Quiescence algorithm cannot execute a transaction while " + txContext.getHostComponent() + " component status is " + compStatus);
 		}
 
@@ -96,17 +95,9 @@ public class QuiescenceImpl implements Algorithm {
 		switch(operationType){
 		case ACK_SUBTX_INIT:
 			LOGGER.warning("deprecated notification ACK_SUBTX_INIT");
-//			parentTx = payloadResolver.getParameter(PayloadType.PARENT_TX);
-//			subTx = payloadResolver.getParameter(PayloadType.SUB_TX);
-//			rootTx = payloadResolver.getParameter(PayloadType.ROOT_TX);
-//			result = doAckSubtxInit(srcComp, hostComp, rootTx, parentTx, subTx);
 			break;
 		case NOTIFY_SUBTX_END:
 			LOGGER.warning("deprecated notification NOTIFY_SUBTX_END");
-//			parentTx = payloadResolver.getParameter(PayloadType.PARENT_TX);
-//			subTx = payloadResolver.getParameter(PayloadType.SUB_TX);
-//			rootTx = payloadResolver.getParameter(PayloadType.ROOT_TX);
-//			result = doNotifySubTxEnd(srcComp, hostComp, rootTx, parentTx, subTx);
 			break;
 		case REQ_PASSIVATE:
 			result = doReqPassivate(srcComp, hostComp, depMgr);
@@ -119,15 +110,6 @@ public class QuiescenceImpl implements Algorithm {
 			break;
 		case NOTIFY_ROOT_TX_END:
 			LOGGER.info("deprecated notification: NOTIFY_ROOT_TX_END");
-//			initDynamicDepMgr(hostComp);
-//			LOGGER.fine("before process NOTIFY_ROOT_TX_END:");
-//			printer.printTxs(depMgr.getTxs());
-			
-//			rootTx = payloadResolver.getParameter(PayloadType.ROOT_TX);
-//			result = doNotifyRootTxEnd(srcComp, hostComp, rootTx);
-			
-//			LOGGER.fine("after process NOTIFY_ROOT_TX_END:");
-//			printer.printTxs(depMgr.getTxs());
 			break;
 		default:
 			throw new RuntimeException("Undefined operation type: " + operationType);
@@ -197,11 +179,7 @@ public class QuiescenceImpl implements Algorithm {
 		String rootTx = txCtx.getRootTx();
 		
 		if (txEventType.equals(TxEventType.TransactionStart)) {
-//			if(!txCtx.getCurrentTx().equals(txCtx.getRootTx())){
-//				String payload = QuiescencePayloadCreator.createPayload(hostComp, txCtx.getParentComponent(), txCtx.getRootTx(), OperationType.ACK_SUBTX_INIT, txCtx.getParentTx(), txCtx.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComp, txCtx.getParentComponent(), CommProtocol.QUIESCENCE, MsgType.DEPENDENCE_MSG, payload);
-//			}
+			
 		} else if (txEventType.equals(TxEventType.TransactionEnd)) {
 			if(rootTx.equals(txCtx.getCurrentTx()))
 				LOGGER.fine("rootTx " + rootTx + " on " + hostComp + " ends.");
@@ -529,9 +507,9 @@ public class QuiescenceImpl implements Algorithm {
 		isPassivateRCVD = false;
 		PASSIVATED = false;
 		
-//		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.QUIESCENCE, 
-//				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
-//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
+		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.QUIESCENCE, 
+				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		return true;
 	}
 

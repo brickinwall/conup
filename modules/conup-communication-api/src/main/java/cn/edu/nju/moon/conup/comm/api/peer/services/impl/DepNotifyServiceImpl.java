@@ -31,6 +31,10 @@ public class DepNotifyServiceImpl implements DepNotifyService{
 			String proctocol, MsgType msgType, String payload) {
 		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
 		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
+		if(targetIdentifier.equals("Coordination") && ipAndPort == null) {
+			LOGGER.info("In current domain, Coordination component does not exist.");
+			return;
+		}
 		new AsynCommClient().sendMsg(ipAndPort.getIp(), ipAndPort.getPort(), srcIdentifier, targetIdentifier, proctocol, msgType, payload);
 	}
 

@@ -49,12 +49,6 @@ public class VersionConsistencyImpl implements Algorithm {
 	
 	public static Map<String, Boolean> isSetupDone = new ConcurrentHashMap<String, Boolean>();
 	
-//	private DynamicDepManager depMgr = null;
-	
-//	private CompLifeCycleManager compLifeCycleMgr = null;
-	
-//	private TxDepRegistry txDepRegistry = null;
-	
 	private Logger LOGGER = Logger.getLogger(VersionConsistencyImpl.class.getName());
 	
 	@Override
@@ -67,11 +61,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		assert compLifeCycleMgr != null;
 		assert depMgr != null;
 		assert compStatus != null;
-		
-//		txContext.setRootTx(txContext.getProxyRootTxId(depMgr.getScope()));
-//		if(txContext.getEventType().equals(TxEventType.TransactionStart)){
-//			LOGGER.fine("TxEventType.TransactionStart, rootTx:" + txContext.getRootTx() + ",currentTx:" + txContext.getCurrentTx());
-//		}
 		
 		switch (compStatus) {
 		case NORMAL:
@@ -134,11 +123,6 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case NOTIFY_START_REMOTE_SUB_TX:
 			LOGGER.warning("deprecated notification NOTIFY_START_REMOTE_SUB_TX");
-//			printer.printDeps(depMgr.getRuntimeInDeps(), "----IN----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
-//			printer.printDeps(depMgr.getRuntimeDeps(), "----Out----" + ", before process NOTIFY_START_REMOTE_SUB_TX:");
-//			doNotifyStartRemoteSubTx(srcComp, targetComp, rootTx);
-//			printer.printDeps(depMgr.getRuntimeInDeps(), "---IN----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
-//			printer.printDeps(depMgr.getRuntimeDeps(), "----Out----" + "after process NOTIFY_START_REMOTE_SUB_TX:");
 			break;
 		case ACK_SUBTX_INIT:
 //			LOGGER.info("before process ACK_SUBTX_INIT:");
@@ -201,7 +185,6 @@ public class VersionConsistencyImpl implements Algorithm {
 //					printer.printTxs(LOGGER, depMgr.getTxs());
 					LOGGER.fine("depMgr.getTxs().size():" + depMgr.getTxs().size());
 					depMgr.getTxs().remove(txCtx.getCurrentTx());
-//					txCtx.getTxDepMonitor().rootTxEnd(hostComp, rootTx);
 					depMgr.getTxLifecycleMgr().rootTxEnd(hostComp, rootTx);
 					LOGGER.fine("removed tx from TxRegistry and TxDepMonitor, local tx: " + txCtx.getCurrentTx() + ", rootTx: " + rootTx);
 					
@@ -348,9 +331,7 @@ public class VersionConsistencyImpl implements Algorithm {
 			 * else if currentTx is root, start cleanup
 			 */
 			if(!currentTx.equals(rootTx)){
-//				String payload = ConsistencyPayloadCreator.createPayload(hostComponent, txContext.getParentComponent(), rootTx, OperationType.NOTIFY_SUBTX_END, txContext.getParentTx(), txContext.getCurrentTx());
-//				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
-//				depNotifyService.synPost(hostComponent, txContext.getParentComponent(), CommProtocol.CONSISTENCY,  MsgType.DEPENDENCE_MSG, payload);
+				
 			}else{
 				/** current tx is root tx */
 				//start cleanup
@@ -387,7 +368,6 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 			assert rootTx != null;
 			if(rootTx.equals(currentTx) && (isSetupDone.get(rootTx) == null || !isSetupDone.get(rootTx))){
-//				Set<String> fDeps = txContext.getFutureComponents();
 				Set<String> fDeps = txDepRegistry.getLocalDep(currentTx).getFutureComponents();
 				Iterator<String> depIterator = fDeps.iterator();
 				DepNotifyService depNotifyService = new DepNotifyServiceImpl();
@@ -547,6 +527,9 @@ public class VersionConsistencyImpl implements Algorithm {
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
 			TransactionContext txCtx;
 			txCtx = allTxs.get(parentTx);
+			if(txCtx == null) {
+				System.out.println(srcComp + "-->" + targetComp + " subTx:" + subTx + " parentTx:" + parentTx);
+			}
 			assert(txCtx!=null);
 			Map<String, String> subTxHostComps = txCtx.getSubTxHostComps();
 			Map<String, TxEventType> subTxStatuses = txCtx.getSubTxStatuses();
@@ -599,26 +582,12 @@ public class VersionConsistencyImpl implements Algorithm {
 			subTxHostComps.put(subTxID, srcComp);
 			subTxStatuses.put(subTxID, TxEventType.TransactionStart);
 			
-//			if(compLifeCycleMgr.isNormal())
 			if(compLifeCycleMgr.getCompStatus().equals(CompStatus.NORMAL))
 				return true;
 			
 			return removeFutureEdges(targetComp, rootTx, parentTxID, subTxID, depMgr);
 		}
 		
-//		Map<String, TransactionContext> allTxs = dynamicDepMgr.getTxs();
-//		TransactionContext txCtx;
-//		txCtx = allTxs.get(parentTxID);
-//		assert(txCtx!=null);
-//		Map<String, String> subTxHostComps = txCtx.getSubTxHostComps();
-//		Map<String, TxEventType> subTxStatuses = txCtx.getSubTxStatuses();
-//		subTxHostComps.put(subTxID, srcComp);
-//		subTxStatuses.put(subTxID, TxEventType.TransactionStart);
-//		
-//		if(dynamicDepMgr.getCompStatus().equals(CompStatus.NORMAL))
-//			return true;
-//		
-//		return removeFutureEdges(dynamicDepMgr, targetComp, rootTx, parentTxID, subTxID);
 	}
 	
 	/**
@@ -643,32 +612,8 @@ public class VersionConsistencyImpl implements Algorithm {
 		return result; 
 	}
 	
-	@Deprecated
-	private boolean doNotifyStartRemoteSubTx(String srcComp, String targetComp,
-			String rootTx, DynamicDepManager depMgr) {
-		Set<Dependence>	rtInDeps = depMgr.getRuntimeInDeps();
-		Set<Dependence> rtOutDeps = depMgr.getRuntimeDeps();
-		
-		Dependence lfe = new Dependence(VersionConsistencyImpl.FUTURE_DEP, 
-				rootTx, targetComp, targetComp, null, null);
-		Dependence lpe = new Dependence(VersionConsistencyImpl.PAST_DEP, 
-				rootTx, targetComp, targetComp, null, null);
-		
-		rtInDeps.add(lfe);
-		rtInDeps.add(lpe);
-		rtOutDeps.add(lfe);
-		rtOutDeps.add(lpe);
-		
-		((DynamicDepManagerImpl)depMgr).getInDepRegistry().removeDependence(FUTURE_DEP, rootTx, srcComp, targetComp);
-//		boolean result = removeFutureEdges(dynamicDepMgr, targetComp, rootTx);
-		
-		return true; 
-	}
-	
 	private boolean doNotifyRemoteUpdateDone(String srComp, String hostComp, DynamicDepManager depMgr){
 		LOGGER.fine(hostComp + " received notifyRemoteUpdateDone from " + srComp);
-//		NodeManager nodeManager = NodeManager.getInstance();
-//		DynamicDepManager depMgr = nodeManager.getDynamicDepManager(hostComp);
 		
 		//notify parent components that remote dynamic update is done
 		Scope scope = depMgr.getScope();
@@ -690,7 +635,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.getRuntimeInDeps().clear();
 		depMgr.setScope(null);
 		
-//		compLifeCycleMgr.remoteDynamicUpdateIsDone();
 		UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(hostComp);
 		updateMgr.remoteDynamicUpdateIsDone();
 		
@@ -746,8 +690,6 @@ public class VersionConsistencyImpl implements Algorithm {
 					outDepRegistry.removeDependence(dep);
 					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), DepOperationType.NOTIFY_FUTURE_REMOVE);
 					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
-//					String payload = ConsistencyPayloadCreator.createPayload(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), dep.getRootTx(), OperationType.NOTIFY_START_REMOTE_SUB_TX);
-//					depNotifyService.synPost(dep.getSrcCompObjIdentifier(), dep.getTargetCompObjIdentifer(), ALGORITHM_TYPE, MsgType.DEPENDENCE_MSG, payload);
 				}else{
 				}
 			}
@@ -928,9 +870,6 @@ public class VersionConsistencyImpl implements Algorithm {
 			}
 		}
 		
-//		assert depMgr.getTxDepMonitor() != null;
-//		depMgr.getTxDepMonitor().rootTxEnd(hostComponent, rootTx);
-		
 		assert depMgr.getTxLifecycleMgr() != null;
 		depMgr.getTxLifecycleMgr().rootTxEnd(hostComponent, rootTx);
 		
@@ -975,7 +914,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		LOGGER.fine("oldRootTx:" + outDepsStr);
 		
 		LOGGER.fine("in consisitency algorithm(allInDeps):" + allInDeps);
-//		LOGGER.fine("in consisitency algorithm(oldrootTxs):" + oldRootTx);
+		LOGGER.fine("in consisitency algorithm(oldrootTxs):" + oldRootTx);
 		return oldRootTx;
 	}
 
@@ -1057,9 +996,9 @@ public class VersionConsistencyImpl implements Algorithm {
 		depMgr.setScope(null);
 		
 		// add for experiment
-//		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
-//				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
-//				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
+		depNotifyService.asynPost(hostComp, "Coordination", CommProtocol.CONSISTENCY, 
+				MsgType.EXPERIMENT_MSG, UpdateContextPayloadCreator.createPayload(
+				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP));
 		LOGGER.fine("update is done, print Txs: txs.size()" + depMgr.getTxs().size() + "\n" + depMgr.getTxs());
 		
 		return true;
@@ -1113,24 +1052,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		return true;
 	}
 
-	//	@Override
-	//	public Set<String> convertToAlgorithmRootTxs(Map<String, String> oldRootTxs) {
-	//		Set<String> result = new HashSet<String>();
-	//		
-	//		Iterator<Entry<String, String>> iterator;
-	//		iterator = oldRootTxs.entrySet().iterator();
-	//		while(iterator.hasNext()){
-	//			result.add(iterator.next().getValue());
-	//		}
-	//		
-	//		return result;
-	//	}
-		
-	//	@Override
-	//	public String getAlgorithmRoot(String parentTx, String rootTx) {
-	//		return rootTx;
-	//	}
-	
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,
 			InvocationContext invocationCtx,
@@ -1167,15 +1088,5 @@ public class VersionConsistencyImpl implements Algorithm {
 			return false;
 		}
 	}
-
-//	@Override
-//	public void setDynamicDepMgr(DynamicDepManager depMgr) {
-//		this.depMgr = depMgr;		
-//	}
-//
-//	@Override
-//	public void setTxDepRegistry(TxDepRegistry txDepRegistry){
-//		this.txDepRegistry = txDepRegistry;
-//	}
 
 }
