@@ -265,23 +265,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 	}
 
-	@Deprecated
-	private void checkConsistency(Map<String, ArrayList<String>> compsVisitLogs, String rootTxId, String subCompVisitLog) {
-		ArrayList<String> previousSubCompVisitLogs = compsVisitLogs.get(rootTxId);
-		String subCompName = subCompVisitLog.split(":")[0];
-		String subCompVersion = subCompVisitLog.split(":")[1];
-		for(String s : previousSubCompVisitLogs){
-			if(s.contains(subCompName)){
-				if(!s.split(":")[1].equals(subCompVersion)){
-					// Found inconsistency!
-					assert false;
-				} else {
-					continue;
-				}
-			}
-		}
-	}
-
 	private boolean isCallback(Message msg){
 		boolean isCallback = false;
 		Endpoint endpoint = msg.getTo();
