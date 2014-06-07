@@ -51,7 +51,7 @@ public class UpdateManagerImpl implements UpdateManager {
 	/** DynamicUpdateContext */
 	private DynamicUpdateContext updateCtx = null;
 	
-	private BufferEventType bufferEventType = BufferEventType.NORMAL;
+//	private BufferEventType bufferEventType = BufferEventType.NORMAL;
 	
 	/** key is rootTxId, value is the sub component visit log(including component name and version)**/
 	private Map<String, ArrayList<String>> compsVisitLogs = new ConcurrentHashMap<String, ArrayList<String>>();
@@ -77,7 +77,6 @@ public class UpdateManagerImpl implements UpdateManager {
 				String freenessConf = compObj.getFreenessConf();
 				FreenessStrategy freeness = UpdateFactory.createFreenessStrategy(freenessConf, compLifeCycleMgr);
 				if(freeness.isReadyForUpdate(compObj.getIdentifier())){
-//					compLifeCycleMgr.achieveFree();
 					achieveFree();
 				}
 			}
@@ -106,13 +105,8 @@ public class UpdateManagerImpl implements UpdateManager {
 			LOGGER.fine("compStatus: " + compStatus);
 			assert compStatus.equals(CompStatus.VALID) || compStatus.equals(CompStatus.FREE);
 			if (compStatus.equals(CompStatus.VALID)) {
-//				compStatus = CompStatus.Free;
 				compLifeCycleMgr.transitToFree();
 				
-				// TODO
-				bufferEventType = BufferEventType.EXEUPDATE;
-				notifyInterceptors(bufferEventType);
-
 				LOGGER.info("**** Component has achieved free, now notify all ****\n\n");
 				validToFreeSyncMonitor.notifyAll();
 			}
@@ -161,8 +155,6 @@ public class UpdateManagerImpl implements UpdateManager {
 		Object updatingSyncMonitor = compObj.getUpdatingSyncMonitor();
 		synchronized (updatingSyncMonitor) {
 			compLifeCycleMgr.transitToNormal();
-			bufferEventType = BufferEventType.NORMAL;
-			notifyInterceptors(bufferEventType);
 			updatingSyncMonitor.notifyAll();
 		}
 		
@@ -254,7 +246,6 @@ public class UpdateManagerImpl implements UpdateManager {
 	 * @return
 	 */
 	private String manageRemoteConf(RequestObject reqObj) {
-	//		boolean updateResult = compLifeCycleMgr.remoteConf(reqObj.getPayload());
 			boolean result = false;
 			String payload = reqObj.getPayload();
 			UpdateContextPayloadResolver payloadResolver = new UpdateContextPayloadResolver(payload);
@@ -439,25 +430,15 @@ public class UpdateManagerImpl implements UpdateManager {
 				exeRecorder = ExecutionRecorder.getInstance(compObj.getIdentifier());
 				exeRecorder.ondemandIsDone();
 				
-//				compStatus = CompStatus.VALID;
 				compLifeCycleMgr.transitToValid();
-//				if(isUpdateRequestReceived){
 				if(compObj.isTargetComp()){
-					bufferEventType = BufferEventType.VALIDTOFREE;
-//					CompLifecycleManager clMgr = NodeManager.getInstance().getCompLifecycleManager(compObj.getIdentifier());
-//					UpdateManager updateMgr = NodeManager.getInstance().getUpdateManageer(compObj.getIdentifier());
 					if (!getUpdateCtx().isOldRootTxsInitiated()) {
 						initOldRootTxs();
 //						Printer printer = new Printer();
 //						printer.printTxs(LOGGER, getTxs());
 						
 					}
-					
-				} else {
-					bufferEventType = BufferEventType.WAITFORREMOTEUPDATE;
 				}
-				notifyInterceptors(bufferEventType);
-//				System.out.println("in ddm:" + bufferEventType);
 				
 				OndemandSetupHelper ondemandSetupHelper = NodeManager.getInstance().getOndemandSetupHelper(compObj.getIdentifier());
 				ondemandSetupHelper.onDemandIsDone();
@@ -475,11 +456,6 @@ public class UpdateManagerImpl implements UpdateManager {
 		}
 	}
 
-	private void notifyInterceptors(BufferEventType eventType){
-		InterceptorStub interceptorStub = NodeManager.getInstance().getInterceptorStub(compObj.getIdentifier());
-		interceptorStub.notifyInterceptors(eventType);
-	}
-
 	@Override
 	public void remoteDynamicUpdateIsDone() {
 		Object waitingRemoteCompUpdateDoneMonitor = compObj.getWaitingRemoteCompUpdateDoneMonitor();
@@ -491,22 +467,13 @@ public class UpdateManagerImpl implements UpdateManager {
 //			}
 //			LOGGER.info(compObj.getIdentifier() + " receive remote_update_is_done, CompStatus: " + compStatus + ", now notify all");
 			if(compStatus.equals(CompStatus.VALID)){
-//				compStatus = CompStatus.NORMAL;
 				compLifeCycleMgr.transitToNormal();
 				//TODO updateManager
-				bufferEventType = BufferEventType.NORMAL;
-				notifyInterceptors(bufferEventType);
-//				notifyObservers(bufferEventType);
-//				System.out.println("in ddm:" + bufferEventType);
 				
 				String compIdentifier = compObj.getIdentifier();
 				LOGGER.info(compIdentifier + " remote update is done, CompStatus: " + compStatus + ", now notify all");
 				waitingRemoteCompUpdateDoneMonitor.notifyAll();
 				
-				// add for experiments
-				// record update cost time
-//				if(compIdentifier.equals("Coordination"))
-//					DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
 			}
 		}
 	}
@@ -520,11 +487,7 @@ public class UpdateManagerImpl implements UpdateManager {
 //				System.out.println(compObj.getIdentifier() + "--> compStatus:" + compStatus);
 			assert compStatus.equals(CompStatus.NORMAL) || compStatus.equals(CompStatus.ONDEMAND);
 			if(compStatus.equals(CompStatus.NORMAL)){
-//				this.compStatus = CompStatus.ONDEMAND;
 				compLifeCycleMgr.transitToOndemand();
-				bufferEventType = BufferEventType.ONDEMAND;
-				notifyInterceptors(bufferEventType);
-//				notifyObservers(bufferEventType);
 			}
 		}
 	}

@@ -18,8 +18,6 @@ public class TimelinessExp {
 	private static TimelinessExp timeliness = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
-	private int nThreads;
-	private int threadId;
 	private String algorithm = null;
 	private String strategy = null;
 
@@ -35,14 +33,12 @@ public class TimelinessExp {
 		strategy = xmlUtil.getFreenessStrategy();
 		strategy = strategy.substring(0, strategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
-		nThreads = expSetting.getnThreads();
-		threadId = expSetting.getThreadId();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/timeliness/";
-		fileName = algorithm + "_" + strategy + "_TimelinessExp_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
-				+ targetComp + ".csv";
+		fileName = algorithm + "_" + strategy + "_TimelinessExp_{" + targetComp
+				+ "_" + rqstInterval + "}" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);
@@ -70,18 +66,8 @@ public class TimelinessExp {
 				out.write(data);
 				out.flush();
 			}
-//			out.close();
 		}
 	}
-	
-	/*public void writeToFile(double updateTime) throws IOException {
-		synchronized (timeliness) {
-			LOGGER.info("updateTime:" + updateTime);
-			String data = updateTime + "\n";
-			out.write(data);
-			out.flush();
-		}
-	}*/
 	
 	public void writeToFile(String data) throws IOException {
 		synchronized (timeliness) {
@@ -91,42 +77,6 @@ public class TimelinessExp {
 		}
 	}
 	
-
-	/*public void addColumn(List<Double> updateTime) throws IOException {
-		synchronized (timeliness) {
-//			LOGGER.info("I'm writing: " + roundId + "," + updateTime);
-			assert algorithm != null;
-			
-			BufferedReader bufReader = new BufferedReader(new FileReader(absolutePath + fileName));
-			String lineStr = "";
-			int rowNum = 0;
-			StringBuffer nContent = new StringBuffer();
-//			nContent.append(bufReader.readLine()).append("\r\n");
-			
-			while((lineStr = bufReader.readLine()) != null){
-				String addValue = "";
-				if(rowNum < updateTime.size()){
-					addValue += updateTime.get(rowNum);
-				}
-				if(lineStr.endsWith(",")){
-					nContent.append(lineStr).append("\"" + addValue + "\"");
-				} else{
-					nContent.append(lineStr).append(",\"" + addValue + "\"");
-				}
-				rowNum ++;
-				nContent.append("\r\n");
-			}
-			bufReader.close();
-			
-			FileOutputStream fileOutStream = new FileOutputStream(new File(absolutePath + fileName), false);
-			fileOutStream.write(nContent.toString().getBytes());
-			fileOutStream.close();
-			
-//			String data = roundId + "," + updateTime + "\n"; 
-//			out.write(data);
-//			out.flush();
-		}
-	}*/
 
 	public void close() {
 		synchronized (timeliness) {

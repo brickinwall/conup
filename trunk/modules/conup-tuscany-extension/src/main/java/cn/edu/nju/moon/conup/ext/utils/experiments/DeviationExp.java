@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
@@ -21,8 +19,6 @@ public class DeviationExp {
 	private static DeviationExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
-	private int nThreads;
-	private int threadId;
 	
 	private DeviationExp() {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
@@ -32,14 +28,12 @@ public class DeviationExp {
 		String freenessStrategy = xmlUtil.getFreenessStrategy();
 		freenessStrategy = freenessStrategy.substring(0, freenessStrategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
-		nThreads = expSetting.getnThreads();
-		threadId = expSetting.getThreadId();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/deviation/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + "deviation" + "_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
-				+ targetComp + ".csv";
+		fileName = algorithm + "_" + freenessStrategy + "_" + "deviation"
+				+ "_{" + targetComp + "_" + rqstInterval + "}" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);
@@ -71,7 +65,7 @@ public class DeviationExp {
 	
 	@Override
 	public String toString() {
-		return "Round, ThreadId, RequestArrivalTime, NormalResponse, UpdateResponse, TimelinessTime";
+		return "Round, ThreadId, RequestArrivalTime, NormalResponse";
 	}
 
 	public void writeToFile(int round, Map<Integer, Long> normalRes, Map<Integer, Long> updateRes) {

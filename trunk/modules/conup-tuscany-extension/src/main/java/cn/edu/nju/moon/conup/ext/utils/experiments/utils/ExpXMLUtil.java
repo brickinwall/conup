@@ -91,8 +91,6 @@ public class ExpXMLUtil {
 		assert setting != null;
 
 		Element indepRun = setting.getChild("indepRun");
-		Element nThreads = setting.getChild("nThreads");
-		Element threadId = setting.getChild("threadId");
 		Element targetComp = setting.getChild("targetComp");
 		Element ipAddress = setting.getChild("ipAddress");
 		Element rqstInterval = setting.getChild("rqstInterval");
@@ -100,8 +98,6 @@ public class ExpXMLUtil {
 		Element scopeElement = setting.getChild("scope");
 
 		expSetting.setIndepRun(Integer.parseInt(indepRun.getValue().trim()));
-		expSetting.setnThreads(Integer.parseInt(nThreads.getValue().trim()));
-		expSetting.setThreadId(Integer.parseInt(threadId.getValue().trim()));
 		expSetting.setTargetComp(targetComp.getValue().trim());
 		expSetting.setIpAddress(ipAddress.getValue().trim());
 		expSetting.setRqstInterval(Integer.parseInt(rqstInterval.getValue()

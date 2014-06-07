@@ -43,19 +43,13 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	/** used to store the deps during the tx running*/
 	private TxDepRegistry txDepRegistry = new TxDepRegistry();
 	private TxLifecycleManager txLifeCycleMgr = null;
-//	private ComponentObject compObject = null;
 	private String compIdentifier = null;
 	
 	public TxDepMonitorImpl(ComponentObject compObject){
-//		this.compObject = compObject;
 		NodeManager nodeMgr = NodeManager.getInstance();
 		this.compIdentifier = compObject.getIdentifier();
 		this.txLifeCycleMgr = nodeMgr.getTxLifecycleManager(compIdentifier);
 	}
-	
-//	public TxDepMonitorImpl(String compIdentifier){
-//		this.compIdentifier = compIdentifier;
-//	}
 	
 	/**
 	 * 
@@ -66,12 +60,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	public boolean notify(TxEventType et, String curTxID){
 		LOGGER.fine("--------TxDepMonitor.notify(" + et.toString() + "," + curTxID + ")--------------");
 		NodeManager nodeMgr = NodeManager.getInstance();
-//		String compIdentifier = compObject.getIdentifier();
-//		TxLifecycleManager txLifecycleMgr = nodeMgr.getTxLifecycleManager(compIdentifier);
-//		TransactionRegistry txRegistry = txLifecycleMgr.getTxRegistry();
 		
 		LocalDynamicDependencesManager ddm = LocalDynamicDependencesManager.getInstance(curTxID);
-//		TransactionContext txContext = txRegistry.getTransactionContext(curTxID);
 		TransactionContext txContext = txLifeCycleMgr.getTransactionContext(curTxID);
 		
 		CompLifeCycleManager compLifeCycleMgr = nodeMgr.getCompLifecycleManager(compIdentifier);
@@ -86,8 +76,6 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		TxDep txDep = new TxDep(convertServiceToComponent(ddm.getFuture(), compIdentifier), convertServiceToComponent(ddm.getPast(), compIdentifier));
 		assert txDep != null;
 		txDepRegistry.addLocalDep(curTxID, txDep);
-//		txContext.setFutureComponents(convertServiceToComponent(ddm.getFuture(), compIdentifier));
-//		txContext.setPastComponents(convertServiceToComponent(ddm.getPast(), compIdentifier));
 		/*
 		 * use componentIdentifier to get specific DynamicDepManager
 		 */
@@ -157,12 +145,8 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 		long enterTime = System.nanoTime();
 		Set<String> comps = new HashSet<String>();
 		
-//		Iterator<Endpoint> endpointsIterator = endpoints.iterator(); 
-		
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-//				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
-//				Node node = compLifeCycleMgr.getNode();
 				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();
@@ -213,8 +197,6 @@ public class TxDepMonitorImpl implements TxDepMonitor {
 	public String convertServiceToComponent(String service, String hostComp){
 		synchronized (serviceToComp) {
 			if(serviceToComp.size() == 0){
-//				CompLifecycleManagerImpl compLifeCycleMgr = (CompLifecycleManagerImpl) CompLifecycleManagerImpl.getInstance(hostComp);
-//				Node node = compLifeCycleMgr.getNode();
 				Node node = (Node) NodeManager.getInstance().getTuscanyNode();
 				DomainRegistry domainRegistry = ((NodeImpl)node).getDomainRegistry();
 				Collection<Endpoint>  endpoints = domainRegistry.getEndpoints();

@@ -284,7 +284,8 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 			assert subComp != null;
 			
 			StringBuffer invokeSequence = null;
-			if(txContext.getInvocationSequence() == null || txContext.getInvocationSequence().equals("null")){
+			if(txContext.getInvocationSequence() == null || txContext.getInvocationSequence().equals("null") 
+					|| txContext.getInvocationSequence().equals("")){
 				invokeSequence = new StringBuffer();
 				invokeSequence.append(hostComponent).append(":").append(currentTx);
 			} else {
@@ -293,7 +294,7 @@ public class TxLifecycleManagerImpl implements TxLifecycleManager {
 			}
 			invocationCtx = new InvocationContext(rootTx, rootComp, parentTx, parentComponent, subTx, subComp, invokeSequence.toString());
 			
-//			startRemoteSubTx(subComp, hostComponent, rootTx, parentTx, subTx);
+			LOGGER.fine("invokeSequence: " +invokeSequence);
 			startRemoteSubTx(invocationCtx);
 		}//else(dependency != null)
 		return invocationCtx;
