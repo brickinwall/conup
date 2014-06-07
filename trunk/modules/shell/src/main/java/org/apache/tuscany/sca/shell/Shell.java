@@ -90,7 +90,6 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.CallBack;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DeviationExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
-import cn.edu.nju.moon.conup.ext.utils.experiments.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
@@ -127,7 +126,6 @@ public class Shell {
     public static void main(final String[] args) throws Exception {
         boolean useJline = true;
         boolean requirePreprocessor = true;
-//        boolean requireContainer = true;
         String domainURI = "uri:default";
         
         @SuppressWarnings("unused")
@@ -259,9 +257,9 @@ public class Shell {
 			}
 			
 			switch (command) {
-			case disruptionAndTimeliness:
+			case DOT:
 				if(input.length == 1){
-					doDisruptionAndTimelinessExp(node);
+					doDOTExp(node);
 				} else{
 					System.out.println("wrong number parameters for 'disruptionExp'");
 					break;
@@ -275,13 +273,6 @@ public class Shell {
 					break;
 				}
 				break;
-			case oneRoundResponse:
-				if(input.length == 1){
-					doOneRoundResponseExp(node);
-				} else{
-					System.out.println("wrong number parameters for 'oneRoundResponse'");
-					break;
-				}
 			case txGranularity:
 				doTxGranularity(node);
 				break;
@@ -438,9 +429,6 @@ public class Shell {
 			} else if(targetComp.equals("HotelPartner")){
 				port = 22301;
 			}
-//			String updateEndTime = new RemoteConfServiceImpl().getUpdateEndTime(ipAddress, port, targetComp, "CONSISTENCY");
-//			System.out.println("updateEndTime:" + updateEndTime + " algorithm: TRANQUILLITY");
-//			DisruptionExp.getInstance().setUpdateEndTime(Long.parseLong(updateEndTime));
 			System.out.println("updateEndTime:" + DisruptionExp.getInstance().getUpdateEndTime() + " updateStartTime:" + DisruptionExp.getInstance().getUpdateStartTime());
 			
 			Thread.sleep(3000);
@@ -467,65 +455,7 @@ public class Shell {
 		}
 	}
 
-	@Deprecated
-	private static void doTimelinessExp(Node node) throws InterruptedException, InvalidParamsException {
-		
-			ExpXMLUtil xmlUtil = new ExpXMLUtil();
-	    	ExpSetting expSetting = xmlUtil.getExpSetting();
-	    	
-	    	// the interval between each request thread
-	    	int rqstInterval = expSetting.getRqstInterval();
-	    	
-	    	int indepRun = expSetting.getIndepRun();
-	    	int nThreads = expSetting.getnThreads();
-	    	// launching the update threadId
-	    	int threadId = expSetting.getThreadId();
-	    	String targetComp = expSetting.getTargetComp();
-	    	String ipAddress = expSetting.getIpAddress();
-	    	Scope scope = expSetting.getScope();
-	    	LOGGER.fine("nThreads:" + nThreads + "\nthreadId" + threadId);
-	    	
-	    	// make request arrival as poission process
-	    	Event event = null;
-	    	int seed = 123456789;
-	    	Properties params = new Properties();
-	    	float MeanArrival = rqstInterval;
-	    	params.setProperty("meanArrival", Float.toString(MeanArrival));
-	    	ArrayList<Event> refEvents = new ArrayList<Event>();
-	    	MyPoissonProcess mpp = new MyPoissonProcess("myPoissonProcess", params, null, refEvents);
-	    	Random random = new Random(seed);
-	    	mpp.setRandom(random);
-
-	    	// warm up code
-	    	int warmUpTimes = 400;
-			CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
-			for (int i = 0; i < warmUpTimes; i++) {
-				new CoordinationVisitorThread(node, warmCountDown).start();
-				if(i == 300){
-					TravelCompUpdate.update(targetComp, ipAddress, scope);
-				}
-				if(i > 200)
-					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-				else	
-					Thread.sleep(200);
-			}
-			warmCountDown.await();
-	
-			Thread.sleep(3000);
-	    	for(int i = 0; i < indepRun; i++){
-	    		CountDownLatch updateCountDown = new CountDownLatch(nThreads);
-				for (int j = 0; j < nThreads; j++) {
-					Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-					new CoordinationVisitorThread(node).start();
-					if(j == threadId)
-						TravelCompUpdate.update(targetComp, ipAddress, scope);
-				}
-				updateCountDown.await();
-	    		Thread.sleep(3000);
-	    	}
-		}
-
-	private static void doDisruptionAndTimelinessExp(Node node) throws InterruptedException, InvalidParamsException {
+	private static void doDOTExp(Node node) throws InterruptedException, InvalidParamsException {
     	ExpXMLUtil xmlUtil = new ExpXMLUtil();
     	ExpSetting expSetting = xmlUtil.getExpSetting();
     	
@@ -842,6 +772,7 @@ public class Shell {
 	 * first run the application 1000 times to warm up, then start the experiment
 	 * every experiment has the same request reach time
 	 */
+	@Deprecated
 	private static void doOneRoundResponseExp(Node node) throws Exception {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
     	ExpSetting expSetting = xmlUtil.getExpSetting();
@@ -1002,15 +933,19 @@ public class Shell {
 		
 		System.out.println("ConUp Shell");
 		System.out.println("Commands:");
-		System.out.println();
 		
-		System.out.println("\thelp");
-		System.out.println("\tdisruptionAndTimeliness");
-		System.out.println("\tcorrectness");
-		System.out.println("\toneRoundResponse");
-		System.out.println("\ttxGranularity");
-		System.out.println("\ttuscany");
-		System.out.print("\ndefault>");
+		System.out.println();
+		System.out.println("experiment of disruption, timeliness and overhead ");
+		System.out.println("	[usage] DTO\n");
+		
+		System.out.println("experiment of correctness ");
+		System.out.println("	[usage] correctness\n");
+		
+		System.out.println("tuscany command line ");
+		System.out.println("    [usage] tuscany\n");
+		
+		System.out.println("'help' shows supported commands.");
+		System.out.println("\ndefault>");
 		
 //    	System.out.println();
 //		System.out.println("Timeliness_Exp");

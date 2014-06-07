@@ -116,7 +116,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	
 	@Override
 	public Map<String, TransactionContext> getTxs() {
-//		return txRegistry.getTransactionContexts();
 		assert txLifecycleMgr != null;
 		return txLifecycleMgr.getTxs();
 	}
@@ -179,13 +178,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		
 		txLifecycleMgr.updateTxContext(currentTxID, txContext);
 		
-//		if (!txRegistry.contains(currentTxID)) {
-//			txRegistry.addTransactionContext(currentTxID, txContext);
-//		} else {
-//			// if this tx id already in txRegistry, update it...
-//			txRegistry.updateTransactionContext(currentTxID, txContext);
-//		}
-		
 		return manageDependence(txContext);
 	}
 
@@ -242,7 +234,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 	@Override
 	public void setTxLifecycleMgr(TxLifecycleManager txLifecycleMgr) {
 		this.txLifecycleMgr = txLifecycleMgr;
-//		this.txRegistry = txLifecycleMgr.getTxRegistry();
 	}
 
 	private Map<String, String> getParamFromPayload(DepPayloadResolver plResolver) {
@@ -254,12 +245,6 @@ public class DynamicDepManagerImpl implements DynamicDepManager {
 		params.put("subTx", plResolver.getParameter(DepPayload.SUB_TX));
 		return params;
 	}
-
-//	@Override
-//	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx,
-//			String parentTx, String subTx) {
-//		return algorithm.notifySubTxStatus(subTxStatus, subComp, curComp, rootTx, parentTx, subTx);
-//	}
 
 	@Override
 	public boolean notifySubTxStatus(TxEventType subTxStatus,

@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 import org.apache.tuscany.sca.Node;
 import org.oasisopen.sca.NoSuchServiceException;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.Experiment;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.sample.portal.services.PortalService;
 
 public class PortalVisitorThread extends Thread {
@@ -35,14 +33,6 @@ public class PortalVisitorThread extends Thread {
 			long endTime = System.nanoTime();
 			double responseTime = (endTime - startTime) / 1000000.0;
 			LOGGER.fine("responseTime:" + responseTime);
-			
-			Experiment exp = Experiment.getInstance();
-			ExpSetting expSetting = exp.getExpSetting();
-//			if(expSetting.getType().contains("disruption")){
-//				String statusWhenStart = "start_status";
-//				String statusWhenEnd = "end_status";
-//				exp.writeResponseTimeToFile(roundId, threadId, statusWhenStart, statusWhenEnd, responseTime);
-//			}
 			
 		} catch (NoSuchServiceException e) {
 			e.printStackTrace();
