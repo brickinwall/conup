@@ -21,8 +21,6 @@ public class DisruptionExp {
 	private static DisruptionExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
-	private int nThreads;
-	private int threadId;
 	
 	// update startTime, endTime
 	private long updateStartTime = 0L;
@@ -39,14 +37,12 @@ public class DisruptionExp {
 		String freenessStrategy = xmlUtil.getFreenessStrategy();
 		freenessStrategy = freenessStrategy.substring(0, freenessStrategy.indexOf("_FOR_FREENESS"));
 		expSetting = xmlUtil.getExpSetting();
-		nThreads = expSetting.getnThreads();
-		threadId = expSetting.getThreadId();
 		String targetComp = expSetting.getTargetComp();
 		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/disruption/";
-		fileName = algorithm + "_" + freenessStrategy + "_DisruptionExp_{" + nThreads + "_" + threadId + "}_" + rqstInterval + "_"
-				+ targetComp + ".csv";
+		fileName = algorithm + "_" + freenessStrategy + "_DisruptionExp_{"
+				+ targetComp + "_" + rqstInterval + "}" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);
@@ -97,7 +93,6 @@ public class DisruptionExp {
 		return experiment;
 	}
 	/**
-	 * @param normalRes
 	 * @param updateRes
 	 * @return get all the response time of disrupted txs
 	 */
@@ -124,18 +119,6 @@ public class DisruptionExp {
 		return disruptedResTime;
 	}
 	
-//	public void writeResponseTimeToFile(int roundId, int curThreadId,
-//			String statusWhenStart, String statusWhenEnd, double responseTime) {
-//		synchronized (experiment) {
-//			LOGGER.info("I'm writing to disruption.. ");
-//			String data = roundId + "," + nThreads + "," + curThreadId + ","
-//					+ statusWhenStart + "," + statusWhenEnd + ","
-//					+ responseTime + "\n";
-//			out.write(data);
-//			out.flush();
-//		}
-//	}
-
 	public void writeToFile(String data) {
 		synchronized (experiment) {
 			LOGGER.fine("I'm writing: " + data);

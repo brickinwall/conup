@@ -30,7 +30,8 @@ public class ResponseTimeRecorder {
 	}
 	
 	/**
-	 * @return get all the response time of disrupted txs
+	 * @return get all the response time of disrupted txs,
+	 * key:threadId, value:response time
 	 */
 	public Map<Integer, Double> getDisruptedTxResTime(){
 		return DisruptionExp.getInstance().getDisruptedTxsResTime(updateResInfos);

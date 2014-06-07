@@ -61,9 +61,6 @@ public class CompLifecycleManagerImpl implements CompLifeCycleManager {
 			return ExecutionRecorder.getInstance(compIdentifier).getActionsAndClear();
 		} else if(opTyep.equals(UpdateOperationType.GET_UPDATE_ENDTIME)){
 			return Long.toString(PerformanceRecorder.getInstance(compIdentifier).getUpdateEndTime());
-		} else if(opTyep.equals(UpdateOperationType.NOTIFY_COORDINATIONIN_TRANQUILLITY_EXP)){
-			DisruptionExp.getInstance().setUpdateEndTime(System.nanoTime());
-			return "ok";
 		} else{
 			LOGGER.warning("unsupported operation type for experiment");
 		}

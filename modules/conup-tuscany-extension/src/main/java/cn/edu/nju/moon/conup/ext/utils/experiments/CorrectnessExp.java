@@ -20,12 +20,6 @@ public class CorrectnessExp {
 	private static CorrectnessExp experiment = null;
 	private static PrintWriter out = null;
 	private ExpSetting expSetting;
-	private CallBack callBack = null;
-	
-	// update startTime, endTime
-	private long updateStartTime = 0L;
-	private long updateEndTime = 0L;
-	private long updateCostTime = 0L;
 
 	private CorrectnessExp() {
 		ExpXMLUtil xmlUtil = new ExpXMLUtil();
@@ -39,8 +33,8 @@ public class CorrectnessExp {
 		int rqstInterval = expSetting.getRqstInterval();
 	
 		absolutePath = tuscanyHomeLocation + "/samples/experiments-result/correctness/";
-		fileName = algorithm + "_" + freenessStrategy + "_" + "correctness" + "_"  + rqstInterval + "_"
-				+ targetComp + ".csv";
+		
+		fileName = algorithm + "_CorrectnessExp_{" + targetComp + "_" + rqstInterval + "}" + ".csv";
 		LOGGER.fine("result file:" + fileName);
 		try {
 			File file = new File(absolutePath + fileName);
