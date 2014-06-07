@@ -61,21 +61,14 @@ public class TxInterceptor extends Interceptor {
 			msg = traceReferencePhase(msg, hostComponent, getTargetServiceName(), txDepMonitor);
 		} // else if(reference.policy)
 
-//		if(phase.equals(Phase.REFERENCE_POLICY)
-//				|| phase.equals(Phase.SERVICE_POLICY)){
-//	
-//			msgBodyOriginal = Arrays.asList((Object [])msg.getBody());
-//			List<Object> copy = new ArrayList<Object>();
-//			copy.addAll(msgBodyOriginal);
-//			String msgBodyStr = new String();
-//			msgBodyStr += "\t" + "Message body:";
-//			for(Object object : copy){
-//				String tmp = object.toString();
-//				msgBodyStr += "\n\t\t" + tmp;
-//			}
-//			msgBodyStr += "\n";
-//			LOGGER.fine(msgBodyStr);
-//		}
+		if(phase.equals(Phase.REFERENCE_POLICY)
+				|| phase.equals(Phase.SERVICE_POLICY)){
+	
+			Map<String, Object>  msgHeaders = msg.getHeaders();
+			Object invocationCtx = msgHeaders.get(TxInterceptor.INVOCATION_CONTEXT);
+			
+			LOGGER.fine("\n\t\tinvocationCtxStr:" + invocationCtx.toString());
+		}
 		return msg;
 	}
 	
@@ -116,8 +109,9 @@ public class TxInterceptor extends Interceptor {
 			String hostComponent) {
 		
 		if(invocationContext ==null || invocationContext.toString().equals("")){
-			//an exception is preferred
 			LOGGER.warning("Error: message body cannot be null in a service body");
+			// current tx is root Tx
+//			invocationContext = new InvocationContext(null, null, null, null, null, null, null);
 		}
 		
 		LOGGER.fine("trace SERVICE_POLICY : " + invocationContext);
