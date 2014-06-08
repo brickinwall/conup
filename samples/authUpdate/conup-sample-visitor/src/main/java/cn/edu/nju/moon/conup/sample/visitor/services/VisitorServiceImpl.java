@@ -6,10 +6,11 @@ import java.util.logging.Logger;
 import org.oasisopen.sca.annotation.Reference;
 import org.oasisopen.sca.annotation.Service;
 
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.sample.portal.services.PortalService;
 import cn.edu.nju.moon.conup.sample.portal.services.TokenService;
 import cn.edu.nju.moon.conup.sample.portal.services.VerificationService;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
 
 @Service(VisitorService.class)
 public class VisitorServiceImpl implements VisitorService {
@@ -32,19 +33,6 @@ public class VisitorServiceImpl implements VisitorService {
 	public void setVerficationService(VerificationService verficationService) {
 		this.verficationService = verficationService;
 	}
-
-	
-//	private ComponentUpdateService componentUpdateService;
-//
-//	public ComponentUpdateService getComponentUpdateService() {
-//		return componentUpdateService;
-//	}
-//	
-//	@Reference
-//	public void setComponentUpdateService(
-//			ComponentUpdateService componentUpdateService) {
-//		this.componentUpdateService = componentUpdateService;
-//	}
 
 	public PortalService getPortalService() {
 		return portalService;
@@ -78,15 +66,17 @@ public class VisitorServiceImpl implements VisitorService {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
 				String baseDir = "/home/nju/deploy/sample/update/old";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("114.212.84.83", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
@@ -127,62 +117,21 @@ public class VisitorServiceImpl implements VisitorService {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
+				RemoteConfigTool rcs =  new RemoteConfigTool();
 				String targetIdentifier = "AuthComponent";
 				int port = 18082;
 				String baseDir = "/home/nju/deploy/sample/update";
 				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
-				rcs.update("114.212.84.83", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
-				
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 			}
 		});
 		
 		thread.start();
 	}
 	
-//	try {
-//		Thread.sleep(1000);
-//		new TokenVisitor(tokenService).start();
-////		new VerifyVisitor(verficationService).start();
-//		
-//		Thread.sleep(200);
-//	} catch (InterruptedException e) {
-//		e.printStackTrace();
-//	}
-	
-	// private class ContinuousVisitor extends Thread {
-	//
-	// // Logger logger = Logger.getLogger(ContinuousVisitor.class.getName());
-	//
-	// public ContinuousVisitor() {
-	//
-	// }
-	//
-	// public void run() {
-	// // try {
-	// // for(int i = 0; i < 4; i++){
-	// // new ContinuousVisitor().start();
-	//
-	// logger.info("\t" + "" + portalService.execute("nju", "cs"));
-	// // Thread.sleep(3500);
-	// // }
-	//
-	// // while(true){
-	// // // PortalService portalService =
-	// // node.getService(PortalService.class,
-	// // //
-	// // "PortalComponent#service-binding(PortalService/PortalService)");
-	// // new ContinuousVisitor().start();
-	// // logger.info("\t" + "" + portalService.execute("nju", "cs"));
-	// // Thread.sleep(3500);
-	// // }
-	// // } catch (InterruptedException e) {
-	// // e.printStackTrace();
-	// // }
-	// }// END RUN()
-	//
-	// }
-
 }
