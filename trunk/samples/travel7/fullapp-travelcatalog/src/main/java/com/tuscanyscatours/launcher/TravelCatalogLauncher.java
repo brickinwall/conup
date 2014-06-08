@@ -1,16 +1,5 @@
 package com.tuscanyscatours.launcher;
 
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.TreeMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 import org.apache.tuscany.sca.Node;
@@ -20,14 +9,18 @@ import org.oasisopen.sca.NoSuchServiceException;
 
 import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.travelcatalog.TravelCatalogSearch;
-import com.tuscanyscatours.trip.impl.TripSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
-import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class TravelCatalogLauncher {
@@ -48,9 +41,24 @@ public class TravelCatalogLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("TravelCatalog", "oldVersion");
-//		nodeMgr.getDynamicDepManager("TravelCatalog").ondemandSetupIsDone();
-		CompLifecycleManager.getInstance("TravelCatalog").setNode(node);
+		ComponentObject travelCatalogCompObj = nodeMgr.getComponentObject("TravelCatalog");
+		CompLifecycleManagerImpl travelCatalogCompLifecycleManager = new CompLifecycleManagerImpl(travelCatalogCompObj);
+		nodeMgr.setTuscanyNode(node);
+		nodeMgr.setCompLifecycleManager("TravelCatalog", travelCatalogCompLifecycleManager);
+		TxLifecycleManager travelCatalogTxLifecycleMgr = new TxLifecycleManagerImpl(travelCatalogCompObj);
+		nodeMgr.setTxLifecycleManager("TravelCatalog", travelCatalogTxLifecycleMgr);
+		TxDepMonitor travelCatalogTxDepMonitor = new TxDepMonitorImpl(travelCatalogCompObj);
+		nodeMgr.setTxDepMonitor("TravelCatalog", travelCatalogTxDepMonitor);
+		
+		DynamicDepManager travelCatalogDepMgr = NodeManager.getInstance().getDynamicDepManager(travelCatalogCompObj.getIdentifier());
+		travelCatalogDepMgr.setTxLifecycleMgr(travelCatalogTxLifecycleMgr);
+		travelCatalogDepMgr.setCompLifeCycleMgr(travelCatalogCompLifecycleManager);
+		
+		nodeMgr.getOndemandSetupHelper("TravelCatalog");
+		UpdateManager travelCatalogUpdateMgr = nodeMgr.getUpdateManageer("TravelCatalog");
 		CommServerManager.getInstance().start("TravelCatalog");
+		ServerIoHandler travelCatalogServerIoHandler = CommServerManager.getInstance().getCommServer("TravelCatalog").getServerIOHandler();
+		travelCatalogServerIoHandler.registerUpdateManager(travelCatalogUpdateMgr);
 
 		// launch DepRecorder
 		DepRecorder depRecorder;
