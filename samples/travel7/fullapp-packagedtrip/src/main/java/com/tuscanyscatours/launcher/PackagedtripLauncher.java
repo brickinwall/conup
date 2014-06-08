@@ -12,9 +12,17 @@ import com.tuscanyscatours.common.TripLeg;
 import com.tuscanyscatours.trip.impl.TripSearch;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class PackagedtripLauncher {
@@ -37,10 +45,28 @@ public class PackagedtripLauncher {
 
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
-		nodeMgr.loadConupConf("TripPartner", "oldVersion");
-//		nodeMgr.getDynamicDepManager("TripPartner").ondemandSetupIsDone();
-		CompLifecycleManager.getInstance("TripPartner").setNode(node);
-		CommServerManager.getInstance().start("TripPartner");
+		String compIdentifier = "TripPartner";
+		nodeMgr.loadConupConf(compIdentifier, "oldVersion");
+		ComponentObject triPartnerCompObj = nodeMgr.getComponentObject(compIdentifier);
+		CompLifecycleManagerImpl triPartnerCompLifecycleManager = new CompLifecycleManagerImpl(triPartnerCompObj);
+		
+		nodeMgr.setTuscanyNode(node);
+		nodeMgr.setCompLifecycleManager(compIdentifier, triPartnerCompLifecycleManager);
+		TxLifecycleManager triPartnerTxLifecycleMgr = new TxLifecycleManagerImpl(triPartnerCompObj);
+		nodeMgr.setTxLifecycleManager(compIdentifier, triPartnerTxLifecycleMgr);
+		TxDepMonitor triPartnerTxDepMonitor = new TxDepMonitorImpl(triPartnerCompObj);
+		nodeMgr.setTxDepMonitor(compIdentifier, triPartnerTxDepMonitor);
+		
+		DynamicDepManager tripPartnerDepMgr = NodeManager.getInstance().getDynamicDepManager(triPartnerCompObj.getIdentifier());
+		tripPartnerDepMgr.setTxLifecycleMgr(triPartnerTxLifecycleMgr);
+		tripPartnerDepMgr.setCompLifeCycleMgr(triPartnerCompLifecycleManager);
+		
+		OndemandSetupHelper ondemandHelper = nodeMgr.getOndemandSetupHelper(compIdentifier);
+		
+		UpdateManager currencyConverterUpdateMgr = nodeMgr.getUpdateManageer(compIdentifier);
+		CommServerManager.getInstance().start(compIdentifier);
+		ServerIoHandler currencyConverterServerIoHandler = CommServerManager.getInstance().getCommServer(compIdentifier).getServerIOHandler();
+		currencyConverterServerIoHandler.registerUpdateManager(currencyConverterUpdateMgr);
 
 		// launch DepRecorder
 		DepRecorder depRecorder;

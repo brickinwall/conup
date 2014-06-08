@@ -15,9 +15,18 @@ import com.tuscanyscatours.shoppingcart.CartInitialize;
 import com.tuscanyscatours.shoppingcart.CartUpdates;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
-import cn.edu.nju.moon.conup.remote.services.impl.RemoteConfServiceImpl;
+import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.datamodel.RemoteConfigContext;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class ShoppingCartLauncher {
@@ -43,14 +52,48 @@ public class ShoppingCartLauncher {
 		NodeManager nodeMgr;
 		nodeMgr = NodeManager.getInstance();
 		nodeMgr.loadConupConf("ShoppingCart", "oldVersion");
-//		nodeMgr.getDynamicDepManager("ShoppingCart").ondemandSetupIsDone();
-		CompLifecycleManager.getInstance("ShoppingCart").setNode(node);
+		ComponentObject shoppingCartCompObj = nodeMgr.getComponentObject("ShoppingCart");
+		CompLifecycleManagerImpl shoppingCartCompLifecycleManager = new CompLifecycleManagerImpl(shoppingCartCompObj);
+
+		nodeMgr.setTuscanyNode(node);
+		nodeMgr.setCompLifecycleManager("ShoppingCart", shoppingCartCompLifecycleManager);
+		TxLifecycleManager shoppingCartTxLifecycleMgr = new TxLifecycleManagerImpl(shoppingCartCompObj);
+		nodeMgr.setTxLifecycleManager("ShoppingCart", shoppingCartTxLifecycleMgr);
+		
+		TxDepMonitor shoppingCartTxDepMonitor = new TxDepMonitorImpl(shoppingCartCompObj);
+		nodeMgr.setTxDepMonitor("ShoppingCart", shoppingCartTxDepMonitor);
+
+		DynamicDepManager shoppingcartDepMgr = NodeManager.getInstance().getDynamicDepManager(shoppingCartCompObj.getIdentifier());
+		shoppingcartDepMgr.setTxLifecycleMgr(shoppingCartTxLifecycleMgr);
+		shoppingcartDepMgr.setCompLifeCycleMgr(shoppingCartCompLifecycleManager);
+		nodeMgr.getOndemandSetupHelper("ShoppingCart");
+		
+		UpdateManager shoppingCartUpdateMgr = nodeMgr.getUpdateManageer("ShoppingCart");
 		CommServerManager.getInstance().start("ShoppingCart");
+		ServerIoHandler shoppingCartServerIoHandler = CommServerManager.getInstance().getCommServer("ShoppingCart").getServerIOHandler();
+		shoppingCartServerIoHandler.registerUpdateManager(shoppingCartUpdateMgr);
+		
 		
 		nodeMgr.loadConupConf("CartStore", "oldVersion");
-//		nodeMgr.getDynamicDepManager("CartStore").ondemandSetupIsDone();
-		CompLifecycleManager.getInstance("CartStore").setNode(node);
+		ComponentObject cartStoreCompObj = nodeMgr.getComponentObject("CartStore");
+		CompLifecycleManagerImpl cartStoreCompLifecycleManager = new CompLifecycleManagerImpl(cartStoreCompObj);
+
+		nodeMgr.setTuscanyNode(node);
+		nodeMgr.setCompLifecycleManager("CartStore", cartStoreCompLifecycleManager);
+		TxLifecycleManager cartStoreTxLifecycleMgr = new TxLifecycleManagerImpl(cartStoreCompObj);
+		nodeMgr.setTxLifecycleManager("CartStore", cartStoreTxLifecycleMgr);
+		TxDepMonitor cartStoreTxDepMonitor = new TxDepMonitorImpl(cartStoreCompObj);
+		nodeMgr.setTxDepMonitor("CartStore", cartStoreTxDepMonitor);
+		
+		DynamicDepManager cartStoreDepMgr = NodeManager.getInstance().getDynamicDepManager(cartStoreCompObj.getIdentifier());
+		cartStoreDepMgr.setTxLifecycleMgr(cartStoreTxLifecycleMgr);
+		cartStoreDepMgr.setCompLifeCycleMgr(cartStoreCompLifecycleManager);
+		
+		nodeMgr.getOndemandSetupHelper("CartStore");
+		UpdateManager cartStoreUpdateMgr = nodeMgr.getUpdateManageer("CartStore");
 		CommServerManager.getInstance().start("CartStore");
+		ServerIoHandler cartStoreServerIoHandler = CommServerManager.getInstance().getCommServer("CartStore").getServerIOHandler();
+		cartStoreServerIoHandler.registerUpdateManager(cartStoreUpdateMgr);
 
 		// launch DepRecorder
 		DepRecorder depRecorder;
@@ -102,22 +145,20 @@ public class ShoppingCartLauncher {
 			
 			@Override
 			public void run() {
-				RemoteConfServiceImpl rcs =  new RemoteConfServiceImpl();
-//				String targetIdentifier = "ShoppingCart";
-//				int port = 22307;
-//				String baseDir = "/home/rgc";
-//				String classFilePath = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
-//				String contributionUri = "fullapp-shoppingcart";
-//				String compsiteUri = "fullapp-shoppingcart.composite";
-//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+				RemoteConfigTool rcs =  new RemoteConfigTool();
+				String targetIdentifier = "ShoppingCart";
+				int port = 22307;
+				String baseDir = "/home/rgc";
+				String classFilePath = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
+				String contributionUri = "fullapp-shoppingcart";
+				String compsiteUri = "fullapp-shoppingcart.composite";
 				
-				String targetIdentifier1 = "CurrencyConverter";
-				int port1 = 22300;
-				String baseDir1 = "/home/rgc";
-				String classFilePath1 = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
-				String contributionUri1 = "fullapp-currency";
-				String compsiteUri1 = "fullapp-currency.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				String ip = "10.0.2.15";
+				String protocol = "CONSISTENCY";
+				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
+						targetIdentifier, protocol, baseDir, classFilePath,
+						contributionUri, null, compsiteUri);
+				rcs.update(rcc);
 				
 			}
 		});

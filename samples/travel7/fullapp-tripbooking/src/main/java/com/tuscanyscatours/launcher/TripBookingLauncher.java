@@ -7,8 +7,16 @@ import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.ext.lifecycle.CompLifecycleManager;
+import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
+import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
+import cn.edu.nju.moon.conup.ext.tx.manager.TxLifecycleManagerImpl;
+import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
+import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
+import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
+import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
+import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
 
 public class TripBookingLauncher {
@@ -30,9 +38,24 @@ public class TripBookingLauncher {
 		nodeMgr = NodeManager.getInstance();
 		
 		nodeMgr.loadConupConf("TripBooking", "oldVersion");
-//		nodeMgr.getDynamicDepManager("TripBooking").ondemandSetupIsDone();
-		CompLifecycleManager.getInstance("TripBooking").setNode(node);
+		ComponentObject tripBookingCompObj = nodeMgr.getComponentObject("TripBooking");
+		CompLifecycleManagerImpl tripBookingCompLifecycleManager = new CompLifecycleManagerImpl(tripBookingCompObj);
+		
+		nodeMgr.setCompLifecycleManager("TripBooking", tripBookingCompLifecycleManager);
+		TxLifecycleManager tripBookingTxLifecycleMgr = new TxLifecycleManagerImpl(tripBookingCompObj);
+		nodeMgr.setTxLifecycleManager("TripBooking", tripBookingTxLifecycleMgr);
+		TxDepMonitor tripBookingTxDepMonitor = new TxDepMonitorImpl(tripBookingCompObj);
+		nodeMgr.setTxDepMonitor("TripBooking", tripBookingTxDepMonitor);
+		
+		DynamicDepManager tripBookingDepMgr = NodeManager.getInstance().getDynamicDepManager(tripBookingCompObj.getIdentifier());
+		tripBookingDepMgr.setTxLifecycleMgr(tripBookingTxLifecycleMgr);
+		tripBookingDepMgr.setCompLifeCycleMgr(tripBookingCompLifecycleManager);
+		
+		nodeMgr.getOndemandSetupHelper("TripBooking");
+		UpdateManager tripBookingUpdateMgr = nodeMgr.getUpdateManageer("TripBooking");
 		CommServerManager.getInstance().start("TripBooking");
+		ServerIoHandler tripBookingServerIoHandler = CommServerManager.getInstance().getCommServer("TripBooking").getServerIOHandler();
+		tripBookingServerIoHandler.registerUpdateManager(tripBookingUpdateMgr);
 		
 		// launch DepRecorder
 		DepRecorder depRecorder;
