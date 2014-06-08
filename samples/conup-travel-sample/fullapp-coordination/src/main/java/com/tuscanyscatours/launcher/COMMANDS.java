@@ -14,12 +14,8 @@ public enum COMMANDS {
 	updateAt,
 	/** help of the commands */
 	help,
-	/** used to disruption experiment */
-	disruption,
-	/** used to timeliness experiment */
-	timeliness,
-	/** used to overhead experiment */
-	overhead,
+	/** disruption, timeliness and overhead experiments **/
+	DTO,
 	/** used to correctness experiment */
 	correctness,
 	/** get the execution recorder */

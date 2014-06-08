@@ -6,10 +6,10 @@ import it.unipr.ce.dsg.deus.core.InvalidParamsException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Timer;
@@ -22,9 +22,7 @@ import org.apache.tuscany.sca.Node;
 import org.apache.tuscany.sca.TuscanyRuntime;
 import org.apache.tuscany.sca.node.ContributionLocationHelper;
 
-
 import cn.edu.nju.conup.comm.api.manager.CommServerManager;
-import cn.edu.nju.moon.conup.comm.api.remote.RemoteConfigTool;
 import cn.edu.nju.moon.conup.comm.api.server.ServerIoHandler;
 import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
@@ -33,11 +31,10 @@ import cn.edu.nju.moon.conup.ext.utils.experiments.CallBack;
 import cn.edu.nju.moon.conup.ext.utils.experiments.CorrectnessExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DeviationExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
-import cn.edu.nju.moon.conup.ext.utils.experiments.OverheadExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExpSetting;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ExperimentOperation;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.ResponseTimeRecorder;
-import cn.edu.nju.moon.conup.ext.utils.experiments.model.TimelinessRecorder;
+import cn.edu.nju.moon.conup.ext.utils.experiments.model.RqstInfo;
 import cn.edu.nju.moon.conup.ext.utils.experiments.utils.ExpXMLUtil;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
@@ -154,10 +151,6 @@ public class CoordinationLauncher {
 		ExpSetting expSetting = xmlUtil.getExpSetting();
 		rqstInterval = expSetting.getRqstInterval();
 		final Scope scope = expSetting.getScope();
-		System.out.println("SCOPE:" + scope);
-		int nThreads = expSetting.getnThreads();
-		int threadId = expSetting.getThreadId();
-		int indepRun = expSetting.getIndepRun();
 		final String targetComp = expSetting.getTargetComp();	//target component for update
 		String ip = expSetting.getIpAddress();
 		
@@ -183,7 +176,6 @@ public class CoordinationLauncher {
 					break;
 				}
 				
-//				System.out.println("accessTimes: " + rqstInterval + " " + accessTimes);
 				CountDownLatch accessCountDown = new CountDownLatch(accessTimes);
 				for (int i = 0; i < accessTimes; i++) {
 					new CoordinationVisitorThread(node, accessCountDown).start();
@@ -196,7 +188,6 @@ public class CoordinationLauncher {
 				if( input.length == 3){
 					String targetComp1 = input[1].trim();
 					toVer = input[2].trim();
-//					System.out.println("update " + targetComp + " " + toVer);
 					TravelCompUpdate.update(targetComp1, toVer, scope);
 				} else{
 					System.out.println("Illegal parameters for 'update'");
@@ -221,258 +212,18 @@ public class CoordinationLauncher {
 				
 				CountDownLatch updateAtCountDown = new CountDownLatch(accessTimes);
 				for (int i = 0; i < accessTimes; i++) {
-					new CoordinationVisitorThread(node, 0 , i + 1, updateAtCountDown).start();
+					new CoordinationVisitorThread(node, updateAtCountDown, i + 1).start();
 					Thread.sleep(rqstInterval);
 					if(updatePoints.get(i) != null){
 						TravelCompUpdate.update(targetComp1, updatePoints.get(i), scope);
 					}
 				}
 				break;
-			case disruption:
-				
-				// make request arrival obey to poission process
-		    	Event event = null;
-		    	int seed = 123456789;
-		    	Properties params = new Properties();
-		    	float MeanArrival = rqstInterval;
-		    	params.setProperty("meanArrival", Float.toString(MeanArrival));
-		    	ArrayList<Event> refEvents = new ArrayList<Event>();
-		    	MyPoissonProcess mpp = new MyPoissonProcess("myPoissonProcess", params, null, refEvents);
-		    	Random random = new Random(seed);
-		    	mpp.setRandom(random);
-				
-				int warmUpTimes = 400;
-				CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
-				for (int i = 0; i < warmUpTimes; i++) {
-					new CoordinationVisitorThread(node, warmCountDown).start();
-					if(i == 300){
-						TravelCompUpdate.update(targetComp, scope);
-					}
-					if(i > 200)
-						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-					else	
-						Thread.sleep(200);
-				}
-				warmCountDown.await();
-				
-				Thread.sleep(3000);
-				
-				DisruptionExp disExp = DisruptionExp.getInstance();
-				final DisruptionExp anotherDisExp = disExp;
-				disExp.setUpdateIsDoneCallBack(new CallBack(){
-					@Override
-					public void callback(){
-						System.out.println("update finished " + new Date());
-						stopExp = true;
-					}
-				});
-				DeviationExp devExp = DeviationExp.getInstance();
-
-				for(int round = 0; round < indepRun; round++){
-					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-					System.out.println("-------------round " + round + "--------------");
-					
-					
-					TimerTask sendUpdateTask = new TimerTask(){
-						@Override
-						public void run(){
-							System.out.println("start send update command " + new Date());
-							anotherDisExp.setUpdateStartTime(System.nanoTime());
-							TravelCompUpdate.update(targetComp, scope);
-						}
-					};
-					Timer sendUpdateTimer = new Timer();
-					sendUpdateTimer.schedule(sendUpdateTask, 15000);
-					
-					TimerTask abortTask = new TimerTask(){
-
-						@Override
-						public void run() {
-							if(!stopExp){
-								System.out.println("excede 20s, stop to send request " + new Date());
-								stopExp = true;
-							}
-						}
-						
-					};
-					Timer abortTimer = new Timer();
-					abortTimer.schedule(abortTask, 25000);
-					
-					int threadsNum = 0;
-					while(!stopExp){
-						new CoordinationVisitorThread(node, threadsNum + 1, resTimeRec, "update").start();
-						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-						threadsNum ++;
-					}
-					
-					CountDownLatch updateCountDown = new CountDownLatch(100);
-					for(int j = threadsNum; j < threadsNum + 100; j++){
-						new CoordinationVisitorThread(node, updateCountDown, j + 1, resTimeRec, "update").start();
-						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-					}
-					
-					updateCountDown.await();
-					
-					Thread.sleep(3000);
-					
-					CountDownLatch normalCountDown = new CountDownLatch(threadsNum);
-					for (int i = 0; i < threadsNum + 100; i++) {
-						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-						Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
-					}
-					normalCountDown.await();
-					
-					Thread.sleep(1000);
-					
-					Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
-					Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
-					// write all normal, update response to file in devation folder
-					devExp.writeToFile(round, normalRes, updateRes);
-					
-					System.out.println("normalRes.size() ==" + normalRes.size() + " threadsNum:" + threadsNum);
-					System.out.println("updateRes.size() ==" + updateRes.size() + " threadsNum:" + threadsNum);
-					
-					if(algorithm.equals("TRANQUILLITY")){
-						int port = 0;
-						if(targetComp.equals("CurrencyConverter")){
-							port = 22300;
-						} else if(targetComp.equals("TripPartner")){
-							port = 22304;
-						} else if(targetComp.equals("HotelPartner")){
-							port = 22301;
-						}
-//						String updateEndTime = new RemoteConfigTool().getUpdateEndTime(ip, port, targetComp, "CONSISTENCY");
-						System.out.println("updateEndTime:" + DisruptionExp.getInstance().getUpdateEndTime() + " algorithm:" + algorithm);
-//						DisruptionExp.getInstance().setUpdateEndTime(Long.parseLong(updateEndTime));
-					}
-					Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
-					Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
-					int count = 0;
-					String data = null;
-					while(iter.hasNext()){
-						Entry<Integer, Double> entry = iter.next();
-						int curThreadId = entry.getKey();
-						Double resTime = entry.getValue();
-						if(count == 0)
-							data = round + "," + curThreadId + "," + normalRes.get(curThreadId) * 1e-6 + "," + resTime + "," + disExp.getTimelinessTime() + "\n";
-						else
-							data = round + "," + curThreadId + "," + normalRes.get(curThreadId) * 1e-6 + "," + resTime + "\n";
-						LOGGER.fine(data);
-						disExp.writeToFile(data);
-						count++;
-					}
-					
-					Thread.sleep(3500);
-					
-					// after one round running, reset flag
-					stopExp = false;
-				}
-				
-//				disExp.close();
-				break;
-			case timeliness:
-
-				warmUpTimes = 400;
-				warmCountDown = new CountDownLatch(warmUpTimes);
-				
-				// make request arrival as poission process
-		    	Event timelinessEvent = null;
-		    	int timelinessSeed = 123456789;
-		    	Properties timelinessParams = new Properties();
-		    	float timelinessMeanArrival = rqstInterval;
-		    	timelinessParams.setProperty("meanArrival", Float.toString(timelinessMeanArrival));
-		    	ArrayList<Event> timelinessRefEvents = new ArrayList<Event>();
-		    	MyPoissonProcess timelinessMpp = new MyPoissonProcess("myPoissonProcess", timelinessParams, null, timelinessRefEvents);
-		    	Random timelinessRandom = new Random(timelinessSeed);
-		    	timelinessMpp.setRandom(timelinessRandom);
-				
-				for (int i = 0; i < warmUpTimes; i++) {
-					new CoordinationVisitorThread(node, warmCountDown).start();
-					if(i == 300){
-						TravelCompUpdate.update(targetComp, scope);
-					}
-					if(i > 200)
-						Thread.sleep((long) timelinessMpp.getNextTriggeringTime(timelinessEvent, 0));
-					else	
-						Thread.sleep(200);
-				}
-				warmCountDown.await();
-				
-				Thread.sleep(3000);
-				timelinessRandom = new Random(timelinessSeed);
-				TimelinessRecorder timelinessRec = new TimelinessRecorder();
-				for(int round = 0; round < indepRun; round++){
-					CountDownLatch updateCountDown = new CountDownLatch(nThreads);
-					for (int i = 0; i < nThreads; i++) {
-						new CoordinationVisitorThread(node, updateCountDown, i + 1, timelinessRec).start();
-						if(i == threadId){
-							TravelCompUpdate.update(targetComp, scope);
-						}
-						Thread.sleep((long) timelinessMpp.getNextTriggeringTime(timelinessEvent, 0));
-					}
-					updateCountDown.await();
-					
-					Thread.sleep(2000);
-				}
-//				List<Double> allUpdateTime = timelinessRec.getAllUpdateCostTime();
-//				System.out.println(allUpdateTime);
-//				TimelinessExp.getInstance().writeToFile(allUpdateTime);
-				
-				break;
-			case overhead:
-				// make request arrival obey to poission process
-		    	Event overheadEvent = null;
-		    	int overheadSeed = 123456789;
-		    	Properties overheadParams = new Properties();
-		    	float overheadMeanArrival = rqstInterval;
-		    	overheadParams.setProperty("meanArrival", Float.toString(overheadMeanArrival));
-		    	ArrayList<Event> overheadRefEvents = new ArrayList<Event>();
-		    	MyPoissonProcess overheadMpp = new MyPoissonProcess("myPoissonProcess", overheadParams, null, overheadRefEvents);
-		    	Random overheadRandom = new Random(overheadSeed);
-		    	overheadMpp.setRandom(overheadRandom);
-				
-				warmUpTimes = 400;
-				warmCountDown = new CountDownLatch(warmUpTimes);
-				for (int i = 0; i < warmUpTimes; i++) {
-					new CoordinationVisitorThread(node, warmCountDown).start();
-					Thread.sleep((long) overheadMpp.getNextTriggeringTime(overheadEvent, 0));
-				}
-				warmCountDown.await();
-				
-				Thread.sleep(3000);
-				// reset random seed
-				overheadRandom = new Random(overheadSeed);
-				
-				OverheadExp overExp = OverheadExp.getInstance();
-				List<Double> tuscanyBaseLine = new ArrayList<Double>();
-				for(int round = 0; round < indepRun; round++){
-					ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
-
-					CountDownLatch normalCountDown = new CountDownLatch(nThreads);
-					for (int i = 0; i < nThreads; i++) {
-						new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
-						Thread.sleep((long) overheadMpp.getNextTriggeringTime(overheadEvent, 0));
-					}
-					normalCountDown.await();
-					//wait for all data store into collection
-					Thread.sleep(1000);
-					
-					tuscanyBaseLine.add(resTimeRec.getTotalNormalResTime());
-					Thread.sleep(2000);
-					// reset random seed
-					overheadRandom = new Random(overheadSeed);
-				}
-				String data = "";
-				for(int m = 0; m < tuscanyBaseLine.size(); m++){
-					data += tuscanyBaseLine.get(m) + "\n";
-				}
-						
-				overExp.writeToFile(data);
+			case DTO:
+				doDTOExp(node);
 				break;
 			case correctness:
-				
 				doCorrectnessExp(node, expSetting);
-				
 				break;
 			case ger:
 				String gerResult =TravelExpResultQuery.queryExpResult(targetComp, ExperimentOperation.GET_EXECUTION_RECORDER);
@@ -493,6 +244,161 @@ public class CoordinationLauncher {
 			
 		}//WHILE
 		
+	}
+	
+	private static void doDTOExp(Node node) throws InterruptedException, InvalidParamsException {
+    	ExpXMLUtil xmlUtil = new ExpXMLUtil();
+    	ExpSetting expSetting = xmlUtil.getExpSetting();
+    	
+    	// the interval between each request thread
+    	int rqstInterval = expSetting.getRqstInterval();
+    	int indepRun = expSetting.getIndepRun();
+    	final String targetComp = expSetting.getTargetComp();
+    	final String ipAddress = expSetting.getIpAddress();
+    	final Scope scope = expSetting.getScope();
+    	
+    	System.out.println("---------------------------------------------");
+    	System.out.println("targetComp:" + targetComp);
+    	System.out.println("ipAddress:" + ipAddress);
+    	System.out.println("scope:" + scope);
+    	System.out.println("rqstInterval:" + rqstInterval);
+    	System.out.println("---------------------------------------------");
+    	
+    	// make request arrival as poission process
+    	Event event = null;
+    	int seed = 123456789;
+    	Properties params = new Properties();
+    	float MeanArrival = rqstInterval;
+    	params.setProperty("meanArrival", Float.toString(MeanArrival));
+    	ArrayList<Event> refEvents = new ArrayList<Event>();
+    	MyPoissonProcess mpp = new MyPoissonProcess("myPoissonProcess", params, null, refEvents);
+    	Random random = new Random(seed);
+    	mpp.setRandom(random);
+    	
+		int warmUpTimes = 400;
+		CountDownLatch warmCountDown = new CountDownLatch(warmUpTimes);
+		for (int i = 0; i < warmUpTimes; i++) {
+			new CoordinationVisitorThread(node, warmCountDown).start();
+			if(i == 300){
+				TravelCompUpdate.update(targetComp, scope);
+			}
+			Thread.sleep(200);
+		}
+		warmCountDown.await();
+		
+		warmUpTimes = 200;
+		warmCountDown = new CountDownLatch(warmUpTimes);
+		for (int i = 0; i < warmUpTimes; i++) {
+			new CoordinationVisitorThread(node, warmCountDown).start();
+			if(i == 100){
+				TravelCompUpdate.update(targetComp, scope);
+			}
+			Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
+		}
+		warmCountDown.await();
+		
+		Thread.sleep(3000);
+		final DisruptionExp disExp = DisruptionExp.getInstance();
+		disExp.setUpdateIsDoneCallBack(new CallBack(){
+			@Override
+			public void callback(){
+				stopExp = true;
+			}
+		});
+		DeviationExp devExp = DeviationExp.getInstance();
+
+		for(int round = 0; round < indepRun; round++){
+			ResponseTimeRecorder resTimeRec = new ResponseTimeRecorder();
+			System.out.println("-------------round " + round + "--------------");
+			
+			TimerTask sendUpdateTask = new TimerTask(){
+				@Override
+				public void run(){
+					System.out.println("start to send update command " + new Date());
+					disExp.setUpdateStartTime(System.nanoTime());
+					TravelCompUpdate.update(targetComp, scope);
+				}
+			};
+			Timer sendUpdateTimer = new Timer();
+			sendUpdateTimer.schedule(sendUpdateTask, 15000);
+			
+			TimerTask abortTask = new TimerTask(){
+
+				@Override
+				public void run() {
+					if(!stopExp){
+						System.out.println("excede 20s, stop to send request " + new Date());
+						stopExp = true;
+					}
+				}
+				
+			};
+			Timer abortTimer = new Timer();
+			abortTimer.schedule(abortTask, 35000);
+			
+			int threadsNum = 0;
+			while(!stopExp){
+				new CoordinationVisitorThread(node, threadsNum + 1, resTimeRec, "update").start();
+				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
+				threadsNum ++;
+			}
+			
+			CountDownLatch updateCountDown = new CountDownLatch(100);
+			for(int j = threadsNum; j < threadsNum + 100; j++){
+				new CoordinationVisitorThread(node, updateCountDown, j + 1, resTimeRec, "update").start();
+				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
+			}
+			
+			updateCountDown.await();
+			
+			Thread.sleep(3000);
+			
+			CountDownLatch normalCountDown = new CountDownLatch(threadsNum + 100);
+			for (int i = 0; i < threadsNum + 100; i++) {
+				new CoordinationVisitorThread(node, normalCountDown, i + 1, resTimeRec, "normal").start();
+				Thread.sleep((long) mpp.getNextTriggeringTime(event, 0));
+			}
+			normalCountDown.await();
+			
+			
+			Thread.sleep(1000);
+			
+			Map<Integer, Long> normalRes = resTimeRec.getNormalRes();
+			Map<Integer, Long> updateRes = resTimeRec.getUpdateRes();
+			// write all normal, update response to file in devation folder
+			devExp.writeToFile(round, normalRes, updateRes);
+			
+			System.out.println("normalRes.size() ==" + normalRes.size() + " threadsNum:" + threadsNum);
+			System.out.println("updateRes.size() ==" + updateRes.size() + " threadsNum:" + threadsNum);
+			
+			Map<Integer, Double> disruptedTxsResTime = resTimeRec.getDisruptedTxResTime();
+			Iterator<Entry<Integer, Double>> iter = disruptedTxsResTime.entrySet().iterator();
+			int count = 0;
+			String data = null;
+			while(iter.hasNext()){
+				Entry<Integer, Double> entry = iter.next();
+				int curThreadId = entry.getKey();
+				Double resTime = entry.getValue();
+				if(count == 0)
+					data = round + "," + curThreadId + "," + normalRes.get(curThreadId) * 1e-6 + "," + resTime + "," + disExp.getTimelinessTime() + "\n";
+				else
+					data = round + "," + curThreadId + "," + normalRes.get(curThreadId) * 1e-6 + "," + resTime + "\n";
+				LOGGER.fine(data);
+				disExp.writeToFile(data);
+				count++;
+			}
+			if(round == 24)
+				Thread.sleep(6000);
+			else
+				Thread.sleep(3500);
+			
+			// after one round running, reset flag
+			stopExp = false;
+		}
+		
+		Thread.sleep(1000);
+		disExp.close();
+    	
 	}
 	
 	
@@ -625,14 +531,8 @@ public class CoordinationLauncher {
 
 	private static void printHelp(){
 		System.out.println();
-		System.out.println("experiment of disruption ");
-		System.out.println("	[usage] disruption\n");
-		
-		System.out.println("experiment of timeliness ");
-		System.out.println("	[usage] timeliness\n");
-		
-		System.out.println("experiment of overhead ");
-		System.out.println("	[usage] overhead\n");
+		System.out.println("experiment of disruption, timeliness and overhead ");
+		System.out.println("	[usage] DTO\n");
 		
 		System.out.println("experiment of correctness ");
 		System.out.println("	[usage] correctness\n");
