@@ -482,14 +482,8 @@ public class CoordinationLauncher {
 	
 	private static void printHelp(){
 		System.out.println();
-		System.out.println("experiment of disruption ");
-		System.out.println("	[usage] disruption\n");
-		
-		System.out.println("experiment of timeliness ");
-		System.out.println("	[usage] timeliness\n");
-		
-		System.out.println("experiment of overhead ");
-		System.out.println("	[usage] overhead\n");
+		System.out.println("experiment of disruption, timeliness and overhead ");
+		System.out.println("	[usage] DTO\n");
 		
 		System.out.println("experiment of correctness ");
 		System.out.println("	[usage] correctness\n");
