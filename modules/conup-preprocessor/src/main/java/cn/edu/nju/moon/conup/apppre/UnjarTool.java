@@ -90,6 +90,7 @@ public class UnjarTool {
 
 		}
 
+		@SuppressWarnings("resource")
 		JarFile jf = new JarFile(fileName);
 
 		for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {

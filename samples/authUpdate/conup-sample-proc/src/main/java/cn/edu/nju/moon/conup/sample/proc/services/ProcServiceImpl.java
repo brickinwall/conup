@@ -86,7 +86,7 @@ public class ProcServiceImpl implements ProcService {
 				String compsiteUri = "auth.composite";
 				
 				String protocol = "CONSISTENCY";
-				String ipAddress = "10.0.2.15";
+				String ipAddress = "172.16.154.128";
 				RemoteConfigContext rcc = new RemoteConfigContext(ipAddress,
 						port, targetIdentifier, protocol, baseDir,
 						classFilePath, contributionUri, null, compsiteUri);

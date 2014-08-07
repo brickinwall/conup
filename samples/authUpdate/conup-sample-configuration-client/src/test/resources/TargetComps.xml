@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <comps>
 	<comp enabled="yes">
-		<ipAddress>10.0.2.15</ipAddress>
+		<ipAddress>172.16.154.128</ipAddress>
 		<port>18082</port>
 		<targetComp>AuthComponent</targetComp>
 		<contributionUri>conup-sample-auth</contributionUri>
@@ -10,7 +10,7 @@
 		<baseDir>/home/conup</baseDir>
 	</comp>
 	<comp enabled="no">
-		<ipAddress>10.0.2.15</ipAddress>
+		<ipAddress>172.16.154.128</ipAddress>
 		<port>18082</port>
 		<targetComp>AuthComponent</targetComp>
 		<contributionUri>conup-sample-auth</contributionUri>
@@ -19,7 +19,7 @@
 		<baseDir>/home/conup</baseDir>
 	</comp>
 	<comp enabled="no">
-		<ipAddress>10.0.2.15</ipAddress>
+		<ipAddress>172.16.154.128</ipAddress>
 		<port>18082</port>
 		<targetComp>AuthComponent</targetComp>
 		<contributionUri>conup-sample-auth</contributionUri>
@@ -28,7 +28,7 @@
 		<baseDir>/home/conup</baseDir>
 	</comp>
 	<comp enabled="no">
-		<ipAddress>10.0.2.15</ipAddress>
+		<ipAddress>172.16.154.128</ipAddress>
 		<port>18082</port>
 		<targetComp>AuthComponent</targetComp>
 		<contributionUri>conup-sample-auth</contributionUri>

@@ -6,12 +6,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 
 public class ResponseTimeRecorder {
-	private static Logger LOGGER = Logger.getLogger(ResponseTimeRecorder.class.getName());
+//	private static Logger LOGGER = Logger.getLogger(ResponseTimeRecorder.class.getName());
 	private Map<Integer, Long> normalRes = new ConcurrentHashMap<Integer, Long>();
 	private Map<Integer, Long> updateRes = new ConcurrentHashMap<Integer, Long>();
 	private Set<RqstInfo> updateResInfos = new ConcurrentSkipListSet<RqstInfo>();

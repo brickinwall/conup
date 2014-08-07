@@ -1,26 +1,11 @@
 package cn.edu.nju.moon.conup.ext.ddm;
 
-import static org.junit.Assert.*;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListSet;
-
 import org.apache.tuscany.sca.Node;
-import org.apache.tuscany.sca.TuscanyRuntime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.edu.nju.moon.conup.ext.comp.manager.CompLifecycleManagerImpl;
-import cn.edu.nju.moon.conup.ext.test.BufferTestConvention;
 import cn.edu.nju.moon.conup.ext.tx.manager.TxDepMonitorImpl;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
-import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 
 public class LocalDynamicDependencesManagerTest {

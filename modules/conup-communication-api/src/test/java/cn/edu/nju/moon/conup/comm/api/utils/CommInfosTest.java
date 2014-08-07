@@ -47,7 +47,7 @@ public class CommInfosTest {
 //		String compIdentifier = "AuthComponent";
 		ComponentObject comObj = new ComponentObject(compIdentifier, "1.1",
 				ALGORITHM_TYPE, CONCURRENT_VERSION, staticDeps, null ,implType);
-//		comObj.setCompCommInfo(new CompCommInfo("AuthComponent", "10.0.2.15", 18080));
+//		comObj.setCompCommInfo(new CompCommInfo("AuthComponent", "172.16.154.128", 18080));
 		nodeMgr.addComponentObject(compIdentifier, comObj);
 		CompLifecycleManagerImpl compLifecycleMgr = new CompLifecycleManagerImpl(comObj);
 		nodeMgr.setCompLifecycleManager(compIdentifier, compLifecycleMgr);

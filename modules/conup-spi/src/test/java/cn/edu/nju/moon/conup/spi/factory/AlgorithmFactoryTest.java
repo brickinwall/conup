@@ -9,9 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cn.edu.nju.moon.conup.spi.datamodel.Algorithm;
-import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
-import cn.edu.nju.moon.conup.spi.test.SpiTestConvention;
 
 /**
  * @author Jiang Wang <jiang.wang88@gmail.com>
@@ -19,8 +17,10 @@ import cn.edu.nju.moon.conup.spi.test.SpiTestConvention;
  */
 public class AlgorithmFactoryTest {
 	/** represent quiescence algorithm */
+	@SuppressWarnings("unused")
 	private final String QUIESCENCE_ALGORITHM_TYPE = "QUIESCENCE_ALGORITHM";
 	/** represent tranquillity algorithm */
+	@SuppressWarnings("unused")
 	private final String TRANQUILLITY_ALGORITHM_TYPE = "TRANQUILLITY_ALGORITHM";
 	/** represent version-consistency algorithm */
 	private final String CONSISTENCY_ALGORITHMTYPE = "CONSISTENCY_ALGORITHM";

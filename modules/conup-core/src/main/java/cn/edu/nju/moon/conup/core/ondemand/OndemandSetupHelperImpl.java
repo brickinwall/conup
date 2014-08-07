@@ -19,7 +19,9 @@ public class OndemandSetupHelperImpl implements OndemandSetupHelper{
 	public static Logger getLogger() {
 		return LOGGER;
 	}
+	@SuppressWarnings("unused")
 	private CompLifeCycleManager compLifeCycleMgr = null;
+	@SuppressWarnings("unused")
 	private DynamicDepManager depMgr = null;
 	private OndemandSetup ondemandSetup = null;
 	private ComponentObject compObj;

@@ -25,30 +25,30 @@
     <component name="HotelPartner">
         <implementation.java class="com.tuscanyscatours.hotel.impl.HotelImpl"/>
         <service name="HotelSearch" requires="trace" policySets="traceBindingPolicySet">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelSearch" />
+			<tuscany:binding.jsonrpc uri="http://172.16.154.128:12301/HotelPartner/HotelSearch" />
         </service>
         <service name="HotelBook" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12301/HotelPartner/HotelBook" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12301/HotelPartner/HotelBook" />
         </service>
     </component>  
     
     <component name="FlightPartner">
         <implementation.java class="com.tuscanyscatours.flight.impl.FlightImpl"/>
         <service name="FlightSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightSearch" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12302/FlightPartner/FlightSearch" />
         </service>
         <service name="FlightBook" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12302/FlightPartner/FlightBook" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12302/FlightPartner/FlightBook" />
         </service>
     </component>
     
     <component name="CarPartner">
         <implementation.java class="com.tuscanyscatours.car.impl.CarImpl"/>
         <service name="CarSearch" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarSearch"/>
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12303/CarPartner/CarSearch"/>
         </service>
         <service name="CarBook" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12303/CarPartner/CarBook" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12303/CarPartner/CarBook" />
         </service>
     </component>
 

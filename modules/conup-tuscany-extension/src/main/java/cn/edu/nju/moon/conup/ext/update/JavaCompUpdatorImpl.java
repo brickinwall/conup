@@ -2,7 +2,6 @@ package cn.edu.nju.moon.conup.ext.update;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +50,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	private boolean isUpdated = false;
 	
+	@SuppressWarnings("rawtypes")
 	private ReflectiveInstanceFactory instanceFactory;
 	
 	public static Logger getLogger() {
@@ -59,8 +59,8 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 	
 	private Node tuscanyNode;
 	
-	public boolean initUpdator(String baseDir, String classPath,
-			String contributionURI, String compositeURI, String compIdentifier) {
+	@SuppressWarnings({ "unused", "rawtypes" })
+	public boolean initUpdator(String baseDir, String classPath, String contributionURI, String compositeURI, String compIdentifier) {
 		NodeManager nodeMgr = NodeManager.getInstance();
 		UpdateManager updateMgr = nodeMgr.getUpdateManageer(compIdentifier);
 		CompLifecycleManagerImpl compLcMgr = (CompLifecycleManagerImpl) nodeMgr.getCompLifecycleManager(compIdentifier);
@@ -96,8 +96,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 				this.javaImpl = javaImpl;
 				Class<?> originalClass = javaImpl.getJavaClass();
 
-				Class<?> newClass = loadClass(baseDir,
-						new String[] { classPath });
+				Class<?> newClass = loadClass(baseDir, new String[] { classPath });
 				DynamicUpdateContext updateCtx = updateMgr.getUpdateCtx();
 				if(updateCtx == null){
 					updateCtx = new POJODynamicUpdateContext();
@@ -126,6 +125,7 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 		return true;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public boolean executeUpdate(String compIdentifier) {
 //		CompLifecycleManagerImpl compLcMgr;
@@ -271,10 +271,12 @@ public class JavaCompUpdatorImpl implements ComponentUpdator {
 		return IMPL_TYPE;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public ReflectiveInstanceFactory getInstanceFactory() {
 		return instanceFactory;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void setInstanceFactory(ReflectiveInstanceFactory instanceFactory) {
 		this.instanceFactory = instanceFactory;
 	}

@@ -8,11 +8,9 @@ import java.util.logging.Logger;
 import cn.edu.nju.moon.conup.ext.update.UpdateFactory;
 import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
-import cn.edu.nju.moon.conup.spi.datamodel.BufferEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
 import cn.edu.nju.moon.conup.spi.datamodel.FreenessStrategy;
-import cn.edu.nju.moon.conup.spi.datamodel.InterceptorStub;
 import cn.edu.nju.moon.conup.spi.datamodel.MsgType;
 import cn.edu.nju.moon.conup.spi.datamodel.RequestObject;
 import cn.edu.nju.moon.conup.spi.datamodel.Scope;
@@ -133,8 +131,7 @@ public class UpdateManagerImpl implements UpdateManager {
 		compIdentifier = compObj.getIdentifier();
 		// if dynamic update is done, cleanup is needed
 		LOGGER.info("**** BeforeSetToNewVersion");
-		compUpdator.finalizeOld(compIdentifier, updateCtx.getOldVerClass(),
-				updateCtx.getNewVerClass(), UpdateFactory.createTransformer());
+		compUpdator.finalizeOld(compIdentifier, updateCtx.getOldVerClass(), updateCtx.getNewVerClass(), UpdateFactory.createTransformer());
 		compUpdator.initNewVersion(compIdentifier, updateCtx.getNewVerClass());
 		compUpdator.cleanUpdate(compIdentifier);
 		compUpdator = UpdateFactory.createCompUpdator(compObj.getImplType());

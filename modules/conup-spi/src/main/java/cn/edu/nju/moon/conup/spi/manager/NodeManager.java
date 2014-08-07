@@ -135,6 +135,7 @@ public class NodeManager{
 				throw new ConupMgrNotFoundException("TxDepMonitor not found.");
 			} else{
 				txDepMonitor = txDepMonitors.get(compObj);
+				@SuppressWarnings("unused")
 				DynamicDepManager depMgr = depMgrs.get(compObj);
 				OndemandSetupHelper ondemandHelpler = ondemandHelpers.get(compObj);
 				ondemandHelpler.getOndemand().setTxDepRegistry(txDepMonitor.getTxDepRegistry());
@@ -370,19 +371,19 @@ public class NodeManager{
 		}
 	}
 
-	@Deprecated
-	private boolean setUpdateManager(String compIdentifier,	UpdateManager updateMgr) {
-		ComponentObject compObj;
-		synchronized (this) {
-			compObj = getComponentObject(compIdentifier);
-			if (!updateMgrs.containsKey(compObj)) {
-				updateMgrs.put(compObj, updateMgr);
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
+//	@Deprecated
+//	private boolean setUpdateManager(String compIdentifier,	UpdateManager updateMgr) {
+//		ComponentObject compObj;
+//		synchronized (this) {
+//			compObj = getComponentObject(compIdentifier);
+//			if (!updateMgrs.containsKey(compObj)) {
+//				updateMgrs.put(compObj, updateMgr);
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		}
+//	}
 	
 	public InterceptorStub getInterceptorStub(String compIdentifier){
 		ComponentObject compObj;

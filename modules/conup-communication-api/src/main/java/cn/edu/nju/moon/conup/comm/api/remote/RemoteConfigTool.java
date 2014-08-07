@@ -60,7 +60,7 @@ public class RemoteConfigTool {
 	public static void main(String[] args) {
 		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "AuthComponent";
-		String ip = "10.0.2.15";
+		String ip = "172.16.154.128";
 		int port = 18082;
 		String baseDir = "/home/nju/deploy/sample/update";
 		String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
@@ -78,7 +78,8 @@ public class RemoteConfigTool {
 	 * affected request.
 	 */
 	public void notifyUpdateIsDone(String targetComp){
-		MsgType msgType = MsgType.EXPERIMENT_MSG;
+//		MsgType msgType = MsgType.EXPERIMENT_MSG;
+		
 //		String payload = UpdateContextPayloadCreator.createPayload(
 //				UpdateOperationType.NOTIFY_UPDATE_IS_DONE_EXP);
 //		
@@ -89,10 +90,7 @@ public class RemoteConfigTool {
 
 	public void update(RemoteConfigContext rcc) {
 		MsgType msgType = MsgType.REMOTE_CONF_MSG;
-		
-		
-		String payload = UpdateContextPayloadCreator.createPayload(
-				UpdateOperationType.UPDATE, rcc);
+		String payload = UpdateContextPayloadCreator.createPayload(UpdateOperationType.UPDATE, rcc);
 		SynCommClient asynCommClient = new SynCommClient();
 		asynCommClient.sendMsg(rcc.getIp(), rcc.getPort(), null, rcc.getTargetIdentifier(), rcc.getProtocol(),
 				msgType, payload);

@@ -500,7 +500,7 @@ public class CoordinationLauncher {
 			} else if(targetComp.equals("HotelPartner")){
 				port = 22301;
 			}
-//			String updateEndTime = new RemoteConfServiceImpl().getUpdateEndTime("10.0.2.15", port, targetComp, "CONSISTENCY");
+//			String updateEndTime = new RemoteConfServiceImpl().getUpdateEndTime("172.16.154.128", port, targetComp, "CONSISTENCY");
 //			System.out.println("updateEndTime:" + updateEndTime + " algorithm: TRANQUILLITY");
 //			DisruptionExp.getInstance().setUpdateEndTime(Long.parseLong(updateEndTime));
 			System.out.println("updateEndTime:" + DisruptionExp.getInstance().getUpdateEndTime() + " updateStartTime:" + DisruptionExp.getInstance().getUpdateStartTime());

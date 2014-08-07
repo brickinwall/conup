@@ -97,6 +97,7 @@ public class TuscanyProgramAnalyzerTest {
 //			LOGGER.fine("Need not to analyze!");
 //		}
 //	}
+	@SuppressWarnings("static-access")
 	@Test
 	public void TestBranchWithoutService() {
 		String conupTx = "Lcn/edu/nju/moon/conup/spi/datamodel/ConupTransaction;";

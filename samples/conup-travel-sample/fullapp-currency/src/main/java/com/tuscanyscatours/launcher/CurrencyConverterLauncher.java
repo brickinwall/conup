@@ -111,7 +111,7 @@ public class CurrencyConverterLauncher {
 //				String classFilePath = "com.tuscanyscatours.currencyconverter.impl.CurrencyConverterImpl";
 //				String contributionUri = "fullapp-currency";
 //				String compsiteUri = "fullapp-currency.composite";
-//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+//				rcs.update("172.16.154.128", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 //				
 //			}
 //		});

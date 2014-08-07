@@ -4,7 +4,7 @@ import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 
 //	<indepRun>200</indepRun>
 //	<targetComp>CurrencyConverter</targetComp>
-//	<ipAddress>10.0.2.15</ipAddress>
+//	<ipAddress>172.16.154.128</ipAddress>
 public class ExpSetting {
 	private int indepRun;
 	private int rqstInterval;

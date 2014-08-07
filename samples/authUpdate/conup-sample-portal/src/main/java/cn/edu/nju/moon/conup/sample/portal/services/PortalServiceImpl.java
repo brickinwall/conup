@@ -91,7 +91,7 @@ public class PortalServiceImpl implements PortalService {
 				String compsiteUri = "auth.composite";
 				
 				String protocol = "CONSISTENCY";
-				String ipAddress = "10.0.2.15";
+				String ipAddress = "172.16.154.128";
 				RemoteConfigContext rcc = new RemoteConfigContext(ipAddress,
 						port, targetIdentifier, protocol, baseDir,
 						classFilePath, contributionUri, null, compsiteUri);
@@ -108,7 +108,7 @@ public class PortalServiceImpl implements PortalService {
 		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "AuthComponent";
 		int port = 18082;
-		rcs.ondemand("10.0.2.15", port, targetIdentifier, "CONSISTENCY", null);
+		rcs.ondemand("172.16.154.128", port, targetIdentifier, "CONSISTENCY", null);
 		//TRANQUILLITY
 		//CONSISTENCY
 	}
