@@ -105,6 +105,7 @@ public class EJBProgramAnalyzer {
 
 			reader = new BufferedReader(new FileReader(file));
 			String tempString = null;
+			@SuppressWarnings("unused")
 			int line = 1;
 
 			while ((tempString = reader.readLine()) != null) {

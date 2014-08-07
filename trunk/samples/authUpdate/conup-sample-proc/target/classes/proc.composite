@@ -11,15 +11,15 @@
 			<implementation.java class="cn.edu.nju.moon.conup.sample.proc.services.ProcServiceImpl" />
 			
 			<service name="ProcService" requires="trace" policySets="traceBindingPolicySet">
-				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8083/ProcComponent/ProcService" />
+				<tuscany:binding.jsonrpc uri="http://172.16.154.128:8083/ProcComponent/ProcService" />
 			</service>
 			
 			<reference name="db" requires="trace" policySets="traceBindingPolicySet">
-				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8081/DBComponent/DBService" />
+				<tuscany:binding.jsonrpc uri="http://172.16.154.128:8081/DBComponent/DBService" />
 			</reference>
 			
 			<reference name="verify" requires="trace" policySets="traceBindingPolicySet">
-				<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/VerificationService" />
+				<tuscany:binding.jsonrpc uri="http://172.16.154.128:8082/AuthComponent/VerificationService" />
 			</reference>
 		</component>
 

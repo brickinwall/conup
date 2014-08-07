@@ -16,8 +16,6 @@ import org.apache.tuscany.sca.policy.PolicyExpression;
 import org.apache.tuscany.sca.policy.PolicySet;
 import org.apache.tuscany.sca.policy.PolicySubject;
 
-import cn.edu.nju.moon.conup.spi.utils.DepRecorder;
-
 
 public class TracePolicyBuilder implements PolicyBuilder<TracePolicy> {
 	private static Logger LOGGER = Logger.getLogger(TracePolicyBuilder.class.getName());

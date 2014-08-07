@@ -16,7 +16,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
+//import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -66,8 +66,8 @@ public class MethodAnalyzer {
 	/**
 	 * Use for EJB application
 	 */
-	@Deprecated
-	private Hashtable<String, String> ejball = new Hashtable<String, String>();
+//	@Deprecated
+//	private Hashtable<String, String> ejball = new Hashtable<String, String>();
 	/**
 	 * Invoke component service firstly. Note: can not use Set, because
 	 * methodInsNode don't implement comparable
@@ -220,6 +220,7 @@ public class MethodAnalyzer {
 	 * @param name
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public LocalVariableNode findVariableLabel(MethodNode mn,String name){
 		for(LocalVariableNode lvn : ((List<LocalVariableNode>) mn.localVariables)){
 			if(lvn.name.equals(name)){
@@ -237,6 +238,7 @@ public class MethodAnalyzer {
 	 * @param conupTx
 	 *            the transaction or method name to be analyze
 	 */
+	@SuppressWarnings("unchecked")
 	public void methodTransform(ClassNode cn, MethodNode mn, String conupTx) {		
 		if (isTransaction(mn, conupTx)) {
 			LOGGER.fine("Begin analyze method:" + mn.name);
@@ -567,6 +569,7 @@ public class MethodAnalyzer {
 				"cn/edu/nju/moon/conup/ext/ddm/LocalDynamicDependencesManager",
 				"trigger", "(Ljava/lang/String;Ljava/lang/String;)V"));
 		insns.insertBefore(insns.getFirst(), trigstart);
+		@SuppressWarnings("unchecked")
 		Iterator<AbstractInsnNode> i = insns.iterator();
 		while(i.hasNext()){
 			AbstractInsnNode node = i.next();
@@ -758,6 +761,7 @@ public class MethodAnalyzer {
 	public boolean isTransaction(MethodNode mn, String annotationDesc) {
 
 		if (mn.visibleAnnotations != null) {
+			@SuppressWarnings("unchecked")
 			Iterator<AnnotationNode> i = mn.visibleAnnotations.iterator();
 			while (i.hasNext()) {
 				AnnotationNode an = i.next();
@@ -774,28 +778,28 @@ public class MethodAnalyzer {
 	 * 
 	 * @param cn
 	 */
-	@Deprecated
-	public void setEjbs(ClassNode cn) {
-
-		for (FieldNode fn : (List<FieldNode>) cn.fields) {
-			if (fn.visibleAnnotations != null) {
-				Iterator<AnnotationNode> fi = fn.visibleAnnotations.iterator();
-				while (fi.hasNext()) {
-					AnnotationNode fa = fi.next();
-					// System.out.println(fa.values);
-					if (fa.desc.contains("AEjb") || fa.desc.contains("Ejb")) {
-						// String ejb =
-						// fa.values.get(1).toString().split("/")[0];
-						String ejb = fn.desc.substring(1, fn.desc.length() - 1);
-						;
-						// System.out.println(ejb+"-"+fn.name);
-						ejball.put(ejb, (String) fn.name);
-						// System.out.println(ejb+"-"+fn.value);
-					}
-				}
-			}
-		}
-	}
+//	@Deprecated
+//	public void setEjbs(ClassNode cn) {
+//
+//		for (FieldNode fn : (List<FieldNode>) cn.fields) {
+//			if (fn.visibleAnnotations != null) {
+//				Iterator<AnnotationNode> fi = fn.visibleAnnotations.iterator();
+//				while (fi.hasNext()) {
+//					AnnotationNode fa = fi.next();
+//					// System.out.println(fa.values);
+//					if (fa.desc.contains("AEjb") || fa.desc.contains("Ejb")) {
+//						// String ejb =
+//						// fa.values.get(1).toString().split("/")[0];
+//						String ejb = fn.desc.substring(1, fn.desc.length() - 1);
+//						;
+//						// System.out.println(ejb+"-"+fn.name);
+//						ejball.put(ejb, (String) fn.name);
+//						// System.out.println(ejb+"-"+fn.value);
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	/**
 	 * Extract CFG of the method
@@ -1074,6 +1078,7 @@ public class MethodAnalyzer {
 	/**
 	 * get future and past components in every state of DDA
 	 */
+	@SuppressWarnings("unchecked")
 	public List<String>[] ExtractMetaData() {
 
 		int states_count = stateMachine.getStatesCount();

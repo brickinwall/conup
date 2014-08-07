@@ -16,19 +16,19 @@
 	<component name="VisitorComponent">
 		<implementation.java class="cn.edu.nju.moon.conup.sample.visitor.services.VisitorServiceImpl" />
 		<service name="VisitorService" >
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8088/VisitorComponent/VisitorService" />
+			<tuscany:binding.jsonrpc uri="http://172.16.154.128:8088/VisitorComponent/VisitorService" />
 		</service>
 		
 		<reference name="portalService">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8084/PortalComponent/PortalService" />
+			<tuscany:binding.jsonrpc uri="http://172.16.154.128:8084/PortalComponent/PortalService" />
 		</reference>
 		
 		<reference name="tokenService">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/TokenService" />
+			<tuscany:binding.jsonrpc uri="http://172.16.154.128:8082/AuthComponent/TokenService" />
 		</reference>
 		
 		<reference name="verficationService">
-			<tuscany:binding.jsonrpc uri="http://10.0.2.15:8082/AuthComponent/VerificationService" />
+			<tuscany:binding.jsonrpc uri="http://172.16.154.128:8082/AuthComponent/VerificationService" />
 		</reference>
 	</component>
 </composite>

@@ -14,13 +14,13 @@ public class OndemandDynDepSetupServiceImpl implements
 		OndemandDynDepSetupService {
 
 	public String synPost(String srcIdentifier, String targetIdentifier, String proctocol, MsgType msgType, String payload) {
-		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
+		// ipAndPort,example-->"ip:172.16.154.128,port:18080"
 		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
 		return new SynCommClient().sendMsg(ipAndPort.getIp(), ipAndPort.getPort(), srcIdentifier, targetIdentifier, proctocol, msgType, payload);
 	}
 
 	public void asynPost(String srcIdentifier, String targetIdentifier, String proctocol, MsgType msgType, String payload) {
-		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
+		// ipAndPort,example-->"ip:172.16.154.128,port:18080"
 		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
 		new AsynCommClient().sendMsg(ipAndPort.getIp(), ipAndPort.getPort(),srcIdentifier, targetIdentifier, proctocol, msgType, payload);
 	}

@@ -81,7 +81,7 @@ public class RemoteConfServiceImpl {
 		String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 		String contributionUri = "conup-sample-auth";
 		String compsiteUri = "auth.composite";
-		rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir,
+		rcs.update("172.16.154.128", port, targetIdentifier, "CONSISTENCY", baseDir,
 				classFilePath, contributionUri, compsiteUri, null);
 		// rcs.ondemand("localhost", port , targetIdentifier, "CONSISTENCY");
 	}

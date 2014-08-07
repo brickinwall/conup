@@ -1,15 +1,8 @@
 package cn.edu.nju.moon.conup.core.ondemand;
 
-import static org.junit.Assert.*;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
-import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 /**

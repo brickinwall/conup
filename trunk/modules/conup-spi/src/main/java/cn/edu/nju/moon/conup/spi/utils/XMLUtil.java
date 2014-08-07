@@ -61,8 +61,8 @@ public class XMLUtil {
 	public String getAlgorithmConf() {
 		Element configuration = root.getChild("configuration");
 		Element algorithms = configuration.getChild("algorithms");
-		List allALgs = algorithms.getChildren();
-		Iterator algsIter = allALgs.iterator();
+		List<?> allALgs = algorithms.getChildren();
+		Iterator<?> algsIter = allALgs.iterator();
 		String algConf = null;
 		while(algsIter.hasNext()){
 			Element alg = (Element) algsIter.next();
@@ -79,8 +79,8 @@ public class XMLUtil {
 	public String getFreenessStrategy() {
 		Element configuration = root.getChild("configuration");
 		Element freenessStrategies = configuration.getChild("freenessStrategies");
-		List allStrategies = freenessStrategies.getChildren();
-		Iterator strategiesIter = allStrategies.iterator();
+		List<?> allStrategies = freenessStrategies.getChildren();
+		Iterator<?> strategiesIter = allStrategies.iterator();
 		String strategyConf = null;
 		while(strategiesIter.hasNext()){
 			Element strategy = (Element) strategiesIter.next();
@@ -98,14 +98,14 @@ public class XMLUtil {
 		Set<String> parentComp = new HashSet<String>();
 		try {
 			Element staticDeps = root.getChild("staticDeps");
-			List compList = staticDeps.getChildren("component");
-			Iterator iterator = compList.iterator();
+			List<?> compList = staticDeps.getChildren("component");
+			Iterator<?> iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
 				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
-					List parentList = comp.getChildren("parent");
-					Iterator parentListIter = parentList.iterator();
+					List<?> parentList = comp.getChildren("parent");
+					Iterator<?> parentListIter = parentList.iterator();
 					while (parentListIter.hasNext()) {
 						parentComp.add(((Element) parentListIter.next()).getValue().trim());
 					}
@@ -121,14 +121,14 @@ public class XMLUtil {
 		Set<String> childrenComps = new ConcurrentSkipListSet<String>();
 		try {
 			Element staticDeps = root.getChild("staticDeps");
-			List compList = staticDeps.getChildren("component");
-			Iterator iterator = compList.iterator();
+			List<?> compList = staticDeps.getChildren("component");
+			Iterator<?> iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
 				String compName = comp.getAttributeValue("name").trim();
 				if (compName.equals(compIdentifier)) {
-					List childrenList = comp.getChildren("child");
-					Iterator childListIter = childrenList.iterator();
+					List<?> childrenList = comp.getChildren("child");
+					Iterator<?> childListIter = childrenList.iterator();
 					while (childListIter.hasNext()) {
 						childrenComps.add(((Element) childListIter.next()).getValue().trim());
 					}
@@ -145,8 +145,8 @@ public class XMLUtil {
 		
 		try {
 			Element staticDeps = root.getChild("staticDeps");
-			List compList = staticDeps.getChildren("component");
-			Iterator iterator = compList.iterator();
+			List<?> compList = staticDeps.getChildren("component");
+			Iterator<?> iterator = compList.iterator();
 			while (iterator.hasNext()) {
 				Element comp = (Element) iterator.next();
 				String compName = comp.getAttributeValue("name").trim();
@@ -161,6 +161,7 @@ public class XMLUtil {
 	private String getDistributionEnvPath(){
 		Properties prpt = System.getProperties();
 		Enumeration<?> enm = prpt.propertyNames(); 
+		@SuppressWarnings("unused")
 		String OS = null;
 		while (enm.hasMoreElements()) {
 			String key = (String) enm.nextElement();

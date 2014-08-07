@@ -8,6 +8,7 @@ import org.apache.tuscany.sca.provider.PolicyProviderFactory;
 import org.apache.tuscany.sca.runtime.RuntimeComponent;
 
 public class TracePolicyProviderFactory implements PolicyProviderFactory<TracePolicy> {
+	@SuppressWarnings("unused")
 	private ExtensionPointRegistry registry;
 	
     public TracePolicyProviderFactory(ExtensionPointRegistry registry) {

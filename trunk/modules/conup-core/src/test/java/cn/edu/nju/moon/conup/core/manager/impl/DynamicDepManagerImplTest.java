@@ -1,16 +1,10 @@
 package cn.edu.nju.moon.conup.core.manager.impl;
 
-import static org.junit.Assert.*;
-import java.util.HashSet;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
 import cn.edu.nju.moon.conup.core.algorithm.VersionConsistencyImpl;
-import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.datamodel.TransactionContext;
-import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 
 public class DynamicDepManagerImplTest {

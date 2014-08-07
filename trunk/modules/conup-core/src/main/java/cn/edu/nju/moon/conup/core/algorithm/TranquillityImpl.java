@@ -35,7 +35,6 @@ import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 
@@ -102,7 +101,6 @@ public class TranquillityImpl implements Algorithm {
 		
 		assert operationType != null;
 		
-		Printer printer = new Printer();
 		
 		switch(operationType){
 		case NOTIFY_FUTURE_CREATE:
@@ -155,6 +153,8 @@ public class TranquillityImpl implements Algorithm {
 			break;
 		case NOTIFY_REMOTE_UPDATE_DONE:
 			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp, depMgr);
+			break;
+		default:
 			break;
 		}
 		return manageDepResult;

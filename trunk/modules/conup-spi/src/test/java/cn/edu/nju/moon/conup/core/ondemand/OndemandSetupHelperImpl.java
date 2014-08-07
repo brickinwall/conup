@@ -5,7 +5,6 @@ import cn.edu.nju.moon.conup.spi.datamodel.Scope;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetup;
 import cn.edu.nju.moon.conup.spi.helper.OndemandSetupHelper;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-import cn.edu.nju.moon.conup.spi.pubsub.Subject;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 /**

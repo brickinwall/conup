@@ -1,8 +1,5 @@
 package cn.edu.nju.moon.conup.ext.tx.manager;
 
-import static org.junit.Assert.*;
-
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.tuscany.sca.Node;
@@ -69,6 +66,7 @@ public class TxDepMonitorTest {
 		node.stop();
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testNotifyTxEventTypeString() throws ContributionReadException, ValidationException, ActivationException {
 		String hostCompName = "AuthComponent";

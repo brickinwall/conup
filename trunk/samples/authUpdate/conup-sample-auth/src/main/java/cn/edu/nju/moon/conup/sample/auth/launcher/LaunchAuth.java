@@ -118,7 +118,7 @@ public class LaunchAuth {
 				String contributionUri = "conup-sample-auth";
 				String compsiteUri = "auth.composite";
 				
-				String ip = "10.0.2.15";
+				String ip = "172.16.154.128";
 				String protocol = "CONSISTENCY";
 				RemoteConfigContext rcc = new RemoteConfigContext(ip, port, targetIdentifier, protocol, baseDir, classFilePath, contributionUri, null, compsiteUri);
 				rcs.update(rcc);

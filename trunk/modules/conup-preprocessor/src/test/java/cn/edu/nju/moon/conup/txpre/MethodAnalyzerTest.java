@@ -166,6 +166,7 @@ public class MethodAnalyzerTest {
 			mark[i] = 0;
 		}
 		methodAnalyzer.recognizeState(0, 0, txmn.instructions,srcNum);
+		@SuppressWarnings("unused")
 		int insnsNum = txmn.instructions.size();
 		methodAnalyzer.getFirstRequestService(0, txmn.instructions, -1,mark);
 		assertEquals(1,methodAnalyzer.getRunInf().size());		

@@ -26,16 +26,16 @@
     <component name="Payment">
         <implementation.java class="com.tuscanyscatours.payment.impl.PaymentImpl" />
         <service name="Payment" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12310/Payment/Payment" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12310/Payment/Payment" />
         </service>
         <reference name="customerRegistry" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12311/CustomerRegistry/CustomerRegistry" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12311/CustomerRegistry/CustomerRegistry" />
         </reference>
         <reference name="creditCardPayment" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/CreditCardPayment/CreditCardPayment" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12313/CreditCardPayment/CreditCardPayment" />
         </reference>
         <reference name="emailGateway" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12312/EmailGateway/EmailGateway" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12312/EmailGateway/EmailGateway" />
         </reference>
         <property name="transactionFee">0.02</property>
     </component>
@@ -43,21 +43,21 @@
     <component name="CustomerRegistry">
         <implementation.java class="com.tuscanyscatours.customer.impl.CustomerRegistryImpl" />
         <service name="CustomerRegistry" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12311/CustomerRegistry/CustomerRegistry" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12311/CustomerRegistry/CustomerRegistry" />
         </service>
     </component>
             
     <component name="EmailGateway">
         <implementation.java class="com.tuscanyscatours.emailgateway.impl.EmailGatewayImpl" />
         <service name="EmailGateway" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12312/EmailGateway/EmailGateway" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12312/EmailGateway/EmailGateway" />
         </service>
     </component>
     
     <component name="CreditCardPayment">
         <implementation.java class="com.tuscanyscatours.creditcard.impl.CreditCardPaymentImpl" />
         <service name="CreditCardPayment" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/CreditCardPayment/CreditCardPayment" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12313/CreditCardPayment/CreditCardPayment" />
         </service>
     </component>
     

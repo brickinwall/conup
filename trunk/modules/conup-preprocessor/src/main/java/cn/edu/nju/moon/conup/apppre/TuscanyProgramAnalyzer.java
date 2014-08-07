@@ -347,7 +347,7 @@ public class TuscanyProgramAnalyzer {
 			targetProjs.add("authUpdate/conup-sample-portal");
 			targetProjs.add("authUpdate/conup-sample-proc");
 			
-			String baseDir = "/home/artemis/Documents/conup/samples/";
+			String baseDir = "/home/wang/Documents/conup/samples/";
 			for(String projLoc : targetProjs){
 				projLoc = baseDir + projLoc + "/target/classes";
 				analyse.analyzeApplication(projLoc, "");

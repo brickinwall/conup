@@ -18,6 +18,7 @@ import cn.edu.nju.moon.conup.spi.test.SpiTestConvention;
  *
  */
 public class ManagerFactoryTest {
+	@SuppressWarnings("unused")
 	private ComponentObject compObj;
 	
 	@BeforeClass

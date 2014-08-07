@@ -112,7 +112,7 @@ public class CommServerManager {
 	 * address and port
 	 * 
 	 * @param targetCompIdentifier
-	 * @return target component's ip address and port: "ip:10.0.2.15,port:18080";
+	 * @return target component's ip address and port: "ip:172.16.154.128,port:18080";
 	 */
 	public static CompCommAddress getInfos(String srcComp, String targetComp) {
 
@@ -128,7 +128,7 @@ public class CommServerManager {
 					String bindingURI = ep.getBinding().getURI();
 					assert bindingURI != null;
 					if (bindingURI.startsWith("http://")) {
-						// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
+						// ex:deployedUri=http://172.16.154.128:8081/DBComponent/DBService/
 						String[] infos = bindingURI.split(":");
 						String ip = infos[1].substring(2);
 						int port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;
@@ -166,7 +166,7 @@ public class CommServerManager {
 				&& !compRefName.contains(epServiceName)) {
 				String deployURI = ep.getDeployedURI();
 				if (deployURI.startsWith("http://")) {
-					// ex:deployedUri=http://10.0.2.15:8081/DBComponent/DBService/
+					// ex:deployedUri=http://172.16.154.128:8081/DBComponent/DBService/
 					String[] infos = deployURI.split(":");
 					ip = infos[1].substring(2);
 					port = Integer.parseInt(infos[2].substring(0, infos[2].indexOf("/"))) + 10000;

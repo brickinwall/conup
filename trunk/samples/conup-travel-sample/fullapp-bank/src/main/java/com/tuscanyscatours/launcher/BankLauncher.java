@@ -74,7 +74,7 @@ public class BankLauncher {
 				String classFilePath1 = "com.tuscanyscatours.bank.impl.BankImpl";
 				String contributionUri1 = "fullapp-bank";
 				String compsiteUri1 = "bank.composite";
-				rcs.update("10.0.2.15", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
+				rcs.update("172.16.154.128", port1, targetIdentifier1, "CONSISTENCY", baseDir1, classFilePath1, contributionUri1, compsiteUri1);
 			}
 		});
 		

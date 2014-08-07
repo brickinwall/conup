@@ -161,7 +161,7 @@ public class BespoketripLauncher {
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
 
-				String ip = "10.0.2.15";
+				String ip = "172.16.154.128";
 				String protocol = "CONSISTENCY";
 				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
 						targetIdentifier, protocol, baseDir, classFilePath,

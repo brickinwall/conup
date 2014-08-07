@@ -2,7 +2,6 @@ package cn.edu.nju.moon.conup.spi.update.impl;
 
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
-import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 
 public class CompLifeCycleManagerImpl implements CompLifeCycleManager {

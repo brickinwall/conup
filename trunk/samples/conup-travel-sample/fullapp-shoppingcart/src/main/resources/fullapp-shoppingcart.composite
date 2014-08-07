@@ -30,28 +30,28 @@
     <component name="ShoppingCart">
         <implementation.java class="com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl"/>
         <service name="CartInitialize" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartInitialize" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12307/ShoppingCart/CartInitialize" />
         </service>
         <service name="CartUpdates" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartUpdates" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12307/ShoppingCart/CartUpdates" />
         </service>
         <service name="CartCheckout" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12307/ShoppingCart/CartCheckout" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12307/ShoppingCart/CartCheckout" />
         </service>
         
         <reference name="cartStore" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12308/CartStore/CartStore" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12308/CartStore/CartStore" />
         </reference>
         
         <reference name="payment" requires="trace" policySets="traceBindingPolicySet">
-            <tuscany:binding.jsonrpc uri="http://10.0.2.15:12310/Payment/Payment" />
+            <tuscany:binding.jsonrpc uri="http://172.16.154.128:12310/Payment/Payment" />
         </reference>
     </component>
     
     <component name="CartStore">
         <implementation.java class="com.tuscanyscatours.shoppingcart.impl.CartStoreImpl"/>
         <service name="CartStore" requires="trace" policySets="traceBindingPolicySet">
-        	<tuscany:binding.jsonrpc uri="http://10.0.2.15:12308/CartStore/CartStore" />
+        	<tuscany:binding.jsonrpc uri="http://172.16.154.128:12308/CartStore/CartStore" />
         </service>
     </component>
 	

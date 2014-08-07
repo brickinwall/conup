@@ -21,7 +21,7 @@ public class UpdateXmlUtilTest {
 	public void testGetTargetComp() {
 		try {
 			TargetComp targetComp = updateXmlUtil.getTargetComp();
-			assertEquals("10.0.2.15", targetComp.getIpAddress());
+			assertEquals("172.16.154.128", targetComp.getIpAddress());
 			assertEquals(18082, targetComp.getPort());
 			assertEquals("AuthComponent", targetComp.getTargetCompIdentifier());
 			assertEquals("conup-sample-auth", targetComp.getContributionUri());

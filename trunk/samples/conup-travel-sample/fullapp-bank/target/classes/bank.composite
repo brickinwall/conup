@@ -26,7 +26,7 @@
     <component name="Bank">
     	<implementation.java class="com.tuscanyscatours.bank.impl.BankImpl" />
     	<service name="Bank" requires="trace" policySets="traceBindingPolicySet">
-    		<tuscany:binding.jsonrpc uri="http://10.0.2.15:12313/Bank/Bank" />
+    		<tuscany:binding.jsonrpc uri="http://172.16.154.128:12313/Bank/Bank" />
     	</service>
     </component>
     

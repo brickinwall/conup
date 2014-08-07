@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.ClassNode;
  *  */
 public class TryCatch implements Opcodes{
 
+	@SuppressWarnings("unused")
 	private void generateClass(ClassVisitor cv) {		
 		FieldVisitor fv;
 		MethodVisitor mv;

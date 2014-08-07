@@ -35,8 +35,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
 //        LOGGER.fine(classname);
         sb.append(File.separator + classname); 
         File classF = new File(sb.toString()); 
-        cls = instantiateClass(name,new FileInputStream(classF),
-            classF.length()); 
+        cls = instantiateClass(name, new FileInputStream(classF), classF.length()); 
         return cls; 
     }   		
 
@@ -47,8 +46,7 @@ public class DynamicUpdateClassLoader extends ClassLoader {
         return defineClass(name,raw,0,raw.length); 
     } 
     
-	protected Class<?> loadClass(String name, boolean resolve) 
-            throws ClassNotFoundException { 
+	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException { 
         Class<?> cls = null; 
         cls = findLoadedClass(name); 
         if(!this.dynaclazns.contains(name) && cls == null){
@@ -87,10 +85,11 @@ public class DynamicUpdateClassLoader extends ClassLoader {
 	          baos.write(ch);  
 	        }
 	        data = baos.toByteArray();  
+			fis.close();
 	      } catch (IOException e) {  
 	        e.printStackTrace();  
 	      }
-		
+
 	    result = defineClass(name, data, 0, data.length);
 		return result;
 	}

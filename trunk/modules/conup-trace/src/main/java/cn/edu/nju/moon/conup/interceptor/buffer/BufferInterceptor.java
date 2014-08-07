@@ -24,7 +24,6 @@ import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxLifecycleManager;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 /**
  * BufferInterceptor is used to block message during the ondemand-setup, achieve
  * free and update
@@ -40,6 +39,7 @@ public class BufferInterceptor extends Interceptor {
 
 	private PolicySubject subject;
 	private String phase;
+	@SuppressWarnings("unused")
 	private TxLifecycleManager txLifecycleMgr;
 	private UpdateManager updateMgr;
 	private CompLifeCycleManager compLifeCycleMgr = null;

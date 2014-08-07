@@ -92,7 +92,7 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //				String classFilePath = "cn.edu.nju.moon.conup.sample.auth.services.AuthServiceImpl";
 //				String contributionUri = "conup-sample-auth";
 //				String compsiteUri = "auth.composite";
-//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+//				rcs.update("172.16.154.128", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 //				
 //			}
 //		});
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements TokenService, VerificationService {
 //		RemoteConfServiceImpl rcs = new RemoteConfServiceImpl();
 //		String targetIdentifier = "AuthComponent";
 //		int port = 18082;
-//		rcs.ondemand("10.0.2.15", port, targetIdentifier, "TRANQUILLITY");
+//		rcs.ondemand("172.16.154.128", port, targetIdentifier, "TRANQUILLITY");
 //		//TRANQUILLITY
 //		//CONSISTENCY
 //	}

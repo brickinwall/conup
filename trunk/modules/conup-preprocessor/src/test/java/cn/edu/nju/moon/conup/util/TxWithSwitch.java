@@ -1,11 +1,5 @@
 package cn.edu.nju.moon.conup.util;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
-import org.junit.Test;
-
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 

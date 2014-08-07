@@ -32,5 +32,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/home/wang/Documents/conup/modules/conup-core/target/conup-core-0.9.6-DU-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/wang/Documents/conup/modules/conup-tuscany-extension/target/conup-tuscany-extension-0.9.6-DU-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -2,7 +2,6 @@ package cn.edu.nju.moon.conup.ext.comp.manager;
 
 import java.util.logging.Logger;
 
-import cn.edu.nju.moon.conup.ext.utils.experiments.DisruptionExp;
 import cn.edu.nju.moon.conup.ext.utils.experiments.model.PerformanceRecorder;
 import cn.edu.nju.moon.conup.spi.datamodel.CompStatus;
 import cn.edu.nju.moon.conup.spi.datamodel.ComponentObject;
@@ -15,7 +14,7 @@ import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayload;
 import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadResolver;
 
 /**
- * CompLifecycleManager: manage the component's lifecyle 
+ * CompLifecycleManager: manage the component's lifecycle 
  * @author Guochao Ren<rgc.nju.cs@gmail.com>
  * @version Created time: Jul 28, 2013 10:56:13 PM
  */

@@ -26,13 +26,11 @@ import cn.edu.nju.moon.conup.spi.datamodel.TxDepRegistry;
 import cn.edu.nju.moon.conup.spi.datamodel.TxEventType;
 import cn.edu.nju.moon.conup.spi.datamodel.UpdateOperationType;
 import cn.edu.nju.moon.conup.spi.manager.DynamicDepManager;
-//import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.manager.NodeManager;
 import cn.edu.nju.moon.conup.spi.tx.TxDepMonitor;
 import cn.edu.nju.moon.conup.spi.update.CompLifeCycleManager;
 import cn.edu.nju.moon.conup.spi.update.UpdateManager;
 import cn.edu.nju.moon.conup.spi.utils.DepOperationType;
-import cn.edu.nju.moon.conup.spi.utils.Printer;
 import cn.edu.nju.moon.conup.spi.utils.UpdateContextPayloadCreator;
 
 /**
@@ -100,7 +98,6 @@ public class VersionConsistencyImpl implements Algorithm {
 		
 		assert operationType != null;
 		
-		Printer printer = new Printer();
 		
 		switch(operationType){
 		case NOTIFY_FUTURE_CREATE:
@@ -159,6 +156,8 @@ public class VersionConsistencyImpl implements Algorithm {
 			break;
 		case NOTIFY_REMOTE_UPDATE_DONE:
 			manageDepResult = doNotifyRemoteUpdateDone(srcComp, targetComp, depMgr);
+			break;
+		default:
 			break;
 		}
 		return manageDepResult;
@@ -516,8 +515,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @param rootTx
 	 * @return
 	 */
-	private boolean doNotifySubTxEnd(String srcComp, String targetComp,
-			String rootTx, String parentTx, String subTx,
+	private boolean doNotifySubTxEnd(String srcComp, String targetComp, String rootTx, String parentTx, String subTx,
 			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTx + " rootTx:" + rootTx);
 		
@@ -525,8 +523,7 @@ public class VersionConsistencyImpl implements Algorithm {
 		synchronized (ondemandSyncMonitor) {
 			//maintain tx
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
-			TransactionContext txCtx;
-			txCtx = allTxs.get(parentTx);
+			TransactionContext txCtx = allTxs.get(parentTx);
 			if(txCtx == null) {
 				System.out.println(srcComp + "-->" + targetComp + " subTx:" + subTx + " parentTx:" + parentTx);
 			}
@@ -566,16 +563,14 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @param subTxID
 	 * @return
 	 */
-	private boolean doAckSubTxInit(String srcComp, String targetComp,
-			String rootTx, String parentTxID, String subTxID,
+	private boolean doAckSubTxInit(String srcComp, String targetComp, String rootTx, String parentTxID, String subTxID,
 			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr) {
 		LOGGER.fine(srcComp + "-->" + targetComp + " subTx:" + subTxID + " rootTx:" + rootTx);
 		
 		Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 		synchronized (ondemandSyncMonitor) {
 			Map<String, TransactionContext> allTxs = depMgr.getTxs();
-			TransactionContext txCtx;
-			txCtx = allTxs.get(parentTxID);
+			TransactionContext txCtx = allTxs.get(parentTxID);
 			assert(txCtx!=null);
 			Map<String, String> subTxHostComps = txCtx.getSubTxHostComps();
 			Map<String, TxEventType> subTxStatuses = txCtx.getSubTxStatuses();
@@ -650,8 +645,7 @@ public class VersionConsistencyImpl implements Algorithm {
 	 * @param subTxID
 	 * @return
 	 */
-	private boolean removeFutureEdges(String currentComp, String rootTx,
-			String currentTxID, String subTxID, DynamicDepManager depMgr) {
+	private boolean removeFutureEdges(String currentComp, String rootTx, String currentTxID, String subTxID, DynamicDepManager depMgr) {
 		DependenceRegistry outDepRegistry = ((DynamicDepManagerImpl)depMgr).getOutDepRegistry();
 		DependenceRegistry inDepRegistry = ((DynamicDepManagerImpl)depMgr).getInDepRegistry();
 		Set<Dependence> outFutureDeps = outDepRegistry.getDependencesViaType(FUTURE_DEP);
@@ -1053,35 +1047,27 @@ public class VersionConsistencyImpl implements Algorithm {
 	}
 
 	@Override
-	public boolean notifySubTxStatus(TxEventType subTxStatus,
-			InvocationContext invocationCtx,
-			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,
-			String proxyRootTxId) {
+	public boolean notifySubTxStatus(TxEventType subTxStatus, InvocationContext invocationCtx,
+			CompLifeCycleManager compLifeCycleMgr, DynamicDepManager depMgr,String proxyRootTxId) {
 		String parentTx = invocationCtx.getParentTx();
 		String subTx = invocationCtx.getSubTx();
 		String subComp = invocationCtx.getSubComp();
 		String rootTx = invocationCtx.getRootTx();
 		String curComp = invocationCtx.getParentComp();
 		if (subTxStatus.equals(TxEventType.TransactionStart)) {
-
-			Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject()
-					.getOndemandSyncMonitor();
+			Object ondemandSyncMonitor = compLifeCycleMgr.getCompObject().getOndemandSyncMonitor();
 			synchronized (ondemandSyncMonitor) {
 				Map<String, TransactionContext> allTxs = depMgr.getTxs();
-				TransactionContext txCtx;
-				txCtx = allTxs.get(parentTx);
+				TransactionContext txCtx = allTxs.get(parentTx);
 				assert (txCtx != null);
 				Map<String, String> subTxHostComps = txCtx.getSubTxHostComps();
-				Map<String, TxEventType> subTxStatuses = txCtx
-						.getSubTxStatuses();
+				Map<String, TxEventType> subTxStatuses = txCtx.getSubTxStatuses();
 				subTxHostComps.put(subTx, subComp);
 				subTxStatuses.put(subTx, TxEventType.TransactionStart);
-
 			}
 			return true;
 		} else if (subTxStatus.equals(TxEventType.TransactionEnd))
-			return doNotifySubTxEnd(subComp, curComp, proxyRootTxId, parentTx, subTx,
-					compLifeCycleMgr, depMgr);
+			return doNotifySubTxEnd(subComp, curComp, proxyRootTxId, parentTx, subTx, compLifeCycleMgr, depMgr);
 		else {
 			LOGGER.warning("unexpected sub transaction status: " + subTxStatus
 					+ " for rootTx " + rootTx);

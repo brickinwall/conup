@@ -133,7 +133,7 @@ public interface DynamicDepManager{
 //	public boolean notifySubTxStatus(TxEventType subTxStatus, String subComp, String curComp, String rootTx, String parentTx, String subTx);
 	
 	/**
-	 * when ondmenad is done, we need to notify algorithm to start to work
+	 * when ondemand is done, we need to notify algorithm to start to work
 	 */
 	public void ondemandSetupIsDone();
 	

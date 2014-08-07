@@ -14,7 +14,7 @@ import org.apache.tuscany.sca.assembly.Endpoint;
 import org.apache.tuscany.sca.assembly.EndpointReference;
 import org.apache.tuscany.sca.assembly.Implementation;
 import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentReferenceImpl;
-import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentServiceImpl;
+//import org.apache.tuscany.sca.core.assembly.impl.RuntimeComponentServiceImpl;
 import org.apache.tuscany.sca.core.assembly.impl.RuntimeEndpointImpl;
 import org.apache.tuscany.sca.interfacedef.Operation;
 import org.apache.tuscany.sca.invocation.Invoker;
@@ -49,8 +49,8 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	
 	private Invoker next;
 	private Operation operation;
-	private List<TracePolicy> policies;
 	private PolicySubject subject;
+	@SuppressWarnings("unused")
 	private String context;
 	private String phase;
 	private TxInterceptor txInterceptor;
@@ -66,7 +66,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 			Operation operation, List<TracePolicy> policies, String phase) {
 		super();
 		this.operation = operation;
-		this.policies = policies;
 		this.subject = subject;
 		this.phase = phase;
 		this.context = getContext();
@@ -199,10 +198,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 	 * @return msg
 	 */
 	private Message attachEndedTxToResAtRefernecePolicy(Message msg) {
-		String currentTx = null;
 		String hostComp = null;
-		String rootTx = null;
-		String subTx = null;
 		String subComp = null;
 		
 		Map<String, Object> msgHeaders = msg.getHeaders();
@@ -213,9 +209,9 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 
 		hostComp = getComponent().getName();
-		currentTx = invocationCtx.getParentTx();
-		rootTx = invocationCtx.getRootTx();
-		subTx = invocationCtx.getSubTx();
+		invocationCtx.getParentTx();
+		invocationCtx.getRootTx();
+		invocationCtx.getSubTx();
 		subComp = invocationCtx.getSubComp();
 		assert hostComp != null;
 		assert hostComp.equals(invocationCtx.getParentComp());
@@ -265,6 +261,7 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isCallback(Message msg){
 		boolean isCallback = false;
 		Endpoint endpoint = msg.getTo();
@@ -307,7 +304,6 @@ public class TracePolicyInterceptor implements PhasedInterceptor {
 //			}
 			
 			for (ComponentService compService : getComponent().getServices()) {
-				RuntimeComponentServiceImpl rtCompService = (RuntimeComponentServiceImpl) compService;
 				if (compService.getCallback() == null
 						|| compService.getCallback().getBindings() == null) {
 					continue;

@@ -18,7 +18,7 @@ public class DepNotifyServiceImpl implements DepNotifyService{
 	
 	public String synPost(String srcIdentifier, String targetIdentifier,
 			String proctocol, MsgType msgType, String payload) {
-		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
+		// ipAndPort,example-->"ip:172.16.154.128,port:18080"
 //		if(payload.contains("NOTIFY_REMOTE_UPDATE_DONE")){
 //			LOGGER.warning("src:" + srcIdentifier + " target:"
 //					+ targetIdentifier + " payload:" + payload);
@@ -29,7 +29,7 @@ public class DepNotifyServiceImpl implements DepNotifyService{
 
 	public void asynPost(String srcIdentifier, String targetIdentifier,
 			String proctocol, MsgType msgType, String payload) {
-		// ipAndPort,example-->"ip:10.0.2.15,port:18080"
+		// ipAndPort,example-->"ip:172.16.154.128,port:18080"
 		CompCommAddress ipAndPort = CommServerManager.getInfos(srcIdentifier, targetIdentifier);
 		if(targetIdentifier.equals("Coordination") && ipAndPort == null) {
 			LOGGER.info("In current domain, Coordination component does not exist.");

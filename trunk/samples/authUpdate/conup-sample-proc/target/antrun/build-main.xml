@@ -2,13 +2,13 @@
 <project name="maven-antrun-" default="main"  >
 <target name="main">
   <tempfile property="temp.file"/>
-  <echo message="proc" file="${temp.file}"/>
+  <echo message="auth-update/proc" file="${temp.file}"/>
   <replace token="." file="${temp.file}" value="/"/>
   <loadfile property="module.path" srcfile="${temp.file}"/>
   <delete file="${temp.file}"/>
   <delete dir="target/module"/>
   <property name="module.dir" value="samples/${module.path}/"/>
-  <copy file="target/conup-sample-proc-0.9.1-DU-SNAPSHOT.jar" tofile="/home/valerio/conup-0.9.0-DU/distribution/conup-0.9.0-DU/${module.dir}/conup-sample-proc.jar"/>
-  <echo>Module proc has been created in the	TUSCANY_HOME/samples directory.</echo>
+  <copy file="target/conup-sample-proc-0.9.6-DU-SNAPSHOT.jar" tofile="/home/wang/Documents/conup/distribution/conup-0.9.0-DU/${module.dir}/conup-sample-proc.jar"/>
+  <echo>Module auth-update/proc has been created in the	TUSCANY_HOME/samples directory.</echo>
 </target>
 </project>

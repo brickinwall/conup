@@ -1,7 +1,5 @@
 package cn.edu.nju.moon.conup.ext.lifecycle;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -107,6 +105,7 @@ public class CompLifecycleManagerTest {
 		node.stop();
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	public void testStop() {
 		String contributionURI = "sample-helloworld";

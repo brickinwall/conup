@@ -74,6 +74,7 @@ public class ExpXMLUtil {
 		return tuscanyHome;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ExpSetting getExpSetting() {
 		ExpSetting expSetting = new ExpSetting();
 		// Element experiment = root.getChild("experiment");
@@ -154,6 +155,7 @@ public class ExpXMLUtil {
 		return expSetting;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public String getAlgorithmConf() {
 		Element configuration = conupRoot.getChild("configuration");
 		Element algorithms = configuration.getChild("algorithms");
@@ -172,6 +174,7 @@ public class ExpXMLUtil {
 		return algConf;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public String getFreenessStrategy() {
 		Element configuration = conupRoot.getChild("configuration");
 		Element freenessStrategies = configuration
@@ -196,6 +199,7 @@ public class ExpXMLUtil {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	public String getDistributionEnvPath() {
 		Properties prpt = System.getProperties();
 		Enumeration<?> enm = prpt.propertyNames();

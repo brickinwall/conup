@@ -55,7 +55,7 @@ public class TravelExpResultQuery {
 		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "ShoppingCart";
 		int port = 22307;
-		String ip = "10.0.2.15";
+		String ip = "172.16.154.128";
 		result = rcs.getExecutionRecorder(ip, port, targetIdentifier, "CONSISTENCY");
 		return result;
 	}
@@ -65,7 +65,7 @@ public class TravelExpResultQuery {
 		RemoteConfigTool rcs = new RemoteConfigTool();
 		String targetIdentifier = "TripPartner";
 		int port = 22304;
-		String ip = "10.0.2.15";
+		String ip = "172.16.154.128";
 		result = rcs.getExecutionRecorder(ip, port, targetIdentifier, "CONSISTENCY");
 		return result;
 	}

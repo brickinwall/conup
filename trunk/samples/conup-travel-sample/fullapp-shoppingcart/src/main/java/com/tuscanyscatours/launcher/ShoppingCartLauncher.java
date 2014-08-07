@@ -158,7 +158,7 @@ public class ShoppingCartLauncher {
 //				String classFilePath = "com.tuscanyscatours.shoppingcart.impl.ShoppingCartImpl";
 //				String contributionUri = "fullapp-shoppingcart";
 //				String compsiteUri = "fullapp-shoppingcart.composite";
-//				rcs.update("10.0.2.15", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
+//				rcs.update("172.16.154.128", port, targetIdentifier, "CONSISTENCY", baseDir, classFilePath, contributionUri, compsiteUri);
 				
 				String targetIdentifier = "CurrencyConverter";
 				int port = 22300;
@@ -167,7 +167,7 @@ public class ShoppingCartLauncher {
 				String contributionUri = "fullapp-currency";
 				String compsiteUri = "fullapp-currency.composite";
 				
-				String ip = "10.0.2.15";
+				String ip = "172.16.154.128";
 				String protocol = "CONSISTENCY";
 				RemoteConfigContext rcc = new RemoteConfigContext(ip, port,
 						targetIdentifier, protocol, baseDir, classFilePath,
